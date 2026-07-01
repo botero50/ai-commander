@@ -333,7 +333,7 @@ describe('OpenRAMissionAgent', () => {
       const metricsJson = agent.formatMetrics(true);
       expect(typeof metricsJson).toBe('string');
       const parsed = JSON.parse(metricsJson);
-      expect(parsed.ticksExecuted).toBeDefined();
+      expect(parsed.totalTicks).toBeDefined();
       expect(parsed.commandsExecuted).toBeDefined();
     });
 
@@ -384,7 +384,7 @@ describe('OpenRAMissionAgent', () => {
       const snapshotJson = agent.formatSnapshot(true);
       expect(typeof snapshotJson).toBe('string');
       const parsed = JSON.parse(snapshotJson);
-      expect(parsed.metadata).toBeDefined();
+      expect(parsed.missionId).toBeDefined();
     });
   });
 
