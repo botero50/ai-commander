@@ -363,7 +363,7 @@ describe('OpenRA Production Validation', () => {
       await agent.shutdown();
 
       const trace = agent.getTrace();
-      const observationEvents = trace.events.filter(e => e.eventType.includes('Tick'));
+      const observationEvents = trace.events.filter(e => e.eventType.includes('tick'));
 
       // Should have multiple observation events
       expect(observationEvents.length).toBeGreaterThan(0);
