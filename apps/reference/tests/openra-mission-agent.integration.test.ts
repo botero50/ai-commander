@@ -115,7 +115,7 @@ describe('OpenRAMissionAgent', () => {
 
       const metrics = agent.getMetrics();
       expect(metrics).toBeDefined();
-      expect(metrics?.ticksExecuted).toBeGreaterThan(0);
+      expect(metrics?.totalTicks).toBeGreaterThan(0);
     });
 
     it('completes mission with different target coordinates', async () => {
@@ -126,7 +126,7 @@ describe('OpenRAMissionAgent', () => {
       await agent.shutdown();
 
       const metrics = agent.getMetrics();
-      expect(metrics?.ticksExecuted).toBeGreaterThan(0);
+      expect(metrics?.totalTicks).toBeGreaterThan(0);
     });
 
     it('handles mission timeout gracefully', async () => {
@@ -175,9 +175,9 @@ describe('OpenRAMissionAgent', () => {
       const metrics1 = await runMission();
       const metrics2 = await runMission();
 
-      expect(metrics1?.ticksExecuted).toBe(metrics2?.ticksExecuted);
-      expect(metrics1?.commandsExecuted).toBe(metrics2?.commandsExecuted);
-      expect(metrics1?.decisionsExecuted).toBe(metrics2?.decisionsExecuted);
+      expect(metrics1?.totalTicks).toBe(metrics2?.totalTicks);
+      expect(metrics1?.successfulCommands).toBe(metrics2?.successfulCommands);
+      expect(metrics1?.decisionsSelected).toBe(metrics2?.decisionsSelected);
     });
 
     it('produces consistent metrics across multiple runs', async () => {
@@ -193,8 +193,8 @@ describe('OpenRAMissionAgent', () => {
       // All metrics should be identical
       const first = results[0];
       for (let i = 1; i < results.length; i++) {
-        expect(results[i]?.ticksExecuted).toBe(first?.ticksExecuted);
-        expect(results[i]?.commandsExecuted).toBe(first?.commandsExecuted);
+        expect(results[i]?.totalTicks).toBe(first?.totalTicks);
+        expect(results[i]?.successfulCommands).toBe(first?.successfulCommands);
       }
     });
   });
@@ -208,7 +208,7 @@ describe('OpenRAMissionAgent', () => {
       await agent.shutdown();
 
       const trace = agent.getTrace();
-      const planEvents = trace.events.filter(e => e.type === 'PlanGenerated');
+      const planEvents = trace.events.filter(e => e.eventType === 'plan_generated');
       expect(planEvents.length).toBeGreaterThan(0);
     });
 
@@ -220,7 +220,7 @@ describe('OpenRAMissionAgent', () => {
       await agent.shutdown();
 
       const trace = agent.getTrace();
-      const decisionEvents = trace.events.filter(e => e.type === 'DecisionSelected');
+      const decisionEvents = trace.events.filter(e => e.eventType === 'decision_selected');
       expect(decisionEvents.length).toBeGreaterThan(0);
     });
 
@@ -232,7 +232,7 @@ describe('OpenRAMissionAgent', () => {
       await agent.shutdown();
 
       const metrics = agent.getMetrics();
-      expect(metrics?.commandsExecuted).toBeGreaterThan(0);
+      expect(metrics?.successfulCommands).toBeGreaterThan(0);
     });
 
     it('generates correct plan structure', async () => {
@@ -243,7 +243,7 @@ describe('OpenRAMissionAgent', () => {
       await agent.shutdown();
 
       const trace = agent.getTrace();
-      const planEvents = trace.events.filter(e => e.type === 'PlanGenerated');
+      const planEvents = trace.events.filter(e => e.eventType === 'plan_generated');
       expect(planEvents.length).toBeGreaterThan(0);
 
       // Plan should have steps (at least x and y movement)
@@ -263,12 +263,12 @@ describe('OpenRAMissionAgent', () => {
       await agent.shutdown();
 
       const trace = agent.getTrace();
-      const eventTypes = trace.events.map(e => e.type);
+      const eventTypes = trace.events.map(e => e.eventType);
 
       // Check for required events
-      expect(eventTypes).toContain('MissionStarted');
-      expect(eventTypes).toContain('MissionInitialized');
-      expect(eventTypes).toContain('MissionCompleted');
+      expect(eventTypes).toContain('mission_started');
+      expect(eventTypes).toContain('mission_initialized');
+      expect(eventTypes).toContain('mission_completed');
     });
 
     it('produces valid trace formatting', async () => {
@@ -306,7 +306,7 @@ describe('OpenRAMissionAgent', () => {
 
       const metrics = agent.getMetrics();
       expect(metrics).toBeDefined();
-      expect(metrics?.ticksExecuted).toBeGreaterThan(0);
+      expect(metrics?.totalTicks).toBeGreaterThan(0);
       expect(metrics?.decisionsExecuted).toBeGreaterThanOrEqual(0);
       expect(metrics?.commandsExecuted).toBeGreaterThanOrEqual(0);
     });
@@ -416,13 +416,13 @@ describe('OpenRAMissionAgent', () => {
       await agent.shutdown();
 
       const trace = agent.getTrace();
-      const eventTypes = trace.events.map(e => e.type);
+      const eventTypes = trace.events.map(e => e.eventType);
 
       // Verify all components were exercised
-      expect(eventTypes).toContain('PlannerInvoked');
-      expect(eventTypes).toContain('PlanGenerated');
-      expect(eventTypes).toContain('DecisionEngineInvoked');
-      expect(eventTypes).toContain('DecisionSelected');
+      expect(eventTypes).toContain('planner_invoked');
+      expect(eventTypes).toContain('plan_generated');
+      expect(eventTypes).toContain('decision_engine_invoked');
+      expect(eventTypes).toContain('decision_selected');
     });
 
     it('maintains determinism across full execution cycle', async () => {

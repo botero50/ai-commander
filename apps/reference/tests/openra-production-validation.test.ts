@@ -93,7 +93,7 @@ describe('OpenRA Production Validation', () => {
 
         // Should not throw and should complete successfully
         expect(agent.getMetrics()).toBeDefined();
-        expect(agent.getMetrics()?.ticksExecuted).toBeGreaterThan(0);
+        expect(agent.getMetrics()?.totalTicks).toBeGreaterThan(0);
       }
 
       // All 10 missions should complete
@@ -120,7 +120,7 @@ describe('OpenRA Production Validation', () => {
       }
 
       expect(results.length).toBe(25);
-      expect(results.every(m => m?.ticksExecuted !== undefined)).toBe(true);
+      expect(results.every(m => m?.totalTicks !== undefined)).toBe(true);
     });
 
     it('handles mission interruption gracefully', async () => {
@@ -203,9 +203,9 @@ describe('OpenRA Production Validation', () => {
       // All metrics should be identical
       const firstMetrics = metrics[0];
       for (let i = 1; i < metrics.length; i++) {
-        expect(metrics[i]?.ticksExecuted).toBe(firstMetrics?.ticksExecuted);
-        expect(metrics[i]?.commandsExecuted).toBe(firstMetrics?.commandsExecuted);
-        expect(metrics[i]?.decisionsExecuted).toBe(firstMetrics?.decisionsExecuted);
+        expect(metrics[i]?.totalTicks).toBe(firstMetrics?.totalTicks);
+        expect(metrics[i]?.successfulCommands).toBe(firstMetrics?.successfulCommands);
+        expect(metrics[i]?.decisionsSelected).toBe(firstMetrics?.decisionsSelected);
       }
     });
 
@@ -259,7 +259,7 @@ describe('OpenRA Production Validation', () => {
         await agent.shutdown();
 
         const trace = agent.getTrace();
-        eventSequences.push(trace.events.map(e => e.type));
+        eventSequences.push(trace.events.map(e => e.eventType));
       }
 
       // All sequences should be identical
@@ -363,7 +363,7 @@ describe('OpenRA Production Validation', () => {
       await agent.shutdown();
 
       const trace = agent.getTrace();
-      const observationEvents = trace.events.filter(e => e.type.includes('Tick'));
+      const observationEvents = trace.events.filter(e => e.eventType.includes('Tick'));
 
       // Should have multiple observation events
       expect(observationEvents.length).toBeGreaterThan(0);
@@ -389,12 +389,12 @@ describe('OpenRA Production Validation', () => {
         const metrics = agent.getMetrics();
         results.push({
           iteration: i,
-          commandsExecuted: metrics?.commandsExecuted,
+          successfulCommands: metrics?.successfulCommands,
         });
       }
 
       // All iterations should successfully execute commands
-      expect(results.every(r => r.commandsExecuted !== undefined)).toBe(true);
+      expect(results.every(r => r.successfulCommands !== undefined)).toBe(true);
     });
   });
 
@@ -620,8 +620,8 @@ describe('OpenRA Production Validation', () => {
         await agent.shutdown();
 
         const metrics = agent.getMetrics();
-        expect(metrics?.ticksExecuted).toBeGreaterThan(0);
-        expect(metrics?.commandsExecuted).toBeGreaterThan(0);
+        expect(metrics?.totalTicks).toBeGreaterThan(0);
+        expect(metrics?.successfulCommands).toBeGreaterThan(0);
       }
     });
 
