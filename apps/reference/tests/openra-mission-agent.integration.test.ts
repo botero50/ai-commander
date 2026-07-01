@@ -18,36 +18,40 @@ function createMockStateChecker(isAvailable: boolean = true) {
 }
 
 function createTestGameState(): OpenRAGameState {
+  const player = {
+    index: 0,
+    clientIndex: 0,
+    playerName: 'Player',
+    color: 0xFF00FF00,
+    faction: 'gdi',
+    isBot: false,
+    isObserver: false,
+    isAlive: true,
+    teamId: -1,
+    cash: 5000,
+    resources: 2500,
+  };
+
   return {
     world: {
       tick: 0,
       frameNumber: 0,
       actors: [
         {
-          id: 'actor-1',
-          name: 'Infantry',
-          owner: 0,
-          type: 'infantry',
-          position: { x: 512, y: 512 },
+          actorID: 1,
+          owner: player,
+          info: {
+            name: 'Infantry',
+            traits: ['Buildable', 'Selectable', 'Health'],
+          },
+          location: { x: 512, y: 512 },
+          centerLocation: { x: 1024, y: 1024 },
           health: 100,
           maxHealth: 100,
+          isIdle: false,
         },
       ],
-      players: [
-        {
-          index: 0,
-          clientIndex: 0,
-          playerName: 'Player',
-          color: 0xFF00FF00,
-          faction: 'gdi',
-          isBot: false,
-          isObserver: false,
-          isAlive: true,
-          teamId: -1,
-          cash: 5000,
-          resources: 2500,
-        },
-      ],
+      players: [player],
       map: {
         name: 'TestMap',
         bounds: {
