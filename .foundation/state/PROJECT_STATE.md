@@ -320,8 +320,12 @@ Deliverables include:
 - ✅ Vitest test infrastructure
 - ✅ Initial module structures
 - ✅ Comprehensive test suite
+- ✅ Canonical architecture documentation
+- ✅ Architecture Decision Records (ADRs)
+- ✅ Package naming conventions
+- ✅ API stability policies
 
-**Milestone Status: COMPLETE** — All deliverables achieved and validated.
+**Milestone Status: COMPLETE** — All deliverables achieved, documented, and validated.
 
 ---
 
@@ -336,7 +340,7 @@ Deliverables include:
 - ✅ AI roles defined
 - ✅ Documentation strategy established
 
-## Foundation - Phase 2 (Current Session)
+## Foundation - Phase 2a (Repository Bootstrap)
 
 - ✅ npm Workspaces configuration
 - ✅ TypeScript setup with composite projects
@@ -350,6 +354,21 @@ Deliverables include:
 - ✅ Test suite with 10 passing tests
 - ✅ Build validation passing
 - ✅ Complete documentation synchronization
+
+## Foundation - Phase 2b (Architecture Documentation)
+
+- ✅ Canonical ARCHITECTURE.md (5500+ lines)
+  - Architectural goals and design principles
+  - Layer specifications with responsibilities
+  - Package responsibilities and module boundaries
+  - Dependency rules and enforcement
+  - Public API policy and versioning strategy
+  - Testing, performance, security, and observability strategies
+- ✅ ADR-0001: Repository Architecture (npm Workspaces monorepo decision)
+- ✅ ADR-0002: Dependency Direction (strict unidirectional dependencies)
+- ✅ ADR-0003: Module Boundaries (public/private API distinction)
+- ✅ ADR-0004: Package Naming Conventions (kebab-case, PascalCase rules)
+- ✅ ADR-0005: Public API Policy (three-tier API stability system)
 
 ---
 
