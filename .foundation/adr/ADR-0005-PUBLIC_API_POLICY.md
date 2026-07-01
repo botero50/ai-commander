@@ -18,6 +18,7 @@ As AI Commander grows, packages will provide APIs for other packages and applica
 - Package evolution stalls
 
 The team needed policies about:
+
 - What constitutes the public API
 - What stability guarantees apply to different API types
 - How APIs evolve over time
@@ -36,6 +37,7 @@ The team needed policies about:
 **Definition:** Core APIs guaranteed to remain compatible across minor versions.
 
 **Characteristics:**
+
 - Defined in TypeScript interfaces
 - Exported from index.ts
 - Documented with examples
@@ -43,6 +45,7 @@ The team needed policies about:
 - Tested with integration tests
 
 **Stability Guarantees:**
+
 - May add optional parameters → MINOR version
 - May add new methods to classes → MINOR version
 - Signature cannot change → would be MAJOR
@@ -67,12 +70,12 @@ export interface World {
   createEntity(id: string): void;
   addComponent(entityId: string, component: Component): void;
   getEntity(id: string): Entity | undefined;
-  getAllEntities(): readonly Entity[];  // New - backward compatible
+  getAllEntities(): readonly Entity[]; // New - backward compatible
 }
 
 // Changing signature - MAJOR version ❌
 export interface World {
-  createEntity(id: string, priority: number): void;  // Breaking change!
+  createEntity(id: string, priority: number): void; // Breaking change!
 }
 ```
 
@@ -81,6 +84,7 @@ export interface World {
 **Definition:** New APIs being tested before stability commitment.
 
 **Characteristics:**
+
 - Not widely used
 - May change based on feedback
 - Marked with `@experimental` JSDoc tag
@@ -88,6 +92,7 @@ export interface World {
 - Used by 0-2 packages
 
 **Stability Guarantees:**
+
 - May change signature → MINOR version (with migration guide)
 - May be removed → MINOR version (with deprecation period)
 - Feedback welcome in issues
@@ -100,10 +105,7 @@ export interface World {
  * Feedback welcome: see issue #123
  */
 export interface AdvancedPlanner extends Planner {
-  planWithConstraints(
-    goal: Goal,
-    constraints: PlanningConstraint[]
-  ): Plan;
+  planWithConstraints(goal: Goal, constraints: PlanningConstraint[]): Plan;
 }
 ```
 
@@ -112,6 +114,7 @@ export interface AdvancedPlanner extends Planner {
 **Definition:** Code not exported from index.ts.
 
 **Characteristics:**
+
 - Implementation details
 - Internal helpers and utilities
 - May change without notice
@@ -119,6 +122,7 @@ export interface AdvancedPlanner extends Planner {
 - Not part of versioning contract
 
 **Stability Guarantees:**
+
 - Can be completely rewritten → PATCH version
 - Can change signatures → PATCH version
 - Can be removed → PATCH version
@@ -164,10 +168,7 @@ export function plan(goal: Goal): Plan {
   // Still works, but marked deprecated
 }
 
-export function planWithContext(
-  goal: Goal,
-  context: PlanningContext
-): Plan {
+export function planWithContext(goal: Goal, context: PlanningContext): Plan {
   // New API
 }
 ```
@@ -200,6 +201,7 @@ export interface EngineConfig {
 ```
 
 **Policy:**
+
 - May add optional fields → MINOR
 - Cannot remove fields → would be MAJOR
 - Cannot make optional field required → would be MAJOR
@@ -216,6 +218,7 @@ export function createWorld(): World {
 ```
 
 **Policy:**
+
 - Return type is public contract
 - Parameter changes → MAJOR
 - May add optional parameters → MINOR
@@ -233,6 +236,7 @@ export interface Entity {
 ```
 
 **Policy:**
+
 - May add optional properties → MINOR
 - Cannot remove properties → would be MAJOR
 - Cannot make optional required → would be MAJOR
@@ -244,12 +248,13 @@ Methods are part of the public contract:
 
 ```typescript
 export class Engine {
-  tick(): void { }
-  getState(): GameState { }
+  tick(): void {}
+  getState(): GameState {}
 }
 ```
 
 **Policy:**
+
 - Cannot remove methods → would be MAJOR
 - May add methods → MINOR
 - Cannot change parameter count → would be MAJOR
@@ -272,14 +277,14 @@ export class Engine {
    *
    * @public
    */
-  tick(): void { }
+  tick(): void {}
 
   /**
    * Enable debug mode (experimental).
    *
    * @experimental This API may change in minor versions.
    */
-  enableDebug(): void { }
+  enableDebug(): void {}
 }
 
 /**
@@ -287,12 +292,13 @@ export class Engine {
  *
  * @internal Not part of public API
  */
-class StateManager { }
+class StateManager {}
 ```
 
 ### Documentation Policy
 
 **Public APIs Must Have:**
+
 - Clear description of purpose
 - Parameter descriptions
 - Return value description
@@ -302,7 +308,7 @@ class StateManager { }
 
 **Example:**
 
-```typescript
+````typescript
 /**
  * Execute one game tick, advancing agents and game state.
  *
@@ -330,22 +336,25 @@ class StateManager { }
  * @see Engine#stop
  */
 tick(): void { }
-```
+````
 
 ### Testing Policy
 
 **Public APIs:**
+
 - Must have integration tests
 - Must test happy path
 - Must test error cases
 - Tests use only public API
 
 **Experimental APIs:**
+
 - Have unit and integration tests
 - May be fragile as API evolves
 - Tests updated with API changes
 
 **Internal APIs:**
+
 - Have unit tests within package
 - Tests access internals directly
 - Can be refactored freely
@@ -386,8 +395,8 @@ tick(): void { }
 
 ```typescript
 // Stable Public API
-export { Engine } from './engine.js';           // ✅ Public
-export type { EngineConfig } from './types/engine-config.js';  // ✅ Public
+export { Engine } from './engine.js'; // ✅ Public
+export type { EngineConfig } from './types/engine-config.js'; // ✅ Public
 
 // Will add experimental:
 // export { AdvancedCoordinator } from './coordinator.js';  // @experimental
@@ -398,9 +407,9 @@ export type { EngineConfig } from './types/engine-config.js';  // ✅ Public
 All exports are type definitions (pure data). All considered stable public API:
 
 ```typescript
-export type { Entity } from './types/entity.js';           // ✅ Stable
-export type { Agent } from './types/agent.js';             // ✅ Stable
-export type { GameState } from './types/game-state.js';    // ✅ Stable
+export type { Entity } from './types/entity.js'; // ✅ Stable
+export type { Agent } from './types/agent.js'; // ✅ Stable
+export type { GameState } from './types/game-state.js'; // ✅ Stable
 ```
 
 **ECS Package:**
@@ -408,9 +417,9 @@ export type { GameState } from './types/game-state.js';    // ✅ Stable
 Stable public API with implementation details hidden:
 
 ```typescript
-export { World } from './world.js';                    // ✅ Public implementation
+export { World } from './world.js'; // ✅ Public implementation
 export type { Component } from './types/component.js'; // ✅ Public interface
-export type { Entity as ECSEntity } from './types/entity.js';  // ✅ Public interface
+export type { Entity as ECSEntity } from './types/entity.js'; // ✅ Public interface
 
 // Internal (not exported):
 // - WorldImpl details

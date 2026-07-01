@@ -731,21 +731,21 @@ Rules:
 
 Define domain models for strategy games and establish the foundation for AI agent development:
 
-* Core game entities (units, buildings, terrain, etc.)
-* Agent capabilities and constraints
-* Action and event schemas
-* Game state perception interfaces
-* Agent decision interfaces
+- Core game entities (units, buildings, terrain, etc.)
+- Agent capabilities and constraints
+- Action and event schemas
+- Game state perception interfaces
+- Agent decision interfaces
 
 The domain models should be extensible enough to support multiple strategy game types (turn-based, real-time, grid-based, continuous) without architectural changes.
 
 Success criteria:
 
-* Domain models defined for at least one strategy game
-* Types fully documented and exported
-* Comprehensive tests covering edge cases
-* No circular dependencies between packages
-* Ready for agent implementation and integration
+- Domain models defined for at least one strategy game
+- Types fully documented and exported
+- Comprehensive tests covering edge cases
+- No circular dependencies between packages
+- Ready for agent implementation and integration
 
 ---
 

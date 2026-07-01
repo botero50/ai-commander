@@ -18,6 +18,7 @@ AI Commander will contain 20+ packages over time. Without consistent naming conv
 - Unclear about relationships
 
 The team needed to establish consistent naming for:
+
 - Package names in npm
 - Export names (classes, functions, types)
 - File and directory names
@@ -40,6 +41,7 @@ The team needed to establish consistent naming for:
 **Rules:**
 
 1. **Kebab-Case** — Use lowercase with hyphens separating words
+
    ```
    @ai-commander/entity-component-system  ✅
    @ai-commander/EntityComponentSystem    ❌
@@ -47,6 +49,7 @@ The team needed to establish consistent naming for:
    ```
 
 2. **Descriptive** — Name describes what the package does, not its layer
+
    ```
    @ai-commander/ecs              ✅ (Entity Component System)
    @ai-commander/engine           ✅ (clear purpose)
@@ -55,6 +58,7 @@ The team needed to establish consistent naming for:
    ```
 
 3. **Singular or Plural** — Use context-appropriate form
+
    ```
    @ai-commander/domain           ✅ (abstract concept, singular)
    @ai-commander/utils            ✅ (multiple utilities, plural)
@@ -62,6 +66,7 @@ The team needed to establish consistent naming for:
    ```
 
 4. **No Redundancy** — Don't repeat "ai-commander" in the name
+
    ```
    @ai-commander/decision         ✅
    @ai-commander/ai-commander-decision  ❌
@@ -81,14 +86,14 @@ Use `PascalCase` for class names. Class represents a thing that can be instantia
 
 ```typescript
 // ✅ Good
-export class Engine { }
-export class World { }
-export class Agent { }
+export class Engine {}
+export class World {}
+export class Agent {}
 
 // ❌ Bad
-export class engine { }          // lowercase
-export class AIEngine { }        // unnecessary prefix
-export const Engine = class { }  // confusing pattern
+export class engine {} // lowercase
+export class AIEngine {} // unnecessary prefix
+export const Engine = class {}; // confusing pattern
 ```
 
 **Interfaces and Types:**
@@ -113,13 +118,13 @@ Use `camelCase` for functions and constants. Use `UPPER_SNAKE_CASE` for true con
 
 ```typescript
 // ✅ Good
-export function createWorld(): World { }
+export function createWorld(): World {}
 export const DEFAULT_TICK_RATE = 60;
 export const MAX_AGENTS = 1000;
 
 // ❌ Bad
-export function CreateWorld(): World { }  // PascalCase for function
-export const defaultTickRate = 60;        // camelCase for constant
+export function CreateWorld(): World {} // PascalCase for function
+export const defaultTickRate = 60; // camelCase for constant
 ```
 
 **Utility Functions:**
@@ -128,13 +133,13 @@ Use verb-noun or verb-object pattern:
 
 ```typescript
 // ✅ Good
-export function createEntity(id: string): Entity { }
-export function validateAction(action: Action): boolean { }
-export function mergeStates(a: GameState, b: GameState): GameState { }
+export function createEntity(id: string): Entity {}
+export function validateAction(action: Action): boolean {}
+export function mergeStates(a: GameState, b: GameState): GameState {}
 
 // ❌ Bad
-export function entity(id: string): Entity { }      // noun, not verb-noun
-export function isActionValid(action: Action): boolean { }  // is-prefix awkward
+export function entity(id: string): Entity {} // noun, not verb-noun
+export function isActionValid(action: Action): boolean {} // is-prefix awkward
 ```
 
 ### File and Directory Naming
@@ -179,6 +184,7 @@ packages/engine/tests/
 Modules within a package can be organized by:
 
 1. **By Type** (Recommended for small packages)
+
    ```
    src/
    ├── index.ts
@@ -191,6 +197,7 @@ Modules within a package can be organized by:
    ```
 
 2. **By Feature** (For larger packages)
+
    ```
    src/
    ├── index.ts
@@ -223,13 +230,13 @@ Prefix with underscore to indicate internal scope:
 ```typescript
 class Engine {
   constructor(config: EngineConfig) {
-    this._state = initialState;      // private field
+    this._state = initialState; // private field
   }
 
-  private _updateState() { }         // private method
+  private _updateState() {} // private method
 }
 
-function _internalHelper() { }       // internal function (not exported)
+function _internalHelper() {} // internal function (not exported)
 ```
 
 **Generic Types:**
@@ -238,7 +245,7 @@ Use single uppercase letter for generic parameters:
 
 ```typescript
 export type Result<T, E> = Success<T> | Failure<E>;
-export interface Repository<T> { }
+export interface Repository<T> {}
 ```
 
 **Enums:**
@@ -290,16 +297,17 @@ export enum agent_state {
 
 These common abbreviations are approved for package names:
 
-| Abbreviation | Meaning |
-| --- | --- |
-| ECS | Entity Component System |
-| AI | Artificial Intelligence |
-| RL | Reinforcement Learning |
-| CLI | Command Line Interface |
-| API | Application Programming Interface |
-| ML | Machine Learning |
+| Abbreviation | Meaning                           |
+| ------------ | --------------------------------- |
+| ECS          | Entity Component System           |
+| AI           | Artificial Intelligence           |
+| RL           | Reinforcement Learning            |
+| CLI          | Command Line Interface            |
+| API          | Application Programming Interface |
+| ML           | Machine Learning                  |
 
 **Guidelines:**
+
 - Only use common, widely-understood abbreviations
 - Document abbreviations in README
 - Prefer full names when abbreviation is uncommon
@@ -360,11 +368,13 @@ packages/decision/
 **Status:** Implemented
 
 **Current Packages:**
+
 - `@ai-commander/domain` ✅ (follows convention)
 - `@ai-commander/ecs` ✅ (follows convention, approved abbreviation)
 - `@ai-commander/engine` ✅ (follows convention)
 
 **Exports:**
+
 - `Engine` class ✅ (PascalCase)
 - `EngineConfig` interface ✅ (PascalCase)
 - `World` class ✅ (PascalCase)

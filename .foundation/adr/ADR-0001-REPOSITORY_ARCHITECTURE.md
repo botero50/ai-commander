@@ -87,6 +87,7 @@ ai-commander/
 - Source maps and declaration files are generated
 
 **Example Build Command:**
+
 ```bash
 tsc -b                    # Build all packages in dependency order
 tsc -b --noEmit          # Type check without compilation
@@ -96,20 +97,24 @@ tsc -b packages/engine   # Build only engine and dependencies
 ### Shared Configuration
 
 **TypeScript Base Configuration** (`tsconfig.base.json`):
+
 - Shared compiler options (strict mode, module resolution, etc.)
 - Path aliases for module resolution
 - All packages extend this configuration
 
 **ESLint Configuration** (`eslint.config.js`):
+
 - Single Flat Config covering all packages
 - Shared TypeScript rules and settings
 - Exclusions for generated files and configs
 
 **Prettier Configuration** (`prettier.config.js`):
+
 - Enforces consistent formatting across all packages
 - `.prettierignore` excludes generated files
 
 **Vitest Configuration** (`vitest.workspace.ts`):
+
 - Aggregates tests from all packages
 - Parallel test execution
 - Unified coverage reporting
@@ -180,6 +185,7 @@ npm run doctor            # Full validation (build + lint + format + test)
 **Status:** Implemented and operational
 
 **Current Implementation:**
+
 - ✅ Root `package.json` with npm Workspaces
 - ✅ TypeScript composite projects with references
 - ✅ Three initial packages: domain, ecs, engine
@@ -190,6 +196,7 @@ npm run doctor            # Full validation (build + lint + format + test)
 - ✅ Root-level build scripts
 
 **Build Verification:**
+
 ```
 npm run doctor: PASS
 ├── typecheck: PASS

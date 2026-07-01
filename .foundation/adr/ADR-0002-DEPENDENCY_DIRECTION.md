@@ -87,7 +87,7 @@ If `domain` tries to import from `engine`:
 
 ```typescript
 // In domain/src/index.ts
-import { Engine } from '@ai-commander/engine'  // ❌ Compile error
+import { Engine } from '@ai-commander/engine'; // ❌ Compile error
 //                                               // Cannot import from higher layer
 ```
 
@@ -152,6 +152,7 @@ To avoid circular dependencies, each layer must be self-contained:
 **Status:** Implemented and enforced
 
 **Current State:**
+
 - ✅ Domain (no dependencies)
 - ✅ ECS (depends on Domain)
 - ✅ Engine (depends on Domain, ECS)

@@ -18,6 +18,7 @@ Each package in AI Commander will expose public APIs (functions, types, classes)
 - Internal refactoring becoming blocked by external dependencies
 
 The team needed to establish clear boundaries between:
+
 - What each package exposes as its public API
 - What is internal implementation
 - How packages can be modified without breaking dependents
@@ -41,8 +42,8 @@ A package's public API consists of:
 
 ```typescript
 // packages/engine/src/index.ts
-export { Engine } from './engine.js';                     // Public: class
-export type { EngineConfig } from './types/engine-config.js';  // Public: interface
+export { Engine } from './engine.js'; // Public: class
+export type { EngineConfig } from './types/engine-config.js'; // Public: interface
 
 // Anything not exported is internal
 // - Coordinator class (not exported)
@@ -73,6 +74,7 @@ The public API is subject to semantic versioning:
 - **PATCH** — Bug fixes (backward compatible)
 
 **What Can Change Without Version Bump:**
+
 - Internal implementations (anything not exported)
 - Internal type definitions
 - Internal files and module structure
@@ -80,6 +82,7 @@ The public API is subject to semantic versioning:
 - Bug fixes in internal behavior
 
 **What Requires Version Bumps:**
+
 - Adding required parameter to public function → MAJOR
 - Removing public export → MAJOR
 - Adding new public export → MINOR
@@ -154,7 +157,7 @@ export { Engine } from './engine.js';
 
 // NEW (version 1.1.0)
 export { Engine } from './engine.js';
-export { Coordinator } from './coordinator.js';  // New export
+export { Coordinator } from './coordinator.js'; // New export
 ```
 
 - Backward compatible ✅
@@ -165,12 +168,12 @@ export { Coordinator } from './coordinator.js';  // New export
 ```typescript
 // OLD (version 1.0.0)
 export class Engine {
-  constructor(config: EngineConfig)
+  constructor(config: EngineConfig);
 }
 
 // NEW (version 2.0.0)
 export class Engine {
-  constructor(config: EngineConfig, logger: Logger)  // Added required param
+  constructor(config: EngineConfig, logger: Logger); // Added required param
 }
 ```
 
@@ -233,6 +236,7 @@ export { Coordinator } from './coordinator.js';
 Currently: Manual enforcement via import statements.
 
 Future options:
+
 - TypeScript path aliases to restrict access
 - Custom ESLint rules to catch internal imports
 - Barrel file organization to make boundaries clear

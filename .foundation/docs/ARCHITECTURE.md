@@ -25,11 +25,11 @@ The AI Commander framework pursues the following architectural goals:
 
 ### Secondary Goals
 
-* Support multiple game types (turn-based, real-time, grid-based, continuous)
-* Remain compatible with reinforcement learning integrations
-* Enable hybrid rule-based and ML approaches
-* Provide reproducible agent behavior across environments
-* Support distributed agent execution in future versions
+- Support multiple game types (turn-based, real-time, grid-based, continuous)
+- Remain compatible with reinforcement learning integrations
+- Enable hybrid rule-based and ML approaches
+- Provide reproducible agent behavior across environments
+- Support distributed agent execution in future versions
 
 ---
 
@@ -72,6 +72,7 @@ All module boundaries are defined by TypeScript interfaces. Implementation detai
 ### 3. No Hidden Coupling
 
 All dependencies must be explicit and discoverable through:
+
 - TypeScript imports
 - Package.json declarations
 - Function parameters (no implicit globals)
@@ -95,6 +96,7 @@ Each module has one reason to change. Modules should be cohesive within their do
 ### 5. Fail Fast
 
 Errors should be detected as early as possible:
+
 - TypeScript strict mode catches type errors at compile time
 - Invalid states should be unrepresentable
 - Runtime errors should include full context
@@ -104,6 +106,7 @@ Errors should be detected as early as possible:
 ### 6. Deterministic by Default
 
 All agent behavior should be reproducible. Randomness must be:
+
 - Explicit in function signatures
 - Injected via dependencies, not global
 - Seeded for reproducibility
@@ -113,6 +116,7 @@ All agent behavior should be reproducible. Randomness must be:
 ### 7. Gradual Adoption
 
 The framework should work with incremental integration:
+
 - Agents can be added to existing games gradually
 - Framework can be adopted game-by-game
 - Old and new code can coexist during migrations
@@ -132,11 +136,13 @@ AI Commander uses a strictly layered architecture. Each layer depends only on la
 **Examples:** Logging, error handling, collection utilities, type guards.
 
 **Constraints:**
+
 - Must not depend on any application layer code
 - Must not contain domain-specific logic
 - Should be generic and reusable
 
 **Characteristics:**
+
 - No side effects
 - Pure functions where possible
 - Minimal external dependencies
@@ -146,6 +152,7 @@ AI Commander uses a strictly layered architecture. Each layer depends only on la
 **Responsibility:** Define core domain models and type structures that represent game concepts.
 
 **What it contains:**
+
 - Entity definitions
 - Agent properties and capabilities
 - Action and event schemas
@@ -154,17 +161,20 @@ AI Commander uses a strictly layered architecture. Each layer depends only on la
 - Constants and enumerations
 
 **What it doesn't contain:**
+
 - Implementation logic
 - External dependencies
 - Side effects
 - Decisions or reasoning
 
 **Constraints:**
+
 - Pure data structures and types only
 - No mutable global state
 - No imports from higher layers
 
 **Characteristics:**
+
 - Highly stable (rarely changes)
 - Used by all higher layers
 - Game-agnostic where possible
@@ -175,12 +185,14 @@ AI Commander uses a strictly layered architecture. Each layer depends only on la
 **Responsibility:** Provide foundational utilities and abstractions that lower layers build upon.
 
 **Planned modules:**
+
 - ECS (Entity Component System)
 - Result/Error types
 - Observable patterns
 - Collection abstractions
 
 **Constraints:**
+
 - Cannot depend on Domain concepts (should be generic)
 - Cannot depend on higher layers
 - Should provide reusable infrastructure
@@ -190,6 +202,7 @@ AI Commander uses a strictly layered architecture. Each layer depends only on la
 **Responsibility:** Execute game ticks, coordinate agent actions, manage state transitions.
 
 **Responsibilities:**
+
 - Manage game loop execution
 - Coordinate multi-agent action execution
 - Handle state transitions
@@ -197,11 +210,13 @@ AI Commander uses a strictly layered architecture. Each layer depends only on la
 - Provide timing and scheduling
 
 **Constraints:**
+
 - Cannot make strategic decisions
 - Cannot implement planning algorithms
 - Must remain strategy-agnostic
 
 **Characteristics:**
+
 - Central coordination point
 - Stateful (maintains execution context)
 - Time-aware
@@ -212,12 +227,14 @@ AI Commander uses a strictly layered architecture. Each layer depends only on la
 **Responsibility:** Implement decision-making logic for individual agents.
 
 **Planned modules:**
+
 - Decision trees
 - Utility-based decision makers
 - State machine evaluators
 - Heuristic evaluators
 
 **Constraints:**
+
 - Cannot make strategic plans
 - Cannot coordinate multiple agents
 - Cannot execute actions directly
@@ -227,12 +244,14 @@ AI Commander uses a strictly layered architecture. Each layer depends only on la
 **Responsibility:** Implement planning algorithms and sequence generation.
 
 **Planned modules:**
+
 - Search algorithms (A*, BFS, DFS)
 - Plan generation
 - Goal decomposition
 - Action sequencing
 
 **Constraints:**
+
 - Cannot directly execute plans
 - Cannot make individual decisions (delegates to Decision layer)
 - Operates on abstract game states
@@ -242,6 +261,7 @@ AI Commander uses a strictly layered architecture. Each layer depends only on la
 **Responsibility:** Implement high-level strategic behavior and multi-agent coordination.
 
 **Planned modules:**
+
 - Strategic policies
 - Multi-agent coordination
 - Behavior trees
@@ -249,6 +269,7 @@ AI Commander uses a strictly layered architecture. Each layer depends only on la
 - Meta-level planning
 
 **Constraints:**
+
 - Cannot modify engine behavior
 - Cannot violate game rules
 - Must decompose to plannable subgoals
@@ -258,6 +279,7 @@ AI Commander uses a strictly layered architecture. Each layer depends only on la
 **Responsibility:** Integrate the framework with specific games and AI systems.
 
 **Contains:**
+
 - Game-specific agents
 - Game-specific strategies
 - Integration code with game engines
@@ -272,6 +294,7 @@ AI Commander uses a strictly layered architecture. Each layer depends only on la
 **Purpose:** Utilities and helpers used across all packages.
 
 **Planned exports:**
+
 - Error types and handling
 - Logger interface
 - Collection utilities
@@ -285,6 +308,7 @@ AI Commander uses a strictly layered architecture. Each layer depends only on la
 **Purpose:** Core domain models for games and agents.
 
 **Current exports:**
+
 - Entity interface
 - Agent interface
 - GameState interface
@@ -292,6 +316,7 @@ AI Commander uses a strictly layered architecture. Each layer depends only on la
 - Event interface
 
 **Future exports:**
+
 - Game-specific types
 - State representations
 - Action schemas
@@ -305,11 +330,13 @@ AI Commander uses a strictly layered architecture. Each layer depends only on la
 **Purpose:** Entity Component System for efficient state management.
 
 **Current exports:**
+
 - World class
 - Component interface
 - Entity interface
 
 **Future exports:**
+
 - System runner
 - Query builder
 - Change tracking
@@ -322,10 +349,12 @@ AI Commander uses a strictly layered architecture. Each layer depends only on la
 **Purpose:** Core execution engine for game loops and agent coordination.
 
 **Current exports:**
+
 - Engine class
 - EngineConfig interface
 
 **Future exports:**
+
 - Action executor
 - State transition manager
 - Timing coordinator
@@ -338,6 +367,7 @@ AI Commander uses a strictly layered architecture. Each layer depends only on la
 **Purpose:** Decision-making algorithms for agents.
 
 **Planned exports:**
+
 - Decision interfaces
 - Evaluators
 - Decision trees
@@ -350,6 +380,7 @@ AI Commander uses a strictly layered architecture. Each layer depends only on la
 **Purpose:** Planning and search algorithms.
 
 **Planned exports:**
+
 - Planner interface
 - Search algorithms
 - Plan representation
@@ -362,6 +393,7 @@ AI Commander uses a strictly layered architecture. Each layer depends only on la
 **Purpose:** Strategic behavior and multi-agent coordination.
 
 **Planned exports:**
+
 - Strategy interfaces
 - Behavior trees
 - Coordination patterns
@@ -383,12 +415,14 @@ AI Commander uses a strictly layered architecture. Each layer depends only on la
 ### Internal vs Public
 
 **Public API:**
+
 - Exported from index.ts
 - Documented
 - Subject to semver
 - Intended for external use
 
 **Internal Implementation:**
+
 - Not exported from index.ts
 - May change without notice
 - For use within package only
@@ -397,11 +431,13 @@ AI Commander uses a strictly layered architecture. Each layer depends only on la
 ### Cross-Package Communication
 
 **Allowed:**
+
 - Using exported types from packages below
 - Implementing interfaces defined in packages below
 - Calling exported functions from packages below
 
 **Forbidden:**
+
 - Importing internal implementations (anything not in index.ts)
 - Creating circular dependencies
 - Accessing private/internal properties
@@ -427,6 +463,7 @@ Dependencies are enforced through:
 ### Rationale
 
 Strict unidirectional dependencies:
+
 - Enable independent reuse of lower layers
 - Prevent circular dependencies that cause maintenance nightmares
 - Allow testing lower layers without loading higher layers
@@ -467,18 +504,21 @@ Not part of the public API:
 ### Stability Guarantees
 
 **Major Version (X.0.0)** — Permitted changes:
+
 - Add new exports
 - Remove exports (with deprecation period in prior version)
 - Change internal implementations (not exposed)
 - Restructure internal modules
 
 **Minor Version (0.X.0)** — Permitted changes:
+
 - Add new exported functions
 - Add new methods to exported classes
 - Add optional parameters to exported functions
 - Add new type exports
 
 **Patch Version (0.0.X)** — Permitted changes:
+
 - Bug fixes
 - Performance improvements
 - Documentation improvements
@@ -501,6 +541,7 @@ The framework is designed to be extended through:
 ### 1. Plugin Architecture (Future)
 
 Strategy implementations can be provided as plugins. Plugins will:
+
 - Implement well-defined interfaces
 - Declare dependencies explicitly
 - Be loaded at runtime
@@ -509,6 +550,7 @@ Strategy implementations can be provided as plugins. Plugins will:
 ### 2. Game Adapters
 
 Games integrate via adapters that:
+
 - Implement perception interfaces
 - Implement action execution
 - Translate game state to domain models
@@ -517,6 +559,7 @@ Games integrate via adapters that:
 ### 3. AI Provider Integration
 
 AI models and ML systems integrate via:
+
 - Strategy interfaces
 - Decision interfaces
 - Custom planning implementations
@@ -524,6 +567,7 @@ AI models and ML systems integrate via:
 ### 4. Custom Evaluators
 
 Strategic and decision evaluation can be customized via:
+
 - Pluggable evaluator interfaces
 - Custom scoring functions
 - Domain-specific heuristics
@@ -544,12 +588,14 @@ The framework follows these configuration principles:
 ### Configuration Types
 
 **Build-Time Configuration:**
+
 - TypeScript compiler options
 - ESLint rules
 - Prettier formatting
 - Vitest settings
 
 **Runtime Configuration:**
+
 - Engine tick rate
 - Agent capabilities
 - Planning parameters
@@ -623,6 +669,7 @@ Application       Handle or propagate
 ### Observable Events
 
 Framework emits events for:
+
 - Agent creation/destruction
 - Agent perception
 - Agent decision
@@ -654,6 +701,7 @@ Framework emits events for:
 ### Determinism Requirement
 
 All tests must be deterministic:
+
 - No time-based assertions (use fake timers)
 - No random values (seed randomness)
 - No external dependencies (mock APIs)
@@ -710,6 +758,7 @@ Each commit must pass all checks via `npm run doctor`.
 ### Production Builds
 
 Production builds verify:
+
 - TypeScript builds without errors
 - All tests pass
 - ESLint checks pass
@@ -732,6 +781,7 @@ The framework follows semantic versioning (MAJOR.MINOR.PATCH):
 ### Breaking Changes
 
 A breaking change is:
+
 - Removing a public export
 - Changing the signature of a public function
 - Changing the required fields of a public type
@@ -739,6 +789,7 @@ A breaking change is:
 - Changing error behavior
 
 Breaking changes require:
+
 - MAJOR version bump
 - Migration guide in release notes
 - Deprecation period in prior version (if possible)
@@ -746,6 +797,7 @@ Breaking changes require:
 ### Pre-release Versions
 
 During pre-release (0.x.x):
+
 - MINOR bumps may include breaking changes
 - PATCH bumps should not include breaking changes
 - Release notes highlight breaking changes
@@ -796,11 +848,13 @@ During pre-release (0.x.x):
 ### Threat Model
 
 AI Commander is designed for:
+
 - Academic and research use
 - Game development
 - AI experimentation
 
 Not designed for:
+
 - Untrusted code execution
 - Network security
 - Cryptographic applications
@@ -821,30 +875,35 @@ Not designed for:
 ### Planned Expansions
 
 #### Phase 2: Planning and Decision Engines
+
 - Implement core Decision layer
 - Implement core Planner layer
 - Add search algorithms
 - Add decision tree evaluators
 
 #### Phase 3: Strategy and Coordination
+
 - Implement Strategy layer
 - Add multi-agent coordination
 - Add behavior trees
 - Add state machines
 
 #### Phase 4: Game Integrations
+
 - Unity integration
 - Unreal Engine integration
 - Custom game engine adapters
 - Example implementations
 
 #### Phase 5: Advanced Features
+
 - Reinforcement learning integration
 - Distributed agent execution
 - Real-time performance optimization
 - Advanced observability
 
 #### Phase 6: Production Hardening
+
 - Production deployment patterns
 - Performance optimization
 - Advanced error handling
@@ -853,6 +912,7 @@ Not designed for:
 ### Evolution Without Architectural Changes
 
 The architecture is designed to accommodate future additions without changes:
+
 - New layers can be added between existing layers
 - New packages can be added within layers
 - New interfaces can be added to existing packages
@@ -863,6 +923,7 @@ The architectural boundaries remain stable.
 ### Architecture Constraints
 
 The following are immutable:
+
 - Unidirectional dependency flow
 - No circular dependencies
 - Explicit interfaces at boundaries
