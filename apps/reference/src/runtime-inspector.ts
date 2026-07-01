@@ -59,7 +59,7 @@ export class RuntimeInspector {
     const agentY = 0;
 
     // Estimate position from commands executed
-    const commandsExecuted = metrics?.commandsExecuted ?? 0;
+    const commandsExecuted = metrics?.successfulCommands ?? 0;
     let estimatedX = agentX;
     let estimatedY = agentY;
 
