@@ -1,0 +1,22 @@
+{
+  "name": "@ai-commander/goals",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest",
+    "lint": "eslint src tests",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ai-commander/core": "workspace:*",
+    "@ai-commander/domain": "workspace:*"
+  },
+  "devDependencies": {}
+}

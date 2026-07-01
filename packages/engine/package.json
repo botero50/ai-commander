@@ -1,6 +1,6 @@
 {
   "name": "@ai-commander/engine",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Core execution engine for AI Commander",
   "license": "MIT",
   "type": "module",
@@ -22,8 +22,9 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@ai-commander/domain": "file:../domain",
-    "@ai-commander/ecs": "file:../ecs"
+    "@ai-commander/core": "workspace:*",
+    "@ai-commander/domain": "workspace:*",
+    "@ai-commander/ecs": "workspace:*"
   },
   "keywords": [
     "ai-commander",

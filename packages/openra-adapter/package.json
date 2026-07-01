@@ -1,0 +1,21 @@
+{
+  "name": "@ai-commander/openra-adapter",
+  "version": "1.0.0",
+  "description": "OpenRA integration for AI Commander - World state observation provider",
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest"
+  },
+  "dependencies": {
+    "@ai-commander/adapter": "workspace:*",
+    "@ai-commander/domain": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0",
+    "vitest": "^0.34.0"
+  }
+}

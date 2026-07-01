@@ -1,0 +1,33 @@
+{
+  "name": "@ai-commander/reference-app",
+  "version": "1.0.0",
+  "description": "Canonical reference application demonstrating framework usage",
+  "type": "module",
+  "main": "dist/index.js",
+  "bin": {
+    "reference-app": "dist/cli.js"
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/cli.js",
+    "test": "vitest",
+    "lint": "eslint src tests",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ai-commander/adapter": "file:../../packages/adapter",
+    "@ai-commander/agent-runtime": "file:../../packages/agent-runtime",
+    "@ai-commander/core": "file:../../packages/core",
+    "@ai-commander/decision": "file:../../packages/decision",
+    "@ai-commander/domain": "file:../../packages/domain",
+    "@ai-commander/engine": "file:../../packages/engine",
+    "@ai-commander/fake-game-adapter": "file:../../packages/fake-game-adapter",
+    "@ai-commander/goals": "file:../../packages/goals",
+    "@ai-commander/openra-adapter": "file:../../packages/openra-adapter",
+    "@ai-commander/planner": "file:../../packages/planner"
+  }
+}

@@ -1,0 +1,22 @@
+{
+  "name": "@ai-commander/behavior-tree",
+  "version": "1.0.0",
+  "description": "Deterministic behavior tree framework for game AI",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest",
+    "lint": "eslint src tests",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ai-commander/core": "workspace:*",
+    "@ai-commander/domain": "workspace:*"
+  }
+}

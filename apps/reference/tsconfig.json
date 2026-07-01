@@ -1,0 +1,20 @@
+{
+  "extends": "../../tsconfig.base.json",
+  "compilerOptions": {
+    "outDir": "./dist"
+  },
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "dist", "tests"],
+  "references": [
+    { "path": "../../packages/core" },
+    { "path": "../../packages/domain" },
+    { "path": "../../packages/adapter" },
+    { "path": "../../packages/engine" },
+    { "path": "../../packages/goals" },
+    { "path": "../../packages/planner" },
+    { "path": "../../packages/decision" },
+    { "path": "../../packages/agent-runtime" },
+    { "path": "../../packages/fake-game-adapter" },
+    { "path": "../../packages/openra-adapter" }
+  ]
+}

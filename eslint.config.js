@@ -4,7 +4,15 @@ import tsPlugin from '@typescript-eslint/eslint-plugin';
 
 export default [
   {
-    ignores: ['**/node_modules/', '**/dist/', '**/.turbo/', '**/.next/', 'coverage/', '.github/'],
+    ignores: [
+      '**/node_modules/',
+      '**/dist/',
+      '**/.turbo/',
+      '**/.next/',
+      'coverage/',
+      '.github/',
+      'examples/',
+    ],
   },
   {
     files: ['**/*.{js,mjs,cjs,ts,mts,cts}'],

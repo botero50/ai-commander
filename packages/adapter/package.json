@@ -1,0 +1,22 @@
+{
+  "name": "@ai-commander/adapter",
+  "version": "1.0.0",
+  "description": "Game adapter contracts for AI Commander",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist", "README.md"],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest",
+    "lint": "eslint src tests",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ai-commander/core": "workspace:*",
+    "@ai-commander/domain": "workspace:*",
+    "@ai-commander/engine": "workspace:*",
+    "@ai-commander/decision": "workspace:*",
+    "@ai-commander/planner": "workspace:*"
+  }
+}

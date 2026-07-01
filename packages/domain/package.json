@@ -1,6 +1,6 @@
 {
   "name": "@ai-commander/domain",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Domain models and entities for AI Commander",
   "license": "MIT",
   "type": "module",

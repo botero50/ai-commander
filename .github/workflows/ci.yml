@@ -9,4 +9,11 @@ jobs:
         with:
           node-version: 22
       - run: npm install
-      - run: npm run typecheck || true
+      - name: Type Check
+        run: npm run typecheck
+      - name: Lint
+        run: npm run lint
+      - name: Format Check
+        run: npm run format:check
+      - name: Test
+        run: npm run test

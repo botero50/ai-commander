@@ -1,6 +1,6 @@
 {
   "name": "@ai-commander/ecs",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "description": "Entity Component System for AI Commander",
   "license": "MIT",
   "type": "module",

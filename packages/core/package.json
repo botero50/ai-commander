@@ -1,0 +1,34 @@
+{
+  "name": "@ai-commander/core",
+  "version": "1.0.0",
+  "description": "Core framework infrastructure and abstractions for AI Commander",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "framework",
+    "core",
+    "infrastructure",
+    "dependency-injection",
+    "event-bus",
+    "lifecycle",
+    "plugin"
+  ],
+  "author": "AI Commander Contributors",
+  "license": "MIT"
+}

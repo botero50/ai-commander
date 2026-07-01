@@ -1,0 +1,23 @@
+{
+  "name": "@ai-commander/fake-game-adapter",
+  "version": "1.0.0",
+  "description": "Fake in-memory game adapter for framework validation",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest",
+    "lint": "eslint src tests",
+    "typecheck": "tsc --noEmit"
+  },
+  "dependencies": {
+    "@ai-commander/adapter": "workspace:*",
+    "@ai-commander/core": "workspace:*",
+    "@ai-commander/domain": "workspace:*"
+  }
+}

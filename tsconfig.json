@@ -4,9 +4,18 @@
     "noEmit": true
   },
   "references": [
-    { "path": "packages/domain" },
-    { "path": "packages/ecs" },
-    { "path": "packages/engine" }
+    { "path": "./packages/core" },
+    { "path": "./packages/domain" },
+    { "path": "./packages/ecs" },
+    { "path": "./packages/engine" },
+    { "path": "./packages/decision" },
+    { "path": "./packages/goals" },
+    { "path": "./packages/planner" },
+    { "path": "./packages/adapter" },
+    { "path": "./packages/fake-game-adapter" },
+    { "path": "./packages/behavior-tree" },
+    { "path": "./packages/agent-runtime" },
+    { "path": "./packages/openra-adapter" }
   ],
-  "files": []
+  "exclude": ["**/tests", "**/node_modules", "**/dist", "examples"]
 }

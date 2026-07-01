@@ -44,6 +44,7 @@ export type { Agent, AgentSnapshot } from './types/agent.js';
 export { AgentState } from './types/agent.js';
 export {
   createAgent,
+  isAgent,
   createAgentSnapshot,
   isAgentActive,
   isPlayerControlled,
