@@ -307,15 +307,16 @@ export class OpenRAMissionAgent {
         console.log(`  Mission progress: ${metrics.commandsExecuted} movement commands executed`);
       }
 
-      // For synthetic testing: record a command executed each tick (since we don't have real command execution)
+      // For synthetic testing: call the order submitter each tick (to test failure recovery)
+      const orderResult = await this.orderSubmitter({ actionType: 'move', parameters: { targetX: this.targetX, targetY: this.targetY } });
       this.tracer.recordCommandExecuted(
         { actionType: 'move', parameters: { targetX: this.targetX, targetY: this.targetY } } as any,
-        { success: true, message: 'Synthetic command', data: {} } as any
+        { success: orderResult, message: orderResult ? 'Command executed' : 'Command failed', data: {} } as any
       );
 
-      // For deterministic testing: stop after a few ticks to avoid max ticks timeout
+      // For deterministic testing: stop after a reasonable number of ticks to test failure recovery
       // In a real mission, this would check world state against goal
-      if (tickCount >= 5) {
+      if (tickCount >= 10) {
         console.log(`  ✓ Mission goal achieved: executed ${metrics.commandsExecuted} commands in ${tickCount} ticks`);
         this.isComplete = true;
         this.tracer.recordMissionCompleted();
