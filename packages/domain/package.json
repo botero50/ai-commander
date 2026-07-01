@@ -1,0 +1,30 @@
+{
+  "name": "@ai-commander/domain",
+  "version": "0.1.0",
+  "description": "Domain models and entities for AI Commander",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "ai-commander",
+    "domain",
+    "entities",
+    "strategy-games"
+  ]
+}

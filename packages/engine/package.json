@@ -1,0 +1,33 @@
+{
+  "name": "@ai-commander/engine",
+  "version": "0.1.0",
+  "description": "Core execution engine for AI Commander",
+  "license": "MIT",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "typecheck": "tsc --noEmit",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@ai-commander/domain": "file:../domain",
+    "@ai-commander/ecs": "file:../ecs"
+  },
+  "keywords": [
+    "ai-commander",
+    "engine",
+    "execution"
+  ]
+}

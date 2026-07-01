@@ -1,0 +1,10 @@
+# Local development files
+.claude/
+.ai/
+
+# Build output
+dist/
+*.tsbuildinfo
+
+# Dependencies
+node_modules/
