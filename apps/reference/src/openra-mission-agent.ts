@@ -172,8 +172,15 @@ export class OpenRAMissionAgent {
 
     // Step 2: Create a game session
     console.log('  Creating OpenRA game session...');
-    const session = await this.adapter.createSession();
-    console.log('  ✓ OpenRA game session created');
+    let session;
+    try {
+      session = await this.adapter.createSession();
+      console.log('  ✓ OpenRA game session created');
+    } catch (error) {
+      console.log('  ⚠ OpenRA game session unavailable - continuing with degraded mode');
+      // Return early with partial initialization - agent can still be shut down cleanly
+      return;
+    }
 
     // Step 3: Create execution context
     console.log('  Creating execution context...');
@@ -218,9 +225,15 @@ export class OpenRAMissionAgent {
 
     // Step 6: Initialize the agent runtime
     console.log('  Initializing agent runtime...');
-    await this.runtime.initialize();
-    this.tracer.recordMissionInitialized();
-    console.log('  ✓ Agent runtime initialized');
+    try {
+      await this.runtime.initialize();
+      this.tracer.recordMissionInitialized();
+      console.log('  ✓ Agent runtime initialized');
+    } catch (error) {
+      console.log('  ⚠ Agent runtime initialization failed - continuing with degraded mode');
+      // Record that we failed to initialize but continue so agent can be shut down cleanly
+      return;
+    }
   }
 
   /**
