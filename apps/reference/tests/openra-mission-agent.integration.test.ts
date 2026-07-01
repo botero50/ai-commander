@@ -358,8 +358,8 @@ describe('OpenRAMissionAgent', () => {
 
       const snapshot = agent.getSnapshot();
       expect(snapshot).toBeDefined();
-      expect(snapshot.metadata.targetX).toBe(512);
-      expect(snapshot.metadata.targetY).toBe(512);
+      expect(snapshot.targetPosition.x).toBe(512);
+      expect(snapshot.targetPosition.y).toBe(512);
     });
 
     it('produces valid snapshot formatting', async () => {
