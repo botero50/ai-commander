@@ -307,8 +307,8 @@ describe('OpenRAMissionAgent', () => {
       const metrics = agent.getMetrics();
       expect(metrics).toBeDefined();
       expect(metrics?.totalTicks).toBeGreaterThan(0);
-      expect(metrics?.decisionsExecuted).toBeGreaterThanOrEqual(0);
-      expect(metrics?.commandsExecuted).toBeGreaterThanOrEqual(0);
+      expect(metrics?.decisionsSelected).toBeGreaterThanOrEqual(0);
+      expect(metrics?.successfulCommands).toBeGreaterThanOrEqual(0);
     });
 
     it('produces valid metrics formatting', async () => {

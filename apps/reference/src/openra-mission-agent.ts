@@ -318,6 +318,9 @@ export class OpenRAMissionAgent {
       await this.adapter.shutdown();
     }
 
+    // Record shutdown event
+    this.tracer.recordMissionShutdown();
+
     // Compute metrics and replay
     const trace = this.tracer.getTrace();
     this.metrics = RuntimeMetricsCollector.collect(trace);
