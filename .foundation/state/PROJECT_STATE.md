@@ -370,6 +370,25 @@ Deliverables include:
 - ✅ ADR-0004: Package Naming Conventions (kebab-case, PascalCase rules)
 - ✅ ADR-0005: Public API Policy (three-tier API stability system)
 
+## Core Features - Phase 1: Domain Model
+
+- ✅ Game-agnostic domain model designed
+- ✅ Identity types: EntityId, ComponentId, PlayerId, TeamId, GameId
+- ✅ Spatial types: Position, GameMap, Region (flexible for grid/hex/graph)
+- ✅ Temporal types: Tick, Phase, GameTime (abstract time representation)
+- ✅ Resource system: ResourceType, Resource, ResourcePool (any resource type)
+- ✅ Agent system: Agent, AgentSnapshot, AgentState enum (7 states)
+- ✅ Player and Team types with full immutability
+- ✅ World state with immutable game snapshot and query helpers
+- ✅ Action system: Command, ActionResult (success/failure discriminated union)
+- ✅ Event system: EventType, Event (public/private variants)
+- ✅ Perception system: VisibilityState, PositionVisibility, FogOfWar, Observation
+- ✅ Capability system: Capability with resources, cooldowns, readiness checks
+- ✅ Goal system: Goal, Objective with deadlines
+- ✅ 33 comprehensive tests for domain model (41 total tests)
+- ✅ Complete README documentation with usage examples
+- ✅ All validation passing: typecheck, lint, format, test
+
 ---
 
 # Pending Stories

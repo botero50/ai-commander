@@ -44,15 +44,15 @@ AI Commander
 
 # Session Objective
 
-Complete the canonical architecture documentation for AI Commander and establish Architecture Decision Records that document the frozen design.
+Implement the game-agnostic domain model for AI Commander, establishing core concepts for all strategy game genres without game-specific assumptions.
 
 Completed during this session:
 
-- Created comprehensive ARCHITECTURE.md specification
-- Established Architecture Decision Records (ADRs) for core decisions
-- Documented all design principles and layer responsibilities
-- Defined public API policies and naming conventions
-- Recorded versioning and evolution strategies
+* Designed game-agnostic domain architecture
+* Implemented 9 core domain concept modules
+* Created 33 comprehensive tests (all passing)
+* Wrote extensive domain documentation
+* All validation passing (typecheck, lint, format, test)
 
 ---
 
@@ -61,406 +61,374 @@ Completed during this session:
 Current repository maturity:
 
 ```text
-Foundation Phase - COMPLETE
-Architecture Documentation - COMPLETE
-Ready for Feature Development
+Foundation Phase - COMPLETE ✅
+Architecture Documentation - COMPLETE ✅
+Domain Model - COMPLETE ✅
+Ready for Planning and Decision Layer
 ```
 
 Implementation status:
 
-- ✅ Repository structure established and operational
-- ✅ Workspace configuration fully functional
-- ✅ TypeScript compilation and build operational
-- ✅ Test infrastructure operational
-- ✅ Linting and formatting infrastructure operational
-- ✅ Initial package scaffolds created with tests
-- ✅ All validation checks passing
-- ✅ Canonical architecture documentation complete
-- ✅ Architecture Decision Records documented
-- ✅ Design principles formalized
-- ✅ Ready for feature implementation
+* ✅ Repository infrastructure (npm Workspaces, TypeScript, tooling)
+* ✅ Architectural documentation (ARCHITECTURE.md, 5 ADRs)
+* ✅ Initial packages (domain, ecs, engine with 10 tests)
+* ✅ Game-agnostic domain model complete
+* ✅ 41 total tests passing (domain +33 new tests)
+* ✅ All validation checks passing
 
 ---
 
-# Active Milestone
+# Session Work: Domain Model Implementation
 
-**Foundation Complete** — ACHIEVED
+## Completed Modules
 
-All foundation deliverables complete:
+### 1. Identity Types (`identity.ts`)
+- EntityId, ComponentId, PlayerId, TeamId, GameId
+- Branded string types for compile-time type safety
+- Validation and creation helpers for each
 
-- ✅ Repository infrastructure
-- ✅ Engineering standards
-- ✅ Architecture documentation
-- ✅ Design decision records
-- ✅ Naming conventions
-- ✅ API policies
-- ✅ Initial packages with tests
+### 2. Spatial Types (`spatial.ts`)
+- **Position**: Flexible format supporting:
+  - Grid coordinates: `row:5,col:10`
+  - Continuous: `100.5,200.3`
+  - Hex grids: `hex-15-20`
+  - Graph nodes: `node-42`
+  - Custom formats (game-defined)
+- **GameMap**: World layout with dimensions and position lists
+- **Region**: Area grouping for regions, visibility, management
 
-The foundation milestone is COMPLETE and CLOSED.
+### 3. Temporal Types (`temporal.ts`)
+- **Tick**: Discrete game time step (turn, frame, simulation step)
+- **Phase**: Multi-phase turn support (perception, decision, action, resolution)
+- **GameTime**: Abstract time with human-readable display
+- Supports: turn-based, real-time, simulation games
+
+### 4. Resource System (`resource.ts`)
+- **ResourceType**: Configurable with min/max, stackability, renewable flag
+- **Resource**: Amount of a specific type
+- **ResourcePool**: Collection with query methods:
+  - `getAmount(typeId)` → amount
+  - `hasEnough(typeId, amount)` → boolean
+  - `getResource(typeId)` → Resource | undefined
+- Supports: economy (gold/wood), combat (health/mana), action points, cards, tokens
+
+### 5. Player and Team (`player.ts`)
+- **Player**: Human or AI with team affiliation, custom data
+- **Team**: Group of players for cooperative play
+- Both fully immutable with validation
+
+### 6. Agent System (`agent.ts`)
+- **Agent**: Branded string type for entity ID
+- **AgentSnapshot**: Current state snapshot:
+  - Agent ID, controller (player or null for NPC)
+  - AgentState enum: Idle, Perceiving, Deciding, Acting, Waiting, Defeated, Unknown
+  - Resources and custom data
+- Helper functions: `isAgentActive()`, `isPlayerControlled()`
+
+### 7. World State (`world.ts`)
+- **WorldState**: Immutable game snapshot containing:
+  - Game time
+  - Map
+  - All players and teams
+  - All agent snapshots
+  - Custom game-specific data
+- Query functions:
+  - `getAgent(state, agentId)` → AgentSnapshot | undefined
+  - `getPlayerAgents(state, playerId)` → AgentSnapshot[]
+  - `agentExists(state, agentId)` → boolean
+  - `getPlayer(state, playerId)` → Player | undefined
+  - `getTeam(state, teamId)` → Team | undefined
+
+### 8. Action System (`action.ts`)
+- **ActionId**: Branded type for action identity
+- **Command**: Agent intent to act:
+  - ID, agent, action type, parameters
+  - Issued tick and priority
+- **ActionResult**: Discriminated union:
+  - Success: includes effects
+  - Failure: includes reason
+- Type guards: `isActionSuccess()`, `isActionFailure()`
+
+### 9. Event System (`event.ts`)
+- **EventType**: Event category with visibility control
+- **Event**: What happened
+  - ID, type, triggering agent, tick, data
+  - Public (visible to all) or private (specific observers)
+- Helpers:
+  - `createPublicEvent()` → visible to all
+  - `createPrivateEvent(visibleTo)` → specific observers
+  - `canObserveEvent(event, observerId)` → boolean
+  - `isPublicEvent()` → boolean
+
+### 10. Perception System (`perception.ts`)
+- **VisibilityState** enum: Visible, FogOfWar, Unexplored
+- **PositionVisibility**: Track visibility of specific position
+  - State, occupier agent, last seen tick
+- **FogOfWar**: Complete vision system:
+  - Agent ID, all position visibility
+  - Vision range (null for custom rules)
+  - Lighting effects, modifiers
+  - Helpers: `getPositionVisibility()`, `countVisiblePositions()`
+- **Observation**: Limited view of world
+  - Visible agents, fog of war, visible events
+  - Custom senses (game-specific)
+  - Helper: `canObserveAgent()`
+
+### 11. Capability System (`capability.ts`)
+- **Capability**: What agents can do
+  - ID, name, category
+  - Enabled flag
+  - Resource cost (any type)
+  - Cooldown tracking
+  - Game-specific properties
+  - Helpers: `isCapabilityReady()`, `canUseCapability()`
+- **Goal**: High-level objective
+  - ID, description, type, priority
+  - Active flag, constraints, success criteria
+- **Objective**: Tactical task
+  - ID, description, type, parent goal
+  - Completion status, deadline
+  - Parameters
+  - Helper: `isObjectiveOverdue()`
+
+## Design Principles Implemented
+
+### 1. Immutability
+All created objects are frozen with Object.freeze(). State changes create new instances.
+
+### 2. Pure Value Objects
+No logic, no side effects. Just data with validation in constructors.
+
+### 3. Discriminated Unions
+ActionResult and Event use exhaustive pattern matching for type safety.
+
+### 4. Game-Agnostic
+No game-specific terminology. Uses `customData` fields for game-specific properties:
+- RTS: `unitType: 'soldier'`
+- Fantasy: `spellsKnown: ['fireball']`
+- Card: `cardsInHand: ['attack']`
+
+### 5. Type Safety
+All branded types prevent accidental mixing:
+- EntityId ≠ PlayerId ≠ TeamId ≠ GameId
+
+## Test Coverage
+
+**33 new tests** across all domain concepts:
+- Identity type creation and validation
+- Spatial concepts (positions, maps, regions)
+- Temporal concepts (ticks, phases, time)
+- Resources and pools
+- Players and teams
+- Agents and snapshots
+- World state integration
+- Commands and action results
+- Events (public, private, visibility)
+- Perception and fog of war
+- Capabilities and readiness
+- Goals and objectives
+- Immutability guarantees
+
+**All passing**: Domain tests (33) + Engine tests (4) + ECS tests (4) = **41 tests**
+
+## Documentation
+
+**Complete `packages/domain/README.md`** includes:
+- Overview and purpose
+- Core concepts with code examples
+- Design principles explained
+- No logic in domain (what's NOT included)
+- Dependency rules
+- Versioning strategy
+- Related documentation links
+
+## Validation Status
+
+All checks passing:
+
+```
+npm run typecheck   ✅  No TypeScript errors
+npm run lint        ✅  No linting violations
+npm run format      ✅  All properly formatted
+npm run test        ✅  41/41 tests passing
+npm run doctor      ✅  All validation passing
+```
 
 ---
 
-# Completed in This Session
+# What Domain Model Supports
 
-## Phase 1: Repository Bootstrap (from prior session)
+### Game Genres
+- ✅ RTS (resource management, units, buildings)
+- ✅ Turn-based (discrete actions, phases)
+- ✅ 4X (large-scale, long-term goals)
+- ✅ Card games (resources as cards, decks)
+- ✅ Tactical (grid positions, line-of-sight)
+- ✅ Simulation (continuous actions, custom time)
+- ✅ Future genres (extensible design)
 
-- Created npm Workspaces monorepo structure
-- Configured TypeScript composite projects
-- Set up ESLint Flat Config
-- Set up Prettier formatting
-- Set up Vitest workspace
-- Created three initial packages
-- All validation checks passing
+### Game Features
+- ✅ Multiple players and teams
+- ✅ AI and human-controlled agents
+- ✅ Custom resource systems
+- ✅ Visibility and fog of war
+- ✅ Event-based state changes
+- ✅ Asynchronous decision-making
+- ✅ Goal-driven behavior
+- ✅ Capability-based action systems
 
-## Phase 2: Architecture Documentation (this session)
+---
 
-### Created .foundation/docs/ARCHITECTURE.md
+# Current State: 41 Tests Passing
 
-Comprehensive 5500+ line architecture specification covering:
+```
+✓ |@ai-commander/ecs| tests/world.test.ts (4 tests) 3ms
+✓ |@ai-commander/engine| tests/engine.test.ts (4 tests) 2ms
+✓ |@ai-commander/domain| tests/domain.test.ts (33 tests) 8ms
 
-**Part 1: Foundation**
+Test Files  3 passed (3)
+Tests  41 passed (41)
+```
 
-- Architectural Goals (8 goals covering modularity, determinism, testability, scalability)
-- Design Principles (7 principles: unidirectional flow, explicit interfaces, no hidden coupling, single responsibility, fail fast, deterministic, gradual adoption)
+---
 
-**Part 2: Architecture**
+# Files Modified
 
-- Layered Architecture (8 layers with specific responsibilities)
-- Layer Descriptions:
-  - Shared (utilities, no domain logic)
-  - Domain (data structures only, no implementation)
-  - Core (ECS and foundational abstractions)
-  - Engine (execution coordination)
-  - Decision (individual agent decisions)
-  - Planner (sequence generation)
-  - Strategy (high-level behavior)
-  - Applications (game integration)
+**Domain Module Files Created:**
+```
+packages/domain/src/types/
+├── identity.ts           # Entity, player, team, game IDs
+├── spatial.ts            # Position, map, region (flexible layout)
+├── temporal.ts           # Tick, phase, game time
+├── resource.ts           # Resource types, amounts, pools
+├── player.ts             # Player, team structures
+├── agent.ts              # Agent type, snapshots, state enum
+├── world.ts              # Complete world state snapshot
+├── action.ts             # Commands, action results
+├── event.ts              # Event types, public/private events
+├── perception.ts         # Visibility, fog of war, observation
+├── capability.ts         # Capabilities, goals, objectives
+└── index.ts              # All public exports
 
-**Part 3: Implementation**
+packages/domain/tests/
+└── domain.test.ts        # 33 comprehensive tests
 
-- Package Responsibilities (all 7 planned packages documented)
-- Module Boundaries (public/private distinction)
-- Dependency Rules (strict enforcement)
-- Public API Policy (stability guarantees)
-- Extension Points (plugins, adapters, evaluators)
+packages/domain/
+└── README.md             # Complete documentation
+```
 
-**Part 4: Technical Strategy**
+---
 
-- Configuration Philosophy (sources and types)
-- Error Handling Strategy (categories and principles)
-- Logging and Observability (events and tracing)
-- Testing Strategy (deterministic, multi-level, coverage goals)
-- Build Architecture (phases and guarantees)
-- Versioning Strategy (semantic versioning, breaking changes)
+# Next Steps for Implementation
 
-**Part 5: Non-Functional**
+The domain model is **complete and stable**. Next phase is **Planning and Decision Engines**:
 
-- Performance Considerations (design for performance, targets, monitoring)
-- Security Considerations (threat model, practices)
-- Future Evolution (phases, expansion without architectural changes)
-- Architecture Constraints (hard vs. soft, immutable rules)
+1. **Decision Layer** - Individual agent decisions based on observations
+2. **Planner Layer** - Sequence generation and search algorithms
+3. **Strategy Layer** - High-level behavior and multi-agent coordination
 
-### Created Architecture Decision Records
+The domain model provides the complete type system and data structures for these layers to build upon.
 
-**ADR-0001: Repository Architecture**
+---
 
-- Decided: npm Workspaces monorepo with TypeScript composite projects
-- Documents: directory structure, package organization, build system
-- Status: Approved and Implemented
-- References: npm Workspaces docs, TypeScript Project References
+# Key Points for Next Engineer/AI
 
-**ADR-0002: Dependency Direction**
+### What the Domain IS
+- Pure data structures defining game concepts
+- Type-safe with immutable value objects
+- Game-agnostic (supports any strategy game genre)
+- Complete vocabulary for describing game state
+- Foundation for higher layers
 
-- Decided: Strict unidirectional dependencies, no cycles
-- Documents: hierarchy, rules, enforcement mechanisms
-- Status: Approved and Implemented
-- Enforcement: TypeScript compiler prevents violations
+### What the Domain IS NOT
+- Game rules or validation
+- AI algorithms or planning
+- Action execution (that's Engine layer)
+- Network code or serialization
+- UI/graphics/audio
+- Game-specific implementations
 
-**ADR-0003: Module Boundaries**
+### Using the Domain
+```typescript
+import {
+  createWorld State, createAgent,
+  createCommand, createEvent,
+  createObservation,
+} from '@ai-commander/domain';
 
-- Decided: Public API from index.ts only, everything else internal
-- Documents: what's public, stability guarantees, changes
-- Status: Approved and Implemented
-- Enforcement: Import resolution and code review
+// Everything is immutable
+// Everything is typed
+// Everything validates on creation
+// No logic, just data
+```
 
-**ADR-0004: Package Naming Conventions**
+### Architecture Compliance
+✅ Domain depends only on Shared
+✅ All other layers depend on Domain
+✅ Pure value objects (no side effects)
+✅ Frozen/immutable objects
+✅ Exhaustive discriminated unions
+✅ No game-specific terminology
 
-- Decided: Kebab-case packages, PascalCase classes, camelCase functions
-- Documents: naming patterns, special cases, approved abbreviations
-- Status: Approved and Implemented
-- Examples: Engine, EngineConfig, createWorld(), DEFAULT_TICK_RATE
+---
 
-**ADR-0005: Public API Policy**
+# Next Session Focus
 
-- Decided: Three-tier API system (Stable, Experimental, Internal)
-- Documents: stability guarantees, evolution process, documentation requirements
-- Status: Approved and Implemented
-- Applies: Semantic versioning, deprecation periods, feedback loops
+**Planning and Decision Engines**
+
+Start with the Decision layer:
+- Decision interfaces and algorithms
+- Individual agent decision-making
+- Evaluating options based on observations
+- Action selection from capabilities
+
+The complete domain model is ready for use.
 
 ---
 
 # Files Changed This Session
 
-Created:
-
 ```
-.foundation/docs/ARCHITECTURE.md          # 5500+ lines
-.foundation/adr/ADR-0001-*.md             # 350 lines
-.foundation/adr/ADR-0002-*.md             # 360 lines
-.foundation/adr/ADR-0003-*.md             # 340 lines
-.foundation/adr/ADR-0004-*.md             # 380 lines
-.foundation/adr/ADR-0005-*.md             # 380 lines
+.foundation/state/PROJECT_STATE.md       # Added domain completion
+.foundation/state/SESSION_HANDOFF.md     # This file
+
+packages/domain/src/types/identity.ts    # Identity types
+packages/domain/src/types/spatial.ts     # Position, map, region
+packages/domain/src/types/temporal.ts    # Tick, phase, time
+packages/domain/src/types/resource.ts    # Resource system
+packages/domain/src/types/player.ts      # Player and team
+packages/domain/src/types/agent.ts       # Agent and snapshots
+packages/domain/src/types/world.ts       # World state
+packages/domain/src/types/action.ts      # Commands and results
+packages/domain/src/types/event.ts       # Events
+packages/domain/src/types/perception.ts  # Visibility and FOW
+packages/domain/src/types/capability.ts  # Capabilities, goals
+packages/domain/src/index.ts             # All exports
+
+packages/domain/tests/domain.test.ts     # 33 tests
+packages/domain/README.md                # Complete docs
 ```
-
-Updated:
-
-```
-.foundation/state/PROJECT_STATE.md        # Added foundation phase 2b
-.foundation/state/SESSION_HANDOFF.md      # This file
-```
-
----
-
-# Build Verification
-
-All checks still passing:
-
-```
-npm run build          ✅
-npm run typecheck      ✅
-npm run lint           ✅
-npm run format:check   ✅
-npm run test           ✅ 10/10 passing
-npm run doctor         ✅ All checks pass
-```
-
----
-
-# Architecture Decision Summary
-
-### Decisions Documented
-
-1. **Repository Structure** — npm Workspaces monorepo (ADR-0001)
-2. **Dependency Flow** — Strict unidirectional through layers (ADR-0002)
-3. **API Boundaries** — Public from index.ts, internal hidden (ADR-0003)
-4. **Naming** — Consistent conventions across codebase (ADR-0004)
-5. **API Stability** — Three-tier system with versioning (ADR-0005)
-
-### Implementation Verified
-
-- Repository structure matches documented design
-- TypeScript references prevent dependency violations
-- Package boundaries enforced through export structure
-- Naming conventions applied to all current code
-- API policies define versioning and evolution
-
----
-
-# Next Session Priorities
-
-**For the Next Engineer / AI:**
-
-The foundation is COMPLETE. You are ready to begin feature development.
-
-**Immediate Next Work:**
-
-1. Define domain models for strategy games
-2. Create game entity and action type definitions
-3. Implement perception and state representation interfaces
-4. Build initial decision and planning stubs
-5. Create simple agent implementation for validation
-6. Integrate with a test game scenario
-
-**Do NOT:**
-
-- Modify the frozen architecture without approval
-- Skip the documentation and ADR requirements
-- Create features without corresponding tests
-- Bypass the architectural boundaries
-
-**Before Starting:**
-
-1. Read `PROJECT_STATE.md`
-2. Read `.foundation/docs/ARCHITECTURE.md`
-3. Skim all 5 ADRs to understand design decisions
-4. Review current package exports in index.ts files
-5. Verify build still passes: `npm run doctor`
-
----
-
-# Technical Debt
-
-Current status: NONE IDENTIFIED
-
-The foundation is production-ready with:
-
-- ✅ Clean architecture
-- ✅ Comprehensive documentation
-- ✅ Type-safe implementation
-- ✅ Passing tests
-- ✅ Proper tooling
-- ✅ Clear design principles
-
----
-
-# Risks and Mitigations
-
-### Risks Identified
-
-**Architectural Drift During Feature Development**
-
-- Risk: Teams add features that violate the frozen architecture
-- Mitigation: Code review with architecture checklist
-- Mitigation: Require ADR for any architectural change
-- Mitigation: TypeScript composite projects prevent dependency violations
-
-**Documentation Falling Behind Implementation**
-
-- Risk: Code changes faster than documentation
-- Mitigation: Update documentation in same PR as code changes
-- Mitigation: Architecture enforces clear API boundaries
-- Mitigation: Session handoffs capture what changed
-
-### Current Risk Assessment
-
-**Overall Risk: LOW**
-
-The frozen architecture and comprehensive documentation provide strong guardrails for future development.
-
----
-
-# Documentation Summary
-
-### What Was Created
-
-1. **ARCHITECTURE.md** — 5500+ line canonical specification
-   - Complete layer definitions
-   - All design principles explained
-   - All policies documented
-   - Examples throughout
-   - Links to ADRs and related docs
-
-2. **Five ADRs** — Each 350-380 lines
-   - Status and date for each decision
-   - Full context explaining why
-   - Decision and consequences
-   - Implementation status verified
-   - Related references
-
-### What This Enables
-
-- **Onboarding** — A new senior engineer can read ARCHITECTURE.md and ADRs, understand the entire design
-- **Governance** — Clear standards for evaluating new proposals
-- **Consistency** — Teams follow documented patterns
-- **Evolution** — ADRs document how decisions were made and can guide future changes
-- **Confidence** — Architecture is frozen and documented; future work builds on solid foundation
 
 ---
 
 # Commits This Session
 
-**Commit 1: Bootstrap repository**
-
-- Repository structure, tooling, and initial packages
-
-**Commit 2: Update documentation**
-
-- PROJECT_STATE and SESSION_HANDOFF with foundation status
-
-**Commit 3: Architecture documentation**
-
-- ARCHITECTURE.md and all 5 ADRs
+1. **Implement game-agnostic domain model**
+   - All 11 domain modules
+   - 33 comprehensive tests
+   - Complete documentation
+   - All validation passing
 
 ---
 
-# Notes for the Next Engineer / AI
+# Summary
 
-### Before You Start
+The **domain model is complete**, **production-ready**, and **fully tested**. It provides a comprehensive, game-agnostic foundation for all strategy game types:
 
-1. **Read the Architecture** — `.foundation/docs/ARCHITECTURE.md` is complete
-2. **Review Decisions** — Read the 5 ADRs to understand why things are designed this way
-3. **Check Current State** — Run `npm run doctor` to verify everything builds
-4. **Understand Layers** — Know which layer your feature belongs to
-5. **Respect Boundaries** — Packages depend only on lower layers
+- ✅ 11 core concept modules
+- ✅ 41 tests passing (33 new)
+- ✅ Complete documentation
+- ✅ Zero technical debt
+- ✅ Frozen architecture preserved
 
-### Key Principles to Remember
-
-1. **Unidirectional Dependencies** — Never violate the layer hierarchy
-2. **No Circular Dependencies** — If you see a cycle, refactor immediately
-3. **Explicit APIs** — Only export from index.ts what's truly public
-4. **Stability Guarantees** — Public APIs are versioned and documented
-5. **Deterministic** — Agent behavior must be reproducible
-
-### Architecture Rules (Immutable)
-
-- No circular dependencies (hard constraint)
-- No shared mutable state (hard constraint)
-- Strict TypeScript mode (hard constraint)
-- All imports use explicit .js extensions (hard constraint)
-- Exports only from index.ts (architectural constraint)
-
-### When Adding Features
-
-1. Determine which layer/package it belongs to
-2. Follow naming conventions (ADR-0004)
-3. Create interfaces, not implementations
-4. Write tests (deterministic, comprehensive)
-5. Document public API
-6. Update SESSION_HANDOFF at session end
-
-### When Making Changes
-
-1. Respect module boundaries (ADR-0003)
-2. Don't depend on internals
-3. Use public APIs only
-4. If you need to change a public API, write an ADR
-5. Update ARCHITECTURE.md if the design changes
-
----
-
-# End-of-Session Checklist
-
-- ✅ Architecture documentation complete
-- ✅ All ADRs written and approved
-- ✅ Implementation matches documentation
-- ✅ Code still passing all validation
-- ✅ No circular dependencies
-- ✅ Design principles clear and documented
-- ✅ Foundation milestone closed
-- ✅ Ready for feature development
-- ✅ SESSION_HANDOFF updated
-
----
-
-# Handoff Summary
-
-**The AI Commander framework now has a complete, documented, frozen architecture.**
-
-All foundation work is complete:
-
-- ✅ Repository infrastructure
-- ✅ Engineering standards
-- ✅ Tooling configuration
-- ✅ Initial packages
-- ✅ Comprehensive tests
-- ✅ Canonical architecture specification
-- ✅ Architecture Decision Records
-- ✅ Design principles documented
-- ✅ API policies established
-- ✅ Naming conventions defined
-
-**The system is ready for feature implementation.**
-
-The frozen architecture provides a stable foundation that can accommodate years of growth and evolution without fundamental redesign. All architectural constraints are immutable. Future work builds upon these decisions.
-
-Teams can proceed with:
-
-- Domain model development
-- Planning and decision engine implementation
-- Game-specific agent development
-- Integration with game engines
-- Advanced AI techniques and optimizations
-
-All work should follow the documented architecture, naming conventions, API policies, and design principles. No architectural changes permitted without an approved ADR.
-
-The next meaningful milestone is **Core Feature Complete** — when domain models, planning, and decision making are implemented and validated.
+**Next step: Decision and Planning Engines** to enable intelligent agent behavior based on domain models.
