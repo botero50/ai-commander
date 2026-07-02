@@ -123,6 +123,9 @@ export class RuntimeMetricsCollector {
     ];
     const reasoningEventTypes = [
       'goal_created',
+      'goal_evaluated',
+      'goal_selected',
+      'goal_changed',
       'planner_invoked',
       'plan_generated',
       'plan_reused',
