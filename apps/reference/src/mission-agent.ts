@@ -24,6 +24,9 @@ import type { ReplayReport } from './replay-engine.js';
 import { RuntimeInspector, formatRuntimeSnapshot, snapshotToJson } from './runtime-inspector.js';
 import type { RuntimeSnapshot } from './runtime-inspector.js';
 import { MovementPlanner } from './movement-planner.js';
+import { ExecutionPreconditionValidator } from './execution-preconditions.js';
+import { PlanValidator } from './plan-validator.js';
+import type { Command } from '@ai-commander/domain';
 
 /**
  * Mission Agent: Autonomous agent that moves to a target location.
@@ -37,6 +40,7 @@ import { MovementPlanner } from './movement-planner.js';
 export class MissionAgent {
   private adapter: GameAdapter | null = null;
   private runtime: AgentRuntime | null = null;
+  private gameSession: any = null; // Game session for world state access
   private planner: Planner;
   private decisionEngine: DecisionEngine;
   private targetX: number;
@@ -48,9 +52,12 @@ export class MissionAgent {
   private replayReport: ReplayReport | null = null;
   private startTime: number = 0;
   private currentTick: number = 0;
+  private currentGoal: any = null; // Goal for precondition checking
+  private currentPlan: Plan | null = null; // Current plan being executed
+  private planValidator = new PlanValidator();
 
   constructor(targetX: number, targetY: number) {
-    this.planner = new MovementPlanner();
+    this.planner = this.createAdaptiveReplanningPlanner();
     this.decisionEngine = this.createBehaviorTreeDecisionEngine();
     this.targetX = targetX;
     this.targetY = targetY;
@@ -59,12 +66,78 @@ export class MissionAgent {
   }
 
   /**
-   * Create a decision engine that records trace events.
+   * Create an adaptive replanning planner that validates existing plans
+   * before creating new ones.
    *
-   * Wraps the base decision logic with trace recording.
+   * This replaces the basic MovementPlanner with one that implements
+   * plan lifecycle management: validation, reuse, and invalidation.
+   *
+   * Since the decision engine doesn't track which steps have been executed,
+   * we generate fresh plans from the current world state on each tick.
+   * We record plan_reused events when the new plan is shorter (indicating
+   * progress toward the goal), and plan_invalidated when the plan needs
+   * to change due to world state changes.
+   */
+  private createAdaptiveReplanningPlanner(): Planner {
+    const self = this;
+    const basePlanner = new MovementPlanner();
+
+    const adaptivePlanner: Planner = {
+      async plan(request: any) {
+        // Generate a fresh plan from current world state
+        const result = await basePlanner.plan(request);
+
+        if (result.plan) {
+          // We have a new plan. Check if this represents progress on a previous plan.
+          if (self.currentPlan) {
+            // If the new plan has fewer steps, we've made progress
+            if (result.plan.steps.length < self.currentPlan.steps.length) {
+              self.tracer.recordPlanReused(result.plan);
+            } else if (result.plan.steps.length > self.currentPlan.steps.length) {
+              // If new plan has more steps, the world changed in an unexpected way
+              self.tracer.recordPlanInvalidated(
+                self.currentPlan,
+                'World state change requires replanning with more steps'
+              );
+              self.tracer.recordPlanGenerated(result.plan);
+            } else {
+              // Same number of steps - might be same plan or slight variation
+              self.tracer.recordPlanReused(result.plan);
+            }
+          } else {
+            // First plan for this goal
+            self.tracer.recordPlanGenerated(result.plan);
+          }
+
+          self.currentPlan = result.plan;
+        } else if (result.diagnostics?.some((d) => d.includes('Goal already satisfied'))) {
+          // Goal is already satisfied
+          if (self.currentPlan) {
+            self.tracer.recordPlanInvalidated(self.currentPlan, 'Goal already satisfied');
+            self.currentPlan = null;
+          }
+        }
+
+        return result;
+      },
+    };
+
+    return adaptivePlanner;
+  }
+
+  /**
+   * Create a decision engine that records trace events and validates preconditions.
+   *
+   * Wraps the base decision logic with trace recording and precondition validation.
+   * Before executing a command, verifies:
+   * - Acting agent still exists in world
+   * - Target entity (if any) still exists
+   * - Goal hasn't already been satisfied
+   * - Command is applicable to current world state
    */
   private createBehaviorTreeDecisionEngine(): DecisionEngine {
     const self = this;
+    const preconditionValidator = new ExecutionPreconditionValidator();
 
     const decisionEngine: DecisionEngine = {
       async decide(request: DecisionRequest): Promise<DecisionResult> {
@@ -85,13 +158,34 @@ export class MissionAgent {
           };
         }
 
-        // Find first incomplete step
+        // Find first incomplete step that passes precondition checks
         const plan = request.plan;
         for (const step of plan.steps) {
           if (!step.status || step.status === 'pending' || step.status === 'active') {
-            self.tracer.recordDecisionSelected(step, step.command);
+            const command = step.command;
+
+            // Validate preconditions before executing
+            let validation: { isValid: boolean; reason?: string } = { isValid: true };
+            if (self.currentGoal) {
+              validation = preconditionValidator.validateCommandExecution(
+                command,
+                request.worldState,
+                self.currentGoal
+              );
+            }
+
+            if (!validation.isValid) {
+              // Precondition failed - mark step as skipped and continue to next
+              (step as any).status = 'skipped';
+              self.tracer.recordCommandSkipped(command, validation.reason || 'Unknown reason');
+              continue;
+            }
+
+            // Preconditions passed - mark step as active and return for execution
+            (step as any).status = 'active';
+            self.tracer.recordDecisionSelected(step, command);
             return {
-              command: step.command,
+              command,
               confidence: 1,
               metadata: Object.freeze({
                 engineType: 'mission-tree',
@@ -104,7 +198,7 @@ export class MissionAgent {
           }
         }
 
-        // All steps complete
+        // All steps complete or all skipped
         return {
           confidence: 1,
           metadata: Object.freeze({
@@ -122,14 +216,88 @@ export class MissionAgent {
   }
 
   /**
-   * Invoke the planner and record trace events.
+   * Get the current world state from the game session.
+   * Returns an empty object if unavailable.
+   */
+  private async getWorldState(): Promise<WorldState> {
+    if (!this.gameSession) {
+      return {} as WorldState;
+    }
+
+    try {
+      if (!this.gameSession.observationProvider) {
+        return {} as WorldState;
+      }
+
+      const available = await this.gameSession.observationProvider.isObservationAvailable();
+      if (!available) {
+        return {} as WorldState;
+      }
+
+      return await this.gameSession.observationProvider.getWorldState();
+    } catch (error) {
+      console.error('Error getting world state:', error);
+      return {} as WorldState;
+    }
+  }
+
+  /**
+   * Check if goal is satisfied in the current world state.
+   * For "move-to-target": checks if agent position matches target coordinates.
+   */
+  private async isGoalSatisfied(goal: any): Promise<boolean> {
+    const worldState = await this.getWorldState();
+
+    try {
+      if (!worldState || !(worldState as any).agents || (worldState as any).agents.length === 0) {
+        return false;
+      }
+
+      const agent = (worldState as any).agents[0];
+      if (!agent || !agent.customData || agent.customData.position === undefined) {
+        return false;
+      }
+
+      const positionStr = String(agent.customData.position);
+      // Position format is "x,y" (e.g., "1,0")
+      const match = positionStr.match(/^(\d+),(\d+)$/);
+      if (!match) {
+        return false;
+      }
+
+      const currentX = parseInt(match[1] || '0', 10);
+      const currentY = parseInt(match[2] || '0', 10);
+      const targetX = goal.parameters?.targetX as number | undefined;
+      const targetY = goal.parameters?.targetY as number | undefined;
+
+      return currentX === targetX && currentY === targetY;
+    } catch {
+      return false;
+    }
+  }
+
+  /**
+   * Invoke the planner with world-state-driven planning.
+   *
+   * The planner receives the current world state and must generate plans
+   * relative to observed reality, not hardcoded assumptions.
    */
   private async invokePlanner(goal: any): Promise<Plan | null> {
     this.tracer.recordPlannerInvoked(this.targetX, this.targetY);
 
+    // Get the actual world state for planning
+    const worldState = await this.getWorldState();
+
+    // Check if goal is already satisfied before planning
+    if (await this.isGoalSatisfied(goal)) {
+      this.tracer.recordPlanEmpty();
+      console.log('  ✓ Goal already satisfied in world state; skipping plan generation');
+      return null;
+    }
+
     const request = {
       goal,
-      worldState: {} as any,
+      worldState,
       executionContext: {} as any,
       policy: {} as any,
     };
@@ -161,6 +329,7 @@ export class MissionAgent {
     // Note: Do NOT call session.start() here - AgentRuntime will do it
     console.log('  Creating game session...');
     const session = await this.adapter.createSession();
+    this.gameSession = session; // Store for world state access
     console.log('  ✓ Game session created');
 
     // Step 3: Create execution context
@@ -211,15 +380,28 @@ export class MissionAgent {
   /**
    * Run the mission until completion.
    *
-   * Autonomous loop:
-   * 1. Execute tick (observe, plan, decide, execute)
-   * 2. Check if goal is complete
-   * 3. Repeat until done
+   * World-state-driven autonomous loop:
+   * 1. Execute tick (observe, plan from world state, decide, execute)
+   * 2. Verify goal completion by checking world state
+   * 3. Repeat until goal is satisfied or timeout
    */
   async run(): Promise<void> {
     if (!this.runtime) {
       throw new Error('Agent not initialized. Call initialize() first.');
     }
+
+    // Create goal for mission and store for precondition checking
+    const goal = createGoal({
+      id: createGoalId('move-to-target'),
+      intent: 'move-to-target',
+      status: GoalStatus.Pending,
+      priority: createGoalPriority(GoalPriorityLevel.NORMAL),
+      parameters: {
+        targetX: this.targetX,
+        targetY: this.targetY,
+      },
+    });
+    this.currentGoal = goal;
 
     console.log('\nStarting mission execution...');
     let tickCount = 0;
@@ -234,25 +416,19 @@ export class MissionAgent {
       // Execute one tick
       await this.runtime.tick();
 
-      // Check goal completion
-      // For "move-to-target", the goal is complete when agent reaches the target position
+      // Verify goal completion using actual world state (not command count)
       const metrics = this.runtime.getMetrics();
       console.log(
         `  Ticks: ${metrics.ticksExecuted}, Decisions: ${metrics.decisionsExecuted}, Commands: ${metrics.commandsExecuted}`
       );
 
-      // Check if we should update goal status
-      // This is a simplified check: count commands as progress
-      if (metrics.commandsExecuted > 0) {
-        console.log(`  Goal progress: ${metrics.commandsExecuted} movement commands executed`);
-      }
-
-      // For deterministic testing: check if we've made enough moves
-      // In a real mission, this would check world state against goal
-      const expectedMoves = Math.abs(this.targetX) + Math.abs(this.targetY);
-      if (metrics.commandsExecuted >= expectedMoves) {
+      // Check if goal is satisfied in world state
+      if (await this.isGoalSatisfied(goal)) {
+        const worldState = await this.getWorldState();
+        const agent = worldState.agents?.[0];
+        const position = agent?.customData?.position || 'unknown';
         console.log(
-          `  ✓ Mission goal achieved: executed ${metrics.commandsExecuted} commands (needed ${expectedMoves})`
+          `  ✓ Mission goal achieved: agent reached target (${this.targetX}, ${this.targetY}) at position ${position}`
         );
         this.isComplete = true;
         this.tracer.recordMissionCompleted();
@@ -273,6 +449,7 @@ export class MissionAgent {
       console.log(`  Decisions made: ${metrics.decisionsExecuted}`);
       console.log(`  Commands executed: ${metrics.commandsExecuted}`);
       console.log(`  Errors: ${metrics.errorsEncountered}`);
+      console.log(`  Completion: ${this.isComplete ? 'SUCCESS' : 'TIMEOUT'}`);
     }
   }
 

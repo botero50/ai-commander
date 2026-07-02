@@ -33,6 +33,8 @@ export type TraceEventType =
   | 'goal_created'
   | 'planner_invoked'
   | 'plan_generated'
+  | 'plan_reused'
+  | 'plan_invalidated'
   | 'plan_empty'
   | 'plan_error'
   | 'decision_engine_invoked'
@@ -40,6 +42,7 @@ export type TraceEventType =
   | 'decision_error'
   | 'command_executed'
   | 'command_failed'
+  | 'command_skipped'
   | 'world_state_updated'
   | 'mission_tick'
   | 'mission_completed'
@@ -135,6 +138,20 @@ export class ExecutionTracer {
     });
   }
 
+  recordPlanReused(plan: Plan): void {
+    this.addEvent('plan_reused', {
+      planId: plan.id,
+      stepCount: plan.steps.length,
+    });
+  }
+
+  recordPlanInvalidated(plan: Plan, reason: string): void {
+    this.addEvent('plan_invalidated', {
+      planId: plan.id,
+      reason,
+    });
+  }
+
   recordDecisionEngineInvoked(): void {
     this.addEvent('decision_engine_invoked', {});
   }
@@ -170,6 +187,14 @@ export class ExecutionTracer {
       commandParameters: command.parameters,
       message: result.message,
       error: result.error,
+    });
+  }
+
+  recordCommandSkipped(command: Command, reason: string): void {
+    this.addEvent('command_skipped', {
+      commandActionType: command.actionType,
+      commandParameters: command.parameters,
+      reason,
     });
   }
 
@@ -264,6 +289,11 @@ export function formatTrace(trace: ExecutionTrace): string {
       lines.push(`    Goal: ${event.data.goalIntent as string}`);
     } else if (event.eventType === 'plan_generated') {
       lines.push(`    Plan: ${event.data.stepCount as number} steps`);
+    } else if (event.eventType === 'plan_reused') {
+      lines.push(`    Plan reused: ${event.data.stepCount as number} steps`);
+    } else if (event.eventType === 'plan_invalidated') {
+      lines.push(`    Plan invalidated`);
+      lines.push(`    Reason: ${event.data.reason as string}`);
     } else if (event.eventType === 'decision_selected') {
       lines.push(
         `    Selected: ${event.data.commandActionType as string}(${JSON.stringify(event.data.commandParameters)})`
@@ -273,6 +303,11 @@ export function formatTrace(trace: ExecutionTrace): string {
         `    Command: ${event.data.commandActionType as string}(${JSON.stringify(event.data.commandParameters)})`
       );
       lines.push(`    Result: ${event.data.success ? 'SUCCESS' : 'FAILED'}`);
+    } else if (event.eventType === 'command_skipped') {
+      lines.push(
+        `    Skipped: ${event.data.commandActionType as string}(${JSON.stringify(event.data.commandParameters)})`
+      );
+      lines.push(`    Reason: ${event.data.reason as string}`);
     } else if (event.eventType === 'world_state_updated') {
       lines.push(`    Position: (${event.data.agentX as number}, ${event.data.agentY as number})`);
     }
