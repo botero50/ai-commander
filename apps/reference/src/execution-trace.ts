@@ -34,6 +34,9 @@ export type TraceEventType =
   | 'goal_evaluated'
   | 'goal_selected'
   | 'goal_changed'
+  | 'goal_progress_updated'
+  | 'goal_progress_trend_changed'
+  | 'goal_completed'
   | 'planner_invoked'
   | 'plan_generated'
   | 'plan_reused'
@@ -140,6 +143,34 @@ export class ExecutionTracer {
       newGoalId: newGoal.id,
       newGoalIntent: newGoal.intent,
       reason,
+    });
+  }
+
+  recordGoalProgressUpdated(progress: any): void {
+    this.addEvent('goal_progress_updated', {
+      goalId: progress.goalId,
+      goalIntent: progress.goalIntent,
+      progressPercent: progress.progressPercent,
+      progressReason: progress.progressReason,
+      trend: progress.trend,
+      evidence: progress.evidence,
+    });
+  }
+
+  recordGoalProgressTrendChanged(goalId: string, goalIntent: string, previousTrend: string, newTrend: string): void {
+    this.addEvent('goal_progress_trend_changed', {
+      goalId,
+      goalIntent,
+      previousTrend,
+      newTrend,
+    });
+  }
+
+  recordGoalCompleted(goalId: string, goalIntent: string, finalProgress: number): void {
+    this.addEvent('goal_completed', {
+      goalId,
+      goalIntent,
+      finalProgress,
     });
   }
 
@@ -366,6 +397,15 @@ export function formatTrace(trace: ExecutionTrace): string {
       lines.push(`    From: ${event.data.previousGoalIntent as string}`);
       lines.push(`    To: ${event.data.newGoalIntent as string}`);
       lines.push(`    Reason: ${event.data.reason as string}`);
+    } else if (event.eventType === 'goal_progress_updated') {
+      lines.push(`    📈 Progress: ${event.data.progressPercent as number}%`);
+      lines.push(`    Trend: ${event.data.trend as string}`);
+      lines.push(`    ${event.data.progressReason as string}`);
+    } else if (event.eventType === 'goal_progress_trend_changed') {
+      lines.push(`    📊 Trend changed: ${event.data.previousTrend as string} → ${event.data.newTrend as string}`);
+    } else if (event.eventType === 'goal_completed') {
+      lines.push(`    ✅ Goal completed: ${event.data.goalIntent as string}`);
+      lines.push(`    Final progress: ${event.data.finalProgress as number}%`);
     } else if (event.eventType === 'plan_generated') {
       lines.push(`    Plan: ${event.data.stepCount as number} steps`);
     } else if (event.eventType === 'plan_reused') {
