@@ -1,52 +1,525 @@
-# AI Commander — Session Handoff
+# Session Handoff — AI Commander
 
-**Location:** `.foundation/state/SESSION_HANDOFF.md`
+**Purpose**: Enable any engineer to resume work immediately without reading chat history.
 
----
+**Last Updated**: July 2, 2026
 
-# SESSION HANDOFF
-
-> This document captures the current working context at the end of each engineering session.
->
-> Unlike `PROJECT_STATE.md`, which represents the canonical project status, this file represents the current implementation context and the immediate next actions.
->
-> It is expected to change every session.
+**Current Status**: Framework stable, product-layer actively developing
 
 ---
 
-# Session Information
+# Quick Start for Next Engineer
 
-**Date**
+1. **Read this file** (you are here)
+2. **Read `.foundation/state/PROJECT_STATE.md`** (comprehensive state)
+3. **Read `.foundation/state/CTO_CONTEXT.md`** (strategic principles)
+4. **Check out latest story**: `STORY_096_DELIVERABLE.md`
+5. **Run the demo**: `pnpm demo` (see everything in action)
 
-```text
-2026-07-02 (Stories 091-094 completion)
-```
+---
 
-**Project**
+# Repository Status
 
-```text
-AI Commander
-```
+**Branch**: main  
+**Latest Commit**: `5fcd9cd` — Story 096: Goal Progress Evaluation - Complete  
+**Test Status**: 980/980 passing ✅  
+**Build Status**: Clean ✅  
+**Framework Status**: Frozen and proven ✅  
 
-**Architecture Version**
-
-```text
-1.0 (Frozen)
-```
-
-**Current Release**
-
-```text
-1.0.0 (GA)
+```bash
+# Verify everything works
+pnpm install
+pnpm typecheck
+pnpm lint
+pnpm test
+pnpm build
 ```
 
 ---
 
-# Session Objective
+# Current Milestone
 
-Complete Stories 091-094: Autonomous Agent Intelligence
+**Milestone 5: Mission Intelligence** (In Progress)
 
-Completed in this session:
+### Completed Stories (091-096)
+
+Stories deliver observable agent intelligence:
+
+| Story | Title | Outcome |
+|-------|-------|---------|
+| 091 ✅ | Goal State Verification | Agent verifies goals are achieved in world |
+| 092 ✅ | Dynamic Replanning | Agent replans based on actual state |
+| 093 ✅ | Plan Invalidation | Agent detects invalid plans and regenerates |
+| 094 ✅ | Failure Diagnosis & Recovery | Agent recovers from command failures |
+| 095 ✅ | Goal Evaluation & Prioritization | Agent switches to higher-priority goals |
+| 096 ✅ | Goal Progress Evaluation | Agent measures progress toward goals |
+
+### In Progress (097-100)
+
+Pending stories to complete the milestone:
+
+| Story | Title | Dependency |
+|-------|-------|------------|
+| 097 | Dashboard Progress Visualization | Requires 096 ✅ |
+| 098 | Multi-Goal Orchestration | Requires 096, 097 |
+| 099 | Goal Completion Callbacks | Requires 098 |
+| 100 | Adaptive Goal Adjustment | Requires 099 |
+
+---
+
+# Last Completed Story
+
+**Story 096: Goal Progress Evaluation**
+
+### What It Does
+
+Agents now measure progress toward goals using observable world state:
+
+- **Progress Calculation**: Manhattan distance from current position to target
+- **Trend Detection**: improving / stable / regressing
+- **Evidence Recording**: Full measurement details in execution trace
+- **History Tracking**: Last 20 progress records per goal
+
+### Files Changed
+
+- Created: `goal-progress-evaluator.ts` (344 lines)
+- Created: `goal-progress-evaluator.test.ts` (300 lines, 25 tests)
+- Modified: `execution-trace.ts` (+3 event types, +recording methods)
+- Modified: `runtime-metrics.ts` (+3 progress event types)
+
+### Test Results
+
+- All 25 new tests passing
+- 980 total tests passing (↑ from 962)
+- 52 test suites, 100% pass rate
+
+### Deliverable
+
+See: `STORY_096_DELIVERABLE.md` for comprehensive documentation
+
+---
+
+# Current Product Status
+
+## Agent Capabilities
+
+✅ **Observable Goal Achievement**
+- Agent verifies goals are satisfied in world state
+- Not just counting commands executed
+
+✅ **Adaptive Planning**
+- Plans updated based on actual agent position
+- Not cached or assumed
+
+✅ **Plan Validation**
+- Invalid plans detected and regenerated
+- Failures trigger replanning
+
+✅ **Failure Recovery**
+- Command failures detected
+- Recovery strategies selected
+- Execution resumes
+
+✅ **Goal Prioritization**
+- Multiple goals evaluated
+- Agent switches to higher-priority goals
+- Scoring is observable
+
+✅ **Progress Measurement**
+- Goal progress calculated from world state
+- 0-100% with evidence
+- Trends tracked (improving/stable/regressing)
+
+## What This Looks Like
+
+When you run `pnpm demo`:
+
+1. Browser dashboard opens (http://localhost:3000)
+2. Agent executes a mission
+3. You can see:
+   - Real-time progress toward goal
+   - Agent position on the map
+   - Every decision made
+   - Every command executed
+   - Reasons for each action
+   - Progress trends
+
+This **feels intelligent** because the agent demonstrates observable goal-awareness.
+
+---
+
+# Important Design Decisions
+
+## Framework is Frozen
+
+The framework (`packages/*`) has not changed in 6 months. It is proven correct.
+
+**What This Means**:
+- No new features in framework packages
+- No architectural changes without ADR
+- Product development happens in `apps/reference/` only
+- Intelligence is built in application layer
+
+**Why It Matters**:
+- Stability for years of development
+- Other teams can use frozen framework
+- Focus on product differentiation, not infrastructure
+
+## Product-First Philosophy
+
+All recent work (Stories 091-096) occurred in `apps/reference/` with ZERO framework changes.
+
+**Pattern**:
+```
+Domain/Framework (frozen) ← Application Layer (evolving)
+```
+
+The framework provides contracts. Applications implement intelligence.
+
+## Observable, Not Assumed
+
+Agent behavior is **measured from world state**, not estimated from command history.
+
+**Example (Story 096)**:
+```typescript
+// WRONG (old approach):
+progress = (commandsExecuted / expectedCommands) * 100
+
+// RIGHT (new approach):
+const distance = Math.abs(targetX - currentX) + Math.abs(targetY - currentY);
+progress = (initialDistance - distance) / initialDistance * 100
+```
+
+This makes progress **deterministic** and **verifiable**.
+
+## YAGNI is Enforced
+
+"You Aren't Gonna Need It" is a release gate.
+
+**What This Means**:
+- No abstract base classes without implementations
+- No interfaces for hypothetical future use
+- No layers or services until needed
+- Every line solves a current problem
+
+**Example**: Stories 091-096 added intelligence without new abstractions. Pure application code.
+
+---
+
+# Current Repository Structure
+
+```
+ai-commander/
+├── .foundation/
+│   ├── adr/                    # 5 approved ADRs
+│   ├── docs/
+│   │   └── ARCHITECTURE.md     # 5500+ lines, FROZEN
+│   ├── design-review/          # Analysis and decisions
+│   ├── research/               # Game evaluation, OpenRA research
+│   └── state/
+│       ├── PROJECT_STATE.md    # ← COMPREHENSIVE STATE (read this)
+│       ├── SESSION_HANDOFF.md  # ← YOU ARE HERE
+│       └── CTO_CONTEXT.md      # ← STRATEGIC PRINCIPLES (read next)
+├── packages/
+│   ├── domain/                 # Game-agnostic types (FROZEN)
+│   ├── core/                   # Infrastructure (FROZEN)
+│   ├── engine/                 # Execution loop (FROZEN)
+│   ├── adapter/                # Game adapter contracts (FROZEN)
+│   ├── fake-game-adapter/      # Reference implementation (FROZEN)
+│   ├── openra-adapter/         # OpenRA integration (production-validated)
+│   ├── planner/                # Planner interface (FROZEN)
+│   ├── goals/                  # Goal system (FROZEN, Story 091)
+│   ├── decision/               # Decision interface (FROZEN)
+│   ├── agent-runtime/          # Agent orchestration (FROZEN)
+│   └── behavior-tree/          # Behavior trees (FROZEN)
+├── apps/
+│   └── reference/              # ← PRODUCT DEVELOPMENT HAPPENS HERE
+│       ├── src/
+│       │   ├── mission-agent.ts           # Orchestrates missions
+│       │   ├── movement-planner.ts        # Domain-specific planner
+│       │   ├── goal-progress-evaluator.ts # Story 096 implementation
+│       │   ├── execution-trace.ts         # Observability
+│       │   ├── runtime-metrics.ts         # Metrics
+│       │   ├── dashboard-server.ts        # Browser dashboard
+│       │   └── [CLI tools and utilities]
+│       └── tests/
+├── docs/
+│   ├── README.md               # Documentation index
+│   ├── QUICK_START.md          # 10-minute onboarding
+│   ├── DEVELOPER_GUIDE.md      # Architecture and patterns
+│   └── GUIDES.md               # Step-by-step how-tos
+└── README.md                   # Main project documentation
+```
+
+**Key Insight**: Framework is frozen (left side). Product development is active (right side).
+
+---
+
+# Constraints
+
+These are NOT suggestions. They are enforced.
+
+## Architecture Frozen
+
+- Cannot modify package boundaries
+- Cannot add new framework packages
+- Cannot change public API contracts
+- Cannot introduce circular dependencies
+
+**Exception**: Approved Architecture Decision Record (ADR)
+
+## Framework Runtime Frozen
+
+- Cannot change AgentRuntime interface
+- Cannot change Planner interface
+- Cannot change DecisionEngine interface
+- Cannot change GameAdapter interface
+
+**Exception**: Approved ADR (hasn't happened)
+
+## Product-First Mandate
+
+- All development happens in `apps/reference/` or application-specific code
+- Framework changes are rare and require ADR
+- Test-first development required
+- YAGNI enforced (no speculative code)
+
+## Code Quality Mandatory
+
+- TypeScript strict mode (no exceptions)
+- All tests passing (0 failures)
+- Lint clean (ESLint)
+- Properly formatted (Prettier)
+- No technical debt
+
+---
+
+# How to Start Work
+
+## 1. Understand the Current State
+
+Read these files in order:
+
+1. `PROJECT_STATE.md` (comprehensive snapshot)
+2. `CTO_CONTEXT.md` (strategic principles)
+3. Latest story deliverable (e.g., `STORY_096_DELIVERABLE.md`)
+
+## 2. Run the Demo
+
+```bash
+cd ai-commander
+pnpm install
+pnpm demo
+```
+
+This:
+- Builds everything
+- Runs tests
+- Launches browser dashboard
+- Executes autonomous mission
+- Shows complete observability stack
+
+## 3. Understand the Architecture
+
+Read these in order:
+
+1. `.foundation/docs/ARCHITECTURE.md` (complete frozen spec, 5500+ lines)
+2. `.foundation/adr/*.md` (5 architecture decisions)
+3. `packages/*/README.md` (package-specific docs)
+
+## 4. Get Next Story Spec from CTO
+
+The next story (097, 098, etc.) will be provided with:
+- Detailed requirements
+- Acceptance criteria
+- Specification
+- Any architectural guidance
+
+## 5. Implement Following Pattern
+
+```
+1. Create feature in apps/reference/src/
+2. Write tests for all scenarios
+3. Verify all checks pass: pnpm doctor
+4. Create STORY_###_DELIVERABLE.md
+5. Update PROJECT_STATE.md if needed
+6. Commit and ready for merge
+```
+
+---
+
+# Recommended Next Story
+
+Based on current state, the next logical story is:
+
+**Story 097: Dashboard Progress Visualization**
+
+### Objective
+
+Integrate goal progress data (from Story 096) into the browser dashboard.
+
+### What Users Will See
+
+- Current goal progress as a percentage bar
+- Trend indicator (↑ improving / → stable / ↓ regressing)
+- Evidence cards showing measurements
+- Progress over time (last 5 measurements)
+
+### Dependencies
+
+- ✅ Story 096 (GoalProgressEvaluator, trace events)
+- ✅ Dashboard infrastructure already exists
+- ✅ Browser rendering infrastructure ready
+
+### Why This Story
+
+Makes progress **visible** in the dashboard. Users can watch the agent make progress toward its goal in real-time.
+
+### Estimated Effort
+
+3-5 days (UI integration + tests)
+
+---
+
+# Tools and Commands
+
+## Daily Development
+
+```bash
+# Start demo (launches browser)
+pnpm demo
+
+# Run all checks (CI equivalent)
+pnpm doctor
+
+# Run tests with watch
+pnpm test:watch
+
+# Type check
+pnpm typecheck
+
+# Lint
+pnpm lint
+
+# Format
+pnpm format
+
+# Build everything
+pnpm build
+```
+
+## Reference Application
+
+```bash
+cd apps/reference
+
+# Run mission
+pnpm mission run --target-x 5 --target-y 3
+
+# See execution trace
+pnpm mission trace
+
+# View runtime metrics
+pnpm mission metrics
+
+# Validate execution consistency
+pnpm mission replay
+
+# View complete report
+pnpm mission report
+
+# Inspect runtime state
+pnpm mission inspect
+
+# Get help
+pnpm mission --help
+```
+
+## Story Deliverables
+
+Each completed story has a deliverable document:
+
+```
+STORY_096_DELIVERABLE.md    # Latest (Story 096)
+STORY_095_DELIVERABLE.md    # Previous
+STORY_094_DELIVERABLE.md    # Previous
+```
+
+Read the latest deliverable to understand what was just built.
+
+---
+
+# Troubleshooting
+
+## Tests Failing
+
+1. Clear node_modules: `rm -rf node_modules && pnpm install`
+2. Check Node version: `node --version` (need 22+)
+3. Run individual test: `cd packages/goals && pnpm test`
+
+## Build Errors
+
+1. Check TypeScript: `pnpm typecheck`
+2. Check lint: `pnpm lint`
+3. Check format: `pnpm format`
+
+## Demo Not Starting
+
+1. Port 3000 in use? Change: `const PORT = 3001` in dashboard-server.ts
+2. Browser not opening? Manual: http://localhost:3000
+3. Game not available? Check `pnpm mission run` output for errors
+
+---
+
+# Key Metrics
+
+## Code Quality
+
+- **Tests**: 980 passing across 52 suites (100% pass rate)
+- **Lint**: 0 errors
+- **Format**: 100% compliance
+- **Types**: Strict mode, 0 errors
+- **Build**: Clean
+
+## Framework
+
+- **Packages**: 13 (all frozen, production-ready)
+- **Lines**: 5000+ (foundation + contracts)
+- **Architecture**: Fully documented (5500+ lines in ARCHITECTURE.md)
+- **Dependencies**: Unidirectional, no cycles
+
+## Product
+
+- **Stories Completed**: 96 (001-096)
+- **Latest Milestone**: Mission Intelligence (6 of 9 stories done)
+- **Agent Capabilities**: Goal-aware, adaptive, recovers from failures
+- **Observability**: Traces (22+ events), Metrics (26 types), Replay validation, Inspector
+
+---
+
+# When You Hand Off to the Next Engineer
+
+1. Update this file with current status
+2. Update PROJECT_STATE.md if major work completed
+3. Commit: `git commit -am "Session handoff: Update state documents"`
+4. Leave a note if there are gotchas
+
+---
+
+# Questions?
+
+If something is unclear, check:
+
+1. `.foundation/docs/ARCHITECTURE.md` — comprehensive specification
+2. `packages/*/README.md` — package-specific documentation
+3. `STORY_###_DELIVERABLE.md` — latest work completed
+4. `.foundation/adr/*.md` — architectural decisions
+
+Everything is documented. If it's not, that's a bug.
+
+---
+
+**Good luck! The codebase is in excellent shape. Focus on the next story and keep the repository clean.**
 
 **Previous Sessions:**
 
