@@ -26,6 +26,7 @@ import type { RuntimeSnapshot } from './runtime-inspector.js';
 import { MovementPlanner } from './movement-planner.js';
 import { ExecutionPreconditionValidator } from './execution-preconditions.js';
 import { PlanValidator } from './plan-validator.js';
+import { FailureDiagnoser, RecoveryStrategy } from './failure-diagnosis.js';
 import type { Command } from '@ai-commander/domain';
 
 /**
@@ -55,6 +56,8 @@ export class MissionAgent {
   private currentGoal: any = null; // Goal for precondition checking
   private currentPlan: Plan | null = null; // Current plan being executed
   private planValidator = new PlanValidator();
+  private failureDiagnoser = new FailureDiagnoser();
+  private recoveryStrategy = new RecoveryStrategy();
 
   constructor(targetX: number, targetY: number) {
     this.planner = this.createAdaptiveReplanningPlanner();
@@ -413,25 +416,98 @@ export class MissionAgent {
       this.tracer.recordMissionTick(tickCount);
       console.log(`\n[Tick ${tickCount}] Executing agent tick...`);
 
-      // Execute one tick
-      await this.runtime.tick();
+      try {
+        // Execute one tick
+        await this.runtime.tick();
 
-      // Verify goal completion using actual world state (not command count)
-      const metrics = this.runtime.getMetrics();
-      console.log(
-        `  Ticks: ${metrics.ticksExecuted}, Decisions: ${metrics.decisionsExecuted}, Commands: ${metrics.commandsExecuted}`
-      );
-
-      // Check if goal is satisfied in world state
-      if (await this.isGoalSatisfied(goal)) {
-        const worldState = await this.getWorldState();
-        const agent = worldState.agents?.[0];
-        const position = agent?.customData?.position || 'unknown';
+        // Verify goal completion using actual world state (not command count)
+        const metrics = this.runtime.getMetrics();
         console.log(
-          `  ✓ Mission goal achieved: agent reached target (${this.targetX}, ${this.targetY}) at position ${position}`
+          `  Ticks: ${metrics.ticksExecuted}, Decisions: ${metrics.decisionsExecuted}, Commands: ${metrics.commandsExecuted}`
         );
-        this.isComplete = true;
-        this.tracer.recordMissionCompleted();
+
+        // Check if goal is satisfied in world state
+        if (await this.isGoalSatisfied(goal)) {
+          const worldState = await this.getWorldState();
+          const agent = worldState.agents?.[0];
+          const position = agent?.customData?.position || 'unknown';
+          console.log(
+            `  ✓ Mission goal achieved: agent reached target (${this.targetX}, ${this.targetY}) at position ${position}`
+          );
+          this.isComplete = true;
+          this.tracer.recordMissionCompleted();
+        }
+      } catch (error) {
+        // Failure occurred - diagnose and recover
+        const worldState = await this.getWorldState();
+        const errorMsg = error instanceof Error ? error.message : String(error);
+
+        console.log(`  ⚠ Failure detected: ${errorMsg}`);
+        this.tracer.recordFailureDetected(errorMsg);
+
+        // Generate diagnosis
+        const diagnosis = this.failureDiagnoser.diagnose({
+          worldState,
+          goal,
+          plan: this.currentPlan ?? undefined,
+          error: errorMsg,
+        });
+
+        console.log(`  📋 Diagnosis: ${diagnosis.category} (${diagnosis.severity})`);
+        console.log(`     ${diagnosis.description}`);
+        this.tracer.recordDiagnosisGenerated(diagnosis);
+
+        // Determine recovery action
+        const recovery = this.recoveryStrategy.decide(diagnosis);
+
+        console.log(`  🔧 Recovery: ${recovery.action}`);
+        console.log(`     ${recovery.reason}`);
+        this.tracer.recordRecoverySelected(recovery);
+
+        // Execute recovery action
+        let recoveryOutcome = 'unknown';
+
+        switch (recovery.action) {
+          case 'continue_plan':
+            recoveryOutcome = 'continued execution with current plan';
+            break;
+
+          case 'skip_action':
+            // Skip the failed action and try next tick
+            recoveryOutcome = 'skipped failed action, continuing';
+            break;
+
+          case 'retry_action':
+            // Not currently implemented in this version
+            recoveryOutcome = 'retry action (not yet implemented)';
+            break;
+
+          case 'invalidate_plan':
+            // Invalidate current plan, will be regenerated next tick
+            this.currentPlan = null;
+            recoveryOutcome = 'plan invalidated, will regenerate on next tick';
+            break;
+
+          case 'generate_replacement_plan':
+            // Immediately generate new plan
+            this.currentPlan = null;
+            recoveryOutcome = 'generating new plan';
+            break;
+
+          case 'abort_mission':
+            // Mission cannot continue
+            console.log(`  ✗ Aborting mission due to: ${diagnosis.description}`);
+            this.isComplete = true;
+            this.tracer.recordMissionFailed(diagnosis.description);
+            recoveryOutcome = 'mission aborted';
+            break;
+
+          default:
+            recoveryOutcome = 'unknown recovery action';
+        }
+
+        console.log(`  ✓ ${recoveryOutcome}`);
+        this.tracer.recordRecoveryCompleted(recovery.action, recoveryOutcome);
       }
     }
 

@@ -132,12 +132,16 @@ export class RuntimeMetricsCollector {
       'decision_engine_invoked',
       'decision_selected',
       'decision_error',
+      'diagnosis_generated',
     ];
     const executionEventTypes = [
       'mission_tick',
       'command_executed',
       'command_failed',
       'command_skipped',
+      'failure_detected',
+      'recovery_selected',
+      'recovery_completed',
       'world_state_updated',
     ];
 

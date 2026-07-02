@@ -43,6 +43,10 @@ export type TraceEventType =
   | 'command_executed'
   | 'command_failed'
   | 'command_skipped'
+  | 'failure_detected'
+  | 'diagnosis_generated'
+  | 'recovery_selected'
+  | 'recovery_completed'
   | 'world_state_updated'
   | 'mission_tick'
   | 'mission_completed'
@@ -198,6 +202,35 @@ export class ExecutionTracer {
     });
   }
 
+  recordFailureDetected(reason: string): void {
+    this.addEvent('failure_detected', {
+      reason,
+    });
+  }
+
+  recordDiagnosisGenerated(diagnosis: any): void {
+    this.addEvent('diagnosis_generated', {
+      category: diagnosis.category,
+      severity: diagnosis.severity,
+      description: diagnosis.description,
+      evidence: diagnosis.evidence,
+    });
+  }
+
+  recordRecoverySelected(recovery: any): void {
+    this.addEvent('recovery_selected', {
+      action: recovery.action,
+      reason: recovery.reason,
+    });
+  }
+
+  recordRecoveryCompleted(recoveryAction: string, outcome: string): void {
+    this.addEvent('recovery_completed', {
+      action: recoveryAction,
+      outcome,
+    });
+  }
+
   recordWorldStateUpdated(agentX: number, agentY: number, tick: number): void {
     this.addEvent('world_state_updated', {
       agentX,
@@ -308,6 +341,18 @@ export function formatTrace(trace: ExecutionTrace): string {
         `    Skipped: ${event.data.commandActionType as string}(${JSON.stringify(event.data.commandParameters)})`
       );
       lines.push(`    Reason: ${event.data.reason as string}`);
+    } else if (event.eventType === 'failure_detected') {
+      lines.push(`    ⚠ Failure detected`);
+      lines.push(`    Reason: ${event.data.reason as string}`);
+    } else if (event.eventType === 'diagnosis_generated') {
+      lines.push(`    📋 Diagnosis: ${event.data.category as string}`);
+      lines.push(`    Severity: ${event.data.severity as string}`);
+      lines.push(`    Description: ${event.data.description as string}`);
+    } else if (event.eventType === 'recovery_selected') {
+      lines.push(`    🔧 Recovery: ${event.data.action as string}`);
+      lines.push(`    Reason: ${event.data.reason as string}`);
+    } else if (event.eventType === 'recovery_completed') {
+      lines.push(`    ✓ Recovery completed: ${event.data.outcome as string}`);
     } else if (event.eventType === 'world_state_updated') {
       lines.push(`    Position: (${event.data.agentX as number}, ${event.data.agentY as number})`);
     }
