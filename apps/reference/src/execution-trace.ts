@@ -31,6 +31,9 @@ export type TraceEventType =
   | 'mission_started'
   | 'mission_initialized'
   | 'goal_created'
+  | 'goal_evaluated'
+  | 'goal_selected'
+  | 'goal_changed'
   | 'planner_invoked'
   | 'plan_generated'
   | 'plan_reused'
@@ -106,6 +109,37 @@ export class ExecutionTracer {
       goalIntent: goal.intent,
       goalParameters: goal.parameters,
       goalStatus: goal.status,
+    });
+  }
+
+  recordGoalEvaluated(goal: Goal, evaluation: any): void {
+    this.addEvent('goal_evaluated', {
+      goalId: goal.id,
+      goalIntent: goal.intent,
+      score: evaluation.score,
+      statusFactor: evaluation.statusFactor,
+      priorityFactor: evaluation.priorityFactor,
+      urgencyFactor: evaluation.urgencyFactor,
+      feasibilityFactor: evaluation.feasibilityFactor,
+      reasoning: evaluation.reasoning,
+    });
+  }
+
+  recordGoalSelected(goal: Goal, reasoning: string): void {
+    this.addEvent('goal_selected', {
+      goalId: goal.id,
+      goalIntent: goal.intent,
+      reasoning,
+    });
+  }
+
+  recordGoalChanged(previousGoal: Goal, newGoal: Goal, reason: string): void {
+    this.addEvent('goal_changed', {
+      previousGoalId: previousGoal.id,
+      previousGoalIntent: previousGoal.intent,
+      newGoalId: newGoal.id,
+      newGoalIntent: newGoal.intent,
+      reason,
     });
   }
 
@@ -320,6 +354,18 @@ export function formatTrace(trace: ExecutionTrace): string {
     // Format specific event types
     if (event.eventType === 'goal_created') {
       lines.push(`    Goal: ${event.data.goalIntent as string}`);
+    } else if (event.eventType === 'goal_evaluated') {
+      lines.push(`    📊 Evaluated: ${event.data.goalIntent as string}`);
+      lines.push(`    Score: ${(event.data.score as number).toFixed(2)}`);
+      lines.push(`    ${event.data.reasoning as string}`);
+    } else if (event.eventType === 'goal_selected') {
+      lines.push(`    ⭐ Selected: ${event.data.goalIntent as string}`);
+      lines.push(`    ${event.data.reasoning as string}`);
+    } else if (event.eventType === 'goal_changed') {
+      lines.push(`    🔄 Goal changed`);
+      lines.push(`    From: ${event.data.previousGoalIntent as string}`);
+      lines.push(`    To: ${event.data.newGoalIntent as string}`);
+      lines.push(`    Reason: ${event.data.reason as string}`);
     } else if (event.eventType === 'plan_generated') {
       lines.push(`    Plan: ${event.data.stepCount as number} steps`);
     } else if (event.eventType === 'plan_reused') {
