@@ -125,6 +125,8 @@ export class RuntimeMetricsCollector {
       'goal_created',
       'planner_invoked',
       'plan_generated',
+      'plan_reused',
+      'plan_invalidated',
       'plan_empty',
       'plan_error',
       'decision_engine_invoked',
@@ -135,6 +137,7 @@ export class RuntimeMetricsCollector {
       'mission_tick',
       'command_executed',
       'command_failed',
+      'command_skipped',
       'world_state_updated',
     ];
 
