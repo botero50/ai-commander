@@ -72,6 +72,9 @@ export class DashboardIntegration {
     this.trace = trace;
     this.metrics = metrics;
 
+    // Initialize debugger with trace data
+    this.dashboard.initializeDebugger(trace, metrics);
+
     // Initial state update
     this.updateAllState();
   }
@@ -150,6 +153,8 @@ export class DashboardIntegration {
   private updateMissionState(): void {
     if (!this.trace || !this.metrics) return;
 
+    const progress = this.extractProgress();
+
     const missionState: DashboardMissionState = Object.freeze({
       goalId: 'goal-movement',
       goalIntent: `Move to (${this.trace.targetX}, ${this.trace.targetY})`,
@@ -158,6 +163,7 @@ export class DashboardIntegration {
       currentStep: this.metrics.successfulCommands,
       lastDecision: this.extractLastDecision(),
       lastCommand: this.extractLastCommand(),
+      progress,
     });
 
     this.dashboard.updateState({ mission: missionState });
@@ -233,6 +239,36 @@ export class DashboardIntegration {
     const lastCommand = commands[commands.length - 1];
     if (!lastCommand) return 'none';
     return (lastCommand.data as any)?.action || 'move';
+  }
+
+  /**
+   * Extract goal progress from last progress update event.
+   */
+  private extractProgress(): DashboardMissionState['progress'] {
+    if (!this.trace || !this.trace.events) return undefined;
+
+    // Find the last goal_progress_updated event
+    const progressEvents = this.trace.events.filter(
+      (e) => e.eventType === 'goal_progress_updated'
+    );
+    if (progressEvents.length === 0) return undefined;
+
+    const lastProgress = progressEvents[progressEvents.length - 1];
+    if (!lastProgress) return undefined;
+
+    const data = lastProgress.data as any;
+    const measurements = progressEvents.slice(-5).map((e) => ({
+      tick: e.tick,
+      percent: (e.data as any)?.progressPercent || 0,
+    }));
+
+    return Object.freeze({
+      percent: data?.progressPercent || 0,
+      trend: data?.trend || 'stable',
+      reason: data?.progressReason || 'Unknown',
+      evidence: data?.evidence || {},
+      measurements,
+    });
   }
 
   /**
