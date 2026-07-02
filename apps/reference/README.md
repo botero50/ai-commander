@@ -2,14 +2,32 @@
 
 The canonical reference application demonstrating how to build applications using the AI Commander framework.
 
+## Quick Start: Launch the Dashboard
+
+The fastest way to see AI Commander in action is to launch the live browser dashboard:
+
+```bash
+pnpm demo
+```
+
+This will:
+1. Start a local web server
+2. Open your default browser
+3. Execute a mission to target (3, 2)
+4. Display live runtime visualization
+
+See [DASHBOARD_README.md](./DASHBOARD_README.md) for complete dashboard documentation.
+
 ## Overview
 
-This application has two implementations:
+This application has multiple implementations:
 
 1. **Bootstrap Application** (`ReferenceApp`) — Validates framework integration and public API usage
 2. **Mission Agent** (`MissionAgent`) — First autonomous agent demonstrating complete mission execution
+3. **Browser Dashboard** — Real-time visualization of mission execution with interactive controls
+4. **OpenRA Integration** — Real game integration demonstrating production-grade adapter usage
 
-Both use only public APIs from the framework and demonstrate core architectural concepts.
+All use only public APIs from the framework and demonstrate core architectural concepts.
 
 ---
 
