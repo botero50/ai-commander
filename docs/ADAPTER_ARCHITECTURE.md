@@ -43,6 +43,7 @@ All game-specific logic lives in the Adapter layer.
 High-level entry point for the adapter.
 
 Responsibilities:
+
 - Identify the adapter (`adapterId`, `displayName`)
 - Expose game capabilities (what the game supports)
 - Initialize the adapter (validate game is available and compatible)
@@ -72,6 +73,7 @@ try {
 Represents one running game instance.
 
 Owns:
+
 - `ObservationProvider`: Get world state snapshots
 - `CommandExecutor`: Execute framework commands
 - Lifecycle: Start, pause, resume, save, restore, stop
@@ -99,6 +101,7 @@ await session.stop();
 Produces immutable `WorldState` snapshots from the external game.
 
 Responsibilities:
+
 - Translate game state into framework `WorldState`
 - Ensure all observations are immutable
 - Handle observation failures gracefully
@@ -123,6 +126,7 @@ const historicalState = await provider.getWorldStateAt?.(tick);
 Executes framework `Command` objects against the external game.
 
 Responsibilities:
+
 - Translate framework Command into game-specific action
 - Execute the command (or fail gracefully)
 - Return execution result (success or failure)
@@ -151,6 +155,7 @@ const available = await executor.isExecutionAvailable();
 Describes what the game adapter supports.
 
 Flags:
+
 - `supportsPause`: Game can pause/resume
 - `supportsSaveState`: Game supports checkpoints
 - `supportsDeterministicMode`: Game is deterministic
@@ -190,6 +195,7 @@ Framework ← Adapter ← Game
 - Game: not aware of Framework
 
 This ensures:
+
 - Framework stays game-agnostic
 - Adapters are completely replaceable
 - New games don't require framework changes
@@ -257,7 +263,7 @@ try {
         // Handle version mismatch
         break;
       default:
-        // Handle other errors
+      // Handle other errors
     }
   }
 }
@@ -322,6 +328,7 @@ What if you want all features?
 ### With Framework
 
 The Framework calls:
+
 - `adapter.initialize()` - startup
 - `adapter.createSession()` - when ready to play
 - `session.observationProvider.getWorldState()` - every tick
@@ -331,6 +338,7 @@ The Framework calls:
 ### With Game
 
 The Adapter calls game-specific:
+
 - DLL hooks (Windows API, direct library calls)
 - Network protocols (RPC, REST, WebSocket, gRPC)
 - File I/O (configuration, save files, logs)
@@ -356,19 +364,23 @@ Implementations can add runtime immutability with `Object.freeze()` if desired.
 The adapter can handle:
 
 ### Single-Agent
+
 - One agent per game session
 - Framework controls one agent at a time
 
 ### Multi-Agent
+
 - Multiple agents in same game
 - Framework can control multiple agents simultaneously
 
 ### Custom Worlds
+
 - Extend `WorldState` with game-specific fields
 - Extend `Command` with game-specific actions
 - Adapter translates everything correctly
 
 ### Real-Time vs Turn-Based
+
 - Tick-based framework works with both
 - Adapter can match game's native timing
 

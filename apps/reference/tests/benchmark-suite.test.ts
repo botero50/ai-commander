@@ -132,10 +132,7 @@ describe('Benchmark Suite', () => {
 
   describe('Statistics Calculation', () => {
     it('should calculate statistics from results', async () => {
-      const results = await BenchmarkSuite.runBenchmarks(
-        [[2, 1]],
-        3,
-      );
+      const results = await BenchmarkSuite.runBenchmarks([[2, 1]], 3);
 
       const stats = BenchmarkSuite.calculateStatistics(results);
 
@@ -146,10 +143,7 @@ describe('Benchmark Suite', () => {
     });
 
     it('should calculate averages correctly', async () => {
-      const results = await BenchmarkSuite.runBenchmarks(
-        [[1, 1]],
-        3,
-      );
+      const results = await BenchmarkSuite.runBenchmarks([[1, 1]], 3);
 
       const stats = BenchmarkSuite.calculateStatistics(results);
 
@@ -162,10 +156,7 @@ describe('Benchmark Suite', () => {
     });
 
     it('should calculate standard deviation', async () => {
-      const results = await BenchmarkSuite.runBenchmarks(
-        [[2, 2]],
-        3,
-      );
+      const results = await BenchmarkSuite.runBenchmarks([[2, 2]], 3);
 
       const stats = BenchmarkSuite.calculateStatistics(results);
 
@@ -175,10 +166,7 @@ describe('Benchmark Suite', () => {
     });
 
     it('should aggregate observability metrics', async () => {
-      const results = await BenchmarkSuite.runBenchmarks(
-        [[1, 1]],
-        2,
-      );
+      const results = await BenchmarkSuite.runBenchmarks([[1, 1]], 2);
 
       const stats = BenchmarkSuite.calculateStatistics(results);
 
@@ -191,10 +179,7 @@ describe('Benchmark Suite', () => {
 
   describe('Report Generation', () => {
     it('should generate a benchmark report', async () => {
-      const results = await BenchmarkSuite.runBenchmarks(
-        [[2, 1]],
-        2,
-      );
+      const results = await BenchmarkSuite.runBenchmarks([[2, 1]], 2);
 
       const report = BenchmarkSuite.generateReport(results);
 
@@ -206,10 +191,7 @@ describe('Benchmark Suite', () => {
     });
 
     it('should freeze report for immutability', async () => {
-      const results = await BenchmarkSuite.runBenchmarks(
-        [[1, 1]],
-        1,
-      );
+      const results = await BenchmarkSuite.runBenchmarks([[1, 1]], 1);
 
       const report = BenchmarkSuite.generateReport(results);
 
@@ -220,10 +202,7 @@ describe('Benchmark Suite', () => {
     });
 
     it('should freeze results in report', async () => {
-      const results = await BenchmarkSuite.runBenchmarks(
-        [[1, 1]],
-        1,
-      );
+      const results = await BenchmarkSuite.runBenchmarks([[1, 1]], 1);
 
       const report = BenchmarkSuite.generateReport(results);
 
@@ -234,10 +213,7 @@ describe('Benchmark Suite', () => {
     });
 
     it('should format report as human-readable text', async () => {
-      const results = await BenchmarkSuite.runBenchmarks(
-        [[2, 2]],
-        1,
-      );
+      const results = await BenchmarkSuite.runBenchmarks([[2, 2]], 1);
 
       const report = BenchmarkSuite.generateReport(results);
       const formatted = BenchmarkSuite.formatReport(report);
@@ -252,10 +228,7 @@ describe('Benchmark Suite', () => {
     });
 
     it('should serialize report to JSON', async () => {
-      const results = await BenchmarkSuite.runBenchmarks(
-        [[1, 1]],
-        1,
-      );
+      const results = await BenchmarkSuite.runBenchmarks([[1, 1]], 1);
 
       const report = BenchmarkSuite.generateReport(results);
       const json = BenchmarkSuite.reportToJson(report);
@@ -269,10 +242,7 @@ describe('Benchmark Suite', () => {
     });
 
     it('should provide consistent JSON serialization', async () => {
-      const results = await BenchmarkSuite.runBenchmarks(
-        [[2, 1]],
-        1,
-      );
+      const results = await BenchmarkSuite.runBenchmarks([[2, 1]], 1);
 
       const report = BenchmarkSuite.generateReport(results);
       const json1 = BenchmarkSuite.reportToJson(report);
@@ -284,14 +254,8 @@ describe('Benchmark Suite', () => {
 
   describe('Benchmark Determinism', () => {
     it('should produce consistent results for same target', async () => {
-      const results1 = await BenchmarkSuite.runBenchmarks(
-        [[3, 2]],
-        2,
-      );
-      const results2 = await BenchmarkSuite.runBenchmarks(
-        [[3, 2]],
-        2,
-      );
+      const results1 = await BenchmarkSuite.runBenchmarks([[3, 2]], 2);
+      const results2 = await BenchmarkSuite.runBenchmarks([[3, 2]], 2);
 
       expect(results1[0].totalTicks).toBe(results2[0].totalTicks);
       expect(results1[0].commandsExecuted).toBe(results2[0].commandsExecuted);
@@ -299,10 +263,7 @@ describe('Benchmark Suite', () => {
     });
 
     it('should show minimal variance in deterministic execution', async () => {
-      const results = await BenchmarkSuite.runBenchmarks(
-        [[2, 2]],
-        3,
-      );
+      const results = await BenchmarkSuite.runBenchmarks([[2, 2]], 3);
 
       // All runs should have same tick count (deterministic)
       const tickCounts = results.map((r) => r.totalTicks);
@@ -316,10 +277,7 @@ describe('Benchmark Suite', () => {
     });
 
     it('should report consistent statistics across runs', async () => {
-      const results = await BenchmarkSuite.runBenchmarks(
-        [[1, 1]],
-        3,
-      );
+      const results = await BenchmarkSuite.runBenchmarks([[1, 1]], 3);
 
       const stats = BenchmarkSuite.calculateStatistics(results);
 
@@ -332,10 +290,7 @@ describe('Benchmark Suite', () => {
 
   describe('Benchmark Report Consistency', () => {
     it('should maintain consistency between formatted and JSON output', async () => {
-      const results = await BenchmarkSuite.runBenchmarks(
-        [[2, 1]],
-        1,
-      );
+      const results = await BenchmarkSuite.runBenchmarks([[2, 1]], 1);
 
       const report = BenchmarkSuite.generateReport(results);
       const formatted = BenchmarkSuite.formatReport(report);
@@ -349,16 +304,12 @@ describe('Benchmark Suite', () => {
     });
 
     it('should preserve statistics accuracy', async () => {
-      const results = await BenchmarkSuite.runBenchmarks(
-        [[1, 2]],
-        2,
-      );
+      const results = await BenchmarkSuite.runBenchmarks([[1, 2]], 2);
 
       const stats = BenchmarkSuite.calculateStatistics(results);
 
       // Average should match
-      const manualAvg =
-        (results[0].totalDurationMs + results[1].totalDurationMs) / results.length;
+      const manualAvg = (results[0].totalDurationMs + results[1].totalDurationMs) / results.length;
       expect(Math.abs(stats.avgTotalDurationMs - manualAvg)).toBeLessThan(0.1);
     });
   });
@@ -379,18 +330,12 @@ describe('Benchmark Suite', () => {
 
     it('should not interfere with other tests', async () => {
       // Run a benchmark
-      const results = await BenchmarkSuite.runBenchmarks(
-        [[1, 1]],
-        1,
-      );
+      const results = await BenchmarkSuite.runBenchmarks([[1, 1]], 1);
 
       expect(results.length).toBe(1);
 
       // Run another benchmark - should work independently
-      const results2 = await BenchmarkSuite.runBenchmarks(
-        [[2, 2]],
-        1,
-      );
+      const results2 = await BenchmarkSuite.runBenchmarks([[2, 2]], 1);
 
       expect(results2.length).toBe(1);
     });

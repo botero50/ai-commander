@@ -55,7 +55,9 @@ describe('Runtime Metrics - Performance Measurement', () => {
 
     // Events should sum to total
     expect(
-      (metrics?.lifecycleEvents ?? 0) + (metrics?.reasoningEvents ?? 0) + (metrics?.executionEvents ?? 0),
+      (metrics?.lifecycleEvents ?? 0) +
+        (metrics?.reasoningEvents ?? 0) +
+        (metrics?.executionEvents ?? 0)
     ).toBe(metrics?.totalEvents);
   });
 
@@ -73,7 +75,11 @@ describe('Runtime Metrics - Performance Measurement', () => {
     expect(metrics?.planErrors).toBeGreaterThanOrEqual(0);
 
     // At least some planning-related event should have occurred
-    const hasPlanning = (metrics?.plannerInvocations ?? 0) + (metrics?.plansGenerated ?? 0) + (metrics?.planErrors ?? 0) > 0;
+    const hasPlanning =
+      (metrics?.plannerInvocations ?? 0) +
+        (metrics?.plansGenerated ?? 0) +
+        (metrics?.planErrors ?? 0) >
+      0;
     expect(hasPlanning || metrics?.reasoningEvents).toBeTruthy();
   });
 
@@ -107,7 +113,7 @@ describe('Runtime Metrics - Performance Measurement', () => {
 
     // Successful + failed should equal total
     expect((metrics?.successfulCommands ?? 0) + (metrics?.failedCommands ?? 0)).toBe(
-      metrics?.commandsExecuted,
+      metrics?.commandsExecuted
     );
 
     // Success rate should be valid
@@ -386,7 +392,10 @@ describe('Runtime Metrics - Consistency', () => {
     const metrics = agent.getMetrics();
 
     // Event sums
-    const eventSum = (metrics?.lifecycleEvents ?? 0) + (metrics?.reasoningEvents ?? 0) + (metrics?.executionEvents ?? 0);
+    const eventSum =
+      (metrics?.lifecycleEvents ?? 0) +
+      (metrics?.reasoningEvents ?? 0) +
+      (metrics?.executionEvents ?? 0);
     expect(eventSum).toBe(metrics?.totalEvents);
 
     // Command sums

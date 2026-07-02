@@ -347,10 +347,7 @@ describe('Game Adapter Contracts', () => {
 
   describe('AdapterError', () => {
     it('should create error with code', () => {
-      const error = new AdapterError(
-        'Game not found',
-        AdapterErrorCode.GameNotFound
-      );
+      const error = new AdapterError('Game not found', AdapterErrorCode.GameNotFound);
 
       expect(error.message).toBe('Game not found');
       expect(error.code).toBe(AdapterErrorCode.GameNotFound);

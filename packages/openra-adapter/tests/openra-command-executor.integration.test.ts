@@ -128,7 +128,7 @@ describe('OpenRACommandExecutor', () => {
       const executor2 = new OpenRACommandExecutor(
         0,
         async () => false, // Submission always fails
-        async () => true   // But game is available
+        async () => true // But game is available
       );
       const command = createTestMoveCommand('actor-1', 100, 200);
 
@@ -305,13 +305,9 @@ describe('OpenRACommandExecutor', () => {
     });
 
     it('catches errors from state checker', async () => {
-      const executor2 = new OpenRACommandExecutor(
-        0,
-        mockOrderSubmitter,
-        async () => {
-          throw new Error('State checker crashed');
-        }
-      );
+      const executor2 = new OpenRACommandExecutor(0, mockOrderSubmitter, async () => {
+        throw new Error('State checker crashed');
+      });
 
       const available = await executor2.isExecutionAvailable();
 

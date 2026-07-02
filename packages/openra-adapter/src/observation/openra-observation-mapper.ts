@@ -99,21 +99,16 @@ export class OpenRAObservationMapper {
       const teamId = this.createTeamId(teamIndex);
       const playerIds = players.map((p) => this.getPlayerId(p.index));
 
-      return createTeam(
-        teamId,
-        `Team ${teamIndex}`,
-        playerIds,
-        {
-          openraTeamIndex: teamIndex,
-          openraPlayerCount: players.length,
-        }
-      );
+      return createTeam(teamId, `Team ${teamIndex}`, playerIds, {
+        openraTeamIndex: teamIndex,
+        openraPlayerCount: players.length,
+      });
     });
   }
 
   private mapMap(openraMap: {
-    name: string
-    bounds: { left: number; top: number; width: number; height: number }
+    name: string;
+    bounds: { left: number; top: number; width: number; height: number };
   }): GameMap {
     // Generate minimal key positions based on map bounds and corners.
     // Full map grid generation would create O(width*height) positions,
@@ -159,10 +154,14 @@ export class OpenRAObservationMapper {
     positions.push(createPosition(`tile:${right - 1},${top}`, `NE Corner (${right - 1}, ${top})`));
 
     // Bottom-left corner
-    positions.push(createPosition(`tile:${left},${bottom - 1}`, `SW Corner (${left}, ${bottom - 1})`));
+    positions.push(
+      createPosition(`tile:${left},${bottom - 1}`, `SW Corner (${left}, ${bottom - 1})`)
+    );
 
     // Bottom-right corner
-    positions.push(createPosition(`tile:${right - 1},${bottom - 1}`, `SE Corner (${right - 1}, ${bottom - 1})`));
+    positions.push(
+      createPosition(`tile:${right - 1},${bottom - 1}`, `SE Corner (${right - 1}, ${bottom - 1})`)
+    );
 
     // Center point
     positions.push(createPosition(`tile:${centerX},${centerY}`, `Center (${centerX}, ${centerY})`));

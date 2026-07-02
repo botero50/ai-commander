@@ -29,9 +29,11 @@ describe('OpenRAObservationMapper', () => {
 
       for (const tick of ticks) {
         // Create game state with at least one actor for valid WorldState
-        const gameState = createTestOpenRAGameState(tick, [createTestOpenRAPlayer(0, 'Human')], [
-          createTestOpenRAActor(1, 'test', createTestOpenRAPlayer(0, 'Human')),
-        ]);
+        const gameState = createTestOpenRAGameState(
+          tick,
+          [createTestOpenRAPlayer(0, 'Human')],
+          [createTestOpenRAActor(1, 'test', createTestOpenRAPlayer(0, 'Human'))]
+        );
         const mapper = new OpenRAObservationMapper();
 
         const worldState = mapper.mapGameState(gameState);
@@ -73,9 +75,14 @@ describe('OpenRAObservationMapper', () => {
 
     it('maps map information', () => {
       // Create game state with at least one actor
-      const gameState = createTestOpenRAGameState(0, [createTestOpenRAPlayer(0, 'Human')], [
-        createTestOpenRAActor(1, 'test', createTestOpenRAPlayer(0, 'Human')),
-      ], 'Custom.mpr', 200, 150);
+      const gameState = createTestOpenRAGameState(
+        0,
+        [createTestOpenRAPlayer(0, 'Human')],
+        [createTestOpenRAActor(1, 'test', createTestOpenRAPlayer(0, 'Human'))],
+        'Custom.mpr',
+        200,
+        150
+      );
       const mapper = new OpenRAObservationMapper();
 
       const worldState = mapper.mapGameState(gameState);
@@ -130,9 +137,11 @@ describe('OpenRAObservationMapper', () => {
 
     it('marks bots correctly', () => {
       const botPlayer = createTestOpenRAPlayer(0, 'AI', 'gdi', -1, true);
-      const gameState = createTestOpenRAGameState(0, [botPlayer], [
-        createTestOpenRAActor(1, 'test', botPlayer),
-      ]);
+      const gameState = createTestOpenRAGameState(
+        0,
+        [botPlayer],
+        [createTestOpenRAActor(1, 'test', botPlayer)]
+      );
       const mapper = new OpenRAObservationMapper();
 
       const worldState = mapper.mapGameState(gameState);
@@ -143,9 +152,11 @@ describe('OpenRAObservationMapper', () => {
 
     it('stores OpenRA-specific player data', () => {
       const testPlayer = createTestOpenRAPlayer(0, 'Human');
-      const gameState = createTestOpenRAGameState(0, [testPlayer], [
-        createTestOpenRAActor(1, 'test', testPlayer),
-      ]);
+      const gameState = createTestOpenRAGameState(
+        0,
+        [testPlayer],
+        [createTestOpenRAActor(1, 'test', testPlayer)]
+      );
       const mapper = new OpenRAObservationMapper();
 
       const worldState = mapper.mapGameState(gameState);
@@ -224,9 +235,11 @@ describe('OpenRAObservationMapper', () => {
       for (const { tick, expectedDisplay } of testCases) {
         // Create game state with at least one actor
         const player = createTestOpenRAPlayer(0, 'Human');
-        const gameState = createTestOpenRAGameState(tick, [player], [
-          createTestOpenRAActor(1, 'test', player),
-        ]);
+        const gameState = createTestOpenRAGameState(
+          tick,
+          [player],
+          [createTestOpenRAActor(1, 'test', player)]
+        );
         const mapper = new OpenRAObservationMapper();
 
         const worldState = mapper.mapGameState(gameState);
@@ -244,9 +257,14 @@ describe('OpenRAObservationMapper', () => {
       for (const width of widths) {
         for (const height of heights) {
           // Need at least one actor for WorldState to be valid
-          const gameState = createTestOpenRAGameState(0, [createTestOpenRAPlayer(0, 'Test')], [
-            createTestOpenRAActor(1, 'test', createTestOpenRAPlayer(0, 'Test')),
-          ], 'test', width, height);
+          const gameState = createTestOpenRAGameState(
+            0,
+            [createTestOpenRAPlayer(0, 'Test')],
+            [createTestOpenRAActor(1, 'test', createTestOpenRAPlayer(0, 'Test'))],
+            'test',
+            width,
+            height
+          );
           const mapper = new OpenRAObservationMapper();
 
           const worldState = mapper.mapGameState(gameState);
@@ -259,9 +277,14 @@ describe('OpenRAObservationMapper', () => {
 
     it('positions have unique IDs', () => {
       // Need at least one actor for WorldState to be valid
-      const gameState = createTestOpenRAGameState(0, [createTestOpenRAPlayer(0, 'Test')], [
-        createTestOpenRAActor(1, 'test', createTestOpenRAPlayer(0, 'Test')),
-      ], 'test', 32, 32);
+      const gameState = createTestOpenRAGameState(
+        0,
+        [createTestOpenRAPlayer(0, 'Test')],
+        [createTestOpenRAActor(1, 'test', createTestOpenRAPlayer(0, 'Test'))],
+        'test',
+        32,
+        32
+      );
       const mapper = new OpenRAObservationMapper();
 
       const worldState = mapper.mapGameState(gameState);

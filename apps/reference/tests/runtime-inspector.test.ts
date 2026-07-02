@@ -1,5 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { RuntimeInspector, formatRuntimeSnapshot, snapshotToJson } from '../src/runtime-inspector.js';
+import {
+  RuntimeInspector,
+  formatRuntimeSnapshot,
+  snapshotToJson,
+} from '../src/runtime-inspector.js';
 import { MissionAgent } from '../src/mission-agent.js';
 
 describe('Runtime Inspector - Snapshot Capture', () => {

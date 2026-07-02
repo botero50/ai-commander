@@ -254,7 +254,9 @@ export function formatTrace(trace: ExecutionTrace): string {
     const relativeTime = event.timestamp - trace.startTime;
     const padding = String(i).padStart(3, '0');
 
-    lines.push(`[${padding}] T+${relativeTime.toString().padStart(5)} Tick ${event.tick.toString().padStart(2)}`);
+    lines.push(
+      `[${padding}] T+${relativeTime.toString().padStart(5)} Tick ${event.tick.toString().padStart(2)}`
+    );
     lines.push(`    Event: ${event.eventType}`);
 
     // Format specific event types
@@ -263,9 +265,13 @@ export function formatTrace(trace: ExecutionTrace): string {
     } else if (event.eventType === 'plan_generated') {
       lines.push(`    Plan: ${event.data.stepCount as number} steps`);
     } else if (event.eventType === 'decision_selected') {
-      lines.push(`    Selected: ${event.data.commandActionType as string}(${JSON.stringify(event.data.commandParameters)})`);
+      lines.push(
+        `    Selected: ${event.data.commandActionType as string}(${JSON.stringify(event.data.commandParameters)})`
+      );
     } else if (event.eventType === 'command_executed') {
-      lines.push(`    Command: ${event.data.commandActionType as string}(${JSON.stringify(event.data.commandParameters)})`);
+      lines.push(
+        `    Command: ${event.data.commandActionType as string}(${JSON.stringify(event.data.commandParameters)})`
+      );
       lines.push(`    Result: ${event.data.success ? 'SUCCESS' : 'FAILED'}`);
     } else if (event.eventType === 'world_state_updated') {
       lines.push(`    Position: (${event.data.agentX as number}, ${event.data.agentY as number})`);

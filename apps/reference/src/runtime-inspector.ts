@@ -52,7 +52,7 @@ export class RuntimeInspector {
     totalTicks: number,
     trace: ExecutionTrace | null,
     metrics: RuntimeMetrics | null,
-    startTime: number,
+    startTime: number
   ): RuntimeSnapshot {
     const elapsedTimeMs = Date.now() - startTime;
     const agentX = 0; // Start position
@@ -127,7 +127,9 @@ export function formatRuntimeSnapshot(snapshot: RuntimeSnapshot): string {
 
   lines.push('│ OBSERVABILITY');
   lines.push(`│   Trace Events: ${snapshot.observability.traceEventCount}`);
-  lines.push(`│   Metrics: ${snapshot.observability.metricsAvailable ? 'Available' : 'Not yet available'}`);
+  lines.push(
+    `│   Metrics: ${snapshot.observability.metricsAvailable ? 'Available' : 'Not yet available'}`
+  );
   lines.push('╰' + '─'.repeat(77) + '╯');
 
   return lines.join('\n');

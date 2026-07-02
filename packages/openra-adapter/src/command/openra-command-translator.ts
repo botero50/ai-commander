@@ -167,7 +167,10 @@ export class OpenRACommandTranslator {
     return { success: true, order };
   }
 
-  private translateAttackGroundCommand(command: Command, playerIndex: number): CommandTranslationResult {
+  private translateAttackGroundCommand(
+    command: Command,
+    playerIndex: number
+  ): CommandTranslationResult {
     const targetPosition = command.parameters[COMMAND_PARAMETERS.TARGET_POSITION];
 
     if (!targetPosition) {

@@ -73,31 +73,32 @@ Want to understand the architecture?
 
 Looking for specific information?
 
-| Topic | Location |
-|-------|----------|
-| Installation | QUICK_START.md |
-| First Mission | QUICK_START.md |
-| CLI Commands | GUIDES.md or `npm start -- help` |
-| Project Structure | DEVELOPER_GUIDE.md |
-| Mission Lifecycle | DEVELOPER_GUIDE.md |
-| Planner | DEVELOPER_GUIDE.md |
-| Decision Engine | DEVELOPER_GUIDE.md |
-| Execution Traces | DEVELOPER_GUIDE.md |
-| Runtime Metrics | DEVELOPER_GUIDE.md |
-| Replay Validation | DEVELOPER_GUIDE.md |
-| Runtime Inspector | DEVELOPER_GUIDE.md |
-| Creating Custom Target | GUIDES.md |
-| Analyzing Performance | GUIDES.md |
-| Debugging Execution | GUIDES.md |
-| Component Responsibilities | ARCHITECTURE.md |
-| Data Flow | ARCHITECTURE.md |
-| Extension Points | ARCHITECTURE.md |
+| Topic                      | Location                         |
+| -------------------------- | -------------------------------- |
+| Installation               | QUICK_START.md                   |
+| First Mission              | QUICK_START.md                   |
+| CLI Commands               | GUIDES.md or `npm start -- help` |
+| Project Structure          | DEVELOPER_GUIDE.md               |
+| Mission Lifecycle          | DEVELOPER_GUIDE.md               |
+| Planner                    | DEVELOPER_GUIDE.md               |
+| Decision Engine            | DEVELOPER_GUIDE.md               |
+| Execution Traces           | DEVELOPER_GUIDE.md               |
+| Runtime Metrics            | DEVELOPER_GUIDE.md               |
+| Replay Validation          | DEVELOPER_GUIDE.md               |
+| Runtime Inspector          | DEVELOPER_GUIDE.md               |
+| Creating Custom Target     | GUIDES.md                        |
+| Analyzing Performance      | GUIDES.md                        |
+| Debugging Execution        | GUIDES.md                        |
+| Component Responsibilities | ARCHITECTURE.md                  |
+| Data Flow                  | ARCHITECTURE.md                  |
+| Extension Points           | ARCHITECTURE.md                  |
 
 ---
 
 ## Quick Reference
 
 ### Installation
+
 ```bash
 git clone <repository>
 cd ai-commander
@@ -106,12 +107,14 @@ npm run build
 ```
 
 ### First Mission
+
 ```bash
 cd apps/reference
 npm start
 ```
 
 ### Common Commands
+
 ```bash
 npm start -- run              # Execute mission
 npm start -- trace            # Print trace
@@ -123,6 +126,7 @@ npm start -- help             # Get help
 ```
 
 ### With Options
+
 ```bash
 npm start -- run --target-x 5 --target-y 4
 npm start -- trace --json
@@ -130,6 +134,7 @@ npm start -- metrics --target-x 2 --target-y 2
 ```
 
 ### Run Tests
+
 ```bash
 npm test
 cd apps/reference && npm test
@@ -160,21 +165,25 @@ Each document builds on the previous:
 ## Learning Paths
 
 ### Path 1: Just Want to Run It (10 minutes)
+
 1. QUICK_START.md
 2. You're done - the agent is running
 
 ### Path 2: Understand the Basics (30 minutes)
+
 1. QUICK_START.md (10 min)
 2. DEVELOPER_GUIDE.md (20 min)
 3. You understand the architecture
 
 ### Path 3: Learn by Doing (45 minutes)
+
 1. QUICK_START.md (10 min)
 2. DEVELOPER_GUIDE.md (20 min)
 3. GUIDES.md - Pick 3 guides (5 min each, 15 min)
 4. You can extend and customize
 
 ### Path 4: Complete Mastery (60+ minutes)
+
 1. QUICK_START.md (10 min)
 2. DEVELOPER_GUIDE.md (20 min)
 3. GUIDES.md - All guides (50 min)
@@ -187,28 +196,36 @@ Each document builds on the previous:
 ## Key Concepts
 
 ### Determinism
+
 Same inputs always produce same outputs. This means:
+
 - You can reproduce bugs
 - You can benchmark performance
 - You can replay execution
 - You can validate consistency
 
 ### Immutability
+
 Objects don't change unexpectedly. This means:
+
 - No race conditions
 - No state corruption
 - No surprising behavior
 - Easier to reason about
 
 ### Observability
+
 Complete visibility into execution. This means:
+
 - See every decision
 - See every action
 - See performance metrics
 - See validation results
 
 ### Orchestration
+
 Clean separation of concerns. This means:
+
 - Easy to replace planner
 - Easy to replace decision engine
 - Easy to extend observability
@@ -260,18 +277,23 @@ If you find a discrepancy, something is out of date.
 ## Getting Help
 
 ### For Installation Issues
+
 See **Troubleshooting** in QUICK_START.md
 
 ### For Understanding Concepts
+
 See **Developer Guide** sections in DEVELOPER_GUIDE.md
 
 ### For How-To Questions
+
 See appropriate guide in GUIDES.md
 
 ### For Architecture Questions
+
 See **Architecture** sections in ARCHITECTURE.md
 
 ### For Technical Questions
+
 Read the source code - it's well-commented and designed to be understandable
 
 ---

@@ -7,6 +7,7 @@ Get up and running with AI Commander in less than 10 minutes.
 ## 1. Install & Build (2 minutes)
 
 ### Prerequisites
+
 - Node.js 18+
 - npm 9+
 
@@ -75,23 +76,28 @@ Starting mission execution...
 The reference application outputs show three levels of information:
 
 ### Level 1: Execution Progress
+
 ```
 [Tick 1] Executing agent tick...
 [Tick 2] Executing agent tick...
 ```
+
 Each tick is one agent decision cycle.
 
 ### Level 2: Final Metrics
+
 ```bash
 npm start -- metrics
 ```
 
 See performance data:
+
 - How many ticks executed
 - How many decisions made
 - How many commands executed
 
 ### Level 3: Detailed Trace
+
 ```bash
 npm start -- trace
 ```
@@ -105,42 +111,50 @@ See the complete event log of everything that happened during the mission.
 The CLI provides different ways to inspect and understand mission execution.
 
 ### Run a mission
+
 ```bash
 cd apps/reference
 npm start -- run
 ```
 
 ### See the execution trace
+
 ```bash
 npm start -- trace
 ```
 
 ### Check performance metrics
+
 ```bash
 npm start -- metrics
 ```
 
 ### Validate execution consistency
+
 ```bash
 npm start -- replay
 ```
 
 ### Inspect the final state
+
 ```bash
 npm start -- inspect
 ```
 
 ### Get a complete report
+
 ```bash
 npm start -- report
 ```
 
 ### Change the target
+
 ```bash
 npm start -- run --target-x 5 --target-y 4
 ```
 
 ### Get help
+
 ```bash
 npm start -- help
 npm start -- help trace
@@ -157,6 +171,7 @@ npm test
 ```
 
 You should see:
+
 ```
 Test Files  34 passed (34)
 Tests       541 passed (541)
@@ -171,7 +186,9 @@ All tests passing means the framework and reference application are working corr
 You're now running AI Commander. Here's where to go from here:
 
 ### Understand How It Works
+
 Read **[Developer Guide](DEVELOPER_GUIDE.md)** to understand:
+
 - Mission lifecycle
 - How the planner works
 - How the decision engine works
@@ -179,7 +196,9 @@ Read **[Developer Guide](DEVELOPER_GUIDE.md)** to understand:
 - How to read metrics
 
 ### Modify and Extend
+
 Follow **[How-To Guides](GUIDES.md)** to:
+
 - Create a new mission type
 - Replace the planner with your own
 - Replace the decision engine
@@ -187,7 +206,9 @@ Follow **[How-To Guides](GUIDES.md)** to:
 - Extend the reference application
 
 ### Architecture & Design
+
 Deep dive into **[Architecture](ARCHITECTURE.md)** for:
+
 - Runtime execution flow
 - Observability pipeline design
 - Component responsibilities
@@ -198,26 +219,31 @@ Deep dive into **[Architecture](ARCHITECTURE.md)** for:
 ## Common Scenarios
 
 ### Scenario 1: I want to move the agent to a different location
+
 ```bash
 npm start -- run --target-x 10 --target-y 5
 ```
 
 ### Scenario 2: I want to see what decisions the agent made
+
 ```bash
 npm start -- trace
 ```
 
 ### Scenario 3: I want to check if execution was correct
+
 ```bash
 npm start -- replay
 ```
 
 ### Scenario 4: I want to understand performance
+
 ```bash
 npm start -- metrics --json
 ```
 
 ### Scenario 5: I want to see everything
+
 ```bash
 npm start -- report
 ```
@@ -227,27 +253,34 @@ npm start -- report
 ## Troubleshooting
 
 ### Build fails
+
 Make sure you have Node.js 18+ and npm 9+:
+
 ```bash
 node --version
 npm --version
 ```
 
 ### Tests fail
+
 Rebuild everything:
+
 ```bash
 npm run build
 npm test
 ```
 
 ### CLI commands don't work
+
 Make sure you're in the reference app directory:
+
 ```bash
 cd apps/reference
 npm start -- help
 ```
 
 ### Port already in use
+
 The reference app doesn't use ports - this shouldn't happen. Make sure no other process is interfering.
 
 ---
@@ -267,13 +300,13 @@ The reference application is fully open - you can read the source code to see ex
 
 ## Key Files
 
-| File | Purpose |
-|------|---------|
-| `apps/reference/src/mission-agent.ts` | The autonomous agent |
-| `apps/reference/src/movement-planner.ts` | Creates movement plans |
-| `apps/reference/src/execution-trace.ts` | Records what happened |
-| `apps/reference/src/runtime-metrics.ts` | Measures performance |
-| `apps/reference/src/replay-engine.ts` | Validates execution |
+| File                                      | Purpose                  |
+| ----------------------------------------- | ------------------------ |
+| `apps/reference/src/mission-agent.ts`     | The autonomous agent     |
+| `apps/reference/src/movement-planner.ts`  | Creates movement plans   |
+| `apps/reference/src/execution-trace.ts`   | Records what happened    |
+| `apps/reference/src/runtime-metrics.ts`   | Measures performance     |
+| `apps/reference/src/replay-engine.ts`     | Validates execution      |
 | `apps/reference/src/runtime-inspector.ts` | Captures state snapshots |
 
 ---

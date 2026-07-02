@@ -6,7 +6,13 @@ import { OpenRAGameAdapter } from '@ai-commander/openra-adapter';
 import { OpenRAMovementPlanner } from './openra-movement-planner.js';
 import type { Planner, Plan } from '@ai-commander/planner';
 import type { DecisionEngine, DecisionRequest, DecisionResult } from '@ai-commander/decision';
-import { createGoal, createGoalId, GoalStatus, GoalPriorityLevel, createGoalPriority } from '@ai-commander/goals';
+import {
+  createGoal,
+  createGoalId,
+  GoalStatus,
+  GoalPriorityLevel,
+  createGoalPriority,
+} from '@ai-commander/goals';
 import { createEventBus, createRealtimeClock, createServiceRegistry } from '@ai-commander/core';
 import type { ExecutionContext } from '@ai-commander/engine';
 import type { WorldState } from '@ai-commander/domain';
@@ -154,7 +160,9 @@ export class OpenRAMissionAgent {
   }
 
   async initialize(): Promise<void> {
-    console.log(`\nInitializing OpenRA mission agent (target: ${this.targetX}, ${this.targetY})...`);
+    console.log(
+      `\nInitializing OpenRA mission agent (target: ${this.targetX}, ${this.targetY})...`
+    );
     this.tracer.recordMissionStarted();
 
     // Step 1: Initialize the OpenRA game adapter
@@ -269,7 +277,10 @@ export class OpenRAMissionAgent {
             id: `step-${tickCount}`,
             sequenceNumber: 0,
             status: 'pending',
-            command: { actionType: 'move', parameters: { targetX: this.targetX, targetY: this.targetY } },
+            command: {
+              actionType: 'move',
+              parameters: { targetX: this.targetX, targetY: this.targetY },
+            },
           },
         ],
         expectedOutcome: 'movement',
@@ -282,15 +293,25 @@ export class OpenRAMissionAgent {
 
       // Check goal completion
       const metrics = this.runtime.getMetrics();
-      console.log(`  Ticks: ${metrics.ticksExecuted}, Decisions: ${metrics.decisionsExecuted}, Commands: ${metrics.commandsExecuted}`);
+      console.log(
+        `  Ticks: ${metrics.ticksExecuted}, Decisions: ${metrics.decisionsExecuted}, Commands: ${metrics.commandsExecuted}`
+      );
 
       // Record plan and decision outcomes based on metrics changes
       if (metrics.decisionsExecuted > previousDecisions) {
         previousDecisions = metrics.decisionsExecuted;
         // Record that a decision was selected (inferred from metrics)
         this.tracer.recordDecisionSelected(
-          { id: `step-${tickCount}`, sequenceNumber: tickCount, status: 'active', command: { actionType: 'move', parameters: {} } } as any,
-          { actionType: 'move', parameters: { targetX: this.targetX, targetY: this.targetY } } as any
+          {
+            id: `step-${tickCount}`,
+            sequenceNumber: tickCount,
+            status: 'active',
+            command: { actionType: 'move', parameters: {} },
+          } as any,
+          {
+            actionType: 'move',
+            parameters: { targetX: this.targetX, targetY: this.targetY },
+          } as any
         );
       }
 
@@ -298,7 +319,10 @@ export class OpenRAMissionAgent {
         previousCommands = metrics.commandsExecuted;
         // Record synthetic command execution for tracing
         this.tracer.recordCommandExecuted(
-          { actionType: 'move', parameters: { targetX: this.targetX, targetY: this.targetY } } as any,
+          {
+            actionType: 'move',
+            parameters: { targetX: this.targetX, targetY: this.targetY },
+          } as any,
           { success: true, message: 'Command executed', data: {} } as any
         );
       }
@@ -308,16 +332,25 @@ export class OpenRAMissionAgent {
       }
 
       // For synthetic testing: call the order submitter each tick (to test failure recovery)
-      const orderResult = await this.orderSubmitter({ actionType: 'move', parameters: { targetX: this.targetX, targetY: this.targetY } });
+      const orderResult = await this.orderSubmitter({
+        actionType: 'move',
+        parameters: { targetX: this.targetX, targetY: this.targetY },
+      });
       this.tracer.recordCommandExecuted(
         { actionType: 'move', parameters: { targetX: this.targetX, targetY: this.targetY } } as any,
-        { success: orderResult, message: orderResult ? 'Command executed' : 'Command failed', data: {} } as any
+        {
+          success: orderResult,
+          message: orderResult ? 'Command executed' : 'Command failed',
+          data: {},
+        } as any
       );
 
       // For deterministic testing: stop after a reasonable number of ticks to test failure recovery
       // In a real mission, this would check world state against goal
       if (tickCount >= 10) {
-        console.log(`  ✓ Mission goal achieved: executed ${metrics.commandsExecuted} commands in ${tickCount} ticks`);
+        console.log(
+          `  ✓ Mission goal achieved: executed ${metrics.commandsExecuted} commands in ${tickCount} ticks`
+        );
         this.isComplete = true;
         this.tracer.recordMissionCompleted();
       }
@@ -420,7 +453,7 @@ export class OpenRAMissionAgent {
       100,
       this.tracer.getTrace(),
       this.metrics,
-      this.startTime,
+      this.startTime
     );
   }
 

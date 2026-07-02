@@ -7,6 +7,7 @@ Read-only world state observation for OpenRA games.
 This package provides the `ObservationProvider` implementation for OpenRA integration. It observes the OpenRA game world and produces immutable `WorldState` snapshots compatible with the AI Commander framework.
 
 **Key Characteristics:**
+
 - **Read-only** — never mutates OpenRA state
 - **Deterministic** — same game state → identical snapshot
 - **Immutable** — all returned objects are frozen
@@ -18,12 +19,14 @@ This package provides the `ObservationProvider` implementation for OpenRA integr
 ### Components
 
 **OpenRAObservationProvider**
+
 - Implements the `ObservationProvider` contract
 - Translates OpenRA game state to AI Commander domain models
 - Manages snapshot caching and historical queries
 - Validates observation availability
 
 **OpenRAObservationMapper**
+
 - Maps OpenRA-specific types to AI Commander types
 - Preserves game-specific metadata in `customData` fields
 - Generates placeholder agents when no real units exist (required by framework)
@@ -64,26 +67,28 @@ const previousState = await observer.getWorldStateAt(100);
 
 ### OpenRA → AI Commander
 
-| OpenRA | AI Commander | Notes |
-|--------|-------------|-------|
-| `World.tick` | `WorldState.time.currentTick.number` | Tick counter |
-| `Map` | `WorldState.map` | Map dimensions and terrain |
-| `Player` | `WorldState.players` | Player list with factions, teams, resources |
-| `Actor` | `WorldState.agents` | Units and buildings |
-| `Health` | `AgentSnapshot.resources['health']` | Unit health as resource |
-| `Location` | `AgentSnapshot.customData.openraLocation` | Actor world position |
+| OpenRA       | AI Commander                              | Notes                                       |
+| ------------ | ----------------------------------------- | ------------------------------------------- |
+| `World.tick` | `WorldState.time.currentTick.number`      | Tick counter                                |
+| `Map`        | `WorldState.map`                          | Map dimensions and terrain                  |
+| `Player`     | `WorldState.players`                      | Player list with factions, teams, resources |
+| `Actor`      | `WorldState.agents`                       | Units and buildings                         |
+| `Health`     | `AgentSnapshot.resources['health']`       | Unit health as resource                     |
+| `Location`   | `AgentSnapshot.customData.openraLocation` | Actor world position                        |
 
 ### Preserved Metadata
 
 OpenRA-specific properties are preserved in `customData` fields:
 
 **Player customData:**
+
 - `openraIndex` — player index
 - `openraFaction` — faction name (gdi, nod, etc.)
 - `openraCash` — current cash reserves
 - `openraResources` — current resources
 
 **Agent customData:**
+
 - `openraActorId` — unique actor ID
 - `openraActorType` — unit/building type
 - `openraActorTraits` — trait list
@@ -92,6 +97,7 @@ OpenRA-specific properties are preserved in `customData` fields:
 - `openraIsIdle` — activity state
 
 **WorldState customData:**
+
 - `openraWorldTick` — raw tick number
 - `openraMapName` — map identifier
 
@@ -136,9 +142,9 @@ state = gameState50;
 const snap50 = await observer.getWorldState();
 
 // Retrieve historical snapshots
-const retrieved0 = await observer.getWorldStateAt(0);  // Cached
-const retrieved50 = await observer.getWorldStateAt(50);  // Cached
-const missing = await observer.getWorldStateAt(25);     // undefined
+const retrieved0 = await observer.getWorldStateAt(0); // Cached
+const retrieved50 = await observer.getWorldStateAt(50); // Cached
+const missing = await observer.getWorldStateAt(25); // undefined
 ```
 
 ## Resilience
@@ -146,16 +152,21 @@ const missing = await observer.getWorldStateAt(25);     // undefined
 The provider handles incomplete or partial game data gracefully:
 
 ### Missing Unit Positions
+
 Units without location data are observed with `openraLocation: null`.
 
 ### Missing Health
+
 Units without health traits get health resource value of 0.
 
 ### Empty Unit List
+
 When no units exist, a placeholder "neutral" agent is created (framework requires at least one agent). This placeholder is marked with `isPlaceholder: true`.
 
 ### Invalid Game State
+
 `isObservationAvailable()` returns false if:
+
 - Game state is null/undefined
 - World is missing
 - Actors array is missing
@@ -170,6 +181,7 @@ npm test -- packages/openra-adapter
 ```
 
 Test coverage includes:
+
 - **Integration tests** — full observation pipeline with realistic game states
 - **Unit tests** — mapper logic with various input scenarios
 - **Immutability tests** — frozen objects cannot be modified
@@ -180,19 +192,23 @@ Test coverage includes:
 ## Known Limitations
 
 ### 1. Placeholder Agent Requirement
+
 When no real units exist on the map, a placeholder "neutral" agent is created to satisfy the framework requirement that WorldState must have at least one agent. This placeholder has `isPlaceholder: true` and should be filtered out by decision engines.
 
 ```typescript
-const realAgents = worldState.agents.filter(a => !a.customData.isPlaceholder);
+const realAgents = worldState.agents.filter((a) => !a.customData.isPlaceholder);
 ```
 
 ### 2. Map Position Count
+
 The observation generates one position per map tile. For large maps (512×512), this creates 262,144 positions. This is correct but may impact memory usage for very large maps. Consider spatial indexing in future versions.
 
 ### 3. Health Only Resource
+
 Only health is currently mapped as a resource. Other OpenRA resources (cash, power, oil) are stored in customData. Future versions could expand resource mapping.
 
 ### 4. No Visibility/Fog of War
+
 The observation captures all world state without fog-of-war filtering. This is correct for server-side observation but requires careful filtering in agent perception layers.
 
 ## Future Extensions
@@ -224,16 +240,19 @@ See `.foundation/research/OPENRA_ARCHITECTURE.md` for complete integration strat
 ```typescript
 async getWorldState(): Promise<WorldState>
 ```
+
 Get current world state. Returns immutable snapshot of complete game world.
 
 ```typescript
 async getWorldStateAt(tick: number): Promise<WorldState | undefined>
 ```
+
 Get world state at a specific tick. Returns undefined if not cached.
 
 ```typescript
 async isObservationAvailable(): Promise<boolean>
 ```
+
 Check if game is observable. Returns false if game has crashed or is disconnected.
 
 ## Contributing

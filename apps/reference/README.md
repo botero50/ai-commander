@@ -66,6 +66,7 @@ A complete autonomous agent that executes a deterministic mission.
 **Goal:** Move agent from origin (0, 0) to a target location (e.g., 3, 2)
 
 **Algorithm:**
+
 1. Create goal with target coordinates
 2. Planner generates movement steps (Manhattan distance path)
 3. Decision engine selects executable steps
@@ -134,26 +135,31 @@ node dist/mission-cli.js
 ### Key Concepts Demonstrated
 
 **1. Movement Planning**
+
 - Planner generates steps based on goal parameters
 - Each step is a movement command (dx, dy)
 - Steps are ordered and deterministic
 
 **2. Decision Engine**
+
 - Examines plan and selects first executable step
 - Returns command for agent to execute
 - Handles empty plans gracefully
 
 **3. Autonomous Execution**
+
 - Agent autonomously executes ticks
 - Each tick: observe → plan → decide → execute
 - Continues until goal is complete
 
 **4. State Management**
+
 - World state immutable after each command
 - Agent position tracked and validated
 - Command count used to track progress
 
 **5. Determinism**
+
 - Same target always produces same execution
 - Reproducible across runs
 - Safe for testing and replay
@@ -192,29 +198,29 @@ Events: 32
 
 [000] T+    0 Tick  0
     Event: mission_started
-    
+
 [001] T+    1 Tick  0
     Event: mission_initialized
-    
+
 [002] T+    2 Tick  0
     Event: goal_created
     Goal: move-to-target
-    
+
 [003] T+    3 Tick  1
     Event: mission_tick
-    
+
 [004] T+    4 Tick  1
     Event: decision_engine_invoked
-    
+
 [005] T+    5 Tick  1
     Event: decision_selected
     Selected: move({"dx":1,"dy":0})
-    
+
 [006] T+    6 Tick  1
     Event: command_executed
     Command: move({"dx":1,"dy":0})
     Result: SUCCESS
-    
+
 [007] T+    7 Tick  1
     Event: world_state_updated
     Position: (1, 0)
@@ -223,7 +229,7 @@ Events: 32
 
 [031] T+   44 Tick  5
     Event: mission_completed
-    
+
 [032] T+   45 Tick  5
     Event: mission_shutdown
 
@@ -235,6 +241,7 @@ Events: 32
 The trace captures these event types:
 
 **Lifecycle Events:**
+
 - `mission_started` — Agent mission began
 - `mission_initialized` — Framework initialized
 - `mission_completed` — Mission goal achieved
@@ -242,6 +249,7 @@ The trace captures these event types:
 - `mission_shutdown` — Resources cleaned up
 
 **Reasoning Events:**
+
 - `goal_created` — Goal defined
 - `planner_invoked` — Planner called
 - `plan_generated` — Plan created (with step count)
@@ -252,6 +260,7 @@ The trace captures these event types:
 - `decision_error` — Decision failed
 
 **Execution Events:**
+
 - `mission_tick` — One agent tick executed
 - `command_executed` — Command succeeded
 - `command_failed` — Command failed
@@ -291,13 +300,14 @@ const duration = trace.endTime - trace.startTime;
 console.log(`Duration: ${duration} ms`);
 
 // Find specific events
-const decisions = trace.events.filter(e => e.eventType === 'decision_selected');
+const decisions = trace.events.filter((e) => e.eventType === 'decision_selected');
 console.log(`Decisions made: ${decisions.length}`);
 ```
 
 ### Why Traces?
 
 Traces provide **observability** without modifying the framework:
+
 - Understand agent reasoning
 - Debug mission failures
 - Validate determinism
@@ -320,6 +330,7 @@ The reference application generates deterministic runtime metrics that summarize
 While execution traces answer "What happened?", metrics answer "How well did it happen?"
 
 Metrics are:
+
 - **Deterministic** — Same mission always produces same metrics
 - **Immutable** — Frozen after generation, cannot be modified
 - **Independent** — Do not influence runtime behavior
@@ -328,33 +339,39 @@ Metrics are:
 ### Key Metrics
 
 **Timing:**
+
 - `missionDurationMs` — Total mission time from start to finish
 - `initializationTimeMs` — Time to initialize framework
 - `executionTimeMs` — Time for autonomous execution loop
 - `shutdownTimeMs` — Time for cleanup
 
 **Event Counts:**
+
 - `totalEvents` — All recorded events
 - `lifecycleEvents` — Mission state changes
 - `reasoningEvents` — Planning and decision-making
 - `executionEvents` — Ticks, commands, world updates
 
 **Execution:**
+
 - `totalTicks` — Agent ticks executed
 - `averageTickDurationMs` — Time per tick
 
 **Planning:**
+
 - `plannerInvocations` — Times planner was called
 - `plansGenerated` — Plans successfully created
 - `planErrors` — Planning failures
 
 **Decision Making:**
+
 - `decisionEngineInvocations` — Times decision engine called
 - `decisionsSelected` — Decisions made
 - `decisionErrors` — Decision failures
 - `averageDecisionsPerTick` — Decisions per tick
 
 **Command Execution:**
+
 - `commandsExecuted` — Total commands executed
 - `successfulCommands` — Commands that succeeded
 - `failedCommands` — Commands that failed
@@ -362,9 +379,11 @@ Metrics are:
 - `averageCommandsPerTick` — Commands per tick
 
 **World State:**
+
 - `worldStateUpdates` — Times world state changed
 
 **Goals:**
+
 - `goalsCreated` — Goals defined
 
 ### Example Metrics Output
@@ -455,6 +474,7 @@ console.log(`Avg tick time: ${metrics?.averageTickDurationMs.toFixed(2)} ms`);
 ### Why Metrics?
 
 Metrics provide **performance visibility**:
+
 - Understand mission efficiency
 - Compare different agents or algorithms
 - Validate performance improvements
@@ -475,6 +495,7 @@ The replay system validates that recorded execution traces are internally consis
 **Replay is deterministic validation, NOT simulation.**
 
 Replay validates that:
+
 - Events are chronologically ordered
 - Required lifecycle events exist
 - Mission completed successfully
@@ -548,6 +569,7 @@ if (report?.isValid) {
 ### Why Replay?
 
 Replay provides **trace validation and consistency checking**:
+
 - Validate recorded execution integrity
 - Detect corrupted or incomplete traces
 - Verify traces are properly formed
@@ -567,6 +589,7 @@ The Runtime Inspector provides immutable read-only snapshots of current executio
 **The Runtime Inspector is read-only access to live execution data.**
 
 It captures:
+
 - Mission status and elapsed time
 - Current agent position and target
 - Current tick and execution progress
@@ -766,6 +789,7 @@ Runs integration tests validating:
 - Error handling and recovery
 
 Test output includes:
+
 - Movement planner validation (Manhattan distance algorithms)
 - Mission execution logs
 - Goal creation and planning
@@ -775,28 +799,34 @@ Test output includes:
 ## Public APIs Used
 
 ### From @ai-commander/adapter
+
 - `GameAdapter` interface
 - `FakeGameAdapter` class
 
 ### From @ai-commander/agent-runtime
+
 - `AgentRuntime` interface
 - `AgentStatus` enum
 - `createAgentRuntime()` function
 
 ### From @ai-commander/goals
+
 - `Goal` type
 - `createGoal()`, `createGoalId()` functions
 - `GoalStatus`, `GoalPriorityLevel` enums
 - `createGoalPriority()` function
 
 ### From @ai-commander/core
+
 - `EventBus`, `Clock`, `ServiceRegistry` types
 - `createEventBus()`, `createRealtimeClock()`, `createServiceRegistry()` functions
 
 ### From @ai-commander/engine
+
 - `ExecutionContext` interface
 
 ### From @ai-commander/planner
+
 - `Planner` interface
 - `PlanningRequest`, `PlanningResult` types
 - `Plan`, `PlanStep`, `PlanId` types
@@ -804,10 +834,12 @@ Test output includes:
 - `createPlan()`, `createPlanId()` functions
 
 ### From @ai-commander/decision
+
 - `DecisionEngine` interface
 - `DecisionRequest`, `DecisionResult` types
 
 ### From @ai-commander/domain
+
 - `Command`, `WorldState` types
 - `createCommand()`, `createActionId()`, `createTick()`, `createAgent()` functions
 
@@ -864,7 +896,7 @@ Each component can be replaced independently.
 ✅ Autonomous loops — Agents execute independently  
 ✅ Deterministic execution — Reproducible across runs  
 ✅ Immutability — World state and plans are immutable  
-✅ Error handling — Graceful recovery from failures  
+✅ Error handling — Graceful recovery from failures
 
 ---
 
@@ -911,7 +943,7 @@ Metrics are collected but not aggregated over time.
 ✅ **Autonomous execution is possible** — Agents complete missions without manual intervention  
 ✅ **Determinism is achievable** — Same inputs produce same execution  
 ✅ **Immutability is enforced** — World state doesn't break under concurrent access  
-✅ **Graceful degradation works** — Agent continues when components fail  
+✅ **Graceful degradation works** — Agent continues when components fail
 
 ---
 

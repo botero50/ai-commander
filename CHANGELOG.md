@@ -168,6 +168,7 @@ Initial alpha release for internal validation.
 **Status:** Pre-release, not recommended for production use.
 
 **Features:**
+
 - Core framework components
 - Basic game adapter pattern
 - Fake game adapter reference implementation
@@ -200,10 +201,10 @@ Initial alpha release for internal validation.
 
 ## Version History Summary
 
-| Version | Date | Status | Notes |
-|---------|------|--------|-------|
-| 1.0.0 | 2026-07-01 | ✅ Current | Stable, production-ready |
-| 0.1.0-alpha | 2026-06-30 | Archived | Pre-release for validation |
+| Version     | Date       | Status     | Notes                      |
+| ----------- | ---------- | ---------- | -------------------------- |
+| 1.0.0       | 2026-07-01 | ✅ Current | Stable, production-ready   |
+| 0.1.0-alpha | 2026-06-30 | Archived   | Pre-release for validation |
 
 ---
 
@@ -212,11 +213,12 @@ Initial alpha release for internal validation.
 ### From Any Pre-Release to v1.0.0
 
 1. Update your package.json dependencies:
+
    ```json
    {
      "dependencies": {
        "@ai-commander/core": "^1.0.0",
-       "@ai-commander/adapter": "^1.0.0",
+       "@ai-commander/adapter": "^1.0.0"
        // ... other packages
      }
    }
@@ -252,7 +254,7 @@ See CONTRIBUTING.md for detailed contribution guidelines.
 ✅ **Deterministic:** 0% variance in execution across runs  
 ✅ **Comprehensive:** 246+ tests, 100% passing  
 ✅ **Well-Documented:** Architecture docs, ADRs, code examples  
-✅ **Secure:** TypeScript strict mode, security policy, no unsafe dependencies  
+✅ **Secure:** TypeScript strict mode, security policy, no unsafe dependencies
 
 ### What's New Compared to Pre-Release
 
@@ -266,6 +268,7 @@ See CONTRIBUTING.md for detailed contribution guidelines.
 ---
 
 **For detailed information, see:**
+
 - README.md - Project overview and quick start
 - CONTRIBUTING.md - Development and contribution process
 - SECURITY.md - Security policy and vulnerability reporting

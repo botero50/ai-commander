@@ -19,6 +19,7 @@ OpenRA is a clean, well-architected real-time strategy game with strong separati
 5. **Clear Integration Points** — OrderManager and World are natural boundaries
 
 **Recommended Integration Strategy:**
+
 - Intercept Orders (player input → game actions)
 - Query World state (observation)
 - Inject Orders (AI decisions → game actions)
@@ -58,21 +59,21 @@ OpenRA.sln
 
 ### 13 Core Systems
 
-| System | Responsibility | Integration Point |
-|--------|-----------------|------------------|
-| **Game** | Main loop, lifecycle | Program entry |
-| **World** | Simulation, tick updates | State observation |
-| **Traits** | Entity components | Gameplay |
-| **Orders** | Command execution | Action injection |
-| **Network** | Synchronization, replays | Determinism |
-| **Map** | World geometry | Navigation |
-| **Graphics** | Rendering | (Not needed) |
-| **Players** | Player state, teams | Observation |
-| **Shroud** | Fog of war | Observation |
-| **Activities** | Unit behaviors | Decision input |
-| **Widgets** | UI system | (Not needed) |
-| **Sound** | Audio | (Not needed) |
-| **Server** | Headless hosting | Could extend |
+| System         | Responsibility           | Integration Point |
+| -------------- | ------------------------ | ----------------- |
+| **Game**       | Main loop, lifecycle     | Program entry     |
+| **World**      | Simulation, tick updates | State observation |
+| **Traits**     | Entity components        | Gameplay          |
+| **Orders**     | Command execution        | Action injection  |
+| **Network**    | Synchronization, replays | Determinism       |
+| **Map**        | World geometry           | Navigation        |
+| **Graphics**   | Rendering                | (Not needed)      |
+| **Players**    | Player state, teams      | Observation       |
+| **Shroud**     | Fog of war               | Observation       |
+| **Activities** | Unit behaviors           | Decision input    |
+| **Widgets**    | UI system                | (Not needed)      |
+| **Sound**      | Audio                    | (Not needed)      |
+| **Server**     | Headless hosting         | Could extend      |
 
 ---
 
@@ -133,6 +134,7 @@ Frame N:
 ```
 
 **Key Synchronization Points:**
+
 - `OrderManager.QueueFrame` — Orders executed this tick
 - `WorldTick` — Number of ticks completed
 - `SyncHash` — Cryptographic state hash (ensures determinism)
@@ -184,6 +186,7 @@ Actor Lifecycle:
 ### State Representation
 
 **World State Contains:**
+
 - Actor list (units, buildings, effects)
 - Player states (resources, tech, shroud)
 - Map state (shroud, ore fields)
@@ -191,11 +194,13 @@ Actor Lifecycle:
 - Network synchronization data
 
 **Immutable Elements:**
+
 - Map geometry (cannot change)
 - Trait definitions (cannot change)
 - Player count and teams (set at game start)
 
 **Mutable Elements:**
+
 - Actor positions and orientations
 - Actor health and status
 - Resource counts
@@ -238,6 +243,7 @@ Map
 ```
 
 **Coordinate Systems:**
+
 - `CPos` — Cell position (integer grid)
 - `MPos` — Map position (for rendering)
 - `WPos` — World position (1/1024 cell precision)
@@ -250,6 +256,7 @@ Map
 ### What Is an Order?
 
 An Order is a command from a player to perform an action. All player input flows through Orders for:
+
 - Network transmission (multiplayer sync)
 - Replay recording (determinism)
 - Validation (cheating prevention)
@@ -291,21 +298,25 @@ Actor State Updated
 ### Order Types
 
 **Movement:**
+
 - Move: Walk to position
 - EnterUnit: Board transport
 - ExitUnit: Exit transport
 
 **Combat:**
+
 - Attack: Attack unit/building
 - AttackGround: Attack position
 - AutoTarget: Toggle auto-attack
 
 **Construction:**
+
 - Build: Construct building
 - Cancel: Abort construction
 - Sell: Demolish building
 
 **Economy:**
+
 - Repair: Repair unit
 - Guard: Guard position
 
@@ -329,6 +340,7 @@ OrderManager.ValidateOrder(Order)
 ### Why Ticks?
 
 OpenRA uses a fixed tick rate (40ms = 25 ticks/second):
+
 - Ensures determinism (same input = same output)
 - Enables replays (record tick number + order)
 - Enables networking (sync state at tick boundaries)
@@ -387,6 +399,7 @@ After each tick:
 ### Existing AI Implementation
 
 OpenRA includes:
+
 - `BotAI` class for autonomous unit control
 - Activity system (queuing unit behaviors)
 - Trait methods for behavior hooks
@@ -433,6 +446,7 @@ Each Tick:
 ### 1. World State Observation
 
 **Where to Read:**
+
 ```
 World
 ├─ Players[]          # All players, resources, tech
@@ -442,6 +456,7 @@ World
 ```
 
 **What to Query:**
+
 - Actor positions: `actor.CenterPosition` (WPos)
 - Actor type: `actor.Info.Name`
 - Actor owner: `actor.Owner`
@@ -454,11 +469,13 @@ World
 ### 2. Command Execution (Order Injection)
 
 **Where to Issue Orders:**
+
 ```
 OrderManager.IssueOrders(List<Order>)
 ```
 
 **How to Create Orders:**
+
 ```
 // Example: Move unit to position
 new Order("Move", actor)
@@ -486,6 +503,7 @@ new Order("Build", player)
 ### 3. Agent Lifecycle
 
 **Where to Hook:**
+
 ```
 Game.Run()
     ├─ Create World
@@ -498,6 +516,7 @@ Game.Run()
 ```
 
 **Lifecycle Methods Needed:**
+
 - `Agent.Initialize(World)` — Called when world created
 - `Agent.Observe()` — Read world state
 - `Agent.Decide()` — Planning phase
@@ -521,6 +540,7 @@ IGameOver               # Game ended
 ### 5. Mission Boundaries
 
 **Game Start:**
+
 ```
 OrderManager.LobbyInfo
 ├─ Players[]
@@ -529,6 +549,7 @@ OrderManager.LobbyInfo
 ```
 
 **Game End:**
+
 ```
 World.IsGameOver       # True if game ended
 World.GameOver event   # Fired when game ends
@@ -578,6 +599,7 @@ Replay:
 ```
 
 **Important:** Determinism requires:
+
 - Same code (code must not change between sessions)
 - Same random seed
 - Same order execution sequence
@@ -589,34 +611,41 @@ Replay:
 ### Technical Risks
 
 **Risk: Rendering System Tightly Coupled**
+
 - Graphics used for state observation in UI
 - Solution: Query World directly, not Renderer
 
 **Risk: Network Desync with Custom Code**
+
 - If AI modifies world directly → desync
 - Solution: Only issue Orders, never modify actors
 
 **Risk: Shared Random Stream Consumed**
+
 - `World.SharedRandom` shared with game logic
 - Solution: Use separate random for planning decisions
 
 **Risk: Order Validation May Reject Decisions**
+
 - OrderManager validates all orders
 - Solution: Follow order format exactly, validate decisions upfront
 
 ### Architectural Constraints
 
 **Single-Threaded:**
+
 - All simulation on main thread
 - Can't parallelize decision-making
 - Must complete within 40ms
 
 **No Direct Actor Modification:**
+
 - Can't directly change actor properties
 - Must issue Orders for all changes
 - Orders queue and execute at specific ticks
 
 **No Game Logic Modification:**
+
 - Can't change trait behavior
 - Can't add new trait types
 - Must work with existing order system
@@ -658,25 +687,26 @@ Replay:
 ### Adapter Components
 
 **1. GameAdapter Implementation**
+
 ```csharp
 class OpenRAGameAdapter : GameAdapter
 {
     private OrderManager orderManager;
     private World world;
-    
+
     public async Task Initialize(Map map, Players[] players)
     {
         // Load OpenRA game
         // Set up world
         // Configure players
     }
-    
+
     public async Task ExecuteTick()
     {
         // world.Tick()
         // Wait for next tick (40ms)
     }
-    
+
     public async Task Shutdown()
     {
         // Cleanup
@@ -685,6 +715,7 @@ class OpenRAGameAdapter : GameAdapter
 ```
 
 **2. ObservationProvider Implementation**
+
 ```csharp
 class OpenRAObservationProvider : ObservationProvider
 {
@@ -700,6 +731,7 @@ class OpenRAObservationProvider : ObservationProvider
 ```
 
 **3. CommandExecutor Implementation**
+
 ```csharp
 class OpenRACommandExecutor : CommandExecutor
 {
@@ -752,17 +784,20 @@ Phase 5: Optimization (1 week)
 ## Story Breakdown
 
 ### Story 4.2: Architecture Discovery ✅ DONE
+
 - Understand OpenRA architecture
 - Document integration points
 - Identify constraints
 
 ### Story 4.3: World State Observation (Estimated 3-5 days)
+
 - Implement ObservationProvider
 - Query actor positions and types
 - Query player states
 - Test observation accuracy
 
 ### Story 4.4: Command Pipeline (Estimated 5-7 days)
+
 - Understand order creation
 - Create movement orders
 - Create attack orders
@@ -770,18 +805,21 @@ Phase 5: Optimization (1 week)
 - Test command execution
 
 ### Story 4.5: Adapter Foundation (Estimated 3-5 days)
+
 - Create GameAdapter skeleton
 - Load OpenRA game
 - Execute ticks
 - Handle lifecycle
 
 ### Story 4.6: Framework Integration (Estimated 5-7 days)
+
 - Connect to ReferencePlanner
 - Connect to DecisionEngine
 - Test autonomous execution
 - Verify determinism
 
 ### Story 4.7: Optimization & Polish (Estimated 3-5 days)
+
 - Performance tuning
 - Documentation
 - Demo scenarios
@@ -796,6 +834,7 @@ Phase 5: Optimization (1 week)
 OpenRA's architecture is well-suited for AI Commander integration:
 
 ✅ **Strengths:**
+
 - Clean separation (rendering, simulation, networking)
 - Order-based system (perfect for injection)
 - Deterministic (perfect for benchmarking)
@@ -803,12 +842,14 @@ OpenRA's architecture is well-suited for AI Commander integration:
 - Well-documented code
 
 ⚠️ **Constraints:**
+
 - Single-threaded execution
 - No direct state modification (orders only)
 - 40ms tick budget
 - Network desync detection
 
 **Integration Approach:**
+
 1. Observe world state via World queries
 2. Inject decisions via OrderManager.IssueOrders()
 3. Monitor tick lifecycle for synchronization
@@ -816,4 +857,3 @@ OpenRA's architecture is well-suited for AI Commander integration:
 
 **Next Steps:**
 Proceed to Story 4.3 (Observation) with this architecture understanding.
-

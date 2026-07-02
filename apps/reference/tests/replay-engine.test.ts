@@ -114,7 +114,9 @@ describe('Replay Engine - Trace Validation', () => {
     }
 
     const result = ReplayEngine.replay(trace);
-    const consistencyValidation = result.validations.find((v) => v.name === 'Event Data Consistency');
+    const consistencyValidation = result.validations.find(
+      (v) => v.name === 'Event Data Consistency'
+    );
     expect(consistencyValidation?.passed).toBe(true);
   });
 

@@ -1,8 +1,4 @@
-import type {
-  AgentConfiguration,
-  AgentRuntime,
-  AgentRuntimeState,
-} from './types/agent-runtime.js';
+import type { AgentConfiguration, AgentRuntime, AgentRuntimeState } from './types/agent-runtime.js';
 import type { AgentMetrics } from './types/agent-metrics.js';
 import type { DecisionContext, DecisionPolicy } from '@ai-commander/decision';
 import type { PlanningPolicy } from '@ai-commander/planner';
@@ -208,4 +204,3 @@ export class DefaultAgentRuntime implements AgentRuntime {
 export function createAgentRuntime(config: AgentConfiguration): AgentRuntime {
   return new DefaultAgentRuntime(config);
 }
-

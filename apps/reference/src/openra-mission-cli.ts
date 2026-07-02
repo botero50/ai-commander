@@ -39,7 +39,7 @@ async function runMission(targetX: number, targetY: number): Promise<OpenRAMissi
       index: 0,
       clientIndex: 0,
       playerName: 'Player',
-      color: 0xFF00FF00,
+      color: 0xff00ff00,
       faction: 'gdi',
       isBot: false,
       isObserver: false,
@@ -102,7 +102,13 @@ async function runMission(targetX: number, targetY: number): Promise<OpenRAMissi
     return true;
   };
 
-  const agent = new OpenRAMissionAgent(targetX, targetY, gameStateAccessor, orderSubmitter, stateChecker);
+  const agent = new OpenRAMissionAgent(
+    targetX,
+    targetY,
+    gameStateAccessor,
+    orderSubmitter,
+    stateChecker
+  );
 
   await agent.initialize();
   await agent.run();
