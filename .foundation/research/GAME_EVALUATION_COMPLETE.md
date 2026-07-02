@@ -9,6 +9,7 @@
 ## Executive Summary
 
 9 games have been evaluated across 4 weighted dimensions:
+
 - **Technical Feasibility** (40%)
 - **AI Suitability** (30%)
 - **Developer Experience** (20%)
@@ -16,29 +17,29 @@
 
 **Final Ranking:**
 
-| Rank | Game | Score | Status |
-|------|------|-------|--------|
-| 1 | **OpenRA** | **85/100** | ⭐ RECOMMENDED |
-| 2 | Godot Sample | 81/100 | Good fallback |
-| 3 | Mindustry | 77/100 | Could work |
-| 4 | Custom Grid-World | 75/100 | Framework only |
-| 5 | Minecraft | 70/100 | Wrong type |
-| 6 | OpenTTD | 69/100 | Less ideal |
-| 7 | Factorio | 67/100 | Optimization not AI |
-| 8 | StarCraft II | 63/100 | Licensing blocks it |
-| 9 | Age of Empires IV | 56/100 | No API |
+| Rank | Game              | Score      | Status              |
+| ---- | ----------------- | ---------- | ------------------- |
+| 1    | **OpenRA**        | **85/100** | ⭐ RECOMMENDED      |
+| 2    | Godot Sample      | 81/100     | Good fallback       |
+| 3    | Mindustry         | 77/100     | Could work          |
+| 4    | Custom Grid-World | 75/100     | Framework only      |
+| 5    | Minecraft         | 70/100     | Wrong type          |
+| 6    | OpenTTD           | 69/100     | Less ideal          |
+| 7    | Factorio          | 67/100     | Optimization not AI |
+| 8    | StarCraft II      | 63/100     | Licensing blocks it |
+| 9    | Age of Empires IV | 56/100     | No API              |
 
 ---
 
 ## Complete Comparison Matrix
 
-| Dimension | Weight | Minecraft | StarCraft | AoE IV | OpenRA | Factorio | Mindustry | OpenTTD | Godot | Grid |
-|-----------|--------|-----------|-----------|--------|--------|----------|-----------|---------|-------|------|
-| **Technical** | 40% | 75 | 45 | 55 | **85** | 65 | 80 | 70 | 95 | 98 |
-| **AI** | 30% | 70 | **95** | 70 | **90** | 70 | 75 | 70 | 100 | 100 |
-| **DevEx** | 20% | 60 | 50 | 45 | **85** | 60 | 75 | 65 | 90 | 85 |
-| **Long-Term** | 10% | 65 | 60 | 55 | **85** | 70 | 70 | 65 | 60 | 40 |
-| **WEIGHTED SCORE** | 100% | **70** | **63** | **56** | **85** | **67** | **77** | **69** | **81** | **75** |
+| Dimension          | Weight | Minecraft | StarCraft | AoE IV | OpenRA | Factorio | Mindustry | OpenTTD | Godot  | Grid   |
+| ------------------ | ------ | --------- | --------- | ------ | ------ | -------- | --------- | ------- | ------ | ------ |
+| **Technical**      | 40%    | 75        | 45        | 55     | **85** | 65       | 80        | 70      | 95     | 98     |
+| **AI**             | 30%    | 70        | **95**    | 70     | **90** | 70       | 75        | 70      | 100    | 100    |
+| **DevEx**          | 20%    | 60        | 50        | 45     | **85** | 60       | 75        | 65      | 90     | 85     |
+| **Long-Term**      | 10%    | 65        | 60        | 55     | **85** | 70       | 70        | 65      | 60     | 40     |
+| **WEIGHTED SCORE** | 100%   | **70**    | **63**    | **56** | **85** | **67**   | **77**    | **69**  | **81** | **75** |
 
 ---
 
@@ -47,6 +48,7 @@
 ### StarCraft II Scores Highest on AI: 95/100
 
 StarCraft II is the most complex RTS game in existence:
+
 - 13+ unique unit types, each with special abilities
 - 62+ technology upgrades
 - Complex economic system
@@ -102,6 +104,7 @@ StarCraft II is the most complex RTS game in existence:
 ### When to Use StarCraft II Instead of OpenRA
 
 **Use StarCraft if:**
+
 - Goal: Publish in Nature/Science
 - Goal: DeepMind/Google partnership
 - Goal: Beat competitive human players
@@ -109,6 +112,7 @@ StarCraft II is the most complex RTS game in existence:
 - Licensing: Have explicit permission from Blizzard
 
 **Use OpenRA if:**
+
 - Goal: Validate framework with real RTS game (THIS)
 - Goal: Open source long-term solution
 - Goal: Custom scenarios and modifications
@@ -118,12 +122,14 @@ StarCraft II is the most complex RTS game in existence:
 ### Analogy
 
 **StarCraft:** Like a Formula 1 race car
+
 - Incredibly complex, best-in-class performance
 - But you can't modify it, parts are proprietary
 - Can't use it for research without permission
 - Could be taken away by manufacturer
 
 **OpenRA:** Like a well-engineered open source car
+
 - Less exotic than F1, but fully customizable
 - Can modify, extend, understand completely
 - Open source guarantees long-term access
@@ -179,6 +185,7 @@ StarCraft II is the most complex RTS game in existence:
 **Why Ranking is So Low:**
 
 Age of Empires scored lowest overall because it combines the worst aspects of multiple games:
+
 - Game state not exposed (worse than StarCraft's closed API)
 - Campaign system not suitable (wrong design for AI)
 - No community support (unlike Minecraft or OpenRA)
@@ -190,16 +197,16 @@ Age of Empires scored lowest overall because it combines the worst aspects of mu
 
 ### Which is Better for First Integration?
 
-| Factor | StarCraft II | OpenRA | Winner |
-|--------|--------------|--------|--------|
-| **AI Complexity** | Extreme (95/100) | High (90/100) | StarCraft |
-| **Licensing** | Proprietary ❌ | MIT Open Source ✅ | **OpenRA** |
-| **API Quality** | Research-focused ❌ | Game-focused ✅ | **OpenRA** |
-| **Extensibility** | None ❌ | Complete ✅ | **OpenRA** |
-| **Installation** | Complex ❌ | Easy ✅ | **OpenRA** |
-| **Integration Effort** | 400+ hours | 220-340 hours | **OpenRA** |
-| **Long-Term Viability** | Uncertain ❌ | Guaranteed ✅ | **OpenRA** |
-| **Total Score** | 63/100 | 85/100 | **OpenRA** |
+| Factor                  | StarCraft II        | OpenRA             | Winner     |
+| ----------------------- | ------------------- | ------------------ | ---------- |
+| **AI Complexity**       | Extreme (95/100)    | High (90/100)      | StarCraft  |
+| **Licensing**           | Proprietary ❌      | MIT Open Source ✅ | **OpenRA** |
+| **API Quality**         | Research-focused ❌ | Game-focused ✅    | **OpenRA** |
+| **Extensibility**       | None ❌             | Complete ✅        | **OpenRA** |
+| **Installation**        | Complex ❌          | Easy ✅            | **OpenRA** |
+| **Integration Effort**  | 400+ hours          | 220-340 hours      | **OpenRA** |
+| **Long-Term Viability** | Uncertain ❌        | Guaranteed ✅      | **OpenRA** |
+| **Total Score**         | 63/100              | 85/100             | **OpenRA** |
 
 ### The Critical Difference
 
@@ -216,6 +223,7 @@ For a new framework, you need to prove the framework works, not that you can sol
 ### 1. OpenRA — 85/100 ⭐ RECOMMENDED
 
 **Why:** Only game that scores well across all dimensions.
+
 - Technical: 85 (clean codebase, MIT license, full control)
 - AI: 90 (proven RTS domain, real-time decision making)
 - DevEx: 85 (easy setup, excellent reproducibility)
@@ -224,6 +232,7 @@ For a new framework, you need to prove the framework works, not that you can sol
 ### 2. Godot Sample — 81/100
 
 **Why:** Perfect technical fit but less impressive.
+
 - Technical: 95 (complete control, no external blocks)
 - AI: 100 (designed perfectly for AI)
 - DevEx: 90 (perfect reproducibility)
@@ -234,6 +243,7 @@ For a new framework, you need to prove the framework works, not that you can sol
 ### 3. Mindustry — 77/100
 
 **Why:** Good open source alternative to OpenRA.
+
 - Technical: 80 (good API, open source)
 - AI: 75 (tower defense mechanics)
 - DevEx: 75 (easy setup, good documentation)
@@ -244,6 +254,7 @@ For a new framework, you need to prove the framework works, not that you can sol
 ### 4. Custom Grid-World — 75/100
 
 **Why:** Functionally perfect but no real game appeal.
+
 - Technical: 98 (trivial implementation)
 - AI: 100 (perfect test domain)
 - DevEx: 85 (minimal setup)
@@ -254,6 +265,7 @@ For a new framework, you need to prove the framework works, not that you can sol
 ### 5. Minecraft — 70/100
 
 **Why:** Well-known but technically unsuitable.
+
 - Technical: 75 (massive mods ecosystem)
 - AI: 70 (interesting problems but no built-in goals)
 - DevEx: 60 (reproducibility nightmare)
@@ -264,6 +276,7 @@ For a new framework, you need to prove the framework works, not that you can sol
 ### 6. OpenTTD — 69/100
 
 **Why:** Solid game but wrong type.
+
 - Technical: 70 (open source, cross-platform)
 - AI: 70 (good planning domain)
 - DevEx: 65 (older codebase)
@@ -274,6 +287,7 @@ For a new framework, you need to prove the framework works, not that you can sol
 ### 7. Factorio — 67/100
 
 **Why:** Great game but optimization not decision-making.
+
 - Technical: 65 (closed API, mods only)
 - AI: 70 (optimization problems)
 - DevEx: 60 (licensing restrictions)
@@ -284,6 +298,7 @@ For a new framework, you need to prove the framework works, not that you can sol
 ### 8. StarCraft II — 63/100
 
 **Why:** Highest AI score (95) but lowest practical score.
+
 - Technical: 45 (proprietary, no extensibility)
 - AI: 95 (most complex RTS, world-class)
 - DevEx: 50 (large download, licensing issues)
@@ -294,6 +309,7 @@ For a new framework, you need to prove the framework works, not that you can sol
 ### 9. Age of Empires IV — 56/100
 
 **Why:** Newest but most problematic.
+
 - Technical: 55 (no API, would need reverse engineering)
 - AI: 70 (campaign-focused, not autonomous)
 - DevEx: 45 (poorest documentation of all)
@@ -335,12 +351,14 @@ This is not an error — it's the correct decision because:
 ### Analogy: Validating an Airplane Engine
 
 **StarCraft:** Test the engine in a supersonic fighter jet
+
 - Proves the engine works in extreme conditions
 - But if it doesn't work, unclear if it's engine or jet
 - Can't modify jet for testing
 - Jet belongs to Blizzard, they can take it back
 
 **OpenRA:** Test the engine in a regular airplane
+
 - Proves the engine works in normal conditions
 - If it works here, know framework is solid
 - Can modify airplane for testing
@@ -362,12 +380,14 @@ Once you validate the engine with a regular plane, you can absolutely put it in 
 6. **No blocking issues** — Full control, no licensing nightmares, extensible
 
 **Why StarCraft is second choice:**
+
 - If Blizzard grants API access ✓
 - If licensing concerns resolved ✓
 - If willing to spend $100k+ ✓
 - After proving framework with OpenRA ✓
 
 **Why Age of Empires is last choice:**
+
 - Absolutely no API available
 - Would need complete reverse engineering
 - Game not designed for autonomous agents
@@ -378,17 +398,17 @@ Once you validate the engine with a regular plane, you can absolutely put it in 
 
 ## Implementation Effort Comparison
 
-| Game | Total Hours | Weeks | Difficulty | Reason |
-|------|-------------|-------|-----------|--------|
-| Custom Grid | 80-120 | 2-3 | Low | Trivial, no external game |
-| OpenRA | 220-340 | 5-8.5 | Moderate | Clean API, straightforward |
-| Mindustry | 240-360 | 6-9 | Moderate | JVM integration, good API |
-| Godot Sample | 280-420 | 7-10.5 | High | Build from scratch |
-| Minecraft | 400-600 | 10-15 | High | Large ecosystem, complex |
-| OpenTTD | 320-480 | 8-12 | High | Old codebase, complex |
-| Factorio | 360-540 | 9-13.5 | High | Closed API, mods only |
-| StarCraft II | 400-600 | 10-15 | Very High | API not designed for this |
-| Age of Empires | 500-800 | 12-20 | Very High | No API, reverse engineer |
+| Game           | Total Hours | Weeks  | Difficulty | Reason                     |
+| -------------- | ----------- | ------ | ---------- | -------------------------- |
+| Custom Grid    | 80-120      | 2-3    | Low        | Trivial, no external game  |
+| OpenRA         | 220-340     | 5-8.5  | Moderate   | Clean API, straightforward |
+| Mindustry      | 240-360     | 6-9    | Moderate   | JVM integration, good API  |
+| Godot Sample   | 280-420     | 7-10.5 | High       | Build from scratch         |
+| Minecraft      | 400-600     | 10-15  | High       | Large ecosystem, complex   |
+| OpenTTD        | 320-480     | 8-12   | High       | Old codebase, complex      |
+| Factorio       | 360-540     | 9-13.5 | High       | Closed API, mods only      |
+| StarCraft II   | 400-600     | 10-15  | Very High  | API not designed for this  |
+| Age of Empires | 500-800     | 12-20  | Very High  | No API, reverse engineer   |
 
 ---
 
@@ -397,22 +417,24 @@ Once you validate the engine with a regular plane, you can absolutely put it in 
 **OpenRA is the clear winner for the first real integration.**
 
 It provides the optimal balance of:
+
 - ✅ Technical excellence (clean codebase, MIT license, full control)
 - ✅ AI suitability (proven RTS domain, real-time decision making)
 - ✅ Developer experience (easy setup, reproducible)
 - ✅ Long-term value (community maintained, extensible)
 
 **StarCraft II is the ultimate goal** but not the first step:
+
 - Has highest AI complexity (95/100)
 - But lowest practical score (63/100) due to licensing and integration barriers
 - Better to validate framework on accessible domain first
 - Then tackle StarCraft after framework is proven
 
 **Age of Empires IV was not competitive:**
+
 - Lowest technical score (55/100)
 - No API available (would need reverse engineering)
 - Campaign system wrong for autonomous agents
 - Least viable option overall
 
 **Next Step:** If approved, begin OpenRA adapter implementation (220-340 hours, ~6 weeks).
-

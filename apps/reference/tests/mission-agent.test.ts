@@ -2,7 +2,13 @@ import { describe, it, expect } from 'vitest';
 import { MissionAgent } from '../src/mission-agent.js';
 import { MovementPlanner } from '../src/movement-planner.js';
 import type { PlanningRequest, Planner } from '@ai-commander/planner';
-import { createGoal, createGoalId, GoalStatus, GoalPriorityLevel, createGoalPriority } from '@ai-commander/goals';
+import {
+  createGoal,
+  createGoalId,
+  GoalStatus,
+  GoalPriorityLevel,
+  createGoalPriority,
+} from '@ai-commander/goals';
 
 describe('Mission Agent - Autonomous Agent Loop', () => {
   it('should initialize a mission agent', async () => {

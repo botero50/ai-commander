@@ -104,10 +104,7 @@ export class BenchmarkSuite {
   /**
    * Run a single mission benchmark.
    */
-  static async runMissionBenchmark(
-    targetX: number,
-    targetY: number,
-  ): Promise<BenchmarkResult> {
+  static async runMissionBenchmark(targetX: number, targetY: number): Promise<BenchmarkResult> {
     const startTime = Date.now();
     const agent = new MissionAgent(targetX, targetY);
 
@@ -158,7 +155,8 @@ export class BenchmarkSuite {
     // Calculate decision and command metrics
     const decisionsPerSecond = totalTicks > 0 ? (totalTicks / executionTimeMs) * 1000 : 0;
     const commandsExecuted = metrics?.commandsExecuted ?? 0;
-    const commandsPerSecond = commandsExecuted > 0 ? (commandsExecuted / executionTimeMs) * 1000 : 0;
+    const commandsPerSecond =
+      commandsExecuted > 0 ? (commandsExecuted / executionTimeMs) * 1000 : 0;
 
     // Planning metrics (from trace)
     const plannerInvocations = trace.events.filter((e) => e.eventType === 'planner_invoked').length;
@@ -198,7 +196,7 @@ export class BenchmarkSuite {
    */
   static async runBenchmarks(
     targets: Array<[number, number]>,
-    runsPerTarget: number = 5,
+    runsPerTarget: number = 5
   ): Promise<BenchmarkResult[]> {
     const results: BenchmarkResult[] = [];
 
@@ -268,15 +266,15 @@ export class BenchmarkSuite {
 
     const initializationStdDev = stdDev(
       targetResults.map((r) => r.initializationTimeMs),
-      avgInitializationTimeMs,
+      avgInitializationTimeMs
     );
     const executionStdDev = stdDev(
       targetResults.map((r) => r.executionTimeMs),
-      avgExecutionTimeMs,
+      avgExecutionTimeMs
     );
     const totalDurationStdDev = stdDev(
       targetResults.map((r) => r.totalDurationMs),
-      avgTotalDurationMs,
+      avgTotalDurationMs
     );
 
     // Planning and decision metrics
@@ -294,9 +292,11 @@ export class BenchmarkSuite {
       targetResults.reduce((sum, r) => sum + r.metricsGenerationOverheadMs, 0) /
       targetResults.length;
     const avgReplayOverheadMs =
-      targetResults.reduce((sum, r) => sum + r.replayValidationOverheadMs, 0) / targetResults.length;
+      targetResults.reduce((sum, r) => sum + r.replayValidationOverheadMs, 0) /
+      targetResults.length;
     const avgInspectorOverheadMs =
-      targetResults.reduce((sum, r) => sum + r.runtimeInspectorOverheadMs, 0) / targetResults.length;
+      targetResults.reduce((sum, r) => sum + r.runtimeInspectorOverheadMs, 0) /
+      targetResults.length;
 
     return {
       targetX,
@@ -326,7 +326,9 @@ export class BenchmarkSuite {
    * Generate a complete benchmark report.
    */
   static generateReport(results: BenchmarkResult[]): BenchmarkReport {
-    const frozenResults = Object.freeze(results.map((r) => Object.freeze(r))) as readonly BenchmarkResult[];
+    const frozenResults = Object.freeze(
+      results.map((r) => Object.freeze(r))
+    ) as readonly BenchmarkResult[];
     const report = Object.freeze({
       version: '1.0',
       timestamp: Date.now(),

@@ -84,6 +84,7 @@ Time (ms)    Event                    Phase
 Each component has a single, clear responsibility:
 
 ### GameAdapter
+
 **Responsibility:** Bridge between agent and game
 
 - Manages game session lifecycle
@@ -92,6 +93,7 @@ Each component has a single, clear responsibility:
 - Translates between game concepts and framework abstractions
 
 ### MissionAgent
+
 **Responsibility:** Orchestrate autonomous mission execution
 
 - Maintains execution state
@@ -101,6 +103,7 @@ Each component has a single, clear responsibility:
 - Collects runtime metrics
 
 ### MovementPlanner
+
 **Responsibility:** Transform goals into movement steps
 
 - Takes goal with target coordinates
@@ -109,6 +112,7 @@ Each component has a single, clear responsibility:
 - Deterministic and immutable
 
 ### DecisionEngine
+
 **Responsibility:** Select next action from plan
 
 - Takes plan and current state
@@ -117,6 +121,7 @@ Each component has a single, clear responsibility:
 - Handles empty plans gracefully
 
 ### ExecutionTracer
+
 **Responsibility:** Record all mission events
 
 - Captures lifecycle events (started, initialized, completed)
@@ -125,6 +130,7 @@ Each component has a single, clear responsibility:
 - Records execution events (command executed, state updated)
 
 ### RuntimeMetrics
+
 **Responsibility:** Measure mission performance
 
 - Collects timing data (initialization, execution, shutdown)
@@ -133,6 +139,7 @@ Each component has a single, clear responsibility:
 - Deterministic computation from trace data
 
 ### ReplayEngine
+
 **Responsibility:** Validate execution consistency
 
 - Checks trace structure
@@ -141,6 +148,7 @@ Each component has a single, clear responsibility:
 - Confirms mission completion status
 
 ### RuntimeInspector
+
 **Responsibility:** Capture point-in-time execution state
 
 - Freezes current mission state as immutable snapshot
@@ -149,6 +157,7 @@ Each component has a single, clear responsibility:
 - Provides both text and JSON formats
 
 ### ReferenceCLI
+
 **Responsibility:** Provide command-line interface
 
 - Parse command-line arguments
@@ -313,36 +322,42 @@ Example:
 Where to modify the system:
 
 ### 1. Replace the Planner
+
 **File:** `src/movement-planner.ts`  
 **What:** Implement different pathfinding algorithm  
 **Impact:** Changes which path is executed  
 **Effort:** Implement `Planner` interface
 
 ### 2. Replace the Decision Engine
+
 **File:** Decision engine in `MissionAgent`  
 **What:** Implement different decision logic  
 **Impact:** Changes command selection  
 **Effort:** Implement `DecisionEngine` interface
 
 ### 3. Add Custom Observability
+
 **File:** `src/execution-trace.ts`  
 **What:** Record additional event types  
 **Impact:** More detailed execution logs  
 **Effort:** Add new event recording methods
 
 ### 4. Add Custom Metrics
+
 **File:** `src/runtime-metrics.ts`  
 **What:** Calculate additional performance data  
 **Impact:** More detailed performance analysis  
 **Effort:** Add new metric calculation methods
 
 ### 5. Change Command Types
+
 **File:** Domain layer  
 **What:** Support new actions (rotate, wait, etc.)  
 **Impact:** Agent can do more  
 **Effort:** Update planner to generate new commands
 
 ### 6. Add New CLI Commands
+
 **File:** `src/reference-cli.ts`  
 **What:** Add new command option  
 **Impact:** New way to invoke agent  
@@ -355,6 +370,7 @@ Where to modify the system:
 The architecture follows these principles:
 
 ### 1. Separation of Concerns
+
 - Planner only plans
 - Decision engine only decides
 - Executor only executes
@@ -363,26 +379,31 @@ The architecture follows these principles:
 Each component has one responsibility.
 
 ### 2. Determinism
+
 - Same inputs always produce same outputs
 - Enables testing and validation
 - Safe for benchmarking and replay
 
 ### 3. Immutability
+
 - Data cannot be accidentally modified
 - Prevents state corruption
 - Makes reasoning about code easier
 
 ### 4. Observability
+
 - Complete visibility without side effects
 - No performance penalty for observation
 - Can record and analyze later
 
 ### 5. Composability
+
 - Components work together
 - Each can be replaced independently
 - Interfaces define integration points
 
 ### 6. Testability
+
 - Each component tested in isolation
 - Integration tests verify composition
 - Determinism enables regression testing
@@ -394,12 +415,13 @@ Each component has one responsibility.
 ### Why This Architecture?
 
 **Monolithic Agent (Alternative)**
+
 ```
 Agent {
   initialize() {
     // All setup here
   }
-  
+
   run() {
     // All logic here:
     // - Planning
@@ -412,12 +434,14 @@ Agent {
 ```
 
 **Problems:**
+
 - Hard to test individual parts
 - Hard to replace algorithm
 - Hard to understand flow
 - Hard to extend
 
 **This Architecture (Chosen)**
+
 ```
 Agent {
   planner: Planner
@@ -428,6 +452,7 @@ Agent {
 ```
 
 **Advantages:**
+
 - Each part independently testable
 - Easy to replace any component
 - Clear separation of concerns
@@ -453,6 +478,7 @@ Agent {
 ### Optimization Opportunities
 
 If needed:
+
 1. Cache plans instead of regenerating
 2. Stream trace to disk instead of memory
 3. Parallel metric calculation
@@ -470,6 +496,7 @@ The reference application is designed for trusted execution:
 - No privilege separation (single process)
 
 For production use, add:
+
 - Input validation
 - Access control
 - Error handling
@@ -502,6 +529,6 @@ The reference application demonstrates:
 ✅ **Extensibility** — Easy to replace any component  
 ✅ **Observability** — Complete visibility without side effects  
 ✅ **Determinism** — Reproducible execution  
-✅ **Immutability** — Safe concurrent access  
+✅ **Immutability** — Safe concurrent access
 
 The architecture scales from simple missions to complex multi-agent scenarios without fundamental redesign.

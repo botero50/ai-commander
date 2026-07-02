@@ -44,12 +44,14 @@ The reference application is a complete, working example you can read and learn 
 A mission goes through these phases:
 
 ### 1. Initialization
+
 ```typescript
 const agent = new MissionAgent(targetX, targetY);
 await agent.initialize();
 ```
 
 **What happens:**
+
 - Game adapter initializes
 - Game session starts
 - Execution context created
@@ -58,6 +60,7 @@ await agent.initialize();
 **Duration:** ~10-20ms
 
 ### 2. Execution Loop
+
 ```typescript
 await agent.run();
 ```
@@ -65,6 +68,7 @@ await agent.run();
 **The loop:**
 
 For each tick:
+
 1. **Observe** — Read current world state
 2. **Plan** — Create steps to reach target
 3. **Decide** — Select next step to execute
@@ -76,11 +80,13 @@ For each tick:
 **Example:** To move to (3, 2), the agent needs 5 ticks (|3| + |2| = 5 Manhattan distance).
 
 ### 3. Shutdown
+
 ```typescript
 await agent.shutdown();
 ```
 
 **What happens:**
+
 - Agent runtime stops
 - Game adapter shuts down
 - Trace and metrics finalized
@@ -95,6 +101,7 @@ await agent.shutdown();
 The planner transforms goals into executable plans.
 
 ### Input: A Goal
+
 ```typescript
 Goal {
   intent: "move-to-target"
@@ -106,6 +113,7 @@ Goal {
 ```
 
 ### Process: Movement Planning
+
 The `MovementPlanner` uses A* pathfinding to find the shortest path to the target:
 
 1. Calculate Manhattan distance
@@ -113,6 +121,7 @@ The `MovementPlanner` uses A* pathfinding to find the shortest path to the targe
 3. Return ordered plan
 
 ### Output: A Plan
+
 ```typescript
 Plan {
   steps: [
@@ -126,6 +135,7 @@ Plan {
 ```
 
 ### Key Properties
+
 - **Deterministic** — Same goal always produces same plan
 - **Executable** — Each step is an actionable command
 - **Immutable** — Plan doesn't change once created
@@ -137,6 +147,7 @@ Plan {
 The decision engine selects which plan step to execute next.
 
 ### Input: A Plan
+
 ```typescript
 Plan {
   steps: [
@@ -148,6 +159,7 @@ Plan {
 ```
 
 ### Process: Step Selection
+
 For each tick, the decision engine:
 
 1. Examine the plan
@@ -155,6 +167,7 @@ For each tick, the decision engine:
 3. Return that step's command
 
 ### Output: A Command
+
 ```typescript
 Command {
   action: "move",
@@ -166,6 +179,7 @@ Command {
 ```
 
 ### Key Properties
+
 - **Deterministic** — Same plan always produces same sequence
 - **Progressive** — Each tick advances through the plan
 - **Failure-safe** — Returns empty decision if stuck
@@ -179,9 +193,11 @@ Execution traces record everything that happened during a mission.
 ### What Gets Recorded?
 
 **Lifecycle Events:**
+
 - Mission started / initialized / completed / failed / shutdown
 
 **Reasoning Events:**
+
 - Goal created
 - Planner invoked
 - Plan generated
@@ -189,6 +205,7 @@ Execution traces record everything that happened during a mission.
 - Decision selected (with command)
 
 **Execution Events:**
+
 - Mission tick
 - Command executed
 - World state updated
@@ -200,6 +217,7 @@ npm start -- trace
 ```
 
 Example output:
+
 ```
 [000] T+    0 Tick  0
     Event: mission_started
@@ -239,23 +257,27 @@ Metrics measure mission performance.
 ### Available Metrics
 
 **Timing:**
+
 - Mission duration (total time)
 - Initialization time
 - Execution time
 - Shutdown time
 
 **Execution:**
+
 - Total ticks executed
 - Commands executed
 - Command success rate
 - Average tick duration
 
 **Planning:**
+
 - Planner invocations
 - Plans generated
 - Plan errors
 
 **Decision Making:**
+
 - Decision engine invocations
 - Decisions made
 - Decision errors
@@ -268,6 +290,7 @@ npm start -- metrics
 ```
 
 Example output:
+
 ```
 TIMING
   Mission Duration: 45 ms
@@ -317,6 +340,7 @@ npm start -- replay
 ```
 
 Example output:
+
 ```
 VALIDATIONS
   [✓] Trace Structure
@@ -345,16 +369,19 @@ The runtime inspector captures point-in-time snapshots of execution state.
 ### What Gets Captured?
 
 **Mission State:**
+
 - Mission ID and status
 - Elapsed time
 
 **Agent State:**
+
 - Current position (estimated)
 - Target position
 - Current tick and total ticks
 - Ticks remaining
 
 **Observability:**
+
 - Trace event count
 - Metrics availability
 
@@ -365,6 +392,7 @@ npm start -- inspect
 ```
 
 Example output:
+
 ```
 RUNTIME INSPECTOR
 Mission: mission-3-2
@@ -477,21 +505,27 @@ console.log(agent.formatSnapshot());
 ## Key Concepts
 
 ### Determinism
+
 Same inputs always produce the same outputs. Missions to the same target always execute identically. This enables:
+
 - Reproducible testing
 - Trace replay
 - Execution validation
 - Performance benchmarking
 
 ### Immutability
+
 World state doesn't change unexpectedly. Plans are immutable. Commands are immutable. This prevents:
+
 - Race conditions
 - State corruption
 - Unexpected side effects
 - Debugging surprises
 
 ### Observability
+
 Complete visibility into mission execution without modifying behavior. You can:
+
 - Record execution traces
 - Measure performance
 - Validate consistency
@@ -499,7 +533,9 @@ Complete visibility into mission execution without modifying behavior. You can:
 - All without affecting the agent
 
 ### Orchestration
+
 The agent orchestrates separate concerns:
+
 - **Planning** — How to reach the goal
 - **Decision** — Which step to execute
 - **Execution** — Running commands

@@ -90,9 +90,11 @@ describe('OpenRAObservationProvider', () => {
     });
 
     it('observes single player scenario', async () => {
-      const gameState = createTestOpenRAGameState(0, [createTestOpenRAPlayer(0, 'Human')], [
-        createTestOpenRAActor(1, 'test', createTestOpenRAPlayer(0, 'Human')),
-      ]);
+      const gameState = createTestOpenRAGameState(
+        0,
+        [createTestOpenRAPlayer(0, 'Human')],
+        [createTestOpenRAActor(1, 'test', createTestOpenRAPlayer(0, 'Human'))]
+      );
       const provider = new OpenRAObservationProvider(async () => gameState);
 
       const snapshot = await provider.getWorldState();
@@ -159,9 +161,14 @@ describe('OpenRAObservationProvider', () => {
 
     it('captures map dimensions correctly', async () => {
       // Map with units, so WorldState is valid
-      const gameState = createTestOpenRAGameState(0, [createTestOpenRAPlayer(0, 'Human')], [
-        createTestOpenRAActor(1, 'test', createTestOpenRAPlayer(0, 'Human')),
-      ], 'TestMap', 256, 192);
+      const gameState = createTestOpenRAGameState(
+        0,
+        [createTestOpenRAPlayer(0, 'Human')],
+        [createTestOpenRAActor(1, 'test', createTestOpenRAPlayer(0, 'Human'))],
+        'TestMap',
+        256,
+        192
+      );
       const provider = new OpenRAObservationProvider(async () => gameState);
 
       const snapshot = await provider.getWorldState();
@@ -179,7 +186,9 @@ describe('OpenRAObservationProvider', () => {
 
       // This will throw because WorldState requires at least one agent.
       // This is a framework limitation, not an adapter issue.
-      await expect(provider.getWorldState()).rejects.toThrow('WorldState must have at least one agent');
+      await expect(provider.getWorldState()).rejects.toThrow(
+        'WorldState must have at least one agent'
+      );
     });
 
     it('includes OpenRA-specific metadata in customData', async () => {
@@ -330,7 +339,9 @@ describe('OpenRAObservationProvider', () => {
 
     it('maintains immutability of historical snapshots', async () => {
       let tick = 0;
-      const provider = new OpenRAObservationProvider(async () => createTestGameStateWithUnits(tick));
+      const provider = new OpenRAObservationProvider(async () =>
+        createTestGameStateWithUnits(tick)
+      );
 
       const snap1 = await provider.getWorldState();
       tick = 50;

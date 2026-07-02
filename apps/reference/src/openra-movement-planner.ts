@@ -64,8 +64,8 @@ export class OpenRAMovementPlanner implements Planner {
               `move-x-${sequenceNumber}`,
               x + dx,
               currentY,
-              request.goal.id,
-            ),
+              request.goal.id
+            )
           );
           sequenceNumber++;
         }
@@ -81,8 +81,8 @@ export class OpenRAMovementPlanner implements Planner {
               `move-y-${sequenceNumber}`,
               targetX,
               y + dy,
-              request.goal.id,
-            ),
+              request.goal.id
+            )
           );
           sequenceNumber++;
         }
@@ -121,7 +121,7 @@ export class OpenRAMovementPlanner implements Planner {
     stepId: string,
     targetX: number,
     targetY: number,
-    goalId: string,
+    goalId: string
   ): PlanStep {
     const command = createCommand(
       createActionId(stepId),
@@ -131,7 +131,7 @@ export class OpenRAMovementPlanner implements Planner {
         targetPosition: { x: targetX, y: targetY },
       },
       createTick(0),
-      0,
+      0
     );
 
     return {

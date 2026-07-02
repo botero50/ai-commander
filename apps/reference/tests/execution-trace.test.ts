@@ -1,7 +1,13 @@
 import { describe, it, expect } from 'vitest';
 import { ExecutionTracer, formatTrace, traceToJson } from '../src/execution-trace.js';
 import { MissionAgent } from '../src/mission-agent.js';
-import { createGoal, createGoalId, GoalStatus, GoalPriorityLevel, createGoalPriority } from '@ai-commander/goals';
+import {
+  createGoal,
+  createGoalId,
+  GoalStatus,
+  GoalPriorityLevel,
+  createGoalPriority,
+} from '@ai-commander/goals';
 
 describe('Execution Trace - Structured Observability', () => {
   it('should create an empty trace', () => {
@@ -76,25 +82,19 @@ describe('Execution Trace - Structured Observability', () => {
   it('should record command execution events', () => {
     const tracer = new ExecutionTracer('command-test', 1, 1);
 
-    tracer.recordCommandExecuted(
-      { actionType: 'move', parameters: { dx: 1, dy: 0 } } as any,
-      {
-        success: true,
-        message: 'Command executed',
-        data: { newTick: 1 },
-      }
-    );
+    tracer.recordCommandExecuted({ actionType: 'move', parameters: { dx: 1, dy: 0 } } as any, {
+      success: true,
+      message: 'Command executed',
+      data: { newTick: 1 },
+    });
     expect(tracer.getTrace().events[0].eventType).toBe('command_executed');
     expect(tracer.getTrace().events[0].data.success).toBe(true);
 
-    tracer.recordCommandFailed(
-      { actionType: 'move', parameters: { dx: 1, dy: 0 } } as any,
-      {
-        success: false,
-        message: 'Command failed',
-        error: { code: 'INVALID_COMMAND', reason: 'Test' },
-      }
-    );
+    tracer.recordCommandFailed({ actionType: 'move', parameters: { dx: 1, dy: 0 } } as any, {
+      success: false,
+      message: 'Command failed',
+      error: { code: 'INVALID_COMMAND', reason: 'Test' },
+    });
     expect(tracer.getTrace().events[1].eventType).toBe('command_failed');
   });
 

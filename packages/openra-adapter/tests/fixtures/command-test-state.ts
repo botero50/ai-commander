@@ -1,16 +1,15 @@
 import type { Command } from '@ai-commander/domain';
-import {
-  createCommand,
-  createAgent,
-  createActionId,
-  createTick,
-} from '@ai-commander/domain';
+import { createCommand, createAgent, createActionId, createTick } from '@ai-commander/domain';
 
 /**
  * Create test commands for various action types.
  */
 
-export function createTestMoveCommand(agentId: string = 'actor-1', targetX: number = 100, targetY: number = 200): Command {
+export function createTestMoveCommand(
+  agentId: string = 'actor-1',
+  targetX: number = 100,
+  targetY: number = 200
+): Command {
   return createCommand(
     createActionId('move-1'),
     createAgent(agentId),

@@ -18,6 +18,7 @@ npm start -- run --target-x 5 --target-y 4
 ```
 
 The agent will:
+
 1. Plan 9 movement steps (|5| + |4| = 9 Manhattan distance)
 2. Execute one step per tick
 3. Complete in 9 ticks
@@ -189,6 +190,7 @@ Events: 24
 ### Understand the Timeline
 
 Each event has:
+
 - **Index** — Event sequence number
 - **T+** — Time offset from start (milliseconds)
 - **Tick** — Which agent tick
@@ -365,6 +367,7 @@ npm start -- inspect
 ```
 
 You can see:
+
 - How many ticks have executed
 - How many ticks remain
 - Current agent position estimate
@@ -441,6 +444,7 @@ npm test
 ```
 
 You should see:
+
 ```
 Test Files  34 passed (34)
 Tests       541 passed (541)
@@ -456,6 +460,7 @@ npm test
 ```
 
 You should see:
+
 ```
 Test Files  7 passed (7)
 Tests       120+ passed
@@ -494,7 +499,7 @@ See which lines are tested.
 ```typescript
 import { MissionAgent } from './mission-agent.js';
 
-const agent = new MissionAgent(3, 2);  // Default target
+const agent = new MissionAgent(3, 2); // Default target
 await agent.initialize();
 await agent.run();
 await agent.shutdown();
@@ -532,11 +537,11 @@ function getTargetFromArgs(): [number, number] {
 async function main() {
   const [targetX, targetY] = getTargetFromArgs();
   const agent = new MissionAgent(targetX, targetY);
-  
+
   await agent.initialize();
   await agent.run();
   await agent.shutdown();
-  
+
   console.log(`Mission to (${targetX}, ${targetY})`);
   console.log(agent.formatMetrics());
 }
@@ -639,27 +644,35 @@ Now that you've explored these guides:
 ## Troubleshooting
 
 ### Commands Don't Work
+
 Make sure you're in the right directory:
+
 ```bash
 cd apps/reference
 npm start -- help
 ```
 
 ### JSON Output Errors
+
 Make sure you're using valid JSON tools:
+
 ```bash
 npm start -- metrics --json | jq .  # Pretty-print
 ```
 
 ### Trace Output is Too Long
+
 Save to file and use tools:
+
 ```bash
 npm start -- trace > trace.txt
 grep "decision_selected" trace.txt
 ```
 
 ### Tests Fail
+
 Rebuild and re-test:
+
 ```bash
 npm run build
 npm test

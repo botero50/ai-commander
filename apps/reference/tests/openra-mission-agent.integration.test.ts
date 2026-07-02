@@ -22,7 +22,7 @@ function createTestGameState(): OpenRAGameState {
     index: 0,
     clientIndex: 0,
     playerName: 'Player',
-    color: 0xFF00FF00,
+    color: 0xff00ff00,
     faction: 'gdi',
     isBot: false,
     isObserver: false,
@@ -84,14 +84,26 @@ describe('OpenRAMissionAgent', () => {
 
   describe('Lifecycle', () => {
     it('initializes successfully', async () => {
-      const agent = new OpenRAMissionAgent(512, 512, createMockGameStateAccessor(gameState), createMockOrderSubmitter(), createMockStateChecker());
+      const agent = new OpenRAMissionAgent(
+        512,
+        512,
+        createMockGameStateAccessor(gameState),
+        createMockOrderSubmitter(),
+        createMockStateChecker()
+      );
 
       await agent.initialize();
       // Should not throw
     });
 
     it('initializes and shuts down cleanly', async () => {
-      const agent = new OpenRAMissionAgent(512, 512, createMockGameStateAccessor(gameState), createMockOrderSubmitter(), createMockStateChecker());
+      const agent = new OpenRAMissionAgent(
+        512,
+        512,
+        createMockGameStateAccessor(gameState),
+        createMockOrderSubmitter(),
+        createMockStateChecker()
+      );
 
       await agent.initialize();
       await agent.shutdown();
@@ -99,7 +111,13 @@ describe('OpenRAMissionAgent', () => {
     });
 
     it('rejects run before initialize', async () => {
-      const agent = new OpenRAMissionAgent(512, 512, createMockGameStateAccessor(gameState), createMockOrderSubmitter(), createMockStateChecker());
+      const agent = new OpenRAMissionAgent(
+        512,
+        512,
+        createMockGameStateAccessor(gameState),
+        createMockOrderSubmitter(),
+        createMockStateChecker()
+      );
 
       await expect(agent.run()).rejects.toThrow('not initialized');
     });
@@ -107,7 +125,13 @@ describe('OpenRAMissionAgent', () => {
 
   describe('Mission Execution', () => {
     it('completes mission successfully', async () => {
-      const agent = new OpenRAMissionAgent(512, 512, createMockGameStateAccessor(gameState), createMockOrderSubmitter(), createMockStateChecker());
+      const agent = new OpenRAMissionAgent(
+        512,
+        512,
+        createMockGameStateAccessor(gameState),
+        createMockOrderSubmitter(),
+        createMockStateChecker()
+      );
 
       await agent.initialize();
       await agent.run();
@@ -119,7 +143,13 @@ describe('OpenRAMissionAgent', () => {
     });
 
     it('completes mission with different target coordinates', async () => {
-      const agent = new OpenRAMissionAgent(256, 256, createMockGameStateAccessor(gameState), createMockOrderSubmitter(), createMockStateChecker());
+      const agent = new OpenRAMissionAgent(
+        256,
+        256,
+        createMockGameStateAccessor(gameState),
+        createMockOrderSubmitter(),
+        createMockStateChecker()
+      );
 
       await agent.initialize();
       await agent.run();
@@ -130,7 +160,13 @@ describe('OpenRAMissionAgent', () => {
     });
 
     it('handles mission timeout gracefully', async () => {
-      const agent = new OpenRAMissionAgent(10000, 10000, createMockGameStateAccessor(gameState), createMockOrderSubmitter(), createMockStateChecker());
+      const agent = new OpenRAMissionAgent(
+        10000,
+        10000,
+        createMockGameStateAccessor(gameState),
+        createMockOrderSubmitter(),
+        createMockStateChecker()
+      );
 
       await agent.initialize();
       await agent.run();
@@ -144,7 +180,13 @@ describe('OpenRAMissionAgent', () => {
   describe('Determinism', () => {
     it('produces identical traces on repeated execution', async () => {
       const runMission = async () => {
-        const agent = new OpenRAMissionAgent(512, 512, createMockGameStateAccessor(gameState), createMockOrderSubmitter(), createMockStateChecker());
+        const agent = new OpenRAMissionAgent(
+          512,
+          512,
+          createMockGameStateAccessor(gameState),
+          createMockOrderSubmitter(),
+          createMockStateChecker()
+        );
         await agent.initialize();
         await agent.run();
         await agent.shutdown();
@@ -165,7 +207,13 @@ describe('OpenRAMissionAgent', () => {
 
     it('produces identical metrics on repeated execution', async () => {
       const runMission = async () => {
-        const agent = new OpenRAMissionAgent(512, 512, createMockGameStateAccessor(gameState), createMockOrderSubmitter(), createMockStateChecker());
+        const agent = new OpenRAMissionAgent(
+          512,
+          512,
+          createMockGameStateAccessor(gameState),
+          createMockOrderSubmitter(),
+          createMockStateChecker()
+        );
         await agent.initialize();
         await agent.run();
         await agent.shutdown();
@@ -183,7 +231,13 @@ describe('OpenRAMissionAgent', () => {
     it('produces consistent metrics across multiple runs', async () => {
       const results = [];
       for (let i = 0; i < 3; i++) {
-        const agent = new OpenRAMissionAgent(512, 512, createMockGameStateAccessor(gameState), createMockOrderSubmitter(), createMockStateChecker());
+        const agent = new OpenRAMissionAgent(
+          512,
+          512,
+          createMockGameStateAccessor(gameState),
+          createMockOrderSubmitter(),
+          createMockStateChecker()
+        );
         await agent.initialize();
         await agent.run();
         await agent.shutdown();
@@ -201,31 +255,49 @@ describe('OpenRAMissionAgent', () => {
 
   describe('Component Integration', () => {
     it('exercises planner and generates plan', async () => {
-      const agent = new OpenRAMissionAgent(512, 512, createMockGameStateAccessor(gameState), createMockOrderSubmitter(), createMockStateChecker());
+      const agent = new OpenRAMissionAgent(
+        512,
+        512,
+        createMockGameStateAccessor(gameState),
+        createMockOrderSubmitter(),
+        createMockStateChecker()
+      );
 
       await agent.initialize();
       await agent.run();
       await agent.shutdown();
 
       const trace = agent.getTrace();
-      const planEvents = trace.events.filter(e => e.eventType === 'plan_generated');
+      const planEvents = trace.events.filter((e) => e.eventType === 'plan_generated');
       expect(planEvents.length).toBeGreaterThan(0);
     });
 
     it('exercises decision engine and selects steps', async () => {
-      const agent = new OpenRAMissionAgent(512, 512, createMockGameStateAccessor(gameState), createMockOrderSubmitter(), createMockStateChecker());
+      const agent = new OpenRAMissionAgent(
+        512,
+        512,
+        createMockGameStateAccessor(gameState),
+        createMockOrderSubmitter(),
+        createMockStateChecker()
+      );
 
       await agent.initialize();
       await agent.run();
       await agent.shutdown();
 
       const trace = agent.getTrace();
-      const decisionEvents = trace.events.filter(e => e.eventType === 'decision_selected');
+      const decisionEvents = trace.events.filter((e) => e.eventType === 'decision_selected');
       expect(decisionEvents.length).toBeGreaterThan(0);
     });
 
     it('executes commands and updates world state', async () => {
-      const agent = new OpenRAMissionAgent(512, 512, createMockGameStateAccessor(gameState), createMockOrderSubmitter(), createMockStateChecker());
+      const agent = new OpenRAMissionAgent(
+        512,
+        512,
+        createMockGameStateAccessor(gameState),
+        createMockOrderSubmitter(),
+        createMockStateChecker()
+      );
 
       await agent.initialize();
       await agent.run();
@@ -236,14 +308,20 @@ describe('OpenRAMissionAgent', () => {
     });
 
     it('generates correct plan structure', async () => {
-      const agent = new OpenRAMissionAgent(512, 512, createMockGameStateAccessor(gameState), createMockOrderSubmitter(), createMockStateChecker());
+      const agent = new OpenRAMissionAgent(
+        512,
+        512,
+        createMockGameStateAccessor(gameState),
+        createMockOrderSubmitter(),
+        createMockStateChecker()
+      );
 
       await agent.initialize();
       await agent.run();
       await agent.shutdown();
 
       const trace = agent.getTrace();
-      const planEvents = trace.events.filter(e => e.eventType === 'plan_generated');
+      const planEvents = trace.events.filter((e) => e.eventType === 'plan_generated');
       expect(planEvents.length).toBeGreaterThan(0);
 
       // Plan should have steps (at least x and y movement)
@@ -256,14 +334,20 @@ describe('OpenRAMissionAgent', () => {
 
   describe('Observability', () => {
     it('generates execution trace with all required events', async () => {
-      const agent = new OpenRAMissionAgent(512, 512, createMockGameStateAccessor(gameState), createMockOrderSubmitter(), createMockStateChecker());
+      const agent = new OpenRAMissionAgent(
+        512,
+        512,
+        createMockGameStateAccessor(gameState),
+        createMockOrderSubmitter(),
+        createMockStateChecker()
+      );
 
       await agent.initialize();
       await agent.run();
       await agent.shutdown();
 
       const trace = agent.getTrace();
-      const eventTypes = trace.events.map(e => e.eventType);
+      const eventTypes = trace.events.map((e) => e.eventType);
 
       // Check for required events
       expect(eventTypes).toContain('mission_started');
@@ -272,7 +356,13 @@ describe('OpenRAMissionAgent', () => {
     });
 
     it('produces valid trace formatting', async () => {
-      const agent = new OpenRAMissionAgent(512, 512, createMockGameStateAccessor(gameState), createMockOrderSubmitter(), createMockStateChecker());
+      const agent = new OpenRAMissionAgent(
+        512,
+        512,
+        createMockGameStateAccessor(gameState),
+        createMockOrderSubmitter(),
+        createMockStateChecker()
+      );
 
       await agent.initialize();
       await agent.run();
@@ -284,7 +374,13 @@ describe('OpenRAMissionAgent', () => {
     });
 
     it('produces valid JSON trace output', async () => {
-      const agent = new OpenRAMissionAgent(512, 512, createMockGameStateAccessor(gameState), createMockOrderSubmitter(), createMockStateChecker());
+      const agent = new OpenRAMissionAgent(
+        512,
+        512,
+        createMockGameStateAccessor(gameState),
+        createMockOrderSubmitter(),
+        createMockStateChecker()
+      );
 
       await agent.initialize();
       await agent.run();
@@ -298,7 +394,13 @@ describe('OpenRAMissionAgent', () => {
     });
 
     it('collects runtime metrics', async () => {
-      const agent = new OpenRAMissionAgent(512, 512, createMockGameStateAccessor(gameState), createMockOrderSubmitter(), createMockStateChecker());
+      const agent = new OpenRAMissionAgent(
+        512,
+        512,
+        createMockGameStateAccessor(gameState),
+        createMockOrderSubmitter(),
+        createMockStateChecker()
+      );
 
       await agent.initialize();
       await agent.run();
@@ -312,7 +414,13 @@ describe('OpenRAMissionAgent', () => {
     });
 
     it('produces valid metrics formatting', async () => {
-      const agent = new OpenRAMissionAgent(512, 512, createMockGameStateAccessor(gameState), createMockOrderSubmitter(), createMockStateChecker());
+      const agent = new OpenRAMissionAgent(
+        512,
+        512,
+        createMockGameStateAccessor(gameState),
+        createMockOrderSubmitter(),
+        createMockStateChecker()
+      );
 
       await agent.initialize();
       await agent.run();
@@ -324,7 +432,13 @@ describe('OpenRAMissionAgent', () => {
     });
 
     it('produces valid JSON metrics output', async () => {
-      const agent = new OpenRAMissionAgent(512, 512, createMockGameStateAccessor(gameState), createMockOrderSubmitter(), createMockStateChecker());
+      const agent = new OpenRAMissionAgent(
+        512,
+        512,
+        createMockGameStateAccessor(gameState),
+        createMockOrderSubmitter(),
+        createMockStateChecker()
+      );
 
       await agent.initialize();
       await agent.run();
@@ -338,7 +452,13 @@ describe('OpenRAMissionAgent', () => {
     });
 
     it('validates replay report', async () => {
-      const agent = new OpenRAMissionAgent(512, 512, createMockGameStateAccessor(gameState), createMockOrderSubmitter(), createMockStateChecker());
+      const agent = new OpenRAMissionAgent(
+        512,
+        512,
+        createMockGameStateAccessor(gameState),
+        createMockOrderSubmitter(),
+        createMockStateChecker()
+      );
 
       await agent.initialize();
       await agent.run();
@@ -350,7 +470,13 @@ describe('OpenRAMissionAgent', () => {
     });
 
     it('captures runtime snapshot', async () => {
-      const agent = new OpenRAMissionAgent(512, 512, createMockGameStateAccessor(gameState), createMockOrderSubmitter(), createMockStateChecker());
+      const agent = new OpenRAMissionAgent(
+        512,
+        512,
+        createMockGameStateAccessor(gameState),
+        createMockOrderSubmitter(),
+        createMockStateChecker()
+      );
 
       await agent.initialize();
       await agent.run();
@@ -363,7 +489,13 @@ describe('OpenRAMissionAgent', () => {
     });
 
     it('produces valid snapshot formatting', async () => {
-      const agent = new OpenRAMissionAgent(512, 512, createMockGameStateAccessor(gameState), createMockOrderSubmitter(), createMockStateChecker());
+      const agent = new OpenRAMissionAgent(
+        512,
+        512,
+        createMockGameStateAccessor(gameState),
+        createMockOrderSubmitter(),
+        createMockStateChecker()
+      );
 
       await agent.initialize();
       await agent.run();
@@ -375,7 +507,13 @@ describe('OpenRAMissionAgent', () => {
     });
 
     it('produces valid JSON snapshot output', async () => {
-      const agent = new OpenRAMissionAgent(512, 512, createMockGameStateAccessor(gameState), createMockOrderSubmitter(), createMockStateChecker());
+      const agent = new OpenRAMissionAgent(
+        512,
+        512,
+        createMockGameStateAccessor(gameState),
+        createMockOrderSubmitter(),
+        createMockStateChecker()
+      );
 
       await agent.initialize();
       await agent.run();
@@ -390,7 +528,13 @@ describe('OpenRAMissionAgent', () => {
 
   describe('Error Handling', () => {
     it('handles unavailable game gracefully', async () => {
-      const agent = new OpenRAMissionAgent(512, 512, createMockGameStateAccessor(gameState), createMockOrderSubmitter(), createMockStateChecker(false));
+      const agent = new OpenRAMissionAgent(
+        512,
+        512,
+        createMockGameStateAccessor(gameState),
+        createMockOrderSubmitter(),
+        createMockStateChecker(false)
+      );
 
       // Should not throw even if game unavailable
       await agent.initialize();
@@ -398,7 +542,13 @@ describe('OpenRAMissionAgent', () => {
 
     it('handles order submission failure gracefully', async () => {
       const failingSubmitter = async () => false;
-      const agent = new OpenRAMissionAgent(512, 512, createMockGameStateAccessor(gameState), failingSubmitter, createMockStateChecker());
+      const agent = new OpenRAMissionAgent(
+        512,
+        512,
+        createMockGameStateAccessor(gameState),
+        failingSubmitter,
+        createMockStateChecker()
+      );
 
       await agent.initialize();
       // Should continue even if orders fail
@@ -409,14 +559,20 @@ describe('OpenRAMissionAgent', () => {
 
   describe('Full Stack Integration', () => {
     it('exercises entire stack: observe → plan → decide → execute', async () => {
-      const agent = new OpenRAMissionAgent(512, 512, createMockGameStateAccessor(gameState), createMockOrderSubmitter(), createMockStateChecker());
+      const agent = new OpenRAMissionAgent(
+        512,
+        512,
+        createMockGameStateAccessor(gameState),
+        createMockOrderSubmitter(),
+        createMockStateChecker()
+      );
 
       await agent.initialize();
       await agent.run();
       await agent.shutdown();
 
       const trace = agent.getTrace();
-      const eventTypes = trace.events.map(e => e.eventType);
+      const eventTypes = trace.events.map((e) => e.eventType);
 
       // Verify all components were exercised
       expect(eventTypes).toContain('planner_invoked');
@@ -427,7 +583,13 @@ describe('OpenRAMissionAgent', () => {
 
     it('maintains determinism across full execution cycle', async () => {
       const firstRun = async () => {
-        const agent = new OpenRAMissionAgent(300, 300, createMockGameStateAccessor(gameState), createMockOrderSubmitter(), createMockStateChecker());
+        const agent = new OpenRAMissionAgent(
+          300,
+          300,
+          createMockGameStateAccessor(gameState),
+          createMockOrderSubmitter(),
+          createMockStateChecker()
+        );
         await agent.initialize();
         await agent.run();
         await agent.shutdown();
@@ -438,7 +600,13 @@ describe('OpenRAMissionAgent', () => {
       };
 
       const secondRun = async () => {
-        const agent = new OpenRAMissionAgent(300, 300, createMockGameStateAccessor(gameState), createMockOrderSubmitter(), createMockStateChecker());
+        const agent = new OpenRAMissionAgent(
+          300,
+          300,
+          createMockGameStateAccessor(gameState),
+          createMockOrderSubmitter(),
+          createMockStateChecker()
+        );
         await agent.initialize();
         await agent.run();
         await agent.shutdown();

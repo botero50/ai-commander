@@ -4,11 +4,7 @@ import { createAgentRuntime, AgentStatus } from '../src/index.js';
 import type { AgentRuntime, AgentConfiguration } from '../src/index.js';
 import type { GameSession } from '@ai-commander/adapter';
 import type { Planner, PlanningRequest, PlanningResult, Plan } from '@ai-commander/planner';
-import type {
-  DecisionEngine,
-  DecisionRequest,
-  DecisionResult,
-} from '@ai-commander/decision';
+import type { DecisionEngine, DecisionRequest, DecisionResult } from '@ai-commander/decision';
 import type { ExecutionContext, EventBus } from '@ai-commander/engine';
 import { createEventBus, createRealtimeClock, createServiceRegistry } from '@ai-commander/core';
 import { createGoal, createGoalId, GoalStatus, GoalPriorityLevel } from '@ai-commander/goals';
@@ -33,13 +29,7 @@ describe('AgentRuntime Execution Loop', () => {
           {
             id: '1',
             sequenceNumber: 0,
-            command: createCommand(
-              'agent-0',
-              'move',
-              { dx: 1, dy: 0 },
-              0,
-              1
-            ),
+            command: createCommand('agent-0', 'move', { dx: 1, dy: 0 }, 0, 1),
             status: 'pending',
           },
         ],
@@ -58,9 +48,7 @@ describe('AgentRuntime Execution Loop', () => {
       decisionCallCount++;
       return {
         command:
-          request.plan && request.plan.steps.length > 0
-            ? request.plan.steps[0].command
-            : undefined,
+          request.plan && request.plan.steps.length > 0 ? request.plan.steps[0].command : undefined,
         metadata: {
           timestamp: Date.now(),
           processingTimeMs: 0,

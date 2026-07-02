@@ -94,6 +94,7 @@ Release Date: July 1, 2026
 Release Type: Stable, Long-Term Support (LTS)
 
 Previous Versions:
+
 - 1.0.0-rc.1 (Release Candidate)
 - 0.1.0-alpha (archived)
 
@@ -309,7 +310,7 @@ Milestone:
 ```
 Milestone 4: OpenRA Integration (In Progress)
   - Story 4.1: Architecture Discovery ✅ COMPLETE
-  - Story 4.2: Observation Provider ✅ COMPLETE  
+  - Story 4.2: Observation Provider ✅ COMPLETE
   - Story 4.3: Command Execution ✅ COMPLETE
   - Story 4.5: Game Adapter ✅ COMPLETE
   - Story 4.4: [Awaiting CTO completion]
@@ -638,6 +639,7 @@ Current implementation status:
 **Status: FRAMEWORK FOUNDATION COMPLETE**
 
 The AI Commander framework now has:
+
 - ✅ Stable, frozen architecture
 - ✅ All reference implementations (Planner, Decision Engine)
 - ✅ Complete E2E runtime validation
@@ -646,6 +648,7 @@ The AI Commander framework now has:
 - ✅ Proven extensibility (components can be replaced)
 
 Ready for:
+
 - Production-grade applications
 - Advanced implementation experimentation
 - Multi-agent orchestration
@@ -703,6 +706,7 @@ Ready for:
 **Status: GAME ADAPTER CONTRACTS + REFERENCE IMPLEMENTATION COMPLETE**
 
 The adapter layer now provides:
+
 - ✅ Minimal, focused contracts
 - ✅ Type-safe interfaces with readonly properties
 - ✅ Comprehensive error codes
@@ -762,6 +766,7 @@ The adapter layer now provides:
 **Status: COMPLETE AUTONOMOUS AI AGENT RUNTIME READY**
 
 The framework now provides:
+
 - ✅ Complete runtime foundation (adapter, session, observation, command execution)
 - ✅ Reference fake game for testing without external games
 - ✅ Behavior tree framework for defining AI decision logic
@@ -770,6 +775,7 @@ The framework now provides:
 - ✅ Type-safe, immutable, deterministic execution throughout
 
 Ready for:
+
 - Real game adapter implementations (OpenRA, StarCraft, Chess, etc.)
 - Game-specific agent instances
 - Behavior tree-based decision engines
@@ -814,6 +820,7 @@ Ready for:
 **Status: REFERENCE APPLICATION AND BOOTSTRAP VALIDATION COMPLETE**
 
 The framework now includes:
+
 - ✅ Public API documentation and contracts
 - ✅ Reference application demonstrating external application development
 - ✅ Clear patterns for framework integration
@@ -862,6 +869,7 @@ The framework now includes:
 **Status: FIRST AUTONOMOUS AGENT COMPLETE**
 
 The reference application now demonstrates:
+
 - ✅ Single-agent autonomous execution
 - ✅ Goal-driven mission planning
 - ✅ Domain-specific planner implementation
@@ -871,6 +879,7 @@ The reference application now demonstrates:
 - ✅ Framework readiness for real-world applications
 
 Ready for:
+
 - Multi-agent missions (application-level coordination)
 - Real game adapters (different games)
 - Complex planning algorithms (GOAP, HTN, A*)
@@ -918,6 +927,7 @@ Ready for:
 **Status: RUNTIME EXECUTION TRACES COMPLETE**
 
 The reference application now provides:
+
 - ✅ Structured execution traces for every mission
 - ✅ Complete event recording (19 event types)
 - ✅ Deterministic trace generation
@@ -926,6 +936,7 @@ The reference application now provides:
 - ✅ Entirely application-layer observability
 
 Ready for:
+
 - Trace replay (future: use traces to replay execution)
 - Runtime visualization (future: display traces as timelines)
 - Execution analysis (future: analyze patterns in traces)
@@ -989,6 +1000,7 @@ Ready for:
 **Status: RUNTIME METRICS COMPLETE**
 
 The reference application now provides:
+
 - ✅ Structured execution traces (19 event types)
 - ✅ Deterministic runtime metrics (26 metric types)
 - ✅ Human-readable and JSON formats for both
@@ -997,6 +1009,7 @@ The reference application now provides:
 - ✅ Entirely application-layer observability
 
 Ready for:
+
 - Metrics comparison (different agents/algorithms)
 - Performance regression detection
 - Mission efficiency analysis
@@ -1043,6 +1056,7 @@ Ready for:
 **Status: MISSION REPLAY SYSTEM COMPLETE**
 
 The reference application now provides:
+
 - ✅ Structured execution traces (19 event types)
 - ✅ Deterministic runtime metrics (26 metric types)
 - ✅ Trace validation and consistency checking (6 validations)
@@ -1052,6 +1066,7 @@ The reference application now provides:
 - ✅ Complete observability stack
 
 Ready for:
+
 - Replay analysis and debugging
 - Trace corruption detection
 - Mission log verification
@@ -1158,18 +1173,21 @@ Ready for:
 ### Key Findings
 
 **Architecture Highlights:**
+
 - Deterministic by design (40ms fixed ticks, sync hash verification)
 - Order-based system (perfect for decision injection)
 - Actor/Trait pattern (flexible component system)
 - Clean layering (network, simulation, rendering separate)
 
 **Integration Strategy:**
+
 - Observe via World queries (direct state reading)
 - Command via OrderManager.IssueOrders() (order injection)
 - Monitor ticks for synchronization (40ms boundary)
 - Verify determinism via replay system
 
 **Effort Estimate:** 220-340 hours (~6 weeks)
+
 - Story 4.3: Observation (3-5 days)
 - Story 4.4: Commands (5-7 days)
 - Story 4.5: Adapter (3-5 days)
@@ -1215,6 +1233,7 @@ Ready for:
 **Status: END-TO-END AUTONOMOUS MISSION COMPLETE**
 
 The AI Commander framework now demonstrates:
+
 - ✅ Complete end-to-end mission execution in OpenRA
 - ✅ All framework layers working together (Observe → Plan → Decide → Execute)
 - ✅ Deterministic, reproducible autonomous execution
@@ -1245,6 +1264,7 @@ The AI Commander framework now demonstrates:
 **Status: PRODUCTION VALIDATION COMPLETE**
 
 The OpenRA integration has completed comprehensive production validation:
+
 - ✅ 26 validation tests covering all critical dimensions
 - ✅ 120+ consecutive missions executed successfully
 - ✅ Zero defects discovered
@@ -1254,6 +1274,7 @@ The OpenRA integration has completed comprehensive production validation:
 **Milestone 4 — OpenRA Integration: COMPLETE**
 
 The complete OpenRA integration (Stories 4.1-4.7) is now:
+
 - ✅ Architecturally sound (adapter/application separation)
 - ✅ Functionally complete (observe, plan, decide, execute)
 - ✅ Tested thoroughly (189+ tests, 100% passing)
@@ -1330,6 +1351,7 @@ The complete OpenRA integration (Stories 4.1-4.7) is now:
 ### Recommended Game: OpenRA (85/100)
 
 **Why OpenRA:**
+
 - Clean, modern codebase (MIT license, open source)
 - Built for determinism (perfect for benchmarking)
 - Native C# / .NET integration
@@ -1341,6 +1363,7 @@ The complete OpenRA integration (Stories 4.1-4.7) is now:
 - Complete extensibility (can add units, modify maps, change rules)
 
 **Why Not StarCraft II (63/100 despite 95/100 AI score):**
+
 - Proprietary Blizzard license (can't modify)
 - API designed for research, not game adapters
 - Zero extensibility (locked down completely)
@@ -1350,6 +1373,7 @@ The complete OpenRA integration (Stories 4.1-4.7) is now:
 - Conclusion: Perfect for AI research AFTER proving framework; not for initial framework validation
 
 **Why Not Age of Empires IV (56/100):**
+
 - NO external API at all (would need reverse engineering)
 - Campaign system wrong for autonomous agents
 - Poorest developer experience of all games
@@ -1358,6 +1382,7 @@ The complete OpenRA integration (Stories 4.1-4.7) is now:
 - Conclusion: Lowest viable option overall
 
 **Why Not Other Alternatives:**
+
 - Minecraft: Not deterministic, wrong AI characteristics
 - Factorio: Optimization not decision-making, licensing restrictive, turn-based
 - Mindustry: Good but less recognized, smaller community
@@ -1366,6 +1391,7 @@ The complete OpenRA integration (Stories 4.1-4.7) is now:
 - OpenTTD: Older codebase, turn-based not real-time, specialized domain
 
 Reference Application now includes:
+
 - ✅ Bootstrap API validation
 - ✅ Autonomous mission execution
 - ✅ Execution traces (19 event types)
@@ -1748,24 +1774,28 @@ All stories for v1.0.0 release are complete:
 ### Repository Ready for v1.0.0 Publication
 
 **Created Files:**
+
 - ✅ CONTRIBUTING.md — Development guide and contribution process
 - ✅ SECURITY.md — Vulnerability reporting and security policy
 - ✅ CODE_OF_CONDUCT.md — Community standards and enforcement
 - ✅ CHANGELOG.md — Version history and release notes
 
 **Enhanced Files:**
+
 - ✅ README.md — Complete project documentation with architecture and examples
 - ✅ LICENSE — Full MIT License text
 - ✅ .github/workflows/ci.yml — Enforces all code quality checks
 - ✅ packages/decision/package.json — Fixed version to 0.1.0 (consistency)
 
 **Test Status:**
+
 - ✅ 246+ tests passing (100%)
 - ✅ CI/CD enforcing lint, test, format, typecheck
 - ✅ Production validation verified (120+ missions, 0 failures)
 - ✅ Determinism validated (0% variance across runs)
 
 **Release Status:**
+
 - ✅ v1.0.0 ready for publication
 - ✅ All acceptance criteria met
 - ✅ Repository suitable for public GitHub
@@ -1778,18 +1808,21 @@ All stories for v1.0.0 release are complete:
 After v1.0.0 publication:
 
 **v1.1.0 Roadmap:**
+
 - Full save/restore state support
 - Session pause/resume with proper game integration
 - Extended adapter examples
 - Performance profiling tools
 
 **v2.0.0 Roadmap:**
+
 - Multi-agent coordination
 - Distributed agent support
 - Learning and training utilities
 - Expanded behavior tree features
 
 **Immediate Post-Release:**
+
 - Monitor community feedback
 - Address reported issues
 - Continue with v1.1.0 planning

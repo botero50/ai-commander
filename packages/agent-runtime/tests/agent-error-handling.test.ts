@@ -4,11 +4,7 @@ import { createAgentRuntime, AgentStatus } from '../src/index.js';
 import type { AgentRuntime, AgentConfiguration } from '../src/index.js';
 import type { GameSession } from '@ai-commander/adapter';
 import type { Planner, PlanningRequest, PlanningResult } from '@ai-commander/planner';
-import type {
-  DecisionEngine,
-  DecisionRequest,
-  DecisionResult,
-} from '@ai-commander/decision';
+import type { DecisionEngine, DecisionRequest, DecisionResult } from '@ai-commander/decision';
 import type { ExecutionContext } from '@ai-commander/engine';
 import { createEventBus, createRealtimeClock, createServiceRegistry } from '@ai-commander/core';
 import { createGoal, createGoalId, GoalStatus, GoalPriorityLevel } from '@ai-commander/goals';

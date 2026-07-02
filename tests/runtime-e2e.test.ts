@@ -44,16 +44,9 @@ import {
   GoalPriorityLevel,
 } from '@ai-commander/goals';
 
-import {
-  ReferencePlanner,
-  type PlanningRequest,
-  type Plan,
-} from '@ai-commander/planner';
+import { ReferencePlanner, type PlanningRequest, type Plan } from '@ai-commander/planner';
 
-import {
-  ReferenceDecisionEngine,
-  type DecisionRequest,
-} from '@ai-commander/decision';
+import { ReferenceDecisionEngine, type DecisionRequest } from '@ai-commander/decision';
 
 describe('Runtime E2E: Complete Autonomous Execution Cycle', () => {
   let worldState: ReturnType<typeof createWorldState>;

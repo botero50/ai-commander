@@ -81,6 +81,7 @@ The pipeline is completely **layered**: each component has a single responsibili
 ## Component Responsibilities
 
 ### Strategy Layer (Future)
+
 - **Responsibility**: Generate Goals based on agent state and world state
 - **Input**: WorldState, agent context
 - **Output**: Goal(s) to pursue
@@ -88,6 +89,7 @@ The pipeline is completely **layered**: each component has a single responsibili
 - **Note**: Not yet implemented; uses placeholder goals in examples
 
 ### Planner
+
 - **Responsibility**: Transform a Goal into an ordered Plan
 - **Input**: PlanningRequest (goal, world state, policy)
 - **Output**: PlanningResult (plan, errors, metadata)
@@ -97,6 +99,7 @@ The pipeline is completely **layered**: each component has a single responsibili
 - **Key Invariant**: Planner NEVER executes; it only plans
 
 ### Decision Engine
+
 - **Responsibility**: Select which step to execute from a Plan
 - **Input**: DecisionRequest (plan, world state, execution context, policy)
 - **Output**: DecisionResult (selected command, metadata, errors)
@@ -106,6 +109,7 @@ The pipeline is completely **layered**: each component has a single responsibili
 - **Key Invariant**: Decision NEVER mutates the Plan
 
 ### Engine
+
 - **Responsibility**: Execute Commands and manage tick progression
 - **Input**: Command, ExecutionContext
 - **Output**: ActionResult (success/failure with data)
@@ -114,6 +118,7 @@ The pipeline is completely **layered**: each component has a single responsibili
 - **Key Invariant**: Engine executes; it does NOT decide what to do
 
 ### World State
+
 - **Responsibility**: Represent the complete game snapshot
 - **Immutability**: WorldState is read-only (all updates create new state)
 - **Scope**: Includes all agents, players, resources, map, temporal information
@@ -138,6 +143,7 @@ World      ← Immutable snapshot
 ### Swapping Implementations
 
 To use a different Planner:
+
 ```typescript
 // Current
 const planner = new ReferencePlanner();
@@ -145,12 +151,13 @@ const plan = await planner.plan(planningRequest);
 
 // Future - GOAP planner
 const planner = new GOAPPlanner();
-const plan = await planner.plan(planningRequest);  // Same signature!
+const plan = await planner.plan(planningRequest); // Same signature!
 ```
 
 The rest of the code needs NO changes. Decision layer, Engine, everything else works unchanged.
 
 To use a different Decision Engine:
+
 ```typescript
 // Current
 const engine = new ReferenceDecisionEngine();
@@ -158,7 +165,7 @@ const decision = await engine.decide(decisionRequest);
 
 // Future - Utility AI
 const engine = new UtilityDecisionEngine();
-const decision = await engine.decide(decisionRequest);  // Same signature!
+const decision = await engine.decide(decisionRequest); // Same signature!
 ```
 
 Again, no other changes needed. Strategy, Planner, Engine all work unchanged.
@@ -178,6 +185,7 @@ The reference implementations are **completely deterministic**:
 - **Engine**: Given same command + execution context → same result
 
 This enables:
+
 - Reproducible AI behavior
 - Debugging and testing
 - Replays for analysis
@@ -194,6 +202,7 @@ All layers **preserve immutability**:
 - **Commands** are immutable (once issued, never modified)
 
 This ensures:
+
 - No hidden state mutations
 - Clearer data flow
 - Easier debugging and reasoning
@@ -212,6 +221,7 @@ Tick 2:  Goal 3 → Plan 3 → Command 3 → Execute → WorldState 3
 ```
 
 Each tick:
+
 1. One (or more) goals are generated
 2. Goals are planned
 3. Plans are decided upon
@@ -232,6 +242,7 @@ The runtime publishes events for monitoring and coordination:
 - **TickCompleted**: One tick finished
 
 These events enable:
+
 - Logging and observability
 - Debugging
 - Replays
@@ -247,6 +258,7 @@ Each layer handles errors gracefully:
 - **No exceptions**: All errors collected and reported
 
 This ensures:
+
 - Robust operation even with bad data
 - Clear error diagnosis
 - Continue operation despite partial failures

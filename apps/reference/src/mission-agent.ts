@@ -5,7 +5,13 @@ import { FakeGameAdapter } from '@ai-commander/fake-game-adapter';
 import type { Planner, Plan } from '@ai-commander/planner';
 import { ReferencePlanner } from '@ai-commander/planner';
 import type { DecisionEngine, DecisionRequest, DecisionResult } from '@ai-commander/decision';
-import { createGoal, createGoalId, GoalStatus, GoalPriorityLevel, createGoalPriority } from '@ai-commander/goals';
+import {
+  createGoal,
+  createGoalId,
+  GoalStatus,
+  GoalPriorityLevel,
+  createGoalPriority,
+} from '@ai-commander/goals';
 import { createEventBus, createRealtimeClock, createServiceRegistry } from '@ai-commander/core';
 import type { ExecutionContext } from '@ai-commander/engine';
 import { createCommand, createActionId, createTick } from '@ai-commander/domain';
@@ -231,7 +237,9 @@ export class MissionAgent {
       // Check goal completion
       // For "move-to-target", the goal is complete when agent reaches the target position
       const metrics = this.runtime.getMetrics();
-      console.log(`  Ticks: ${metrics.ticksExecuted}, Decisions: ${metrics.decisionsExecuted}, Commands: ${metrics.commandsExecuted}`);
+      console.log(
+        `  Ticks: ${metrics.ticksExecuted}, Decisions: ${metrics.decisionsExecuted}, Commands: ${metrics.commandsExecuted}`
+      );
 
       // Check if we should update goal status
       // This is a simplified check: count commands as progress
@@ -243,7 +251,9 @@ export class MissionAgent {
       // In a real mission, this would check world state against goal
       const expectedMoves = Math.abs(this.targetX) + Math.abs(this.targetY);
       if (metrics.commandsExecuted >= expectedMoves) {
-        console.log(`  ✓ Mission goal achieved: executed ${metrics.commandsExecuted} commands (needed ${expectedMoves})`);
+        console.log(
+          `  ✓ Mission goal achieved: executed ${metrics.commandsExecuted} commands (needed ${expectedMoves})`
+        );
         this.isComplete = true;
         this.tracer.recordMissionCompleted();
       }
@@ -392,7 +402,7 @@ export class MissionAgent {
       totalTicks,
       this.tracer.getTrace(),
       this.metrics,
-      this.startTime,
+      this.startTime
     );
   }
 

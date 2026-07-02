@@ -30,11 +30,7 @@ import {
   createServiceRegistry,
 } from '@ai-commander/core';
 import { type ExecutionContext } from '@ai-commander/engine';
-import {
-  ReferencePlanner,
-  type PlanningRequest,
-  type Plan,
-} from '@ai-commander/planner';
+import { ReferencePlanner, type PlanningRequest, type Plan } from '@ai-commander/planner';
 import {
   createGoal,
   createGoalId,
@@ -42,10 +38,7 @@ import {
   GoalStatus,
   GoalPriorityLevel,
 } from '@ai-commander/goals';
-import {
-  ReferenceDecisionEngine,
-  type DecisionRequest,
-} from '../src/index.js';
+import { ReferenceDecisionEngine, type DecisionRequest } from '../src/index.js';
 
 describe('Integration: Planner → Decision → Command', () => {
   let worldState: ReturnType<typeof createWorldState>;
