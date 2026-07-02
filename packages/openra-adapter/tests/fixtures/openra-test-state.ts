@@ -26,7 +26,7 @@ export function createTestOpenRAPlayer(
     index,
     clientIndex: index,
     playerName,
-    color: 0xff000000 + (index * 0x00111111),
+    color: 0xff000000 + index * 0x00111111,
     faction,
     isBot,
     isObserver: false,
@@ -104,9 +104,31 @@ export function createTestGameStateWithUnits(tick: number = 0): OpenRAGameState 
 
   const actors: OpenRAActor[] = [
     createTestOpenRAActor(1, 'mcv', gdiPlayer, createTestOpenRALocation(0, 0), 100, 100),
-    createTestOpenRAActor(2, 'medium-tank', gdiPlayer, createTestOpenRALocation(512, 512), 100, 100),
-    createTestOpenRAActor(3, 'ranger', gdiPlayer, createTestOpenRALocation(256, 256), 60, 100, true),
-    createTestOpenRAActor(4, 'medium-tank', nodPlayer, createTestOpenRALocation(1024, 1024), 75, 100),
+    createTestOpenRAActor(
+      2,
+      'medium-tank',
+      gdiPlayer,
+      createTestOpenRALocation(512, 512),
+      100,
+      100
+    ),
+    createTestOpenRAActor(
+      3,
+      'ranger',
+      gdiPlayer,
+      createTestOpenRALocation(256, 256),
+      60,
+      100,
+      true
+    ),
+    createTestOpenRAActor(
+      4,
+      'medium-tank',
+      nodPlayer,
+      createTestOpenRALocation(1024, 1024),
+      75,
+      100
+    ),
     createTestOpenRAActor(5, 'buggy', nodPlayer, createTestOpenRALocation(768, 768), 40, 80),
   ];
 

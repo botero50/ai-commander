@@ -276,6 +276,7 @@ Optional footer with issue references.
 ```
 
 **Types:**
+
 - `feat:` New feature
 - `fix:` Bug fix
 - `refactor:` Code refactoring
@@ -316,22 +317,27 @@ recovery scenarios.
 
 ```markdown
 ## Description
+
 Brief explanation of what this PR does.
 
 ## Type
+
 - [ ] Feature
 - [ ] Bug fix
 - [ ] Documentation
 - [ ] Refactoring
 
 ## Changes
+
 - Bullet point of changes
 - Another change
 
 ## Testing
+
 Describe how you tested these changes.
 
 ## Issues
+
 Fixes #123, Related to #456
 ```
 
@@ -356,18 +362,23 @@ ADRs are stored in `.foundation/adr/` and follow this structure:
 # ADR-NNN: Title
 
 ## Status
+
 Proposed | Accepted | Deprecated
 
 ## Context
+
 Problem statement and background.
 
 ## Decision
+
 What was decided and why.
 
 ## Consequences
+
 Positive and negative outcomes.
 
 ## Alternatives Considered
+
 Other options and why they were rejected.
 ```
 
@@ -409,21 +420,27 @@ Current: v1.0.0
 ## [1.0.0] - 2026-07-01
 
 ### Added
+
 - New features here
 
 ### Changed
+
 - Modified features here
 
 ### Fixed
+
 - Bug fixes here
 
 ### Deprecated
+
 - Deprecated features here
 
 ### Removed
+
 - Removed features here
 
 ### Security
+
 - Security updates here
 ```
 

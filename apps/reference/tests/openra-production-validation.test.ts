@@ -15,7 +15,7 @@ function createTestGameState(): OpenRAGameState {
     index: 0,
     clientIndex: 0,
     playerName: 'Player',
-    color: 0xFF00FF00,
+    color: 0xff00ff00,
     faction: 'gdi',
     isBot: false,
     isObserver: false,
@@ -79,7 +79,7 @@ describe('OpenRA Production Validation', () => {
           512 + i * 10,
           async () => gameState,
           async () => true,
-          async () => true,
+          async () => true
         );
 
         await agent.initialize();
@@ -109,7 +109,7 @@ describe('OpenRA Production Validation', () => {
           512,
           async () => gameState,
           async () => true,
-          async () => true,
+          async () => true
         );
 
         await agent.initialize();
@@ -120,7 +120,7 @@ describe('OpenRA Production Validation', () => {
       }
 
       expect(results.length).toBe(25);
-      expect(results.every(m => m?.totalTicks !== undefined)).toBe(true);
+      expect(results.every((m) => m?.totalTicks !== undefined)).toBe(true);
     });
 
     it('handles mission interruption gracefully', async () => {
@@ -132,7 +132,7 @@ describe('OpenRA Production Validation', () => {
         512,
         async () => gameState,
         async () => true,
-        async () => isAvailable,
+        async () => isAvailable
       );
 
       await agent.initialize();
@@ -159,7 +159,7 @@ describe('OpenRA Production Validation', () => {
           512,
           async () => gameState,
           async () => true,
-          async () => true,
+          async () => true
         );
 
         await agent.initialize();
@@ -190,7 +190,7 @@ describe('OpenRA Production Validation', () => {
           512,
           async () => gameState,
           async () => true,
-          async () => true,
+          async () => true
         );
 
         await agent.initialize();
@@ -219,7 +219,7 @@ describe('OpenRA Production Validation', () => {
           512,
           async () => gameState,
           async () => true,
-          async () => true,
+          async () => true
         );
 
         await agent.initialize();
@@ -251,7 +251,7 @@ describe('OpenRA Production Validation', () => {
           256,
           async () => gameState,
           async () => true,
-          async () => true,
+          async () => true
         );
 
         await agent.initialize();
@@ -259,7 +259,7 @@ describe('OpenRA Production Validation', () => {
         await agent.shutdown();
 
         const trace = agent.getTrace();
-        eventSequences.push(trace.events.map(e => e.eventType));
+        eventSequences.push(trace.events.map((e) => e.eventType));
       }
 
       // All sequences should be identical
@@ -281,7 +281,7 @@ describe('OpenRA Production Validation', () => {
           512,
           async () => gameState,
           async () => true,
-          async () => true,
+          async () => true
         );
 
         const startMetrics = agent.getMetrics();
@@ -300,7 +300,7 @@ describe('OpenRA Production Validation', () => {
 
       // All sessions should complete and clean up
       expect(sessionLifecycles.length).toBe(10);
-      expect(sessionLifecycles.every(s => s.end !== null)).toBe(true);
+      expect(sessionLifecycles.every((s) => s.end !== null)).toBe(true);
     });
 
     it('handles repeated adapter initialize/shutdown', async () => {
@@ -312,7 +312,7 @@ describe('OpenRA Production Validation', () => {
           512,
           async () => gameState,
           async () => true,
-          async () => true,
+          async () => true
         );
 
         await agent.initialize();
@@ -330,7 +330,7 @@ describe('OpenRA Production Validation', () => {
         512,
         async () => gameState,
         async () => true,
-        async () => true,
+        async () => true
       );
 
       await agent.initialize();
@@ -355,7 +355,7 @@ describe('OpenRA Production Validation', () => {
         512,
         async () => gameState,
         async () => true,
-        async () => true,
+        async () => true
       );
 
       await agent.initialize();
@@ -363,7 +363,7 @@ describe('OpenRA Production Validation', () => {
       await agent.shutdown();
 
       const trace = agent.getTrace();
-      const observationEvents = trace.events.filter(e => e.eventType.includes('tick'));
+      const observationEvents = trace.events.filter((e) => e.eventType.includes('tick'));
 
       // Should have multiple observation events
       expect(observationEvents.length).toBeGreaterThan(0);
@@ -379,7 +379,7 @@ describe('OpenRA Production Validation', () => {
           512,
           async () => gameState,
           async () => true,
-          async () => true,
+          async () => true
         );
 
         await agent.initialize();
@@ -394,7 +394,7 @@ describe('OpenRA Production Validation', () => {
       }
 
       // All iterations should successfully execute commands
-      expect(results.every(r => r.successfulCommands !== undefined)).toBe(true);
+      expect(results.every((r) => r.successfulCommands !== undefined)).toBe(true);
     });
   });
 
@@ -408,7 +408,7 @@ describe('OpenRA Production Validation', () => {
         512,
         async () => gameState,
         async () => true,
-        async () => isAvailable,
+        async () => isAvailable
       );
 
       await agent.initialize();
@@ -439,7 +439,7 @@ describe('OpenRA Production Validation', () => {
           }
           return true;
         },
-        async () => true,
+        async () => true
       );
 
       await agent.initialize();
@@ -469,7 +469,7 @@ describe('OpenRA Production Validation', () => {
           return gameState;
         },
         async () => true,
-        async () => true,
+        async () => true
       );
 
       // Initialization should fail
@@ -493,7 +493,7 @@ describe('OpenRA Production Validation', () => {
           }
           return true;
         },
-        async () => true,
+        async () => true
       );
 
       await agent.initialize();
@@ -517,7 +517,7 @@ describe('OpenRA Production Validation', () => {
           512,
           async () => gameState,
           async () => true,
-          async () => true,
+          async () => true
         );
 
         const startTime = Date.now();
@@ -554,7 +554,7 @@ describe('OpenRA Production Validation', () => {
             512,
             async () => gameState,
             async () => true,
-            async () => true,
+            async () => true
           );
 
           const startTime = Date.now();
@@ -591,7 +591,7 @@ describe('OpenRA Production Validation', () => {
           512,
           async () => gameState,
           async () => true,
-          async () => true,
+          async () => true
         );
 
         await agent.initialize();
@@ -612,7 +612,7 @@ describe('OpenRA Production Validation', () => {
           512,
           async () => gameState,
           async () => true,
-          async () => true,
+          async () => true
         );
 
         await agent.initialize();
@@ -633,7 +633,7 @@ describe('OpenRA Production Validation', () => {
           512,
           async () => gameState,
           async () => true,
-          async () => true,
+          async () => true
         );
 
         await agent.initialize();
@@ -653,7 +653,7 @@ describe('OpenRA Production Validation', () => {
           512,
           async () => gameState,
           async () => true,
-          async () => true,
+          async () => true
         );
 
         await agent.initialize();

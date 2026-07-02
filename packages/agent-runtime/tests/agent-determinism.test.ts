@@ -4,11 +4,7 @@ import { createAgentRuntime } from '../src/index.js';
 import type { AgentRuntime, AgentConfiguration } from '../src/index.js';
 import type { GameSession } from '@ai-commander/adapter';
 import type { Planner, PlanningRequest, PlanningResult } from '@ai-commander/planner';
-import type {
-  DecisionEngine,
-  DecisionRequest,
-  DecisionResult,
-} from '@ai-commander/decision';
+import type { DecisionEngine, DecisionRequest, DecisionResult } from '@ai-commander/decision';
 import type { ExecutionContext } from '@ai-commander/engine';
 import { createEventBus, createRealtimeClock, createServiceRegistry } from '@ai-commander/core';
 import { createGoal, createGoalId, GoalStatus, GoalPriorityLevel } from '@ai-commander/goals';
@@ -28,13 +24,7 @@ describe('AgentRuntime Determinism', () => {
             {
               id: '1',
               sequenceNumber: 0,
-              command: createCommand(
-                'agent-0',
-                'move',
-                { dx: 1, dy: 0 },
-                0,
-                1
-              ),
+              command: createCommand('agent-0', 'move', { dx: 1, dy: 0 }, 0, 1),
               status: 'pending',
             },
           ],
@@ -49,9 +39,7 @@ describe('AgentRuntime Determinism', () => {
   const createMockDecisionEngine = (): DecisionEngine => ({
     async decide(request: DecisionRequest): Promise<DecisionResult> {
       const command =
-        request.plan && request.plan.steps.length > 0
-          ? request.plan.steps[0].command
-          : undefined;
+        request.plan && request.plan.steps.length > 0 ? request.plan.steps[0].command : undefined;
       return {
         command,
         metadata: {
@@ -253,9 +241,7 @@ describe('AgentRuntime Determinism', () => {
 
     // Metrics should continue accumulating
     expect(metricsAfterResume.ticksExecuted).toBe(4);
-    expect(metricsAfterResume.ticksExecuted).toBeGreaterThan(
-      metricsBeforePause.ticksExecuted
-    );
+    expect(metricsAfterResume.ticksExecuted).toBeGreaterThan(metricsBeforePause.ticksExecuted);
   });
 
   it('should return consistent runtime state', async () => {
@@ -316,12 +302,12 @@ describe('AgentRuntime Determinism', () => {
       const config: AgentConfiguration = {
         agentId: 'agent-0' as any,
         goal: createGoal({
-        id: createGoalId('test-goal'),
-        intent: 'test-goal',
-        status: GoalStatus.Pending,
-        priority: GoalPriorityLevel.Normal,
-        parameters: {},
-      }),
+          id: createGoalId('test-goal'),
+          intent: 'test-goal',
+          status: GoalStatus.Pending,
+          priority: GoalPriorityLevel.Normal,
+          parameters: {},
+        }),
         gameSession: session,
         planner: flakeyPlanner,
         decisionEngine: createMockDecisionEngine(),

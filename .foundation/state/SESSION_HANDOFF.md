@@ -49,6 +49,7 @@ Complete Story 1.3: Runtime Execution Traces — Add structured observability to
 Completed in this session:
 
 **Previous Sessions:**
+
 - Story 1.1 (Bootstrap Application) — Created reference app with single-tick execution
 - Story 1.1a (Cleanup) — Moved test doubles to test suite, implemented dependency injection
 - Story 1.2 (First Autonomous Agent) — Implemented autonomous mission agent with movement planning
@@ -675,9 +676,9 @@ packages/fake-game-adapter/
 3. **Configure GitHub Actions CI/CD** (automated testing on commits)
 4. **Add game-specific modules** (domain extensions for specific games)
 5. **Document game adapter patterns** (step-by-step guide for new adapters)
-✅ Frozen/immutable objects
-✅ Exhaustive discriminated unions
-✅ No game-specific terminology
+   ✅ Frozen/immutable objects
+   ✅ Exhaustive discriminated unions
+   ✅ No game-specific terminology
 
 ---
 
@@ -756,24 +757,29 @@ A generic, game-agnostic framework for defining agent behavior using trees of co
 ### Core Concepts
 
 **BehaviorNode** — Base unit of behavior
+
 - `execute(context)` → BehaviorStatus (Success, Failure, Running)
 - `reset()` → Clear internal state
 - Fully deterministic: same input → same output
 
 **Composite Nodes** — Control flow
+
 - **Sequence**: Execute children in order until one fails. All must succeed for sequence to succeed.
 - **Selector**: Execute children in order until one succeeds. First success wins. Only fails if all fail.
 
 **Decorators** — Transform child behavior
+
 - **Inverter**: Flip success/failure (but leave running alone)
 - **Succeeder**: Always return success (useful for non-critical branches)
 - **FailureDecorator**: Always return failure
 
 **Leaf Nodes** — Actual decisions
+
 - **ActionNode**: Execute an action, returns Success/Failure/Running
 - **ConditionNode**: Test a condition, returns Success/Failure (never Running)
 
 **BehaviorContext** — Immutable execution context
+
 - Game state and agent perception passed through tree
 - Tick metadata (depth, time step)
 - Fully frozen for safety
@@ -789,6 +795,7 @@ A generic, game-agnostic framework for defining agent behavior using trees of co
 ### Test Coverage
 
 32 comprehensive tests validating:
+
 - ✅ Individual node execution (action, condition)
 - ✅ Sequence behavior (all succeed, early failure)
 - ✅ Selector behavior (first success, all fail)
@@ -813,7 +820,7 @@ Behavior Tree (decision structure, no logic)
 Action (command the framework executes in the game)
 ```
 
-The framework never knows *how* actions are implemented. The game adapter never knows *what* decisions mean. The behavior tree never knows *which* game it's in.
+The framework never knows _how_ actions are implemented. The game adapter never knows _what_ decisions mean. The behavior tree never knows _which_ game it's in.
 
 ### Files Created
 
@@ -876,52 +883,60 @@ One tick per frame. Deterministic: same goal + same world → same execution eve
 ```typescript
 // Configuration (immutable input)
 interface AgentConfiguration {
-  agentId: Agent
-  goal: Goal
-  gameSession: GameSession
-  planner: Planner
-  decisionEngine: DecisionEngine
-  executionContext: ExecutionContext
+  agentId: Agent;
+  goal: Goal;
+  gameSession: GameSession;
+  planner: Planner;
+  decisionEngine: DecisionEngine;
+  executionContext: ExecutionContext;
 }
 
 // Runtime status (state machine)
 enum AgentStatus {
-  Initializing, Idle, Planning, Deciding, Executing,
-  Paused, Stopped, Failed
+  Initializing,
+  Idle,
+  Planning,
+  Deciding,
+  Executing,
+  Paused,
+  Stopped,
+  Failed,
 }
 
 // Metrics (measurement only, no optimization)
 interface AgentMetrics {
-  ticksExecuted: number
-  decisionsExecuted: number
-  commandsExecuted: number
-  averagePlanningTimeMs: number
-  averageDecisionTimeMs: number
-  errorsEncountered: number
-  lastTickTimestamp: number
+  ticksExecuted: number;
+  decisionsExecuted: number;
+  commandsExecuted: number;
+  averagePlanningTimeMs: number;
+  averageDecisionTimeMs: number;
+  errorsEncountered: number;
+  lastTickTimestamp: number;
 }
 
 // API
 interface AgentRuntime {
-  initialize(): Promise<void>    // Start session
-  tick(): Promise<void>          // Execute one frame
-  pause(): Promise<void>         // Pause execution
-  resume(): Promise<void>        // Resume from pause
-  shutdown(): Promise<void>      // Stop session
-  getStatus(): AgentStatus
-  getMetrics(): AgentMetrics
-  getRuntimeState(): AgentRuntimeState
+  initialize(): Promise<void>; // Start session
+  tick(): Promise<void>; // Execute one frame
+  pause(): Promise<void>; // Pause execution
+  resume(): Promise<void>; // Resume from pause
+  shutdown(): Promise<void>; // Stop session
+  getStatus(): AgentStatus;
+  getMetrics(): AgentMetrics;
+  getRuntimeState(): AgentRuntimeState;
 }
 ```
 
 ### Error Handling Strategy
 
 **Validation errors (throw):**
+
 - Already initialized
 - Not active
 - State machine violations (pause while paused, etc.)
 
 **Execution errors (recover gracefully):**
+
 - Planning fails: log error, continue with old plan
 - Decision fails: skip frame, try again next tick
 - Command fails: log error, continue

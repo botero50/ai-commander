@@ -138,9 +138,18 @@ export class RuntimeMetricsCollector {
       'world_state_updated',
     ];
 
-    const lifecycleEvents = lifecycleEventTypes.reduce((sum, type) => sum + (eventCounts.get(type) ?? 0), 0);
-    const reasoningEvents = reasoningEventTypes.reduce((sum, type) => sum + (eventCounts.get(type) ?? 0), 0);
-    const executionEvents = executionEventTypes.reduce((sum, type) => sum + (eventCounts.get(type) ?? 0), 0);
+    const lifecycleEvents = lifecycleEventTypes.reduce(
+      (sum, type) => sum + (eventCounts.get(type) ?? 0),
+      0
+    );
+    const reasoningEvents = reasoningEventTypes.reduce(
+      (sum, type) => sum + (eventCounts.get(type) ?? 0),
+      0
+    );
+    const executionEvents = executionEventTypes.reduce(
+      (sum, type) => sum + (eventCounts.get(type) ?? 0),
+      0
+    );
 
     // Extract specific metrics
     const totalTicks = eventCounts.get('mission_tick') ?? 0;
@@ -150,7 +159,8 @@ export class RuntimeMetricsCollector {
     const decisionEngineInvocations = eventCounts.get('decision_engine_invoked') ?? 0;
     const decisionsSelected = eventCounts.get('decision_selected') ?? 0;
     const decisionErrors = eventCounts.get('decision_error') ?? 0;
-    const commandsExecuted = (eventCounts.get('command_executed') ?? 0) + (eventCounts.get('command_failed') ?? 0);
+    const commandsExecuted =
+      (eventCounts.get('command_executed') ?? 0) + (eventCounts.get('command_failed') ?? 0);
     const successfulCommands = eventCounts.get('command_executed') ?? 0;
     const failedCommands = eventCounts.get('command_failed') ?? 0;
     const worldStateUpdates = eventCounts.get('world_state_updated') ?? 0;

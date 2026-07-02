@@ -81,8 +81,8 @@ export class MovementPlanner implements Planner {
               `move-x-${sequenceNumber}`,
               dx,
               0,
-              request.goal.id,
-            ),
+              request.goal.id
+            )
           );
           sequenceNumber++;
         }
@@ -98,8 +98,8 @@ export class MovementPlanner implements Planner {
               `move-y-${sequenceNumber}`,
               0,
               dy,
-              request.goal.id,
-            ),
+              request.goal.id
+            )
           );
           sequenceNumber++;
         }
@@ -114,7 +114,7 @@ export class MovementPlanner implements Planner {
           'wait',
           {},
           createTick(0),
-          0,
+          0
         );
 
         steps.push({
@@ -180,7 +180,7 @@ export class MovementPlanner implements Planner {
     stepId: string,
     dx: number,
     dy: number,
-    goalId: string,
+    goalId: string
   ): PlanStep {
     const agent = createAgent('mission-agent');
     const command = createCommand(
@@ -189,7 +189,7 @@ export class MovementPlanner implements Planner {
       'move',
       { dx, dy },
       createTick(0),
-      0,
+      0
     );
 
     return {

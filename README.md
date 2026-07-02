@@ -29,7 +29,7 @@ The framework is **game-agnostic** and **AI-agnostic**: you integrate any game (
 ✅ **Composable:** Build agents by assembling simple components  
 ✅ **Well-Tested:** 246+ tests, 100% passing rate  
 ✅ **TypeScript:** Type-safe with strict mode enabled  
-✅ **Zero Frameworks:** No heavy dependencies, minimal external libraries  
+✅ **Zero Frameworks:** No heavy dependencies, minimal external libraries
 
 ---
 
@@ -57,18 +57,18 @@ This runs a complete mission cycle: observe world state → plan → decide → 
 ### Example: Create a Simple Agent
 
 ```typescript
-import { OpenRAGameAdapter } from '@ai-commander/openra-adapter'
-import { ReferencePlanner } from '@ai-commander/planner'
-import { ReferenceDecisionEngine } from '@ai-commander/decision'
-import { AgentRuntime } from '@ai-commander/agent-runtime'
+import { OpenRAGameAdapter } from '@ai-commander/openra-adapter';
+import { ReferencePlanner } from '@ai-commander/planner';
+import { ReferenceDecisionEngine } from '@ai-commander/decision';
+import { AgentRuntime } from '@ai-commander/agent-runtime';
 
 // Create components
-const adapter = new OpenRAGameAdapter()
-const planner = new ReferencePlanner()
-const decisionEngine = new ReferenceDecisionEngine()
+const adapter = new OpenRAGameAdapter();
+const planner = new ReferencePlanner();
+const decisionEngine = new ReferenceDecisionEngine();
 
 // Initialize
-const session = await adapter.initialize()
+const session = await adapter.initialize();
 
 // Create runtime
 const runtime = new AgentRuntime({
@@ -76,18 +76,18 @@ const runtime = new AgentRuntime({
   gameSession: session,
   planner,
   decisionEngine,
-})
+});
 
 // Execute mission loop
-await runtime.initialize()
+await runtime.initialize();
 while (runtime.getStatus() !== 'stopped') {
-  await runtime.tick()
+  await runtime.tick();
 }
-await runtime.shutdown()
+await runtime.shutdown();
 
 // Get results
-console.log(runtime.getMetrics())
-console.log(runtime.getTrace())
+console.log(runtime.getMetrics());
+console.log(runtime.getTrace());
 ```
 
 ---
@@ -131,11 +131,11 @@ The unified representation of game state:
 
 ```typescript
 interface WorldState {
-  tick: number                    // Game tick
-  agents: Map<AgentId, Agent>     // Player units
-  terrain: TerrainMap             // Walkability, resource locations
-  goals: Map<GoalId, Goal>        // Current mission objectives
-  metadata: Map<string, unknown>  // Game-specific data
+  tick: number; // Game tick
+  agents: Map<AgentId, Agent>; // Player units
+  terrain: TerrainMap; // Walkability, resource locations
+  goals: Map<GoalId, Goal>; // Current mission objectives
+  metadata: Map<string, unknown>; // Game-specific data
 }
 ```
 
@@ -145,11 +145,11 @@ What an agent wants to achieve:
 
 ```typescript
 interface Goal {
-  readonly id: GoalId
-  readonly intent: string         // e.g., "move-unit"
-  readonly parameters: object     // { targetX: 256, targetY: 512 }
-  readonly priority: number
-  status: GoalStatus             // pending | executing | completed | failed
+  readonly id: GoalId;
+  readonly intent: string; // e.g., "move-unit"
+  readonly parameters: object; // { targetX: 256, targetY: 512 }
+  readonly priority: number;
+  status: GoalStatus; // pending | executing | completed | failed
 }
 ```
 
@@ -159,15 +159,15 @@ An ordered sequence of steps to achieve a goal:
 
 ```typescript
 interface Plan {
-  readonly planId: PlanId
-  readonly goalId: GoalId
-  readonly steps: Step[]          // Ordered actions
+  readonly planId: PlanId;
+  readonly goalId: GoalId;
+  readonly steps: Step[]; // Ordered actions
 }
 
 interface Step {
-  readonly stepId: string
-  readonly command: Command
-  status: StepStatus             // pending | executing | completed | failed
+  readonly stepId: string;
+  readonly command: Command;
+  status: StepStatus; // pending | executing | completed | failed
 }
 ```
 
@@ -177,28 +177,28 @@ An action the game can execute:
 
 ```typescript
 interface Command {
-  readonly action: string         // e.g., "move-unit"
-  readonly parameters: object     // { unitId: '5', targetX: 256 }
-  readonly metadata?: unknown
+  readonly action: string; // e.g., "move-unit"
+  readonly parameters: object; // { unitId: '5', targetX: 256 }
+  readonly metadata?: unknown;
 }
 ```
 
 ### Package Structure
 
-| Package | Purpose |
-|---------|---------|
-| `@ai-commander/core` | Event bus, scheduler, service registry, game clock |
-| `@ai-commander/domain` | Game-agnostic domain model (Agent, Goal, Plan, Command) |
-| `@ai-commander/ecs` | Entity component system for game state management |
-| `@ai-commander/engine` | Execution pipeline orchestrator |
-| `@ai-commander/goals` | Goal model and contracts |
-| `@ai-commander/planner` | Goal → Plan transformation (ReferencePlanner) |
-| `@ai-commander/decision` | Plan step → Command selection (ReferenceDecisionEngine) |
-| `@ai-commander/behavior-tree` | Deterministic behavior tree framework |
-| `@ai-commander/adapter` | Game adapter contracts (GameAdapter, GameSession) |
-| `@ai-commander/fake-game-adapter` | In-memory reference adapter for testing |
-| `@ai-commander/openra-adapter` | Production OpenRA game integration |
-| `@ai-commander/agent-runtime` | Autonomous agent runtime orchestrator |
+| Package                           | Purpose                                                 |
+| --------------------------------- | ------------------------------------------------------- |
+| `@ai-commander/core`              | Event bus, scheduler, service registry, game clock      |
+| `@ai-commander/domain`            | Game-agnostic domain model (Agent, Goal, Plan, Command) |
+| `@ai-commander/ecs`               | Entity component system for game state management       |
+| `@ai-commander/engine`            | Execution pipeline orchestrator                         |
+| `@ai-commander/goals`             | Goal model and contracts                                |
+| `@ai-commander/planner`           | Goal → Plan transformation (ReferencePlanner)           |
+| `@ai-commander/decision`          | Plan step → Command selection (ReferenceDecisionEngine) |
+| `@ai-commander/behavior-tree`     | Deterministic behavior tree framework                   |
+| `@ai-commander/adapter`           | Game adapter contracts (GameAdapter, GameSession)       |
+| `@ai-commander/fake-game-adapter` | In-memory reference adapter for testing                 |
+| `@ai-commander/openra-adapter`    | Production OpenRA game integration                      |
+| `@ai-commander/agent-runtime`     | Autonomous agent runtime orchestrator                   |
 
 ---
 
@@ -209,14 +209,15 @@ interface Command {
 Execute the same mission twice with identical results:
 
 ```typescript
-const result1 = await agent.run()
-const result2 = await agent.run()
+const result1 = await agent.run();
+const result2 = await agent.run();
 
-assert.deepEqual(result1.trace, result2.trace)      // ✅ 0% variance
-assert.deepEqual(result1.metrics, result2.metrics)  // ✅ Identical
+assert.deepEqual(result1.trace, result2.trace); // ✅ 0% variance
+assert.deepEqual(result1.metrics, result2.metrics); // ✅ Identical
 ```
 
 This enables:
+
 - Reproducible debugging (replay mission execution step-by-step)
 - Regression testing (confirm changes don't break behavior)
 - Deterministic AI training (same seed produces same behavior)
@@ -226,20 +227,20 @@ This enables:
 GameAdapter composes independent components:
 
 ```typescript
-const adapter = new OpenRAGameAdapter()
-const session = await adapter.initialize()
+const adapter = new OpenRAGameAdapter();
+const session = await adapter.initialize();
 
 // Observe world state
-const worldState = await session.observationProvider.observe()
+const worldState = await session.observationProvider.observe();
 
 // Execute command
-const result = await session.commandExecutor.execute(command)
+const result = await session.commandExecutor.execute(command);
 
 // Manage lifecycle
-await session.start()
-await session.pause()
-await session.resume()
-await session.stop()
+await session.start();
+await session.pause();
+await session.resume();
+await session.stop();
 ```
 
 ### 3. Game-Agnostic Framework
@@ -248,13 +249,13 @@ Replace the game without changing agent code:
 
 ```typescript
 // Current: OpenRA
-import { OpenRAGameAdapter } from '@ai-commander/openra-adapter'
+import { OpenRAGameAdapter } from '@ai-commander/openra-adapter';
 
 // Future: StarCraft
-import { StarCraftGameAdapter } from '@custom/starcraft-adapter'
+import { StarCraftGameAdapter } from '@custom/starcraft-adapter';
 
 // Agent code remains identical
-const runtime = new AgentRuntime({ adapter, planner, decisionEngine })
+const runtime = new AgentRuntime({ adapter, planner, decisionEngine });
 ```
 
 ### 4. Application-Owned Strategy
@@ -263,8 +264,8 @@ Planning and decision-making logic lives in applications, not the framework:
 
 ```typescript
 // Good: Application owns planning
-const planner = new MyDomainPlanner()
-const decisionEngine = new MyStrategyEngine()
+const planner = new MyDomainPlanner();
+const decisionEngine = new MyStrategyEngine();
 
 // Bad (architectural violation): Planning in adapter
 // ❌ new OpenRAMovementPlanner() — belongs in app, not adapter
@@ -295,6 +296,7 @@ npx ts-node src/openra-mission-cli.ts run
 ```
 
 Output includes:
+
 - Execution metrics (ticks, decisions, commands)
 - Trace of all operations
 - Replay validation report
@@ -315,6 +317,7 @@ npx ts-node src/openra-mission-cli.ts metrics
 ```
 
 Shows:
+
 - Total ticks executed
 - Decisions made
 - Commands executed
@@ -472,7 +475,7 @@ const session: GameSession = {
   observationProvider: new MyObservationProvider(),
   commandExecutor: new MyCommandExecutor(),
   // ... lifecycle methods
-}
+};
 ```
 
 See `.foundation/architecture/` for detailed integration patterns.
@@ -511,7 +514,7 @@ We welcome contributions! Please see:
 
 - **.foundation/architecture/** — Design documentation and patterns
 - **.foundation/adr/** — Architecture decision records
-- **packages/*/README.md** — Per-package API documentation
+- **packages/\*/README.md** — Per-package API documentation
 
 ### Security & Community
 
@@ -599,4 +602,4 @@ Made with care for determinism, composition, and clarity.
 
 ---
 
-*Last Updated: July 1, 2026*
+_Last Updated: July 1, 2026_

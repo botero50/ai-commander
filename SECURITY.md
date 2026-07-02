@@ -4,10 +4,10 @@
 
 AI Commander v1.0.0 and later are supported with security updates.
 
-| Version | Supported | Status |
-|---------|-----------|--------|
-| 1.0.0+  | ✅ Yes   | Active |
-| < 1.0.0 | ❌ No    | End of Life |
+| Version | Supported | Status      |
+| ------- | --------- | ----------- |
+| 1.0.0+  | ✅ Yes    | Active      |
+| < 1.0.0 | ❌ No     | End of Life |
 
 For versions below 1.0.0, security patches are not provided. Users are encouraged to upgrade to v1.0.0 or later.
 
@@ -48,6 +48,7 @@ We follow responsible disclosure practices:
 6. **Credit** → Acknowledge reporter (if desired)
 
 We request a 30-day embargo period for:
+
 - Critical vulnerabilities (CVSS 9.0+)
 - Zero-day vulnerabilities
 

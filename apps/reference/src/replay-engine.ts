@@ -130,7 +130,7 @@ export class ReplayEngine {
     checks.push(typeof trace.startTime === 'number' && trace.startTime > 0);
     checks.push(Array.isArray(trace.events));
     checks.push(
-      trace.status === 'running' || trace.status === 'completed' || trace.status === 'failed',
+      trace.status === 'running' || trace.status === 'completed' || trace.status === 'failed'
     );
 
     const passed = checks.every((c) => c);
@@ -146,9 +146,14 @@ export class ReplayEngine {
     });
   }
 
-  private static validateLifecycleEvents(trace: ExecutionTrace, errors: string[]): ReplayValidation {
+  private static validateLifecycleEvents(
+    trace: ExecutionTrace,
+    errors: string[]
+  ): ReplayValidation {
     const requiredEvents: string[] = ['mission_started', 'mission_initialized', 'mission_shutdown'];
-    const eventTypes = new Set<string>(trace.events.filter((e) => e).map((e) => e?.eventType ?? ''));
+    const eventTypes = new Set<string>(
+      trace.events.filter((e) => e).map((e) => e?.eventType ?? '')
+    );
 
     const missingEvents: string[] = [];
     for (const required of requiredEvents) {
@@ -172,7 +177,10 @@ export class ReplayEngine {
     });
   }
 
-  private static validateChronologicalOrder(trace: ExecutionTrace, errors: string[]): ReplayValidation {
+  private static validateChronologicalOrder(
+    trace: ExecutionTrace,
+    errors: string[]
+  ): ReplayValidation {
     let previousTimestamp = 0;
     const violations: number[] = [];
 
@@ -195,20 +203,26 @@ export class ReplayEngine {
     return Object.freeze({
       name: 'Chronological Order',
       passed,
-      message: passed ? 'Events are chronologically ordered' : `${violations.length} events out of order`,
+      message: passed
+        ? 'Events are chronologically ordered'
+        : `${violations.length} events out of order`,
     });
   }
 
-  private static validateMissionCompletion(trace: ExecutionTrace, errors: string[]): ReplayValidation {
+  private static validateMissionCompletion(
+    trace: ExecutionTrace,
+    errors: string[]
+  ): ReplayValidation {
     const completionEvent = trace.events.find((e) => {
       const type = e?.eventType;
       return type === 'mission_completed' || type === 'mission_failed';
     });
 
     const completionEventType = completionEvent?.eventType as string | undefined;
-    const statusValid = (trace.status === 'completed' && completionEventType === 'mission_completed') ||
-                       (trace.status === 'failed' && completionEventType === 'mission_failed') ||
-                       (trace.status === 'running' && !completionEvent);
+    const statusValid =
+      (trace.status === 'completed' && completionEventType === 'mission_completed') ||
+      (trace.status === 'failed' && completionEventType === 'mission_failed') ||
+      (trace.status === 'running' && !completionEvent);
 
     if (!statusValid) {
       errors.push('Mission completion status does not match events');
@@ -224,7 +238,7 @@ export class ReplayEngine {
   private static validateEventConsistency(
     trace: ExecutionTrace,
     errors: string[],
-    warnings: string[],
+    warnings: string[]
   ): ReplayValidation {
     const issues: string[] = [];
 

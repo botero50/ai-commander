@@ -146,12 +146,14 @@ const metrics = runtime.getMetrics();
 ### Why These Metrics
 
 These metrics enable:
+
 - **Diagnostics**: Identify bottlenecks (planning too slow? decisions failing?)
 - **Debugging**: Track how many commands succeeded vs failed
 - **Monitoring**: Detect if agent is stuck (no ticks advancing)
 - **Tuning**: Measure improvement from planner or engine changes
 
 They explicitly do NOT track:
+
 - Goal completion (use events instead)
 - Memory usage (use profiler)
 - Game-specific performance (use game adapter metrics)
@@ -195,13 +197,13 @@ expect(runtime.getMetrics().errorsEncountered).toBeGreaterThan(0);
 
 **Recovery strategy:**
 
-| Failure | Recovery |
-|---------|----------|
-| Planning fails | Continue with old plan; increment error count |
-| Decision fails | Wait one tick; increment error count |
-| Command fails | Log failure; increment error count |
-| Observation unavailable | Skip tick; increment error count |
-| Execution unavailable | Skip tick; increment error count |
+| Failure                 | Recovery                                      |
+| ----------------------- | --------------------------------------------- |
+| Planning fails          | Continue with old plan; increment error count |
+| Decision fails          | Wait one tick; increment error count          |
+| Command fails           | Log failure; increment error count            |
+| Observation unavailable | Skip tick; increment error count              |
+| Execution unavailable   | Skip tick; increment error count              |
 
 ## Extensibility
 
@@ -341,4 +343,3 @@ Future layers built on top of the Agent Runtime:
 3. **Plan Caching** - Cache and reuse plans across ticks
 4. **Learning Integration** - Integrate RL training
 5. **Distributed Agents** - Networking and multiplayer support
-

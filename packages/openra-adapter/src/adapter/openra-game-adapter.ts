@@ -78,7 +78,9 @@ export class OpenRAGameAdapter implements GameAdapter {
         throw new Error('Game instance not accessible');
       }
     } catch (error) {
-      throw new Error(`Failed to initialize adapter: ${error instanceof Error ? error.message : 'Unknown error'}`);
+      throw new Error(
+        `Failed to initialize adapter: ${error instanceof Error ? error.message : 'Unknown error'}`
+      );
     }
 
     this.gameInstanceAccessor = gameInstanceAccessor;

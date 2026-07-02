@@ -98,7 +98,9 @@ describe('OpenRAGameAdapter', () => {
         },
       };
 
-      await expect(adapter.initialize(failingConfig)).rejects.toThrow('Failed to initialize adapter');
+      await expect(adapter.initialize(failingConfig)).rejects.toThrow(
+        'Failed to initialize adapter'
+      );
     });
 
     it('detects null game instance', async () => {

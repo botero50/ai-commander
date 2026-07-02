@@ -4,7 +4,13 @@ import type { GameAdapter } from '@ai-commander/adapter';
 import { FakeGameAdapter } from '@ai-commander/fake-game-adapter';
 import type { Planner } from '@ai-commander/planner';
 import type { DecisionEngine } from '@ai-commander/decision';
-import { createGoal, createGoalId, GoalStatus, GoalPriorityLevel, createGoalPriority } from '@ai-commander/goals';
+import {
+  createGoal,
+  createGoalId,
+  GoalStatus,
+  GoalPriorityLevel,
+  createGoalPriority,
+} from '@ai-commander/goals';
 import { createEventBus, createRealtimeClock, createServiceRegistry } from '@ai-commander/core';
 import type { ExecutionContext } from '@ai-commander/engine';
 

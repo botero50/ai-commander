@@ -17,7 +17,10 @@ export default defineConfig({
       '@ai-commander/planner': path.resolve(__dirname, '../../packages/planner/src'),
       '@ai-commander/decision': path.resolve(__dirname, '../../packages/decision/src'),
       '@ai-commander/agent-runtime': path.resolve(__dirname, '../../packages/agent-runtime/src'),
-      '@ai-commander/fake-game-adapter': path.resolve(__dirname, '../../packages/fake-game-adapter/src'),
+      '@ai-commander/fake-game-adapter': path.resolve(
+        __dirname,
+        '../../packages/fake-game-adapter/src'
+      ),
       '@ai-commander/behavior-tree': path.resolve(__dirname, '../../packages/behavior-tree/src'),
     },
   },
