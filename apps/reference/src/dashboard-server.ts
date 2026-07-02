@@ -14,6 +14,10 @@
 
 import http from 'http';
 import type { IncomingMessage, ServerResponse } from 'http';
+import { DashboardDebugger } from './dashboard-debugger.js';
+import { TimelineInspector } from './timeline-inspector.js';
+import type { ExecutionTrace } from './execution-trace.js';
+import type { RuntimeMetrics } from './runtime-metrics.js';
 
 export interface DashboardRuntimeState {
   readonly status: 'initializing' | 'running' | 'paused' | 'stopped' | 'completed';
@@ -31,6 +35,24 @@ export interface DashboardMissionState {
   readonly currentStep: number;
   readonly lastDecision: string;
   readonly lastCommand: string;
+  readonly progress?: {
+    readonly percent: number;
+    readonly trend: 'improving' | 'stable' | 'regressing';
+    readonly reason: string;
+    readonly evidence: {
+      readonly currentX?: number;
+      readonly currentY?: number;
+      readonly targetX?: number;
+      readonly targetY?: number;
+      readonly currentDistance?: number;
+      readonly initialDistance?: number;
+      readonly distanceCovered?: number;
+    };
+    readonly measurements: readonly {
+      readonly tick: number;
+      readonly percent: number;
+    }[];
+  };
 }
 
 export interface DashboardWorldState {
@@ -53,6 +75,12 @@ export interface DashboardState {
   readonly mission: DashboardMissionState;
   readonly world: DashboardWorldState;
   readonly timeline: readonly DashboardTimelineEvent[];
+  readonly debugger?: {
+    readonly mode: 'live' | 'inspection' | 'comparison';
+    readonly selectedTick: number | null;
+    readonly inspection?: unknown;
+    readonly comparison?: unknown;
+  };
 }
 
 export interface DashboardControlEvent {
@@ -68,6 +96,8 @@ export class DashboardServer {
   private state: DashboardState;
   private clients: ServerResponse[] = [];
   private controlCallbacks: Map<string, (cmd: string) => Promise<void>> = new Map();
+  private debugger: DashboardDebugger = new DashboardDebugger();
+  private inspector: TimelineInspector = new TimelineInspector();
 
   constructor(port: number = 3000) {
     this.port = port;
@@ -119,6 +149,18 @@ export class DashboardServer {
   }
 
   /**
+   * Initialize debugger with trace data.
+   */
+  initializeDebugger(trace: ExecutionTrace, metrics: RuntimeMetrics): void {
+    this.inspector.initialize(trace, metrics);
+    this.debugger.initialize(trace, metrics);
+    this.debugger.onStateChange(() => {
+      this.updateDebuggerState();
+    });
+    this.updateDebuggerState();
+  }
+
+  /**
    * Update dashboard state and broadcast to all connected clients.
    */
   updateState(newState: Partial<DashboardState>): void {
@@ -139,6 +181,45 @@ export class DashboardServer {
       timeline,
     });
     this.broadcastState();
+  }
+
+  /**
+   * Update mission progress and broadcast.
+   */
+  updateProgress(progress: DashboardMissionState['progress']): void {
+    const mission = this.state.mission;
+    this.state = Object.freeze({
+      ...this.state,
+      mission: Object.freeze({
+        ...mission,
+        progress,
+      }),
+    });
+    this.broadcastState();
+  }
+
+  /**
+   * Update debugger state and broadcast.
+   */
+  private updateDebuggerState(): void {
+    const debuggerState = this.debugger.getState();
+    const inspection =
+      debuggerState.selectedTick !== null
+        ? this.debugger.getSelectedTickInspection()
+        : null;
+    const comparison =
+      debuggerState.mode === 'comparison'
+        ? this.debugger.getComparison()
+        : null;
+
+    this.updateState({
+      debugger: {
+        mode: debuggerState.mode,
+        selectedTick: debuggerState.selectedTick,
+        inspection,
+        comparison,
+      },
+    });
   }
 
   /**
@@ -178,6 +259,37 @@ export class DashboardServer {
         this.handleStreamRequest(req, res);
       } else if (url === '/api/control' && req.method === 'POST') {
         this.handleControlRequest(req, res);
+      } else if (url.startsWith('/api/debugger/select-tick/') && req.method === 'POST') {
+        const tick = parseInt(url.split('/').pop() || '', 10);
+        this.debugger.selectTick(tick);
+        this.updateDebuggerState();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true }));
+      } else if (url === '/api/debugger/next-tick' && req.method === 'POST') {
+        this.debugger.nextTick();
+        this.updateDebuggerState();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true }));
+      } else if (url === '/api/debugger/prev-tick' && req.method === 'POST') {
+        this.debugger.previousTick();
+        this.updateDebuggerState();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true }));
+      } else if (url === '/api/debugger/first-tick' && req.method === 'POST') {
+        this.debugger.firstTick();
+        this.updateDebuggerState();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true }));
+      } else if (url === '/api/debugger/latest-tick' && req.method === 'POST') {
+        this.debugger.latestTick();
+        this.updateDebuggerState();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true }));
+      } else if (url === '/api/debugger/resume-live' && req.method === 'POST') {
+        this.debugger.resumeLive();
+        this.updateDebuggerState();
+        res.writeHead(200, { 'Content-Type': 'application/json' });
+        res.end(JSON.stringify({ ok: true }));
       } else {
         res.writeHead(404, { 'Content-Type': 'text/plain' });
         res.end('Not Found');
@@ -562,6 +674,23 @@ export class DashboardServer {
         <span class="stat-value" id="mission-status">pending</span>
       </div>
       <div class="stat">
+        <span class="stat-label">Progress</span>
+        <div style="display: flex; align-items: center; gap: 8px;">
+          <div style="flex: 1; height: 8px; background: #1e293b; border-radius: 4px; overflow: hidden;">
+            <div id="progress-bar" style="height: 100%; background: #3b82f6; width: 0%; transition: width 0.3s ease;"></div>
+          </div>
+          <span class="stat-value" id="progress-percent">0%</span>
+        </div>
+      </div>
+      <div class="stat">
+        <span class="stat-label">Trend</span>
+        <span class="stat-value" id="progress-trend">-</span>
+      </div>
+      <div class="stat" style="font-size: 12px;">
+        <span class="stat-label">Evidence</span>
+        <span class="stat-value" id="progress-evidence" style="font-size: 11px; white-space: pre-wrap;">-</span>
+      </div>
+      <div class="stat">
         <span class="stat-label">Plan Steps</span>
         <span class="stat-value" id="mission-steps">0</span>
       </div>
@@ -620,6 +749,18 @@ export class DashboardServer {
       </div>
     </div>
 
+    <div class="panel" id="inspection-panel" style="display: none;">
+      <h2>Tick Inspection</h2>
+      <div id="inspection-content">No tick selected</div>
+      <div style="margin-top: 12px; display: flex; gap: 8px; flex-wrap: wrap;">
+        <button id="first-tick-btn" style="padding: 8px 12px; background: #444; color: white; border: none; border-radius: 4px; cursor: pointer;">First</button>
+        <button id="prev-tick-btn" style="padding: 8px 12px; background: #444; color: white; border: none; border-radius: 4px; cursor: pointer;">Previous</button>
+        <button id="next-tick-btn" style="padding: 8px 12px; background: #444; color: white; border: none; border-radius: 4px; cursor: pointer;">Next</button>
+        <button id="latest-tick-btn" style="padding: 8px 12px; background: #444; color: white; border: none; border-radius: 4px; cursor: pointer;">Latest</button>
+        <button id="resume-live-btn" style="padding: 8px 12px; background: #666; color: white; border: none; border-radius: 4px; cursor: pointer;">Resume Live</button>
+      </div>
+    </div>
+
     <div class="controls">
       <button class="primary" id="pause-btn">Pause</button>
       <button class="primary" id="resume-btn">Resume</button>
@@ -668,6 +809,34 @@ export class DashboardServer {
       // Update mission panel
       document.getElementById('mission-goal').textContent = state.mission.goalIntent;
       document.getElementById('mission-status').textContent = state.mission.goalStatus;
+
+      // Update progress
+      if (state.mission.progress) {
+        const progress = state.mission.progress;
+        document.getElementById('progress-bar').style.width = progress.percent + '%';
+        document.getElementById('progress-percent').textContent = progress.percent + '%';
+
+        // Trend indicator
+        const trendEmoji = {
+          'improving': '↑',
+          'stable': '→',
+          'regressing': '↓'
+        }[progress.trend] || '?';
+        document.getElementById('progress-trend').textContent = trendEmoji + ' ' + progress.trend;
+
+        // Evidence
+        const evidence = progress.evidence;
+        const evidenceText = evidence.currentX !== undefined && evidence.targetX !== undefined
+          ? \`(\${evidence.currentX},\${evidence.currentY}) → (\${evidence.targetX},\${evidence.targetY})\\nDistance: \${evidence.currentDistance}m\`
+          : progress.reason;
+        document.getElementById('progress-evidence').textContent = evidenceText;
+      } else {
+        document.getElementById('progress-bar').style.width = '0%';
+        document.getElementById('progress-percent').textContent = '0%';
+        document.getElementById('progress-trend').textContent = '-';
+        document.getElementById('progress-evidence').textContent = '-';
+      }
+
       document.getElementById('mission-steps').textContent = state.mission.planSteps;
       document.getElementById('mission-current').textContent = state.mission.currentStep;
 
@@ -707,6 +876,49 @@ export class DashboardServer {
 
       // Auto-scroll timeline
       timelineEvents.scrollTop = timelineEvents.scrollHeight;
+
+      // Update inspection panel
+      const inspectionPanel = document.getElementById('inspection-panel');
+      const inspectionContent = document.getElementById('inspection-content');
+      if (state.debugger && state.debugger.selectedTick !== null) {
+        inspectionPanel.style.display = 'block';
+        const inspection = state.debugger.inspection;
+        if (inspection) {
+          inspectionContent.innerHTML = \`
+            <div style="padding: 8px; background: #1a1a1a; border-radius: 4px; overflow-x: auto;">
+              <pre style="margin: 0; font-size: 11px; white-space: pre-wrap; word-break: break-word;">\${formatInspection(inspection)}</pre>
+            </div>
+          \`;
+        }
+      } else {
+        inspectionPanel.style.display = 'none';
+      }
+    }
+
+    function formatInspection(inspection) {
+      if (!inspection) return 'No data';
+      let output = \`TICK \${inspection.tick}\\n\\n\`;
+      if (inspection.progress) {
+        output += \`PROGRESS:\\n  Percent: \${inspection.progress.percent}%\\n\`;
+        output += \`  Trend: \${inspection.progress.trend}\\n\`;
+        output += \`  Reason: \${inspection.progress.reason}\\n\\n\`;
+      }
+      if (inspection.observation) {
+        output += \`OBSERVATION:\\n  \${JSON.stringify(inspection.observation, null, 2)}\\n\\n\`;
+      }
+      if (inspection.planning) {
+        output += \`PLANNING:\\n  Goal: \${inspection.planning.goal}\\n\`;
+        output += \`  Steps: \${inspection.planning.steps}\\n\\n\`;
+      }
+      if (inspection.decision) {
+        output += \`DECISION:\\n  Command: \${inspection.decision.command}\\n\`;
+        output += \`  Confidence: \${inspection.decision.confidence}\\n\\n\`;
+      }
+      if (inspection.execution) {
+        output += \`EXECUTION:\\n  Action: \${inspection.execution.commandAction}\\n\`;
+        output += \`  Success: \${inspection.execution.success}\\n\\n\`;
+      }
+      return output;
     }
 
     async function sendControl(command) {
@@ -729,6 +941,34 @@ export class DashboardServer {
     document.getElementById('resume-btn').addEventListener('click', () => sendControl('resume'));
     document.getElementById('step-btn').addEventListener('click', () => sendControl('step'));
     document.getElementById('stop-btn').addEventListener('click', () => sendControl('stop'));
+
+    // Debugger buttons
+    document.getElementById('first-tick-btn').addEventListener('click', () => sendDebuggerCommand('/api/debugger/first-tick'));
+    document.getElementById('prev-tick-btn').addEventListener('click', () => sendDebuggerCommand('/api/debugger/prev-tick'));
+    document.getElementById('next-tick-btn').addEventListener('click', () => sendDebuggerCommand('/api/debugger/next-tick'));
+    document.getElementById('latest-tick-btn').addEventListener('click', () => sendDebuggerCommand('/api/debugger/latest-tick'));
+    document.getElementById('resume-live-btn').addEventListener('click', () => sendDebuggerCommand('/api/debugger/resume-live'));
+
+    // Timeline click handler for tick selection
+    document.getElementById('timeline-events').addEventListener('click', (e) => {
+      const tickEl = e.target.closest('.timeline-event');
+      if (tickEl) {
+        const tickText = tickEl.querySelector('.timeline-tick')?.textContent;
+        const tickMatch = tickText?.match(/Tick (\\d+)/);
+        if (tickMatch) {
+          const tick = parseInt(tickMatch[1], 10);
+          sendDebuggerCommand(\`/api/debugger/select-tick/\${tick}\`);
+        }
+      }
+    });
+
+    async function sendDebuggerCommand(endpoint) {
+      try {
+        await fetch(endpoint, { method: 'POST' });
+      } catch (error) {
+        console.error('Debugger command failed:', error);
+      }
+    }
 
     // Connect to stream and load initial state
     fetch('/api/state')

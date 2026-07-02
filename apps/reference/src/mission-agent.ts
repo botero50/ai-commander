@@ -27,6 +27,7 @@ import { MovementPlanner } from './movement-planner.js';
 import { ExecutionPreconditionValidator } from './execution-preconditions.js';
 import { PlanValidator } from './plan-validator.js';
 import { FailureDiagnoser, RecoveryStrategy } from './failure-diagnosis.js';
+import { GoalProgressEvaluator } from './goal-progress-evaluator.js';
 import type { Command } from '@ai-commander/domain';
 
 /**
@@ -58,6 +59,9 @@ export class MissionAgent {
   private planValidator = new PlanValidator();
   private failureDiagnoser = new FailureDiagnoser();
   private recoveryStrategy = new RecoveryStrategy();
+  private progressEvaluator = new GoalProgressEvaluator();
+  private progressHistory: Array<{ tick: number; percent: number }> = [];
+  private lastProgressTrend: 'improving' | 'stable' | 'regressing' = 'stable';
 
   constructor(targetX: number, targetY: number) {
     this.planner = this.createAdaptiveReplanningPlanner();
@@ -426,14 +430,41 @@ export class MissionAgent {
           `  Ticks: ${metrics.ticksExecuted}, Decisions: ${metrics.decisionsExecuted}, Commands: ${metrics.commandsExecuted}`
         );
 
+        // Evaluate goal progress from world state
+        const worldState = await this.getWorldState();
+        const progressData = this.progressEvaluator.evaluateProgress(goal, worldState, tickCount);
+        this.tracer.recordGoalProgressUpdated(progressData);
+
+        // Track progress history (keep last 5)
+        this.progressHistory.push({ tick: tickCount, percent: progressData.progressPercent });
+        if (this.progressHistory.length > 5) {
+          this.progressHistory.shift();
+        }
+
+        // Check if trend changed
+        if (progressData.trend !== this.lastProgressTrend) {
+          this.tracer.recordGoalProgressTrendChanged(
+            goal.id,
+            goal.intent,
+            this.lastProgressTrend,
+            progressData.trend
+          );
+          this.lastProgressTrend = progressData.trend;
+        }
+
+        // Log progress
+        console.log(
+          `  📈 Progress: ${progressData.progressPercent}% (${progressData.trend}) - ${progressData.progressReason}`
+        );
+
         // Check if goal is satisfied in world state
         if (await this.isGoalSatisfied(goal)) {
-          const worldState = await this.getWorldState();
           const agent = worldState.agents?.[0];
           const position = agent?.customData?.position || 'unknown';
           console.log(
             `  ✓ Mission goal achieved: agent reached target (${this.targetX}, ${this.targetY}) at position ${position}`
           );
+          this.tracer.recordGoalCompleted(goal.id, goal.intent, progressData.progressPercent);
           this.isComplete = true;
           this.tracer.recordMissionCompleted();
         }
