@@ -31,12 +31,34 @@ export type TraceEventType =
   | 'mission_started'
   | 'mission_initialized'
   | 'goal_created'
+  | 'goal_lifecycle_transitioned'
   | 'goal_evaluated'
+  | 'goal_candidates_evaluated'
   | 'goal_selected'
+  | 'goal_adapted'
   | 'goal_changed'
   | 'goal_progress_updated'
   | 'goal_progress_trend_changed'
   | 'goal_completed'
+  | 'resource_field_detected'
+  | 'resource_field_selected'
+  | 'gathering_started'
+  | 'gathering_progress_updated'
+  | 'gathering_completed'
+  | 'worker_movement_started'
+  | 'worker_position_updated'
+  | 'worker_arrival_detected'
+  | 'worker_gathering_begun'
+  | 'worker_return_started'
+  | 'worker_return_progress'
+  | 'worker_return_complete'
+  | 'resources_deposited'
+  | 'production_started'
+  | 'production_progress_updated'
+  | 'production_completed'
+  | 'unit_spawned'
+  | 'worker_assigned'
+  | 'worker_reassigned'
   | 'planner_invoked'
   | 'plan_generated'
   | 'plan_reused'
@@ -115,6 +137,22 @@ export class ExecutionTracer {
     });
   }
 
+  recordGoalLifecycleTransitioned(
+    goalId: string,
+    goalIntent: string,
+    fromState: string,
+    toState: string,
+    reason?: string
+  ): void {
+    this.addEvent('goal_lifecycle_transitioned', {
+      goalId,
+      goalIntent,
+      fromState,
+      toState,
+      reason: reason || '',
+    });
+  }
+
   recordGoalEvaluated(goal: Goal, evaluation: any): void {
     this.addEvent('goal_evaluated', {
       goalId: goal.id,
@@ -136,6 +174,22 @@ export class ExecutionTracer {
     });
   }
 
+  recordGoalCandidatesEvaluated(evaluations: any[]): void {
+    this.addEvent('goal_candidates_evaluated', {
+      candidateCount: evaluations.length,
+      evaluations: evaluations.map(e => ({
+        goalId: e.goal.id,
+        goalIntent: e.goal.intent,
+        score: e.score,
+        statusFactor: e.statusFactor,
+        priorityFactor: e.priorityFactor,
+        urgencyFactor: e.urgencyFactor,
+        feasibilityFactor: e.feasibilityFactor,
+        reasoning: e.reasoning,
+      })),
+    });
+  }
+
   recordGoalChanged(previousGoal: Goal, newGoal: Goal, reason: string): void {
     this.addEvent('goal_changed', {
       previousGoalId: previousGoal.id,
@@ -143,6 +197,28 @@ export class ExecutionTracer {
       newGoalId: newGoal.id,
       newGoalIntent: newGoal.intent,
       reason,
+    });
+  }
+
+  recordGoalAdapted(
+    previousGoalId: string,
+    previousGoalIntent: string,
+    newGoalId: string,
+    newGoalIntent: string,
+    previousScore: number,
+    newScore: number,
+    worldStateChange: string,
+    reasoning: string
+  ): void {
+    this.addEvent('goal_adapted', {
+      previousGoalId,
+      previousGoalIntent,
+      newGoalId,
+      newGoalIntent,
+      previousScore,
+      newScore,
+      worldStateChange,
+      reasoning,
     });
   }
 
@@ -329,6 +405,181 @@ export class ExecutionTracer {
   recordMissionShutdown(): void {
     this.addEvent('mission_shutdown', {
       duration: Date.now() - this.startTime,
+    });
+  }
+
+  recordResourceFieldDetected(fieldId: string, resourceType: string, amount: number, position: { x: number; y: number }): void {
+    this.addEvent('resource_field_detected', {
+      fieldId,
+      resourceType,
+      amount,
+      position,
+    });
+  }
+
+  recordResourceFieldSelected(fieldId: string, resourceType: string, score: number, reasoning: string): void {
+    this.addEvent('resource_field_selected', {
+      fieldId,
+      resourceType,
+      score,
+      reasoning,
+    });
+  }
+
+  recordGatheringStarted(fieldId: string, resourceType: string, targetAmount: number): void {
+    this.addEvent('gathering_started', {
+      fieldId,
+      resourceType,
+      targetAmount,
+    });
+  }
+
+  recordGatheringProgressUpdated(
+    fieldId: string,
+    resourceType: string,
+    amountCollected: number,
+    amountRemaining: number,
+    percentComplete: number,
+    status: 'traveling' | 'gathering' | 'returning' | 'complete'
+  ): void {
+    this.addEvent('gathering_progress_updated', {
+      fieldId,
+      resourceType,
+      amountCollected,
+      amountRemaining,
+      percentComplete,
+      status,
+    });
+  }
+
+  recordGatheringCompleted(fieldId: string, resourceType: string, totalCollected: number): void {
+    this.addEvent('gathering_completed', {
+      fieldId,
+      resourceType,
+      totalCollected,
+    });
+  }
+
+  recordWorkerMovementStarted(fieldId: string, targetPosition: { x: number; y: number }, currentPosition: { x: number; y: number }): void {
+    this.addEvent('worker_movement_started', {
+      fieldId,
+      targetPosition,
+      currentPosition,
+      distance: Math.abs(targetPosition.x - currentPosition.x) + Math.abs(targetPosition.y - currentPosition.y),
+    });
+  }
+
+  recordWorkerPositionUpdated(
+    fieldId: string,
+    currentPosition: { x: number; y: number },
+    targetPosition: { x: number; y: number },
+    distanceRemaining: number,
+    percentComplete: number
+  ): void {
+    this.addEvent('worker_position_updated', {
+      fieldId,
+      currentPosition,
+      targetPosition,
+      distanceRemaining,
+      percentComplete,
+    });
+  }
+
+  recordWorkerArrivalDetected(fieldId: string, arrivedPosition: { x: number; y: number }, ticksToArrive: number): void {
+    this.addEvent('worker_arrival_detected', {
+      fieldId,
+      arrivedPosition,
+      ticksToArrive,
+    });
+  }
+
+  recordWorkerGatheringBegun(fieldId: string, resourceType: string, targetAmount: number): void {
+    this.addEvent('worker_gathering_begun', {
+      fieldId,
+      resourceType,
+      targetAmount,
+    });
+  }
+
+  recordWorkerReturnStarted(fieldId: string, resourceType: string, amountCollected: number, basePosition: { x: number; y: number }): void {
+    this.addEvent('worker_return_started', {
+      fieldId,
+      resourceType,
+      amountCollected,
+      basePosition,
+    });
+  }
+
+  recordWorkerReturnProgress(currentPosition: { x: number; y: number }, basePosition: { x: number; y: number }, distanceRemaining: number, percentComplete: number): void {
+    this.addEvent('worker_return_progress', {
+      currentPosition,
+      basePosition,
+      distanceRemaining,
+      percentComplete,
+    });
+  }
+
+  recordWorkerReturnComplete(basePosition: { x: number; y: number }, resourcesReturned: number, ticksToReturn: number): void {
+    this.addEvent('worker_return_complete', {
+      basePosition,
+      resourcesReturned,
+      ticksToReturn,
+    });
+  }
+
+  recordResourcesDeposited(amount: number): void {
+    this.addEvent('resources_deposited', {
+      amount,
+    });
+  }
+
+  recordProductionStarted(buildingId: string, unitType: string, cost: number, buildTime: number): void {
+    this.addEvent('production_started', {
+      buildingId,
+      unitType,
+      cost,
+      buildTime,
+    });
+  }
+
+  recordProductionProgressUpdated(buildingId: string, unitType: string, percentComplete: number, status: string): void {
+    this.addEvent('production_progress_updated', {
+      buildingId,
+      unitType,
+      percentComplete,
+      status,
+    });
+  }
+
+  recordProductionCompleted(buildingId: string, unitType: string): void {
+    this.addEvent('production_completed', {
+      buildingId,
+      unitType,
+    });
+  }
+
+  recordUnitSpawned(unitId: string, unitType: string, position: { x: number; y: number }): void {
+    this.addEvent('unit_spawned', {
+      unitId,
+      unitType,
+      position,
+    });
+  }
+
+  recordWorkerAssigned(workerId: string, fieldId: string, resourceType: string): void {
+    this.addEvent('worker_assigned', {
+      workerId,
+      fieldId,
+      resourceType,
+    });
+  }
+
+  recordWorkerReassigned(workerId: string, oldFieldId: string, newFieldId: string, reason: string): void {
+    this.addEvent('worker_reassigned', {
+      workerId,
+      oldFieldId,
+      newFieldId,
+      reason,
     });
   }
 

@@ -154,6 +154,10 @@ export class DashboardIntegration {
     if (!this.trace || !this.metrics) return;
 
     const progress = this.extractProgress();
+    const goalCandidates = this.extractGoalCandidates();
+    const goalLifecycles = this.extractGoalLifecycles();
+    const lastGoalAdaptation = this.extractLastGoalAdaptation();
+    const gatheringProgress = this.extractGatheringProgress();
 
     const missionState: DashboardMissionState = Object.freeze({
       goalId: 'goal-movement',
@@ -164,6 +168,10 @@ export class DashboardIntegration {
       lastDecision: this.extractLastDecision(),
       lastCommand: this.extractLastCommand(),
       progress,
+      goalCandidates,
+      goalLifecycles,
+      lastGoalAdaptation,
+      gatheringProgress,
     });
 
     this.dashboard.updateState({ mission: missionState });
@@ -271,6 +279,185 @@ export class DashboardIntegration {
     });
   }
 
+  private extractGoalCandidates(): DashboardMissionState['goalCandidates'] {
+    if (!this.trace || !this.trace.events) return undefined;
+
+    // Find the last goal_candidates_evaluated event
+    const candidatesEvents = this.trace.events.filter(
+      (e) => e.eventType === 'goal_candidates_evaluated'
+    );
+    if (candidatesEvents.length === 0) return undefined;
+
+    const lastCandidatesEvent = candidatesEvents[candidatesEvents.length - 1];
+    if (!lastCandidatesEvent) return undefined;
+
+    // Find the goal_selected event at the same tick to mark which was selected
+    const selectedEvent = this.trace.events.find(
+      (e) => e.eventType === 'goal_selected' && e.tick === lastCandidatesEvent.tick
+    );
+    const selectedGoalId = selectedEvent?.data?.goalId;
+
+    const evaluations = (lastCandidatesEvent.data as any)?.evaluations || [];
+    return Object.freeze(
+      evaluations.map((evaluation: any) => ({
+        goalId: evaluation.goalId,
+        intent: evaluation.goalIntent,
+        score: evaluation.score,
+        priorityFactor: evaluation.priorityFactor,
+        statusFactor: evaluation.statusFactor,
+        urgencyFactor: evaluation.urgencyFactor,
+        feasibilityFactor: evaluation.feasibilityFactor,
+        reasoning: evaluation.reasoning,
+        isSelected: evaluation.goalId === selectedGoalId,
+      }))
+    );
+  }
+
+  private extractGoalLifecycles(): DashboardMissionState['goalLifecycles'] {
+    if (!this.trace || !this.trace.events) return undefined;
+
+    // Find all unique goals created
+    const goalIds = new Set<string>();
+    this.trace.events.forEach(e => {
+      if (e.eventType === 'goal_created') {
+        goalIds.add((e.data as any)?.goalId);
+      }
+    });
+
+    if (goalIds.size === 0) return undefined;
+
+    // Get lifecycle state for each goal
+    const lifecycles: any[] = [];
+
+    goalIds.forEach(goalId => {
+      // Find creation event
+      const creationEvent = this.trace!.events.find(
+        e => e.eventType === 'goal_created' && (e.data as any)?.goalId === goalId
+      );
+      if (!creationEvent) return;
+
+      const goalIntent = (creationEvent.data as any)?.goalIntent || 'unknown';
+      const createdAtTick = creationEvent.tick;
+
+      // Find all transitions
+      const transitions = this.trace!.events
+        .filter(
+          e =>
+            e.eventType === 'goal_lifecycle_transitioned' &&
+            (e.data as any)?.goalId === goalId
+        )
+        .map(e => ({
+          tick: e.tick,
+          from: (e.data as any)?.fromState || '',
+          to: (e.data as any)?.toState || '',
+        }));
+
+      // Derive current lifecycle state
+      let lifecycleState = 'Queued'; // Initial state
+      if (transitions.length > 0) {
+        lifecycleState = transitions[transitions.length - 1].to;
+      }
+
+      // Check for explicit completion
+      const completedEvent = this.trace!.events.find(
+        e => e.eventType === 'goal_completed' && (e.data as any)?.goalId === goalId
+      );
+      if (completedEvent) {
+        lifecycleState = 'Completed';
+      }
+
+      lifecycles.push({
+        goalId,
+        intent: goalIntent,
+        lifecycleState,
+        createdAtTick,
+        transitions,
+      });
+    });
+
+    return lifecycles.length > 0 ? Object.freeze(lifecycles) : undefined;
+  }
+
+  private extractLastGoalAdaptation(): DashboardMissionState['lastGoalAdaptation'] {
+    if (!this.trace || !this.trace.events) return undefined;
+
+    // Find the last goal_adapted event
+    const adaptedEvents = this.trace.events.filter(e => e.eventType === 'goal_adapted');
+    if (adaptedEvents.length === 0) return undefined;
+
+    const lastEvent = adaptedEvents[adaptedEvents.length - 1];
+    if (!lastEvent) return undefined;
+
+    const data = lastEvent.data as any;
+    const scoreImprovement = data.newScore - data.previousScore;
+
+    return {
+      tick: lastEvent.tick,
+      from: data.previousGoalIntent,
+      to: data.newGoalIntent,
+      worldStateChange: data.worldStateChange,
+      scoreImprovement,
+      reasoning: data.reasoning,
+    };
+  }
+
+  private extractGatheringProgress(): DashboardMissionState['gatheringProgress'] {
+    if (!this.trace || !this.trace.events) return undefined;
+
+    // Find the most recent gathering-related events
+    const detectedEvents = this.trace.events.filter(e => e.eventType === 'resource_field_detected');
+    const selectedEvents = this.trace.events.filter(e => e.eventType === 'resource_field_selected');
+    const startedEvents = this.trace.events.filter(e => e.eventType === 'gathering_started');
+    const progressEvents = this.trace.events.filter(e => e.eventType === 'gathering_progress_updated');
+    const completedEvents = this.trace.events.filter(e => e.eventType === 'gathering_completed');
+
+    // If no gathering events, no active gathering
+    if (selectedEvents.length === 0) return undefined;
+
+    const lastSelected = selectedEvents[selectedEvents.length - 1];
+    if (!lastSelected) return undefined;
+
+    const selectedData = lastSelected.data as any;
+    const lastProgress = progressEvents.length > 0 ? progressEvents[progressEvents.length - 1] : null;
+    const lastStarted = startedEvents.length > 0 ? startedEvents[startedEvents.length - 1] : null;
+    const lastDetected = detectedEvents.length > 0 ? detectedEvents[detectedEvents.length - 1] : null;
+
+    if (!lastProgress && !lastStarted) return undefined;
+
+    const progressData = lastProgress ? (lastProgress.data as any) : null;
+    const startedData = lastStarted ? (lastStarted.data as any) : null;
+    const detectedData = lastDetected ? (lastDetected.data as any) : null;
+
+    const amountCollected = progressData?.amountCollected || 0;
+    const amountRemaining = progressData?.amountRemaining || selectedData.targetAmount || 0;
+    const percentComplete = progressData?.percentComplete || 0;
+    const targetAmount = startedData?.targetAmount || selectedData.targetAmount || amountCollected + amountRemaining;
+    const status = progressData?.status || 'traveling';
+
+    // Calculate gathering rate (units per tick)
+    const ticksElapsed = (lastProgress?.tick || lastStarted?.tick || 0) - (lastDetected?.tick || 0);
+    const gatheringRate = ticksElapsed > 0 ? amountCollected / ticksElapsed : 0;
+
+    // Estimate completion tick
+    const ticksRemaining = gatheringRate > 0 ? Math.ceil(amountRemaining / gatheringRate) : 100;
+    const estimatedCompletionTick = (lastProgress?.tick || lastStarted?.tick || 0) + ticksRemaining;
+
+    return {
+      fieldId: String(selectedData.fieldId),
+      resourceType: String(selectedData.resourceType),
+      targetAmount: Number(targetAmount),
+      amountCollected: Number(amountCollected),
+      amountRemaining: Number(amountRemaining),
+      percentComplete: Number(percentComplete),
+      status: status as 'traveling' | 'gathering' | 'returning' | 'complete',
+      gatheringRate: Number(gatheringRate),
+      estimatedCompletionTick: percentComplete < 100 ? estimatedCompletionTick : undefined,
+      detectedAtTick: Number(lastDetected?.tick || 0),
+      selectedAtTick: Number(lastSelected.tick),
+      startedAtTick: Number(lastStarted?.tick || 0),
+    };
+  }
+
   /**
    * Format event detail for display.
    */
@@ -291,6 +478,54 @@ export class DashboardIntegration {
         return 'Mission completed successfully';
       case 'mission_failed':
         return 'Mission failed';
+      case 'resource_field_detected':
+        return `Detected: ${(data as any)?.fieldId || 'unknown'} (${(data as any)?.amount || 0} ${(data as any)?.resourceType || 'resource'})`;
+      case 'resource_field_selected':
+        return `Selected: ${(data as any)?.fieldId || 'unknown'} (score: ${((data as any)?.score || 0).toFixed(2)})`;
+      case 'gathering_started':
+        return `Started: ${(data as any)?.fieldId || 'unknown'} (target: ${(data as any)?.targetAmount || 0})`;
+      case 'gathering_progress_updated':
+        return `Progress: ${(data as any)?.amountCollected || 0}/${(data as any)?.amountCollected + (data as any)?.amountRemaining || 0} (${(data as any)?.percentComplete || 0}%)`;
+      case 'gathering_completed':
+        return `Completed: collected ${(data as any)?.totalCollected || 0} ${(data as any)?.resourceType || 'resources'}`;
+      case 'goal_candidates_evaluated':
+        return `Evaluated ${((data as any)?.evaluations || []).length} goal candidates`;
+      case 'goal_selected':
+        return `Selected: ${(data as any)?.goalIntent || 'goal'}`;
+      case 'goal_lifecycle_transitioned':
+        return `${(data as any)?.goalIntent || 'Goal'}: ${(data as any)?.fromState || '?'} → ${(data as any)?.toState || '?'}`;
+      case 'goal_adapted':
+        return `Adapted: ${(data as any)?.previousGoalIntent || '?'} → ${(data as any)?.newGoalIntent || '?'}`;
+      case 'goal_progress_updated':
+        return `Progress: ${(data as any)?.progressPercent || 0}% (${(data as any)?.trend || 'stable'})`;
+      case 'worker_movement_started':
+        return `Movement: traveling to ${(data as any)?.fieldId || 'field'} (${(data as any)?.distance || 0} units)`;
+      case 'worker_position_updated':
+        return `Position: (${(data as any)?.currentPosition?.x || 0},${(data as any)?.currentPosition?.y || 0}) → distance ${(data as any)?.distanceRemaining || 0}`;
+      case 'worker_arrival_detected':
+        return `Arrived: at ${(data as any)?.fieldId || 'field'} after ${(data as any)?.ticksToArrive || 0} ticks`;
+      case 'worker_gathering_begun':
+        return `Gathering: ${(data as any)?.resourceType || 'resource'} (target: ${(data as any)?.targetAmount || 0})`;
+      case 'worker_return_started':
+        return `Return: ${(data as any)?.amountCollected || 0} ${(data as any)?.resourceType || 'resource'} to base`;
+      case 'worker_return_progress':
+        return `Return: ${(data as any)?.percentComplete || 0}% - distance: ${(data as any)?.distanceRemaining || 0}`;
+      case 'worker_return_complete':
+        return `Arrived at base with ${(data as any)?.resourcesReturned || 0} resources`;
+      case 'resources_deposited':
+        return `Deposited: ${(data as any)?.amount || 0} resources`;
+      case 'production_started':
+        return `Production: ${(data as any)?.unitType || 'unit'} (cost: ${(data as any)?.cost || 0})`;
+      case 'production_progress_updated':
+        return `Production: ${(data as any)?.percentComplete || 0}% of ${(data as any)?.unitType || 'unit'}`;
+      case 'production_completed':
+        return `Production: ${(data as any)?.unitType || 'unit'} complete`;
+      case 'unit_spawned':
+        return `Spawned: ${(data as any)?.unitType || 'unit'} at (${(data as any)?.position?.x || 0},${(data as any)?.position?.y || 0})`;
+      case 'worker_assigned':
+        return `Assigned: ${(data as any)?.workerId || 'worker'} to ${(data as any)?.resourceType || 'resource'}`;
+      case 'worker_reassigned':
+        return `Reassigned: ${(data as any)?.workerId || 'worker'} to ${(data as any)?.newFieldId || 'field'} (${(data as any)?.reason || 'rebalance'})`;
       default:
         return JSON.stringify(data).substring(0, 60);
     }
