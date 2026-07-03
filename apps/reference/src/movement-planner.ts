@@ -7,19 +7,60 @@ import type { ExecutionTracer } from './execution-trace.js';
 /**
  * Movement Planner: Generates a plan to move an agent to a target location.
  *
+ * World-state driven planning:
+ * - Reads current agent position from the world state (not hardcoded)
+ * - Reads target from goal parameters: { targetX, targetY }
+ * - Generates movement steps relative to observed world
+ * - Skips planning entirely if goal is already satisfied
+ *
  * Algorithm: Simple Manhattan distance path
- * - From current position, generate steps to reach target
+ * - From observed position, generate steps to reach target
  * - Each step is a movement command (dx, dy)
  * - Steps are executed sequentially
  *
- * The planner reads the target from goal.parameters: { targetX, targetY }
- *
- * This demonstrates that applications can implement domain-specific planners
+ * This demonstrates world-state-driven planning in applications
  * while keeping the framework generic.
  */
 export class MovementPlanner implements Planner {
   async plan(request: PlanningRequest): Promise<PlanningResult> {
     return Promise.resolve(this.planSync(request));
+  }
+
+  /**
+   * Extract agent position from world state.
+   * Returns [x, y] coordinates or null if position cannot be determined.
+   */
+  private extractAgentPosition(worldState: any): [number, number] | null {
+    try {
+      if (!worldState || !worldState.agents || worldState.agents.length === 0) {
+        return null;
+      }
+
+      const agent = worldState.agents[0];
+      if (!agent.customData || agent.customData.position === undefined) {
+        return null;
+      }
+
+      const positionStr = agent.customData.position;
+      const match = positionStr.match(/^(\d+),(\d+)$/);
+      if (match) {
+        return [parseInt(match[1], 10), parseInt(match[2], 10)];
+      }
+
+      return null;
+    } catch {
+      return null;
+    }
+  }
+
+  /**
+   * Check if goal is already satisfied in the world state.
+   */
+  private isGoalSatisfied(targetX: number, targetY: number, worldState: any): boolean {
+    const position = this.extractAgentPosition(worldState);
+    if (!position) return false;
+    const [currentX, currentY] = position;
+    return currentX === targetX && currentY === targetY;
   }
 
   private planSync(request: PlanningRequest): PlanningResult {
@@ -63,10 +104,24 @@ export class MovementPlanner implements Planner {
         };
       }
 
-      // Generate movement steps
-      // Current position is always (0, 0) for the fake game adapter
-      const currentX = 0;
-      const currentY = 0;
+      // Check if goal is already satisfied in world state
+      if (this.isGoalSatisfied(targetX, targetY, request.worldState)) {
+        return {
+          metadata: {
+            timestamp: startTime,
+            plannerType: 'movement',
+            planningDurationMs: Date.now() - startTime,
+            reason: 'goal_already_satisfied',
+          },
+          diagnostics: [`Goal already satisfied: agent is at target (${targetX}, ${targetY})`],
+          errors: [],
+        };
+      }
+
+      // Read current agent position from world state (world-state driven)
+      const position = this.extractAgentPosition(request.worldState);
+      const currentX = position ? position[0] : 0;
+      const currentY = position ? position[1] : 0;
 
       const steps: PlanStep[] = [];
       let sequenceNumber = 0;
@@ -144,6 +199,9 @@ export class MovementPlanner implements Planner {
           stepCount: steps.length,
           targetX,
           targetY,
+          currentX,
+          currentY,
+          worldStateDriven: true,
         },
       });
 
@@ -153,9 +211,10 @@ export class MovementPlanner implements Planner {
           timestamp: startTime,
           plannerType: 'movement',
           planningDurationMs: Date.now() - startTime,
+          worldStateObserved: true,
         },
         diagnostics: [
-          `Movement planner: generated ${steps.length} steps to reach (${targetX}, ${targetY})`,
+          `Movement planner (world-state driven): agent at (${currentX}, ${currentY}), generated ${steps.length} steps to reach (${targetX}, ${targetY})`,
         ],
         errors: [],
       };

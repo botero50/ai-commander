@@ -28,6 +28,11 @@ import { ExecutionPreconditionValidator } from './execution-preconditions.js';
 import { PlanValidator } from './plan-validator.js';
 import { FailureDiagnoser, RecoveryStrategy } from './failure-diagnosis.js';
 import { GoalProgressEvaluator } from './goal-progress-evaluator.js';
+import { GoalEvaluator } from './goal-evaluator.js';
+import { GoalLifecycleTracker } from './goal-lifecycle-tracker.js';
+import { WorldStateTracker } from './world-state-tracker.js';
+import { ResourceGatherer } from './resource-gatherer.js';
+import { WorkerMovement, type MovementPhase } from './worker-movement.js';
 import type { Command } from '@ai-commander/domain';
 
 /**
@@ -60,6 +65,27 @@ export class MissionAgent {
   private failureDiagnoser = new FailureDiagnoser();
   private recoveryStrategy = new RecoveryStrategy();
   private progressEvaluator = new GoalProgressEvaluator();
+  private goalEvaluator = new GoalEvaluator();
+  private lifecycleTracker = new GoalLifecycleTracker();
+  private worldStateTracker = new WorldStateTracker();
+  private resourceGatherer = new ResourceGatherer();
+  private workerMovement = new WorkerMovement();
+  private goalLifecycleStates: Map<string, 'Queued' | 'Candidate' | 'Selected' | 'Executing' | 'Completed'> = new Map();
+  private currentGoalScore: number = 0;
+  private lastEvaluationScores: Map<string, number> = new Map();
+  private resourceFields: Map<string, any> = new Map();
+  private gatheringTargetFieldId: string | null = null;
+  private gatheringStartTick: number | null = null;
+  private gatheringDetectedAtTick: number | null = null;
+  private gatheringSelectedAtTick: number | null = null;
+  private gatheringMovementStartTick: number | null = null;
+  private gatheringArrivalTick: number | null = null;
+  private returningStartTick: number | null = null;
+  private returningArrivalTick: number | null = null;
+  private basePosition: { x: number; y: number } = { x: 20, y: 20 };
+  private currentMovementPhase: MovementPhase = 'idle';
+  private lastGatheringProgress: number = 0;
+  private resourcesCollected: number = 0;
   private progressHistory: Array<{ tick: number; percent: number }> = [];
   private lastProgressTrend: 'improving' | 'stable' | 'regressing' = 'stable';
 
@@ -248,6 +274,20 @@ export class MissionAgent {
     }
   }
 
+  private extractAgentPosition(worldState: WorldState): { x: number; y: number } {
+    const agent = (worldState.agents || [])[0];
+    if (agent && agent.customData?.position) {
+      const pos = agent.customData.position;
+      if (typeof pos === 'string') {
+        const match = (pos as string).match(/^(\d+),(\d+)$/);
+        if (match && match[1] && match[2]) {
+          return { x: parseInt(match[1], 10), y: parseInt(match[2], 10) };
+        }
+      }
+    }
+    return { x: 0, y: 0 };
+  }
+
   /**
    * Check if goal is satisfied in the current world state.
    * For "move-to-target": checks if agent position matches target coordinates.
@@ -281,6 +321,50 @@ export class MissionAgent {
     } catch {
       return false;
     }
+  }
+
+  /**
+   * Create candidate goals for evaluation.
+   *
+   * The GoalEvaluator supports any number of candidates.
+   * This demonstration uses 3 for observability.
+   * To add more candidates: create additional goals and push to array.
+   * To remove candidates: delete the corresponding goal creation.
+   * No changes needed to evaluation pipeline - it handles any count.
+   */
+  private createCandidateGoals(): any[] {
+    // Primary goal (mission objective)
+    const primaryGoal = this.currentGoal;
+
+    // Alternative goals (for demonstration - add/remove as needed)
+    const exploreGoal = createGoal({
+      id: createGoalId('explore'),
+      intent: 'explore-world',
+      status: GoalStatus.Pending,
+      priority: createGoalPriority(GoalPriorityLevel.LOW),
+      parameters: { radius: 50 },
+    });
+
+    const defendGoal = createGoal({
+      id: createGoalId('defend'),
+      intent: 'defend-position',
+      status: GoalStatus.Pending,
+      priority: createGoalPriority(GoalPriorityLevel.HIGH),
+      parameters: { position: { x: this.targetX, y: this.targetY } },
+    });
+
+    // Story 101: Economy bootstrapping - resource gathering goal
+    const gatherResourcesGoal = createGoal({
+      id: createGoalId('gather-resources'),
+      intent: 'gather-resources',
+      status: GoalStatus.Pending,
+      priority: createGoalPriority(GoalPriorityLevel.NORMAL),
+      parameters: { strategy: 'economy-bootstrap' },
+    });
+
+    // Return array of all candidates
+    // Pipeline evaluates all of them - order, count, and content are flexible
+    return [primaryGoal, exploreGoal, defendGoal, gatherResourcesGoal];
   }
 
   /**
@@ -410,6 +494,10 @@ export class MissionAgent {
     });
     this.currentGoal = goal;
 
+    // Initialize goal lifecycle tracking
+    this.goalLifecycleStates.set(goal.id, 'Queued');
+    this.lifecycleTracker.initialize(this.tracer.getTrace());
+
     console.log('\nStarting mission execution...');
     let tickCount = 0;
     const maxTicks = 100; // Safety limit
@@ -421,6 +509,9 @@ export class MissionAgent {
       console.log(`\n[Tick ${tickCount}] Executing agent tick...`);
 
       try {
+        // Use current goal (may have been adapted from previous tick)
+        const activeGoal = this.currentGoal;
+
         // Execute one tick
         await this.runtime.tick();
 
@@ -432,7 +523,328 @@ export class MissionAgent {
 
         // Evaluate goal progress from world state
         const worldState = await this.getWorldState();
-        const progressData = this.progressEvaluator.evaluateProgress(goal, worldState, tickCount);
+
+        // Evaluate multiple candidate goals
+        // The evaluator supports any number of candidates - add/remove as needed
+        // Currently demonstrating with 3 candidates for observability
+        const candidateGoals = this.createCandidateGoals();
+
+        const selectionResult = this.goalEvaluator.selectGoal(candidateGoals, worldState, tickCount);
+        this.tracer.recordGoalCandidatesEvaluated(Array.from(selectionResult.allEvaluations));
+        this.tracer.recordGoalSelected(selectionResult.selectedGoal, selectionResult.reasoning);
+
+        // Track lifecycle transitions for all candidate goals
+        for (const candidateGoal of candidateGoals) {
+          const currentState = this.goalLifecycleStates.get(candidateGoal.id) || 'Queued';
+
+          // Transition to Candidate when being evaluated
+          if (currentState === 'Queued') {
+            this.tracer.recordGoalLifecycleTransitioned(
+              candidateGoal.id,
+              candidateGoal.intent,
+              'Queued',
+              'Candidate',
+              'Entered evaluation'
+            );
+            this.goalLifecycleStates.set(candidateGoal.id, 'Candidate');
+          }
+
+          // Transition to Selected if this goal was chosen
+          if (candidateGoal.id === selectionResult.selectedGoal.id && currentState !== 'Selected') {
+            this.tracer.recordGoalLifecycleTransitioned(
+              candidateGoal.id,
+              candidateGoal.intent,
+              'Candidate',
+              'Selected',
+              selectionResult.reasoning
+            );
+            this.goalLifecycleStates.set(candidateGoal.id, 'Selected');
+          }
+        }
+
+        // Log goal evaluation
+        console.log(`  🎯 Goal Evaluation:`);
+        for (const evaluation of selectionResult.allEvaluations) {
+          const marker = evaluation.goal.id === activeGoal.id ? '→' : ' ';
+          console.log(
+            `    ${marker} ${evaluation.goal.intent}: ${evaluation.score.toFixed(3)} (priority: ${evaluation.priorityFactor.toFixed(2)}, urgency: ${evaluation.urgencyFactor.toFixed(2)}, feasibility: ${evaluation.feasibilityFactor.toFixed(2)})`
+          );
+        }
+
+        // Store evaluation scores for adaptation comparison
+        selectionResult.allEvaluations.forEach(evaluation => {
+          this.lastEvaluationScores.set(evaluation.goal.id, evaluation.score);
+        });
+
+        // Track world state and detect changes
+        const worldSnapshot = this.worldStateTracker.captureSnapshot(worldState, tickCount);
+        const worldChange = this.worldStateTracker.detectChanges(worldSnapshot);
+
+        // Check for goal adaptation opportunity
+        if (worldChange && worldChange.anyChange && selectionResult.selectedGoal.id !== activeGoal.id) {
+          const previousScore = this.lastEvaluationScores.get(activeGoal.id) || 0;
+          const newScore = selectionResult.evaluation.score;
+
+          // Only adapt if new goal is objectively better
+          const scoreImprovement = newScore - previousScore;
+          if (scoreImprovement > 0.05) {
+            // Threshold: 5% improvement required
+            console.log(
+              `  🔄 Goal Adaptation: ${activeGoal.intent} (${previousScore.toFixed(3)}) → ${selectionResult.selectedGoal.intent} (${newScore.toFixed(3)})`
+            );
+            console.log(`     Reason: ${worldChange.changeDescription}`);
+
+            this.tracer.recordGoalAdapted(
+              activeGoal.id,
+              activeGoal.intent,
+              selectionResult.selectedGoal.id,
+              selectionResult.selectedGoal.intent,
+              previousScore,
+              newScore,
+              worldChange.changeDescription,
+              `New goal is ${(scoreImprovement * 100).toFixed(1)}% better based on world-state change: ${worldChange.changeDescription}`
+            );
+
+            // Update active goal for next tick
+            this.currentGoal = selectionResult.selectedGoal;
+            this.currentGoalScore = newScore;
+          }
+        } else if (worldChange === null) {
+          // First tick - capture initial score
+          this.currentGoalScore = selectionResult.evaluation.score;
+        }
+
+        // Story 102: Handle resource gathering goal with observable events
+        if (activeGoal.intent === 'gather-resources') {
+          const agentPos = this.extractAgentPosition(worldState);
+          const availableFields = this.resourceGatherer.detectResourceFields(worldState, agentPos);
+
+          if (availableFields.length > 0) {
+            // Record field detection (once per mission)
+            if (!this.gatheringDetectedAtTick) {
+              availableFields.forEach(field => {
+                this.tracer.recordResourceFieldDetected(field.id, field.resourceType, field.amount, field.position);
+              });
+              this.gatheringDetectedAtTick = tickCount;
+            }
+
+            const selection = this.resourceGatherer.selectBestField(availableFields);
+
+            if (selection.selectedField && !this.gatheringTargetFieldId) {
+              this.gatheringTargetFieldId = selection.selectedField.id;
+              this.gatheringStartTick = tickCount;
+              this.gatheringSelectedAtTick = tickCount;
+
+              // Record field selection
+              this.tracer.recordResourceFieldSelected(
+                selection.selectedField.id,
+                selection.selectedField.resourceType,
+                selection.evaluations[0]?.score || 0,
+                selection.reasoning
+              );
+
+              // Record gathering start
+              this.tracer.recordGatheringStarted(
+                selection.selectedField.id,
+                selection.selectedField.resourceType,
+                selection.selectedField.amount
+              );
+
+              // Store resource fields for progress tracking
+              selection.evaluations.forEach(e => {
+                this.resourceFields.set(e.field.id, e.field);
+              });
+
+              console.log(`  💰 Selected resource field: ${selection.selectedField.resourceType} at (${selection.selectedField.position.x}, ${selection.selectedField.position.y})`);
+            }
+
+            // Story 104: Track real worker movement to resource field
+            if (this.gatheringTargetFieldId) {
+              const targetField = this.resourceFields.get(this.gatheringTargetFieldId);
+              if (targetField && agentPos) {
+                // Record movement start
+                if (!this.gatheringMovementStartTick) {
+                  this.gatheringMovementStartTick = tickCount;
+                  this.tracer.recordWorkerMovementStarted(
+                    this.gatheringTargetFieldId,
+                    targetField.position,
+                    agentPos
+                  );
+                }
+
+                // Track movement progress
+                const distance = this.workerMovement.calculateDistance(agentPos, targetField.position);
+                const initialDistance = this.workerMovement.calculateDistance(
+                  { x: agentPos.x, y: agentPos.y },
+                  targetField.position
+                );
+                const pathTraveled = Math.max(0, initialDistance - distance);
+                const pathPercent = initialDistance > 0 ? (pathTraveled / initialDistance) * 100 : 100;
+
+                // Detect arrival
+                const hasArrived = this.workerMovement.detectArrival(agentPos, targetField.position);
+                if (hasArrived && !this.gatheringArrivalTick) {
+                  this.gatheringArrivalTick = tickCount;
+                  this.currentMovementPhase = 'arrived';
+                  this.tracer.recordWorkerArrivalDetected(
+                    this.gatheringTargetFieldId,
+                    agentPos,
+                    tickCount - (this.gatheringMovementStartTick || tickCount)
+                  );
+                  console.log(`  ✓ Worker arrived at ${this.gatheringTargetFieldId}`);
+                } else if (!hasArrived) {
+                  this.currentMovementPhase = 'traveling';
+                  this.tracer.recordWorkerPositionUpdated(
+                    this.gatheringTargetFieldId,
+                    agentPos,
+                    targetField.position,
+                    distance,
+                    Math.floor(pathPercent)
+                  );
+                }
+
+                // Begin gathering only after arrival
+                if (hasArrived && !this.tracer.getTrace().events.some(e => e.eventType === 'worker_gathering_begun' && (e.data as any).fieldId === this.gatheringTargetFieldId)) {
+                  this.currentMovementPhase = 'gathering';
+                  this.tracer.recordWorkerGatheringBegun(
+                    this.gatheringTargetFieldId,
+                    targetField.resourceType,
+                    targetField.amount
+                  );
+
+                  // Story 105: Issue gather command to game session
+                  if (this.gameSession && targetField) {
+                    try {
+                      await this.gameSession.commandExecutor.executeCommand({
+                        type: 'gather',
+                        targetId: this.gatheringTargetFieldId,
+                        targetPosition: targetField.position,
+                      });
+                      console.log(`  → Issued gather command for ${this.gatheringTargetFieldId}`);
+                    } catch (e) {
+                      console.warn(`  ⚠ Failed to issue gather command: ${e}`);
+                    }
+                  }
+                }
+              }
+
+              // Track actual resource collection from world state
+              if (this.gatheringTargetFieldId && hasArrived) {
+                const currentField = this.resourceFields.get(this.gatheringTargetFieldId);
+                if (currentField) {
+                  const gatheringProgress = this.resourceGatherer.calculateGatheringProgress(
+                    this.gatheringTargetFieldId,
+                    this.gatheringArrivalTick || tickCount,
+                    tickCount,
+                    this.resourceFields
+                  );
+
+                  if (gatheringProgress) {
+                    this.tracer.recordGatheringProgressUpdated(
+                      gatheringProgress.targetFieldId,
+                      gatheringProgress.resourceType,
+                      gatheringProgress.amountCollected,
+                      gatheringProgress.amountRemaining,
+                      gatheringProgress.percentComplete,
+                      gatheringProgress.status
+                    );
+
+                    if (gatheringProgress.status === 'complete' && this.lastGatheringProgress < 100) {
+                      this.tracer.recordGatheringCompleted(
+                        gatheringProgress.targetFieldId,
+                        gatheringProgress.resourceType,
+                        gatheringProgress.amountCollected
+                      );
+                      console.log(`  ✓ Gathering complete: ${gatheringProgress.amountCollected} ${gatheringProgress.resourceType}`);
+
+                      // Story 106: Transition to returning resources
+                      this.resourcesCollected = gatheringProgress.amountCollected;
+                      this.currentMovementPhase = 'returning';
+                      this.returningStartTick = tickCount;
+                      this.tracer.recordWorkerReturnStarted(
+                        gatheringProgress.targetFieldId,
+                        gatheringProgress.resourceType,
+                        gatheringProgress.amountCollected,
+                        this.basePosition
+                      );
+                      console.log(`  → Starting return to base with ${gatheringProgress.amountCollected} ${gatheringProgress.resourceType}`);
+
+                      this.gatheringTargetFieldId = null;
+                    }
+
+                    this.lastGatheringProgress = gatheringProgress.percentComplete;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        // Story 106: Track return to base
+        if (this.currentMovementPhase === 'returning' && agentPos) {
+          const hasArrivedAtBase = agentPos.x === this.basePosition.x && agentPos.y === this.basePosition.y;
+
+          if (hasArrivedAtBase) {
+            if (!this.returningArrivalTick) {
+              this.returningArrivalTick = tickCount;
+              this.tracer.recordWorkerReturnComplete(
+                this.basePosition,
+                this.resourcesCollected,
+                tickCount - (this.returningStartTick || tickCount)
+              );
+
+              // Issue deposit command
+              if (this.gameSession) {
+                try {
+                  await this.gameSession.commandExecutor.executeCommand({
+                    type: 'deposit',
+                    targetId: 'base',
+                    amount: this.resourcesCollected,
+                  });
+                  this.tracer.recordResourcesDeposited(this.resourcesCollected);
+                  console.log(`  ✓ Deposited ${this.resourcesCollected} resources at base`);
+
+                  // Reset for next gather cycle
+                  this.currentMovementPhase = 'idle';
+                  this.returningStartTick = null;
+                  this.returningArrivalTick = null;
+                  this.resourcesCollected = 0;
+                } catch (e) {
+                  console.warn(`  ⚠ Failed to deposit: ${e}`);
+                }
+              }
+            }
+          } else if (this.returningStartTick) {
+            // Track return movement
+            const distance = this.workerMovement.calculateDistance(agentPos, this.basePosition);
+            const startPos = { x: 0, y: 0 };
+            const initialDistance = this.workerMovement.calculateDistance(startPos, this.basePosition);
+            const pathTraveled = Math.max(0, initialDistance - distance);
+            const returnPercent = initialDistance > 0 ? (pathTraveled / initialDistance) * 100 : 100;
+
+            this.tracer.recordWorkerReturnProgress(
+              agentPos,
+              this.basePosition,
+              distance,
+              Math.floor(returnPercent)
+            );
+          }
+        }
+
+        // Transition to Executing when we start making progress on the goal
+        const currentState = this.goalLifecycleStates.get(activeGoal.id) || 'Queued';
+        if (currentState === 'Selected') {
+          this.tracer.recordGoalLifecycleTransitioned(
+            activeGoal.id,
+            activeGoal.intent,
+            'Selected',
+            'Executing',
+            'Plan is being executed'
+          );
+          this.goalLifecycleStates.set(activeGoal.id, 'Executing');
+        }
+
+        const progressData = this.progressEvaluator.evaluateProgress(activeGoal, worldState, tickCount);
         this.tracer.recordGoalProgressUpdated(progressData);
 
         // Track progress history (keep last 5)
@@ -444,8 +856,8 @@ export class MissionAgent {
         // Check if trend changed
         if (progressData.trend !== this.lastProgressTrend) {
           this.tracer.recordGoalProgressTrendChanged(
-            goal.id,
-            goal.intent,
+            activeGoal.id,
+            activeGoal.intent,
             this.lastProgressTrend,
             progressData.trend
           );
@@ -458,13 +870,25 @@ export class MissionAgent {
         );
 
         // Check if goal is satisfied in world state
-        if (await this.isGoalSatisfied(goal)) {
+        if (await this.isGoalSatisfied(activeGoal)) {
+          // Transition to Completed
+          const execState = this.goalLifecycleStates.get(activeGoal.id) || 'Executing';
+          if (execState !== 'Completed') {
+            this.tracer.recordGoalLifecycleTransitioned(
+              activeGoal.id,
+              activeGoal.intent,
+              execState,
+              'Completed',
+              'Goal satisfied'
+            );
+            this.goalLifecycleStates.set(activeGoal.id, 'Completed');
+          }
           const agent = worldState.agents?.[0];
           const position = agent?.customData?.position || 'unknown';
           console.log(
             `  ✓ Mission goal achieved: agent reached target (${this.targetX}, ${this.targetY}) at position ${position}`
           );
-          this.tracer.recordGoalCompleted(goal.id, goal.intent, progressData.progressPercent);
+          this.tracer.recordGoalCompleted(activeGoal.id, activeGoal.intent, progressData.progressPercent);
           this.isComplete = true;
           this.tracer.recordMissionCompleted();
         }
@@ -479,8 +903,8 @@ export class MissionAgent {
         // Generate diagnosis
         const diagnosis = this.failureDiagnoser.diagnose({
           worldState,
-          goal,
-          plan: this.currentPlan ?? undefined,
+          goal: this.currentGoal,
+          plan: this.currentPlan,
           error: errorMsg,
         });
 
