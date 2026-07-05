@@ -27,7 +27,7 @@ This executes an autonomous AI mission to reach a target location. You'll see:
 - **Progress tracking** toward the goal
 - **Execution trace** of every decision and action
 
-For detailed features including the browser-based dashboard, see the [Getting Started](./GETTING_STARTED.md) guide.
+For detailed setup instructions, see the [Quick Start Guide](./docs/QUICK_START.md).
 
 ---
 

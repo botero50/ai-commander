@@ -11,8 +11,7 @@ New to AI Commander? Start here:
 1. **[Quick Start](QUICK_START.md)** (10 minutes)
    - Installation and first mission
    - Understanding the output
-   - Running CLI commands
-   - Troubleshooting
+   - Running commands
 
 ---
 
@@ -20,52 +19,23 @@ New to AI Commander? Start here:
 
 Want to understand how everything works?
 
-1. **[Developer Guide](DEVELOPER_GUIDE.md)** (20 minutes)
-   - Project structure
-   - Mission lifecycle
-   - How the planner works
-   - How the decision engine works
-   - Understanding execution traces
-   - Understanding metrics
-   - Understanding validation
-   - Understanding snapshots
-   - Using the CLI
-
----
-
-## Doing
-
-Ready to build and extend?
-
-1. **[How-To Guides](GUIDES.md)** (5 minutes each)
-   - Run a mission to a custom target
-   - Analyze mission with metrics
-   - Debug with execution traces
-   - Validate with replay
-   - Inspect mission state
-   - Generate reports
-   - Run tests
-   - Add custom coordinates
-   - View all commands
-   - Compare missions
-
----
-
-## Deep Dive
-
-Want to understand the architecture?
-
-1. **[Architecture](ARCHITECTURE.md)** (15 minutes)
+1. **[API Reference](API.md)** — Complete interface documentation
+2. **[ARCHITECTURE_BOOK.md](../ARCHITECTURE_BOOK.md)** — Comprehensive design reference
+3. **[Architecture](ARCHITECTURE.md)** (15 minutes)
    - Runtime execution flow
-   - Lifecycle timing
    - Component responsibilities
    - Data flow
-   - Observability pipeline
-   - Determinism design
-   - Immutability enforcement
-   - Extension points
    - Design principles
-   - Performance considerations
+
+---
+
+## Building & Testing
+
+Ready to extend and contribute?
+
+1. **[Contributing Guide](CONTRIBUTING.md)** — Development standards
+2. **[Testing Guide](TESTING.md)** — Test infrastructure
+3. **[FAQ](FAQ.md)** — Answers to common questions
 
 ---
 
@@ -77,21 +47,12 @@ Looking for specific information?
 | -------------------------- | -------------------------------- |
 | Installation               | QUICK_START.md                   |
 | First Mission              | QUICK_START.md                   |
-| CLI Commands               | GUIDES.md or `npm start -- help` |
-| Project Structure          | DEVELOPER_GUIDE.md               |
-| Mission Lifecycle          | DEVELOPER_GUIDE.md               |
-| Planner                    | DEVELOPER_GUIDE.md               |
-| Decision Engine            | DEVELOPER_GUIDE.md               |
-| Execution Traces           | DEVELOPER_GUIDE.md               |
-| Runtime Metrics            | DEVELOPER_GUIDE.md               |
-| Replay Validation          | DEVELOPER_GUIDE.md               |
-| Runtime Inspector          | DEVELOPER_GUIDE.md               |
-| Creating Custom Target     | GUIDES.md                        |
-| Analyzing Performance      | GUIDES.md                        |
-| Debugging Execution        | GUIDES.md                        |
-| Component Responsibilities | ARCHITECTURE.md                  |
-| Data Flow                  | ARCHITECTURE.md                  |
-| Extension Points           | ARCHITECTURE.md                  |
+| API Reference              | API.md                           |
+| Architecture               | ARCHITECTURE.md                  |
+| Complete Design Details    | ../ARCHITECTURE_BOOK.md          |
+| Contributing               | CONTRIBUTING.md                  |
+| Testing                    | TESTING.md                       |
+| Common Questions           | FAQ.md                           |
 
 ---
 
@@ -116,29 +77,11 @@ npm start
 ### Common Commands
 
 ```bash
-npm start -- run              # Execute mission
-npm start -- trace            # Print trace
-npm start -- metrics          # Print metrics
-npm start -- replay           # Validate
-npm start -- inspect          # Print state
-npm start -- report           # Full report
-npm start -- help             # Get help
+pnpm run mission              # Execute a mission
+pnpm run dashboard            # Start the browser dashboard
+pnpm test                      # Run test suite
 ```
 
-### With Options
-
-```bash
-npm start -- run --target-x 5 --target-y 4
-npm start -- trace --json
-npm start -- metrics --target-x 2 --target-y 2
-```
-
-### Run Tests
-
-```bash
-npm test
-cd apps/reference && npm test
-```
 
 ---
 
@@ -148,17 +91,23 @@ cd apps/reference && npm test
 docs/
 ├── README.md              ← You are here
 ├── QUICK_START.md         ← Start here (10 min)
-├── DEVELOPER_GUIDE.md     ← Understand (20 min)
-├── GUIDES.md              ← Learn by doing (5 min each)
-└── ARCHITECTURE.md        ← Deep dive (15 min)
+├── ARCHITECTURE.md        ← System design (15 min)
+├── API.md                 ← API reference
+├── TESTING.md             ← Test infrastructure
+├── CONTRIBUTING.md        ← Development guide
+└── FAQ.md                 ← Common questions
+
+Root:
+└── ARCHITECTURE_BOOK.md   ← Complete technical reference (52KB)
 ```
 
-Each document builds on the previous:
+Each document is self-contained and builds on QUICK_START:
 
 1. **QUICK_START** — Get it running
-2. **DEVELOPER_GUIDE** — Understand how it works
-3. **GUIDES** — Try practical tasks
-4. **ARCHITECTURE** — Understand the design
+2. **ARCHITECTURE** — Understand the design
+3. **API** — Reference for all interfaces
+4. **CONTRIBUTING** — Start building
+5. **ARCHITECTURE_BOOK** — Deep dive into design decisions
 
 ---
 
@@ -169,27 +118,28 @@ Each document builds on the previous:
 1. QUICK_START.md
 2. You're done - the agent is running
 
-### Path 2: Understand the Basics (30 minutes)
+### Path 2: Understand the Basics (25 minutes)
 
 1. QUICK_START.md (10 min)
-2. DEVELOPER_GUIDE.md (20 min)
+2. ARCHITECTURE.md (15 min)
 3. You understand the architecture
 
-### Path 3: Learn by Doing (45 minutes)
+### Path 3: Build Custom Agents (40+ minutes)
 
 1. QUICK_START.md (10 min)
-2. DEVELOPER_GUIDE.md (20 min)
-3. GUIDES.md - Pick 3 guides (5 min each, 15 min)
-4. You can extend and customize
+2. API.md (10 min)
+3. CONTRIBUTING.md (5 min)
+4. Review source code in apps/reference/src/
+5. You can extend and build custom agents
 
 ### Path 4: Complete Mastery (60+ minutes)
 
 1. QUICK_START.md (10 min)
-2. DEVELOPER_GUIDE.md (20 min)
-3. GUIDES.md - All guides (50 min)
-4. ARCHITECTURE.md (15 min)
+2. ARCHITECTURE.md (15 min)
+3. ARCHITECTURE_BOOK.md (20 min)
+4. TESTING.md (10 min)
 5. Review source code
-6. You're ready to build on it
+6. You're ready to build on it and contribute
 
 ---
 
@@ -220,16 +170,7 @@ Complete visibility into execution. This means:
 - See every decision
 - See every action
 - See performance metrics
-- See validation results
-
-### Orchestration
-
-Clean separation of concerns. This means:
-
-- Easy to replace planner
-- Easy to replace decision engine
-- Easy to extend observability
-- Easy to test each part
+- Complete execution traces
 
 ---
 
@@ -239,25 +180,25 @@ Clean separation of concerns. This means:
 A: Follow QUICK_START.md - about 10 minutes
 
 **Q: How do I understand how it works?**
-A: Read DEVELOPER_GUIDE.md - about 20 minutes
+A: Read ARCHITECTURE.md - about 15 minutes
 
-**Q: How do I modify it?**
-A: Follow guides in GUIDES.md - 5 minutes each
+**Q: How do I build custom agents?**
+A: See API.md and CONTRIBUTING.md
 
 **Q: How do I extend it?**
-A: See ARCHITECTURE.md Extension Points - plan accordingly
+A: See ARCHITECTURE.md and review source code
 
 **Q: Where's the source code?**
 A: `apps/reference/src/` - fully open and readable
 
 **Q: Can I run tests?**
-A: Yes - `npm test` - 541 tests passing
+A: Yes - `pnpm test` - 1870 tests passing
 
 **Q: What if something breaks?**
-A: Check troubleshooting in QUICK_START.md
+A: Check troubleshooting in QUICK_START.md and FAQ.md
 
-**Q: How do I report issues?**
-A: Check PROJECT_STATE.md and SESSION_HANDOFF.md for how to contribute
+**Q: How do I contribute?**
+A: See CONTRIBUTING.md
 
 ---
 
@@ -265,10 +206,10 @@ A: Check PROJECT_STATE.md and SESSION_HANDOFF.md for how to contribute
 
 These documents are kept in sync with the implementation:
 
-- Every CLI command documented is tested
 - Every code example compiles and runs
 - Every concept is explained with examples
 - Every procedure is step-by-step
+- All links point to current documentation
 
 If you find a discrepancy, something is out of date.
 
@@ -282,19 +223,23 @@ See **Troubleshooting** in QUICK_START.md
 
 ### For Understanding Concepts
 
-See **Developer Guide** sections in DEVELOPER_GUIDE.md
+See **Architecture** sections in ARCHITECTURE.md and ARCHITECTURE_BOOK.md
 
-### For How-To Questions
+### For API Questions
 
-See appropriate guide in GUIDES.md
+Check API.md for complete interface documentation
 
-### For Architecture Questions
+### For Common Issues
 
-See **Architecture** sections in ARCHITECTURE.md
+See FAQ.md
 
-### For Technical Questions
+### For Development Questions
 
-Read the source code - it's well-commented and designed to be understandable
+See CONTRIBUTING.md
+
+### For Technical Deep Dives
+
+Read the source code in apps/reference/src/ - it's well-commented and designed to be understandable
 
 ---
 
@@ -303,9 +248,9 @@ Read the source code - it's well-commented and designed to be understandable
 Choose your path:
 
 - **Just want to run it?** → [QUICK_START.md](QUICK_START.md)
-- **Want to understand it?** → [DEVELOPER_GUIDE.md](DEVELOPER_GUIDE.md)
-- **Want to use it?** → [GUIDES.md](GUIDES.md)
-- **Want to extend it?** → [ARCHITECTURE.md](ARCHITECTURE.md)
+- **Want to understand the design?** → [ARCHITECTURE.md](ARCHITECTURE.md)
+- **Want to build agents?** → [API.md](API.md)
+- **Want to contribute?** → [CONTRIBUTING.md](CONTRIBUTING.md)
 
 **Start with QUICK_START.md and spend 10 minutes.**
 
