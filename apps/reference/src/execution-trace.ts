@@ -79,7 +79,42 @@ export type TraceEventType =
   | 'mission_tick'
   | 'mission_completed'
   | 'mission_failed'
-  | 'mission_shutdown';
+  | 'mission_shutdown'
+  | 'economy_observed'
+  | 'economy_scaling_decision'
+  | 'economy_saturation_reached'
+  | 'expansion_observed'
+  | 'expansion_decision'
+  | 'expansion_started'
+  | 'expansion_progress_updated'
+  | 'expansion_completed'
+  | 'building_observed'
+  | 'building_decision'
+  | 'building_started'
+  | 'building_progress_updated'
+  | 'building_completed'
+  | 'military_production_observed'
+  | 'military_production_decision'
+  | 'military_production_started'
+  | 'military_unit_spawned'
+  | 'tactical_positioning_observed'
+  | 'tactical_positioning_decision'
+  | 'tactical_movement_started'
+  | 'tactical_arrival_detected'
+  | 'threat_scan_completed'
+  | 'threat_detected'
+  | 'threat_priority_updated'
+  | 'threat_resolved'
+  | 'combat_decision_made'
+  | 'combat_attack_issued'
+  | 'combat_retreat_ordered'
+  | 'combat_outcome_detected'
+  | 'army_groups_formed'
+  | 'army_group_coordination'
+  | 'army_group_disbanded'
+  | 'scouting_target_selected'
+  | 'scouting_movement_started'
+  | 'region_explored';
 
 export interface ExecutionTrace {
   readonly missionId: string;
@@ -583,6 +618,178 @@ export class ExecutionTracer {
     });
   }
 
+  recordEconomyObserved(snapshot: any): void {
+    this.addEvent('economy_observed', {
+      totalWorkers: snapshot.totalWorkers,
+      activeGatheringWorkers: snapshot.activeGatheringWorkers,
+      idleWorkers: snapshot.idleWorkers,
+      availableFieldCount: snapshot.availableFieldCount,
+      currentResources: snapshot.currentResources,
+      averageFieldSaturation: snapshot.averageFieldSaturation,
+      efficiency: snapshot.efficiency,
+    });
+  }
+
+  recordEconomyScalingDecision(decision: any): void {
+    this.addEvent('economy_scaling_decision', {
+      shouldProduce: decision.shouldProduce,
+      reason: decision.reason,
+      optimalWorkerCount: decision.optimalWorkerCount,
+      currentWorkerCount: decision.currentWorkerCount,
+      efficiency: decision.efficiency,
+    });
+  }
+
+  recordEconomySaturationReached(): void {
+    this.addEvent('economy_saturation_reached', {});
+  }
+
+  recordExpansionObserved(dropOffCount: number, fieldCount: number, avgDistance: number): void {
+    this.addEvent('expansion_observed', {
+      dropOffCount,
+      fieldCount,
+      avgDistance,
+    });
+  }
+
+  recordExpansionDecision(decision: any): void {
+    this.addEvent('expansion_decision', {
+      shouldExpand: decision.shouldExpand,
+      reason: decision.reason,
+      targetLocation: decision.targetLocation,
+      expectedGainPercent: decision.expectedGainPercent,
+    });
+  }
+
+  recordExpansionStarted(position: { x: number; y: number }, cost: number): void {
+    this.addEvent('expansion_started', {
+      position,
+      cost,
+    });
+  }
+
+  recordExpansionProgressUpdated(position: { x: number; y: number }, percentComplete: number): void {
+    this.addEvent('expansion_progress_updated', {
+      position,
+      percentComplete,
+    });
+  }
+
+  recordExpansionCompleted(position: { x: number; y: number }, constructionTime: number): void {
+    this.addEvent('expansion_completed', {
+      position,
+      constructionTime,
+    });
+  }
+
+  recordBuildingObserved(count: number): void {
+    this.addEvent('building_observed', { count });
+  }
+
+  recordBuildingDecision(decision: Record<string, unknown>): void {
+    this.addEvent('building_decision', decision);
+  }
+
+  recordBuildingStarted(buildingType: string, position: { x: number; y: number }): void {
+    this.addEvent('building_started', { buildingType, position });
+  }
+
+  recordBuildingProgressUpdated(position: { x: number; y: number }, percentComplete: number): void {
+    this.addEvent('building_progress_updated', { position, percentComplete });
+  }
+
+  recordBuildingCompleted(buildingType: string, position: { x: number; y: number }, constructionTime: number): void {
+    this.addEvent('building_completed', { buildingType, position, constructionTime });
+  }
+
+  recordMilitaryProductionObserved(buildingCount: number, unitCount: number): void {
+    this.addEvent('military_production_observed', { buildingCount, unitCount });
+  }
+
+  recordMilitaryProductionDecision(decision: Record<string, unknown>): void {
+    this.addEvent('military_production_decision', decision);
+  }
+
+  recordMilitaryProductionStarted(unitType: string, buildingId: string, position: { x: number; y: number }): void {
+    this.addEvent('military_production_started', { unitType, buildingId, position });
+  }
+
+  recordMilitaryUnitSpawned(unitType: string, unitId: string, position: { x: number; y: number }): void {
+    this.addEvent('military_unit_spawned', { unitType, unitId, position });
+  }
+
+  recordTacticalPositioningObserved(unitCount: number): void {
+    this.addEvent('tactical_positioning_observed', { unitCount });
+  }
+
+  recordTacticalPositioningDecision(decision: Record<string, unknown>): void {
+    this.addEvent('tactical_positioning_decision', decision);
+  }
+
+  recordTacticalMovementStarted(unitId: string, fromPosition: { x: number; y: number }, toPosition: { x: number; y: number }): void {
+    this.addEvent('tactical_movement_started', { unitId, fromPosition, toPosition });
+  }
+
+  recordTacticalArrivalDetected(unitId: string, position: { x: number; y: number }): void {
+    this.addEvent('tactical_arrival_detected', { unitId, position });
+  }
+
+  recordThreatScanCompleted(threatCount: number, highestPriority: number): void {
+    this.addEvent('threat_scan_completed', { threatCount, highestPriority });
+  }
+
+  recordThreatDetected(threatId: string, threatType: string, position: { x: number; y: number }, priority: number): void {
+    this.addEvent('threat_detected', { threatId, threatType, position, priority });
+  }
+
+  recordThreatPriorityUpdated(threatId: string, oldPriority: number, newPriority: number): void {
+    this.addEvent('threat_priority_updated', { threatId, oldPriority, newPriority });
+  }
+
+  recordThreatResolved(threatId: string): void {
+    this.addEvent('threat_resolved', { threatId });
+  }
+
+  recordCombatDecisionMade(decision: Record<string, unknown>): void {
+    this.addEvent('combat_decision_made', decision);
+  }
+
+  recordCombatAttackIssued(unitId: string, targetId: string, position: { x: number; y: number }): void {
+    this.addEvent('combat_attack_issued', { unitId, targetId, position });
+  }
+
+  recordCombatRetreatOrdered(unitId: string, reason: string): void {
+    this.addEvent('combat_retreat_ordered', { unitId, reason });
+  }
+
+  recordCombatOutcomeDetected(unitId: string, targetId: string, outcome: string): void {
+    this.addEvent('combat_outcome_detected', { unitId, targetId, outcome });
+  }
+
+  recordArmyGroupsFormed(groupCount: number, totalUnits: number): void {
+    this.addEvent('army_groups_formed', { groupCount, totalUnits });
+  }
+
+  recordArmyGroupCoordination(decision: Record<string, unknown>): void {
+    this.addEvent('army_group_coordination', decision);
+  }
+
+  recordArmyGroupDisbanded(groupId: string, reason: string): void {
+    this.addEvent('army_group_disbanded', { groupId, reason });
+  }
+
+  recordScoutingTargetSelected(scoutId: string, target: { x: number; y: number }, priority: number): void {
+    this.addEvent('scouting_target_selected', { scoutId, target, priority });
+  }
+
+  recordScoutingMovementStarted(scoutId: string, fromPosition: { x: number; y: number }, toPosition: { x: number; y: number }): void {
+    this.addEvent('scouting_movement_started', { scoutId, fromPosition, toPosition });
+  }
+
+  recordRegionExplored(position: { x: number; y: number }, coverage: number): void {
+    this.addEvent('region_explored', { position, coverage });
+  }
+
   getTrace(): ExecutionTrace {
     return Object.freeze({
       missionId: this.missionId,
@@ -692,6 +899,119 @@ export function formatTrace(trace: ExecutionTrace): string {
       lines.push(`    ✓ Recovery completed: ${event.data.outcome as string}`);
     } else if (event.eventType === 'world_state_updated') {
       lines.push(`    Position: (${event.data.agentX as number}, ${event.data.agentY as number})`);
+    } else if (event.eventType === 'economy_observed') {
+      lines.push(`    💰 Economy Snapshot`);
+      lines.push(`    Workers: ${event.data.totalWorkers as number} (${event.data.activeGatheringWorkers as number} gathering, ${event.data.idleWorkers as number} idle)`);
+      lines.push(`    Fields: ${event.data.availableFieldCount as number} | Resources: ${event.data.currentResources as number}`);
+      lines.push(`    Efficiency: ${((event.data.efficiency as number) * 100).toFixed(1)}%`);
+    } else if (event.eventType === 'economy_scaling_decision') {
+      lines.push(`    🔧 Scaling Decision: ${event.data.shouldProduce ? 'PRODUCE' : 'HOLD'}`);
+      lines.push(`    Reason: ${event.data.reason as string}`);
+      lines.push(`    Workers: ${event.data.currentWorkerCount as number} → ${event.data.optimalWorkerCount as number} (optimal)`);
+    } else if (event.eventType === 'economy_saturation_reached') {
+      lines.push(`    ✅ Economy Saturation Reached`);
+    } else if (event.eventType === 'expansion_observed') {
+      lines.push(`    🏗️  Expansion State`);
+      lines.push(`    Drop-offs: ${event.data.dropOffCount}, Fields: ${event.data.fieldCount}, Avg distance: ${event.data.avgDistance}`);
+    } else if (event.eventType === 'expansion_decision') {
+      lines.push(`    🔨 Expansion Decision: ${event.data.shouldExpand ? 'BUILD' : 'HOLD'}`);
+      lines.push(`    Reason: ${event.data.reason as string}`);
+    } else if (event.eventType === 'expansion_started') {
+      lines.push(`    🚧 Construction Started`);
+      lines.push(`    Position: (${(event.data.position as any).x}, ${(event.data.position as any).y})`);
+    } else if (event.eventType === 'expansion_progress_updated') {
+      lines.push(`    📊 Construction Progress: ${event.data.percentComplete}%`);
+    } else if (event.eventType === 'expansion_completed') {
+      lines.push(`    ✅ Expansion Complete`);
+      lines.push(`    Time: ${event.data.constructionTime} ticks`);
+    } else if (event.eventType === 'building_observed') {
+      lines.push(`    🏗️  Production Buildings Observed`);
+      lines.push(`    Count: ${event.data.count}`);
+    } else if (event.eventType === 'building_decision') {
+      lines.push(`    🔨 Building Decision: ${(event.data.shouldBuild as boolean) ? 'BUILD' : 'HOLD'}`);
+      lines.push(`    Reason: ${event.data.reason as string}`);
+    } else if (event.eventType === 'building_started') {
+      lines.push(`    🚧 Building Construction Started`);
+      lines.push(`    Type: ${event.data.buildingType}`);
+      lines.push(`    Position: (${(event.data.position as any).x}, ${(event.data.position as any).y})`);
+    } else if (event.eventType === 'building_progress_updated') {
+      lines.push(`    📊 Building Progress: ${event.data.percentComplete}%`);
+    } else if (event.eventType === 'building_completed') {
+      lines.push(`    ✅ Building Complete`);
+      lines.push(`    Type: ${event.data.buildingType}`);
+      lines.push(`    Time: ${event.data.constructionTime} ticks`);
+    } else if (event.eventType === 'military_production_observed') {
+      lines.push(`    🎖️  Military Production Observed`);
+      lines.push(`    Buildings: ${event.data.buildingCount} | Units: ${event.data.unitCount}`);
+    } else if (event.eventType === 'military_production_decision') {
+      lines.push(`    ⚔️  Military Production Decision: ${(event.data.shouldProduce as boolean) ? 'PRODUCE' : 'HOLD'}`);
+      lines.push(`    Reason: ${event.data.reason as string}`);
+    } else if (event.eventType === 'military_production_started') {
+      lines.push(`    🚀 Military Production Started`);
+      lines.push(`    Unit: ${event.data.unitType} | Building: ${event.data.buildingId}`);
+      lines.push(`    Position: (${(event.data.position as any).x}, ${(event.data.position as any).y})`);
+    } else if (event.eventType === 'military_unit_spawned') {
+      lines.push(`    💪 Military Unit Spawned`);
+      lines.push(`    Unit Type: ${event.data.unitType} | ID: ${event.data.unitId}`);
+      lines.push(`    Position: (${(event.data.position as any).x}, ${(event.data.position as any).y})`);
+    } else if (event.eventType === 'tactical_positioning_observed') {
+      lines.push(`    🎯 Tactical Positioning Observed`);
+      lines.push(`    Military Units: ${event.data.unitCount}`);
+    } else if (event.eventType === 'tactical_positioning_decision') {
+      lines.push(`    🗺️  Tactical Positioning Decision`);
+      lines.push(`    Unit: ${event.data.unitId} | Move: ${(event.data.shouldMove as boolean) ? 'YES' : 'NO'}`);
+      lines.push(`    Distance: ${event.data.distance} | Reason: ${event.data.reason}`);
+    } else if (event.eventType === 'tactical_movement_started') {
+      lines.push(`    ➡️  Tactical Movement Started`);
+      lines.push(`    Unit: ${event.data.unitId}`);
+      lines.push(`    From: (${(event.data.fromPosition as any).x}, ${(event.data.fromPosition as any).y}) → To: (${(event.data.toPosition as any).x}, ${(event.data.toPosition as any).y})`);
+    } else if (event.eventType === 'tactical_arrival_detected') {
+      lines.push(`    ✓ Tactical Arrival Detected`);
+      lines.push(`    Unit: ${event.data.unitId} | Position: (${(event.data.position as any).x}, ${(event.data.position as any).y})`);
+    } else if (event.eventType === 'threat_scan_completed') {
+      lines.push(`    🚨 Threat Scan Completed`);
+      lines.push(`    Active Threats: ${event.data.threatCount} | Highest Priority: ${((event.data.highestPriority as number) * 100).toFixed(0)}%`);
+    } else if (event.eventType === 'threat_detected') {
+      lines.push(`    ⚠️  Threat Detected`);
+      lines.push(`    Type: ${event.data.threatType} | Priority: ${((event.data.priority as number) * 100).toFixed(0)}%`);
+      lines.push(`    Position: (${(event.data.position as any).x}, ${(event.data.position as any).y})`);
+    } else if (event.eventType === 'threat_priority_updated') {
+      lines.push(`    📊 Threat Priority Updated`);
+      lines.push(`    Threat: ${event.data.threatId} | ${((event.data.oldPriority as number) * 100).toFixed(0)}% → ${((event.data.newPriority as number) * 100).toFixed(0)}%`);
+    } else if (event.eventType === 'threat_resolved') {
+      lines.push(`    ✓ Threat Resolved`);
+      lines.push(`    Threat: ${event.data.threatId}`);
+    } else if (event.eventType === 'combat_decision_made') {
+      lines.push(`    ⚔️  Combat Decision: ${event.data.action}`);
+      lines.push(`    Unit: ${event.data.unitId} | Reason: ${event.data.reason}`);
+    } else if (event.eventType === 'combat_attack_issued') {
+      lines.push(`    🔥 Combat Attack Issued`);
+      lines.push(`    Unit: ${event.data.unitId} → Target: ${event.data.targetId}`);
+      lines.push(`    Position: (${(event.data.position as any).x}, ${(event.data.position as any).y})`);
+    } else if (event.eventType === 'combat_retreat_ordered') {
+      lines.push(`    🏃 Combat Retreat Ordered`);
+      lines.push(`    Unit: ${event.data.unitId} | Reason: ${event.data.reason}`);
+    } else if (event.eventType === 'combat_outcome_detected') {
+      lines.push(`    📊 Combat Outcome`);
+      lines.push(`    Unit: ${event.data.unitId} vs Target: ${event.data.targetId} | Result: ${event.data.outcome}`);
+    } else if (event.eventType === 'army_groups_formed') {
+      lines.push(`    🎖️  Army Groups Formed`);
+      lines.push(`    Groups: ${event.data.groupCount} | Total Units: ${event.data.totalUnits}`);
+    } else if (event.eventType === 'army_group_coordination') {
+      lines.push(`    🔗 Army Group Coordination`);
+      lines.push(`    Group: ${event.data.groupId} | Action: ${event.data.action} | Cohesion: ${((event.data.cohesionScore as number) * 100).toFixed(0)}%`);
+    } else if (event.eventType === 'army_group_disbanded') {
+      lines.push(`    💔 Army Group Disbanded`);
+      lines.push(`    Group: ${event.data.groupId} | Reason: ${event.data.reason}`);
+    } else if (event.eventType === 'scouting_target_selected') {
+      lines.push(`    🔭 Scouting Target Selected`);
+      lines.push(`    Scout: ${event.data.scoutId} | Target: (${(event.data.target as any).x}, ${(event.data.target as any).y})`);
+    } else if (event.eventType === 'scouting_movement_started') {
+      lines.push(`    👁️  Scouting Movement Started`);
+      lines.push(`    Scout: ${event.data.scoutId} | From: (${(event.data.fromPosition as any).x}, ${(event.data.fromPosition as any).y}) → To: (${(event.data.toPosition as any).x}, ${(event.data.toPosition as any).y})`);
+    } else if (event.eventType === 'region_explored') {
+      lines.push(`    ✓ Region Explored`);
+      lines.push(`    Position: (${(event.data.position as any).x}, ${(event.data.position as any).y}) | Coverage: ${((event.data.coverage as number) * 100).toFixed(1)}%`);
     }
 
     lines.push('');

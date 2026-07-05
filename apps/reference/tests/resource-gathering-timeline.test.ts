@@ -383,7 +383,7 @@ describe('Story 103: Resource Gathering Timeline Visualization', () => {
       });
 
       const inspection = inspector.inspectTick(1);
-      expect(inspection?.gatheringProgress).toBeNull();
+      expect(inspection?.gatheringProgress).toBeUndefined();
     });
 
     it('should handle timeline with only detection', () => {

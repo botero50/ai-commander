@@ -33,6 +33,15 @@ import { GoalLifecycleTracker } from './goal-lifecycle-tracker.js';
 import { WorldStateTracker } from './world-state-tracker.js';
 import { ResourceGatherer } from './resource-gatherer.js';
 import { WorkerMovement, type MovementPhase } from './worker-movement.js';
+import { EconomyScaler } from './economy-scaler.js';
+import { BaseExpansion } from './base-expansion.js';
+import { BuildingConstruction } from './building-construction.js';
+import { MilitaryProduction } from './military-production.js';
+import { TacticalPositioning } from './tactical-positioning.js';
+import { ThreatDetection } from './threat-detection.js';
+import { CombatDecisionMaker } from './combat-decision.js';
+import { ArmyCoordination } from './army-coordination.js';
+import { Scouting } from './scouting.js';
 import type { Command } from '@ai-commander/domain';
 
 /**
@@ -70,6 +79,15 @@ export class MissionAgent {
   private worldStateTracker = new WorldStateTracker();
   private resourceGatherer = new ResourceGatherer();
   private workerMovement = new WorkerMovement();
+  private economyScaler = new EconomyScaler();
+  private baseExpansion = new BaseExpansion();
+  private buildingConstruction = new BuildingConstruction();
+  private militaryProduction = new MilitaryProduction();
+  private tacticalPositioning = new TacticalPositioning();
+  private threatDetection = new ThreatDetection();
+  private combatDecisionMaker = new CombatDecisionMaker();
+  private armyCoordination = new ArmyCoordination();
+  private scouting = new Scouting();
   private goalLifecycleStates: Map<string, 'Queued' | 'Candidate' | 'Selected' | 'Executing' | 'Completed'> = new Map();
   private currentGoalScore: number = 0;
   private lastEvaluationScores: Map<string, number> = new Map();
@@ -614,9 +632,341 @@ export class MissionAgent {
           this.currentGoalScore = selectionResult.evaluation.score;
         }
 
+        // Story 109: Autonomous Economy Scaling - decide whether to produce workers
+        const economySnapshot = this.economyScaler.observeEconomy(worldState);
+        this.tracer.recordEconomyObserved(economySnapshot);
+
+        const scalingDecision = this.economyScaler.decideProduction(economySnapshot);
+        this.tracer.recordEconomyScalingDecision(scalingDecision);
+
+        if (scalingDecision.shouldProduce && this.gameSession) {
+          // Produce a worker
+          try {
+            const cost = this.economyScaler.getWorkerCost();
+            await this.gameSession.commandExecutor.executeCommand({
+              type: 'produce',
+              unitType: 'worker',
+              cost,
+            });
+            console.log(`  🏭 Produced worker (efficiency: ${(economySnapshot.efficiency * 100).toFixed(1)}%)`);
+          } catch (e) {
+            console.warn(`  ⚠ Failed to produce worker: ${e}`);
+          }
+        } else {
+          const reason = scalingDecision.reason.split(':')[0];
+          console.log(`  ⏸️  Worker production on hold (${reason})`);
+        }
+
+        // Story 110: Autonomous Base Expansion
+        const dropOffs = this.baseExpansion.observeDropOffs(worldState);
+        const fields = this.baseExpansion.observeFields(worldState);
+        const avgDist = fields.length > 0
+          ? fields.reduce((sum, f) => {
+              const dists = dropOffs.map(d => Math.abs(d.position.x - f.position.x) + Math.abs(d.position.y - f.position.y));
+              return sum + (dists.length > 0 ? Math.min(...dists) : 50);
+            }, 0) / fields.length
+          : 0;
+
+        this.tracer.recordExpansionObserved(dropOffs.length, fields.length, avgDist);
+
+        const expansionDecision = this.baseExpansion.decideExpansion(
+          dropOffs,
+          fields,
+          economySnapshot.currentResources
+        );
+        this.tracer.recordExpansionDecision(expansionDecision);
+
+        if (expansionDecision.shouldExpand && expansionDecision.targetLocation && this.gameSession) {
+          try {
+            await this.gameSession.commandExecutor.executeCommand({
+              type: 'construct',
+              buildingType: 'dropoff',
+              position: expansionDecision.targetLocation.position,
+              cost: this.baseExpansion.getConstructionCost(),
+            });
+            this.tracer.recordExpansionStarted(
+              expansionDecision.targetLocation.position,
+              this.baseExpansion.getConstructionCost()
+            );
+            console.log(`  🏗️  Starting expansion at (${expansionDecision.targetLocation.position.x}, ${expansionDecision.targetLocation.position.y})`);
+          } catch (e) {
+            console.warn(`  ⚠ Failed to start expansion: ${e}`);
+          }
+        } else if (!expansionDecision.shouldExpand) {
+          const reason = expansionDecision.reason.split(':')[0];
+          console.log(`  ⏸️  Expansion on hold (${reason})`);
+        }
+
+        // Story 111: Autonomous Building Construction
+        const productionBuildings = this.buildingConstruction.observeProductionBuildings(worldState);
+        const dropOffsForBuilding = this.buildingConstruction.observeDropOffBuildings(worldState);
+        this.tracer.recordBuildingObserved(productionBuildings.length);
+
+        const workerCount = worldState.agents?.length ?? 0;
+        const buildingDecision = this.buildingConstruction.decideBuild(
+          productionBuildings,
+          dropOffsForBuilding,
+          economySnapshot.currentResources,
+          workerCount
+        );
+        this.tracer.recordBuildingDecision(buildingDecision);
+
+        if (buildingDecision.shouldBuild && buildingDecision.targetPosition && this.gameSession) {
+          try {
+            await this.gameSession.commandExecutor.executeCommand({
+              type: 'construct',
+              buildingType: buildingDecision.buildingType,
+              position: buildingDecision.targetPosition,
+              cost: this.buildingConstruction.getConstructionCost(),
+            });
+            this.tracer.recordBuildingStarted(
+              buildingDecision.buildingType,
+              buildingDecision.targetPosition
+            );
+            console.log(`  🏗️  Starting construction at (${buildingDecision.targetPosition.x}, ${buildingDecision.targetPosition.y})`);
+          } catch (e) {
+            console.warn(`  ⚠ Failed to start building construction: ${e}`);
+          }
+        } else if (!buildingDecision.shouldBuild) {
+          const reason = buildingDecision.reason.split(':')[0];
+          console.log(`  ⏸️  Building on hold (${reason})`);
+        }
+
+        // Story 112: Autonomous Military Unit Production
+        const militaryBuildings = this.militaryProduction.observeProductionBuildings(worldState);
+        const militaryUnitCount = worldState.agents?.filter((a: any) => a.customData?.isMilitary).length ?? 0;
+        this.tracer.recordMilitaryProductionObserved(militaryBuildings.length, militaryUnitCount);
+
+        const militaryDecision = this.militaryProduction.decideMilitaryProduction(
+          militaryBuildings,
+          economySnapshot.currentResources,
+          workerCount,
+          militaryUnitCount
+        );
+        this.tracer.recordMilitaryProductionDecision(militaryDecision);
+
+        if (militaryDecision.shouldProduce && militaryDecision.selectedBuilding && militaryDecision.buildingPosition && this.gameSession) {
+          try {
+            await this.gameSession.commandExecutor.executeCommand({
+              type: 'produce',
+              buildingId: militaryDecision.selectedBuilding,
+              unitType: militaryDecision.unitType,
+              cost: this.militaryProduction.getProductionCost(),
+            });
+            this.tracer.recordMilitaryProductionStarted(
+              militaryDecision.unitType,
+              militaryDecision.selectedBuilding,
+              militaryDecision.buildingPosition
+            );
+            console.log(`  🎖️  Starting military production: ${militaryDecision.unitType}`);
+          } catch (e) {
+            console.warn(`  ⚠ Failed to start military production: ${e}`);
+          }
+        } else if (!militaryDecision.shouldProduce) {
+          const reason = militaryDecision.reason.split(':')[0];
+          console.log(`  ⏸️  Military production on hold (${reason})`);
+        }
+
+        // Story 113: Autonomous Tactical Positioning
+        const tacticallUnits = this.tacticalPositioning.observeMilitaryUnits(worldState);
+        this.tracer.recordTacticalPositioningObserved(tacticallUnits.length);
+
+        const friendlyStructures = this.tacticalPositioning.observeFriendlyStructures(worldState);
+        const resourceLocations = this.tacticalPositioning.observeResourceLocations(worldState);
+
+        for (const unit of tacticallUnits) {
+          const targetPosition = this.tacticalPositioning.determineTacticalPosition(
+            unit,
+            friendlyStructures,
+            resourceLocations,
+            tacticallUnits
+          );
+
+          const decision = this.tacticalPositioning.decideRepositioning(unit, targetPosition, tacticallUnits);
+          this.tracer.recordTacticalPositioningDecision(decision);
+
+          if (decision.shouldMove && this.gameSession) {
+            try {
+              await this.gameSession.commandExecutor.executeCommand({
+                type: 'move',
+                unitId: unit.id,
+                position: decision.targetPosition,
+              });
+              this.tracer.recordTacticalMovementStarted(
+                unit.id,
+                decision.currentPosition,
+                decision.targetPosition
+              );
+              console.log(`  🎯 Unit ${unit.id} repositioning to (${decision.targetPosition.x}, ${decision.targetPosition.y})`);
+            } catch (e) {
+              console.warn(`  ⚠ Failed to move unit ${unit.id}: ${e}`);
+            }
+          }
+        }
+
+        // Story 114: Autonomous Threat Detection
+        const enemyUnits = this.threatDetection.observeEnemyUnits(worldState);
+        const enemyStructures = this.threatDetection.observeEnemyStructures(worldState);
+        const friendlyAssets = this.threatDetection.observeFriendlyAssets(worldState);
+
+        const threatModel = this.threatDetection.buildThreatModel(
+          enemyUnits,
+          enemyStructures,
+          friendlyAssets
+        );
+
+        this.tracer.recordThreatScanCompleted(threatModel.activeThreatCount, threatModel.highestPriority);
+
+        // Record new threats
+        const newThreats = this.threatDetection.getNewThreats(threatModel);
+        for (const threat of newThreats) {
+          this.tracer.recordThreatDetected(threat.id, threat.threatType, threat.position, threat.priority);
+          console.log(`  🚨 Threat detected: ${threat.subType} at (${threat.position.x}, ${threat.position.y}), priority: ${(threat.priority * 100).toFixed(0)}%`);
+        }
+
+        // Record resolved threats
+        const resolvedThreats = this.threatDetection.getResolvedThreats(threatModel);
+        for (const threatId of resolvedThreats) {
+          this.tracer.recordThreatResolved(threatId);
+          console.log(`  ✓ Threat resolved: ${threatId}`);
+        }
+
+        this.threatDetection.updateThreatState(threatModel);
+
+        // Story 115: Autonomous Combat Decision Making
+        const combatUnits = tacticallUnits.map(u => ({
+          id: u.id,
+          position: u.position,
+          unitType: u.unitType,
+          health: 1.0,
+        }));
+
+        for (const unit of combatUnits) {
+          const combatDecision = this.combatDecisionMaker.decideCombatAction(
+            unit,
+            threatModel.threats,
+            combatUnits.length
+          );
+
+          this.tracer.recordCombatDecisionMade(combatDecision);
+
+          if (combatDecision.action === 'attack' && combatDecision.targetPosition && this.gameSession) {
+            try {
+              await this.gameSession.commandExecutor.executeCommand({
+                type: 'attack',
+                unitId: unit.id,
+                targetId: combatDecision.targetId,
+                targetPosition: combatDecision.targetPosition,
+              });
+              this.tracer.recordCombatAttackIssued(
+                unit.id,
+                combatDecision.targetId || '',
+                combatDecision.targetPosition
+              );
+              console.log(`  🔥 Unit ${unit.id} attacking target ${combatDecision.targetId}`);
+            } catch (e) {
+              console.warn(`  ⚠ Failed to issue attack order: ${e}`);
+            }
+          } else if (combatDecision.action === 'retreat') {
+            this.tracer.recordCombatRetreatOrdered(unit.id, combatDecision.reason);
+            console.log(`  🏃 Unit ${unit.id} retreating (${combatDecision.reason})`);
+          }
+        }
+
+        // Story 116: Autonomous Army Coordination
+        const armyUnits = combatUnits.map(u => ({
+          id: u.id,
+          position: u.position,
+          unitType: u.unitType,
+          health: u.health,
+        }));
+
+        const armyGroups = this.armyCoordination.formMilitaryGroups(armyUnits);
+        this.tracer.recordArmyGroupsFormed(armyGroups.length, armyUnits.length);
+
+        const unitMap = new Map(armyUnits.map(u => [u.id, u]));
+        const armyObjective = threatModel.threats.length > 0
+          ? threatModel.threats[0].position
+          : null;
+
+        for (const group of armyGroups) {
+          const coordDecision = this.armyCoordination.decideGroupAction(
+            group,
+            unitMap,
+            armyObjective
+          );
+
+          this.tracer.recordArmyGroupCoordination(coordDecision);
+
+          if (coordDecision.action === 'advance' && armyObjective && this.gameSession) {
+            try {
+              for (const unitId of coordDecision.unitIds) {
+                await this.gameSession.commandExecutor.executeCommand({
+                  type: 'move',
+                  unitId,
+                  position: armyObjective,
+                });
+              }
+              console.log(`  🔗 Group ${group.id} advancing toward objective`);
+            } catch (e) {
+              console.warn(`  ⚠ Failed to coordinate group movement: ${e}`);
+            }
+          }
+        }
+
+        const newGroups = this.armyCoordination.getNewGroups(armyGroups);
+        for (const group of newGroups) {
+          console.log(`  🎖️  Army group formed: ${group.id} (${group.unitCount} units)`);
+        }
+
+        const disbandedGroups = this.armyCoordination.getDisbandedGroups(armyGroups);
+        for (const groupId of disbandedGroups) {
+          this.tracer.recordArmyGroupDisbanded(groupId, 'unit_loss');
+          console.log(`  💔 Army group disbanded: ${groupId}`);
+        }
+
+        this.armyCoordination.updateGroupState(armyGroups);
+
+        // Story 117: Scouting
+        const scouts = this.scouting.observeScouts(worldState);
+        for (const scout of scouts) {
+          this.scouting.recordExploration(scout.position);
+
+          const target = this.scouting.determineScoutTarget(scout.position);
+          this.tracer.recordScoutingTargetSelected(scout.id, target.position, target.priority);
+
+          const decision = this.scouting.decideScoutMovement(scout, target);
+
+          if (decision.shouldMove && this.gameSession) {
+            try {
+              await this.gameSession.commandExecutor.executeCommand({
+                type: 'move',
+                unitId: scout.id,
+                position: decision.targetPosition,
+              });
+              this.tracer.recordScoutingMovementStarted(
+                scout.id,
+                decision.currentPosition,
+                decision.targetPosition
+              );
+              console.log(`  🔭 Scout ${scout.id} moving to (${decision.targetPosition.x}, ${decision.targetPosition.y})`);
+            } catch (e) {
+              console.warn(`  ⚠ Failed to move scout: ${e}`);
+            }
+          }
+        }
+
+        const coverage = this.scouting.getExplorationCoverage();
+        if (scouts.length > 0 && coverage > 0) {
+          this.tracer.recordRegionExplored(scouts[0].position, coverage);
+        }
+
         // Story 102: Handle resource gathering goal with observable events
+        let agentPos: { x: number; y: number } | null = null;
+        let hasArrived = false;
+
         if (activeGoal.intent === 'gather-resources') {
-          const agentPos = this.extractAgentPosition(worldState);
+          agentPos = this.extractAgentPosition(worldState);
           const availableFields = this.resourceGatherer.detectResourceFields(worldState, agentPos);
 
           if (availableFields.length > 0) {
@@ -682,7 +1032,7 @@ export class MissionAgent {
                 const pathPercent = initialDistance > 0 ? (pathTraveled / initialDistance) * 100 : 100;
 
                 // Detect arrival
-                const hasArrived = this.workerMovement.detectArrival(agentPos, targetField.position);
+                hasArrived = this.workerMovement.detectArrival(agentPos, targetField.position);
                 if (hasArrived && !this.gatheringArrivalTick) {
                   this.gatheringArrivalTick = tickCount;
                   this.currentMovementPhase = 'arrived';
@@ -904,7 +1254,7 @@ export class MissionAgent {
         const diagnosis = this.failureDiagnoser.diagnose({
           worldState,
           goal: this.currentGoal,
-          plan: this.currentPlan,
+          plan: this.currentPlan || undefined,
           error: errorMsg,
         });
 
@@ -1083,6 +1433,13 @@ export class MissionAgent {
       return 'Replay report not available (mission not yet complete)';
     }
     return formatReplayReport(this.replayReport);
+  }
+
+  /**
+   * Get the agent runtime for diagnostic purposes.
+   */
+  getRuntime(): AgentRuntime | null {
+    return this.runtime;
   }
 
   /**
