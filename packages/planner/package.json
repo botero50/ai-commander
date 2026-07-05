@@ -1,9 +1,16 @@
 {
   "name": "@ai-commander/planner",
   "version": "1.0.0",
+  "description": "Planning algorithms and step sequencing for autonomous agents",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
   "files": [
     "dist",
     "README.md"
