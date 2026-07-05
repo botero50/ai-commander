@@ -4,34 +4,30 @@
 
 ![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
 ![Node.js: >=22.0.0](https://img.shields.io/badge/node.js-%3E%3D22.0.0-brightgreen)
-![TypeScript: 5.5+](https://img.shields.io/badge/typescript-5.5%2B-blue)
-![Tests: 919+](https://img.shields.io/badge/tests-919%2B-brightgreen)
+![TypeScript: 5.6+](https://img.shields.io/badge/typescript-5.6%2B-blue)
+![Tests: 1870+](https://img.shields.io/badge/tests-1870%2B-brightgreen)
 ![Status: Stable](https://img.shields.io/badge/status-stable-brightgreen)
 
 ---
 
 ## Experience AI Commander in 5 Minutes
 
-Start here. Clone, install, and see autonomous AI in action:
+Start here. Clone, install, and run your first mission:
 
 ```bash
 git clone https://github.com/anthropics/ai-commander
 cd ai-commander
 pnpm install
-pnpm demo
+pnpm run mission
 ```
 
-This launches a browser dashboard showing a real-time AI agent controlling a simulated world. Watch the agent:
-- **Perceive** the world state
-- **Plan** a sequence of actions
-- **Decide** the next command to execute
-- **Execute** commands in the game
+This executes an autonomous AI mission to reach a target location. You'll see:
+- **Real-time execution** with goal evaluation at each tick
+- **Decision reasoning** showing why each action was chosen
+- **Progress tracking** toward the goal
+- **Execution trace** of every decision and action
 
-The dashboard displays:
-- **Live execution** with tick-by-tick progress
-- **Timeline** of all events and decisions
-- **Inspection** — click any event to see what the AI knew at that moment
-- **Comparison** — compare any two ticks to understand state changes
+For detailed features including the browser-based dashboard, see the [Getting Started](./GETTING_STARTED.md) guide.
 
 ---
 
@@ -49,14 +45,13 @@ The framework is **game-agnostic** and **AI-agnostic**: you integrate any game (
 
 ### Key Characteristics
 
-✅ **Production-Proven:** Validated across 120+ mission executions with 0 failures  
+✅ **Thoroughly Tested:** 1870+ tests, 100% passing rate, covering all systems  
 ✅ **Deterministic:** Identical inputs produce identical outputs for reproducible testing  
 ✅ **Composable:** Build agents by assembling simple components  
-✅ **Well-Tested:** 919+ tests, 100% passing rate  
 ✅ **TypeScript:** Type-safe with strict mode enabled  
-✅ **Observable:** Complete execution traces and metrics  
-✅ **Debuggable:** Browser-based dashboard for step-through debugging  
-✅ **Zero Heavy Dependencies:** Minimal external libraries
+✅ **Observable:** Complete execution traces with 100+ event types  
+✅ **Debuggable:** Browser dashboard and CLI tools for analysis  
+✅ **Zero Heavy Dependencies:** Only 'open' package, minimal external libraries
 
 ---
 
@@ -77,10 +72,10 @@ A real-time debugger showing:
 ### Complete Observability
 
 Every mission produces:
-- **Execution Trace** — 19 event types recording every decision and action
-- **Runtime Metrics** — 26 measurements of performance and behavior
-- **Replay Report** — validation of execution consistency
-- **JSON Export** — for analysis and integration
+- **Execution Trace** — Comprehensive event recording of every decision, action, and state change
+- **Runtime Metrics** — Performance measurements (timing, tick count, command success rate)
+- **Replay Report** — Validation of execution consistency
+- **JSON Export** — For analysis and integration with external tools
 
 ### Deterministic Execution
 
