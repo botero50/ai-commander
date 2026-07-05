@@ -148,6 +148,7 @@ export class DashboardServer {
   private state: DashboardState;
   private clients: ServerResponse[] = [];
   private controlCallbacks: Map<string, (cmd: string) => Promise<void>> = new Map();
+  private stateChangeCallbacks: Map<string, (state: DashboardState) => void> = new Map();
   private debugger: DashboardDebugger = new DashboardDebugger();
   private inspector: TimelineInspector = new TimelineInspector();
 
@@ -201,6 +202,13 @@ export class DashboardServer {
   }
 
   /**
+   * Register a state change callback handler.
+   */
+  onStateChange(callback: (state: DashboardState) => void): void {
+    this.stateChangeCallbacks.set('handler', callback);
+  }
+
+  /**
    * Initialize debugger with trace data.
    */
   initializeDebugger(trace: ExecutionTrace, metrics: RuntimeMetrics): void {
@@ -220,6 +228,10 @@ export class DashboardServer {
       ...this.state,
       ...newState,
     });
+    const callback = this.stateChangeCallbacks.get('handler');
+    if (callback) {
+      callback(this.state);
+    }
     this.broadcastState();
   }
 
