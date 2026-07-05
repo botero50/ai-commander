@@ -119,7 +119,8 @@ export type TraceEventType =
   | 'enemy_position_updated'
   | 'enemy_lost'
   | 'defense_assigned'
-  | 'defense_recalled';
+  | 'defense_recalled'
+  | 'map_analysis_completed';
 
 export interface ExecutionTrace {
   readonly missionId: string;
