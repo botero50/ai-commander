@@ -1,9 +1,28 @@
 {
   "name": "ai-commander",
+  "version": "1.0.0",
   "private": true,
   "type": "module",
   "description": "AI Commander - Framework for building AI-controlled strategy game agents",
+  "keywords": [
+    "ai",
+    "strategy-games",
+    "agents",
+    "planning",
+    "decision-making",
+    "game-development",
+    "autonomous-agents",
+    "framework"
+  ],
+  "author": "Anthropic",
   "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/anthropics/ai-commander"
+  },
+  "bugs": {
+    "url": "https://github.com/anthropics/ai-commander/issues"
+  },
   "engines": {
     "node": ">=22.0.0"
   },

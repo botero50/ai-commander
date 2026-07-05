@@ -1,9 +1,16 @@
 {
   "name": "@ai-commander/goals",
   "version": "1.0.0",
+  "description": "Goal management and evaluation for autonomous agents",
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
   "files": [
     "dist",
     "README.md"

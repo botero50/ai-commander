@@ -28,6 +28,28 @@ import { ExecutionPreconditionValidator } from './execution-preconditions.js';
 import { PlanValidator } from './plan-validator.js';
 import { FailureDiagnoser, RecoveryStrategy } from './failure-diagnosis.js';
 import { GoalProgressEvaluator } from './goal-progress-evaluator.js';
+import { GoalEvaluator } from './goal-evaluator.js';
+import { GoalLifecycleTracker } from './goal-lifecycle-tracker.js';
+import { WorldStateTracker } from './world-state-tracker.js';
+import { ResourceGatherer } from './resource-gatherer.js';
+import { WorkerMovement, type MovementPhase } from './worker-movement.js';
+import { EconomyScaler } from './economy-scaler.js';
+import { BaseExpansion } from './base-expansion.js';
+import { BuildingConstruction } from './building-construction.js';
+import { MilitaryProduction } from './military-production.js';
+import { TacticalPositioning } from './tactical-positioning.js';
+import { ThreatDetection } from './threat-detection.js';
+import { CombatDecisionMaker } from './combat-decision.js';
+import { ArmyCoordination } from './army-coordination.js';
+import { Scouting } from './scouting.js';
+import { FogOfWar } from './fog-of-war.js';
+import { BaseDefense } from './base-defense.js';
+import { CombatExecution } from './combat-execution.js';
+import { UnitMicro } from './unit-micro.js';
+import { ArmyReinforcement } from './army-reinforcement.js';
+import { ArmyStaging } from './army-staging.js';
+import { AttackTiming } from './attack-timing.js';
+import { GameplayMetricsCollector } from './gameplay-metrics.js';
 import type { Command } from '@ai-commander/domain';
 
 /**
@@ -60,6 +82,44 @@ export class MissionAgent {
   private failureDiagnoser = new FailureDiagnoser();
   private recoveryStrategy = new RecoveryStrategy();
   private progressEvaluator = new GoalProgressEvaluator();
+  private goalEvaluator = new GoalEvaluator();
+  private lifecycleTracker = new GoalLifecycleTracker();
+  private worldStateTracker = new WorldStateTracker();
+  private resourceGatherer = new ResourceGatherer();
+  private workerMovement = new WorkerMovement();
+  private economyScaler = new EconomyScaler();
+  private baseExpansion = new BaseExpansion();
+  private buildingConstruction = new BuildingConstruction();
+  private militaryProduction = new MilitaryProduction();
+  private tacticalPositioning = new TacticalPositioning();
+  private threatDetection = new ThreatDetection();
+  private combatDecisionMaker = new CombatDecisionMaker();
+  private armyCoordination = new ArmyCoordination();
+  private scouting = new Scouting();
+  private fogOfWar = new FogOfWar();
+  private baseDefense = new BaseDefense();
+  private combatExecution = new CombatExecution();
+  private unitMicro = new UnitMicro();
+  private armyReinforcement = new ArmyReinforcement();
+  private armyStaging = new ArmyStaging();
+  private attackTiming = new AttackTiming();
+  private gameplayMetrics = new GameplayMetricsCollector();
+  private goalLifecycleStates: Map<string, 'Queued' | 'Candidate' | 'Selected' | 'Executing' | 'Completed'> = new Map();
+  private currentGoalScore: number = 0;
+  private lastEvaluationScores: Map<string, number> = new Map();
+  private resourceFields: Map<string, any> = new Map();
+  private gatheringTargetFieldId: string | null = null;
+  private gatheringStartTick: number | null = null;
+  private gatheringDetectedAtTick: number | null = null;
+  private gatheringSelectedAtTick: number | null = null;
+  private gatheringMovementStartTick: number | null = null;
+  private gatheringArrivalTick: number | null = null;
+  private returningStartTick: number | null = null;
+  private returningArrivalTick: number | null = null;
+  private basePosition: { x: number; y: number } = { x: 20, y: 20 };
+  private currentMovementPhase: MovementPhase = 'idle';
+  private lastGatheringProgress: number = 0;
+  private resourcesCollected: number = 0;
   private progressHistory: Array<{ tick: number; percent: number }> = [];
   private lastProgressTrend: 'improving' | 'stable' | 'regressing' = 'stable';
 
@@ -248,6 +308,20 @@ export class MissionAgent {
     }
   }
 
+  private extractAgentPosition(worldState: WorldState): { x: number; y: number } {
+    const agent = (worldState.agents || [])[0];
+    if (agent && agent.customData?.position) {
+      const pos = agent.customData.position;
+      if (typeof pos === 'string') {
+        const match = (pos as string).match(/^(\d+),(\d+)$/);
+        if (match && match[1] && match[2]) {
+          return { x: parseInt(match[1], 10), y: parseInt(match[2], 10) };
+        }
+      }
+    }
+    return { x: 0, y: 0 };
+  }
+
   /**
    * Check if goal is satisfied in the current world state.
    * For "move-to-target": checks if agent position matches target coordinates.
@@ -281,6 +355,50 @@ export class MissionAgent {
     } catch {
       return false;
     }
+  }
+
+  /**
+   * Create candidate goals for evaluation.
+   *
+   * The GoalEvaluator supports any number of candidates.
+   * This demonstration uses 3 for observability.
+   * To add more candidates: create additional goals and push to array.
+   * To remove candidates: delete the corresponding goal creation.
+   * No changes needed to evaluation pipeline - it handles any count.
+   */
+  private createCandidateGoals(): any[] {
+    // Primary goal (mission objective)
+    const primaryGoal = this.currentGoal;
+
+    // Alternative goals (for demonstration - add/remove as needed)
+    const exploreGoal = createGoal({
+      id: createGoalId('explore'),
+      intent: 'explore-world',
+      status: GoalStatus.Pending,
+      priority: createGoalPriority(GoalPriorityLevel.LOW),
+      parameters: { radius: 50 },
+    });
+
+    const defendGoal = createGoal({
+      id: createGoalId('defend'),
+      intent: 'defend-position',
+      status: GoalStatus.Pending,
+      priority: createGoalPriority(GoalPriorityLevel.HIGH),
+      parameters: { position: { x: this.targetX, y: this.targetY } },
+    });
+
+    // Story 101: Economy bootstrapping - resource gathering goal
+    const gatherResourcesGoal = createGoal({
+      id: createGoalId('gather-resources'),
+      intent: 'gather-resources',
+      status: GoalStatus.Pending,
+      priority: createGoalPriority(GoalPriorityLevel.NORMAL),
+      parameters: { strategy: 'economy-bootstrap' },
+    });
+
+    // Return array of all candidates
+    // Pipeline evaluates all of them - order, count, and content are flexible
+    return [primaryGoal, exploreGoal, defendGoal, gatherResourcesGoal];
   }
 
   /**
@@ -410,6 +528,10 @@ export class MissionAgent {
     });
     this.currentGoal = goal;
 
+    // Initialize goal lifecycle tracking
+    this.goalLifecycleStates.set(goal.id, 'Queued');
+    this.lifecycleTracker.initialize(this.tracer.getTrace());
+
     console.log('\nStarting mission execution...');
     let tickCount = 0;
     const maxTicks = 100; // Safety limit
@@ -421,6 +543,9 @@ export class MissionAgent {
       console.log(`\n[Tick ${tickCount}] Executing agent tick...`);
 
       try {
+        // Use current goal (may have been adapted from previous tick)
+        const activeGoal = this.currentGoal;
+
         // Execute one tick
         await this.runtime.tick();
 
@@ -432,7 +557,727 @@ export class MissionAgent {
 
         // Evaluate goal progress from world state
         const worldState = await this.getWorldState();
-        const progressData = this.progressEvaluator.evaluateProgress(goal, worldState, tickCount);
+
+        // Evaluate multiple candidate goals
+        // The evaluator supports any number of candidates - add/remove as needed
+        // Currently demonstrating with 3 candidates for observability
+        const candidateGoals = this.createCandidateGoals();
+
+        const selectionResult = this.goalEvaluator.selectGoal(candidateGoals, worldState, tickCount);
+        this.tracer.recordGoalCandidatesEvaluated(Array.from(selectionResult.allEvaluations));
+        this.tracer.recordGoalSelected(selectionResult.selectedGoal, selectionResult.reasoning);
+
+        // Track lifecycle transitions for all candidate goals
+        for (const candidateGoal of candidateGoals) {
+          const currentState = this.goalLifecycleStates.get(candidateGoal.id) || 'Queued';
+
+          // Transition to Candidate when being evaluated
+          if (currentState === 'Queued') {
+            this.tracer.recordGoalLifecycleTransitioned(
+              candidateGoal.id,
+              candidateGoal.intent,
+              'Queued',
+              'Candidate',
+              'Entered evaluation'
+            );
+            this.goalLifecycleStates.set(candidateGoal.id, 'Candidate');
+          }
+
+          // Transition to Selected if this goal was chosen
+          if (candidateGoal.id === selectionResult.selectedGoal.id && currentState !== 'Selected') {
+            this.tracer.recordGoalLifecycleTransitioned(
+              candidateGoal.id,
+              candidateGoal.intent,
+              'Candidate',
+              'Selected',
+              selectionResult.reasoning
+            );
+            this.goalLifecycleStates.set(candidateGoal.id, 'Selected');
+          }
+        }
+
+        // Log goal evaluation
+        console.log(`  🎯 Goal Evaluation:`);
+        for (const evaluation of selectionResult.allEvaluations) {
+          const marker = evaluation.goal.id === activeGoal.id ? '→' : ' ';
+          console.log(
+            `    ${marker} ${evaluation.goal.intent}: ${evaluation.score.toFixed(3)} (priority: ${evaluation.priorityFactor.toFixed(2)}, urgency: ${evaluation.urgencyFactor.toFixed(2)}, feasibility: ${evaluation.feasibilityFactor.toFixed(2)})`
+          );
+        }
+
+        // Store evaluation scores for adaptation comparison
+        selectionResult.allEvaluations.forEach(evaluation => {
+          this.lastEvaluationScores.set(evaluation.goal.id, evaluation.score);
+        });
+
+        // Track world state and detect changes
+        const worldSnapshot = this.worldStateTracker.captureSnapshot(worldState, tickCount);
+        const worldChange = this.worldStateTracker.detectChanges(worldSnapshot);
+
+        // Check for goal adaptation opportunity
+        if (worldChange && worldChange.anyChange && selectionResult.selectedGoal.id !== activeGoal.id) {
+          const previousScore = this.lastEvaluationScores.get(activeGoal.id) || 0;
+          const newScore = selectionResult.evaluation.score;
+
+          // Only adapt if new goal is objectively better
+          const scoreImprovement = newScore - previousScore;
+          if (scoreImprovement > 0.05) {
+            // Threshold: 5% improvement required
+            console.log(
+              `  🔄 Goal Adaptation: ${activeGoal.intent} (${previousScore.toFixed(3)}) → ${selectionResult.selectedGoal.intent} (${newScore.toFixed(3)})`
+            );
+            console.log(`     Reason: ${worldChange.changeDescription}`);
+
+            this.tracer.recordGoalAdapted(
+              activeGoal.id,
+              activeGoal.intent,
+              selectionResult.selectedGoal.id,
+              selectionResult.selectedGoal.intent,
+              previousScore,
+              newScore,
+              worldChange.changeDescription,
+              `New goal is ${(scoreImprovement * 100).toFixed(1)}% better based on world-state change: ${worldChange.changeDescription}`
+            );
+
+            // Update active goal for next tick
+            this.currentGoal = selectionResult.selectedGoal;
+            this.currentGoalScore = newScore;
+          }
+        } else if (worldChange === null) {
+          // First tick - capture initial score
+          this.currentGoalScore = selectionResult.evaluation.score;
+        }
+
+        // Story 109: Autonomous Economy Scaling - decide whether to produce workers
+        const economySnapshot = this.economyScaler.observeEconomy(worldState);
+        this.tracer.recordEconomyObserved(economySnapshot);
+
+        const scalingDecision = this.economyScaler.decideProduction(economySnapshot);
+        this.tracer.recordEconomyScalingDecision(scalingDecision);
+
+        if (scalingDecision.shouldProduce && this.gameSession) {
+          // Produce a worker
+          try {
+            const cost = this.economyScaler.getWorkerCost();
+            await this.gameSession.commandExecutor.executeCommand({
+              type: 'produce',
+              unitType: 'worker',
+              cost,
+            });
+            console.log(`  🏭 Produced worker (efficiency: ${(economySnapshot.efficiency * 100).toFixed(1)}%)`);
+          } catch (e) {
+            console.warn(`  ⚠ Failed to produce worker: ${e}`);
+          }
+        } else {
+          const reason = scalingDecision.reason.split(':')[0];
+          console.log(`  ⏸️  Worker production on hold (${reason})`);
+        }
+
+        // Story 110: Autonomous Base Expansion
+        const dropOffs = this.baseExpansion.observeDropOffs(worldState);
+        const fields = this.baseExpansion.observeFields(worldState);
+        const avgDist = fields.length > 0
+          ? fields.reduce((sum, f) => {
+              const dists = dropOffs.map(d => Math.abs(d.position.x - f.position.x) + Math.abs(d.position.y - f.position.y));
+              return sum + (dists.length > 0 ? Math.min(...dists) : 50);
+            }, 0) / fields.length
+          : 0;
+
+        this.tracer.recordExpansionObserved(dropOffs.length, fields.length, avgDist);
+
+        const expansionDecision = this.baseExpansion.decideExpansion(
+          dropOffs,
+          fields,
+          economySnapshot.currentResources
+        );
+        this.tracer.recordExpansionDecision(expansionDecision);
+
+        if (expansionDecision.shouldExpand && expansionDecision.targetLocation && this.gameSession) {
+          try {
+            await this.gameSession.commandExecutor.executeCommand({
+              type: 'construct',
+              buildingType: 'dropoff',
+              position: expansionDecision.targetLocation.position,
+              cost: this.baseExpansion.getConstructionCost(),
+            });
+            this.tracer.recordExpansionStarted(
+              expansionDecision.targetLocation.position,
+              this.baseExpansion.getConstructionCost()
+            );
+            console.log(`  🏗️  Starting expansion at (${expansionDecision.targetLocation.position.x}, ${expansionDecision.targetLocation.position.y})`);
+          } catch (e) {
+            console.warn(`  ⚠ Failed to start expansion: ${e}`);
+          }
+        } else if (!expansionDecision.shouldExpand) {
+          const reason = expansionDecision.reason.split(':')[0];
+          console.log(`  ⏸️  Expansion on hold (${reason})`);
+        }
+
+        // Story 111: Autonomous Building Construction
+        const productionBuildings = this.buildingConstruction.observeProductionBuildings(worldState);
+        const dropOffsForBuilding = this.buildingConstruction.observeDropOffBuildings(worldState);
+        this.tracer.recordBuildingObserved(productionBuildings.length);
+
+        const workerCount = worldState.agents?.length ?? 0;
+        const buildingDecision = this.buildingConstruction.decideBuild(
+          productionBuildings,
+          dropOffsForBuilding,
+          economySnapshot.currentResources,
+          workerCount
+        );
+        this.tracer.recordBuildingDecision(buildingDecision);
+
+        if (buildingDecision.shouldBuild && buildingDecision.targetPosition && this.gameSession) {
+          try {
+            await this.gameSession.commandExecutor.executeCommand({
+              type: 'construct',
+              buildingType: buildingDecision.buildingType,
+              position: buildingDecision.targetPosition,
+              cost: this.buildingConstruction.getConstructionCost(),
+            });
+            this.tracer.recordBuildingStarted(
+              buildingDecision.buildingType,
+              buildingDecision.targetPosition
+            );
+            console.log(`  🏗️  Starting construction at (${buildingDecision.targetPosition.x}, ${buildingDecision.targetPosition.y})`);
+          } catch (e) {
+            console.warn(`  ⚠ Failed to start building construction: ${e}`);
+          }
+        } else if (!buildingDecision.shouldBuild) {
+          const reason = buildingDecision.reason.split(':')[0];
+          console.log(`  ⏸️  Building on hold (${reason})`);
+        }
+
+        // Story 112: Autonomous Military Unit Production
+        const militaryBuildings = this.militaryProduction.observeProductionBuildings(worldState);
+        const militaryUnitCount = worldState.agents?.filter((a: any) => a.customData?.isMilitary).length ?? 0;
+        this.tracer.recordMilitaryProductionObserved(militaryBuildings.length, militaryUnitCount);
+
+        const militaryDecision = this.militaryProduction.decideMilitaryProduction(
+          militaryBuildings,
+          economySnapshot.currentResources,
+          workerCount,
+          militaryUnitCount
+        );
+        this.tracer.recordMilitaryProductionDecision(militaryDecision);
+
+        if (militaryDecision.shouldProduce && militaryDecision.selectedBuilding && militaryDecision.buildingPosition && this.gameSession) {
+          try {
+            await this.gameSession.commandExecutor.executeCommand({
+              type: 'produce',
+              buildingId: militaryDecision.selectedBuilding,
+              unitType: militaryDecision.unitType,
+              cost: this.militaryProduction.getProductionCost(),
+            });
+            this.tracer.recordMilitaryProductionStarted(
+              militaryDecision.unitType,
+              militaryDecision.selectedBuilding,
+              militaryDecision.buildingPosition
+            );
+            console.log(`  🎖️  Starting military production: ${militaryDecision.unitType}`);
+          } catch (e) {
+            console.warn(`  ⚠ Failed to start military production: ${e}`);
+          }
+        } else if (!militaryDecision.shouldProduce) {
+          const reason = militaryDecision.reason.split(':')[0];
+          console.log(`  ⏸️  Military production on hold (${reason})`);
+        }
+
+        // Story 113: Autonomous Tactical Positioning
+        const tacticallUnits = this.tacticalPositioning.observeMilitaryUnits(worldState);
+        this.tracer.recordTacticalPositioningObserved(tacticallUnits.length);
+
+        const friendlyStructures = this.tacticalPositioning.observeFriendlyStructures(worldState);
+        const resourceLocations = this.tacticalPositioning.observeResourceLocations(worldState);
+
+        for (const unit of tacticallUnits) {
+          const targetPosition = this.tacticalPositioning.determineTacticalPosition(
+            unit,
+            friendlyStructures,
+            resourceLocations,
+            tacticallUnits
+          );
+
+          const decision = this.tacticalPositioning.decideRepositioning(unit, targetPosition, tacticallUnits);
+          this.tracer.recordTacticalPositioningDecision(decision);
+
+          if (decision.shouldMove && this.gameSession) {
+            try {
+              await this.gameSession.commandExecutor.executeCommand({
+                type: 'move',
+                unitId: unit.id,
+                position: decision.targetPosition,
+              });
+              this.tracer.recordTacticalMovementStarted(
+                unit.id,
+                decision.currentPosition,
+                decision.targetPosition
+              );
+              console.log(`  🎯 Unit ${unit.id} repositioning to (${decision.targetPosition.x}, ${decision.targetPosition.y})`);
+            } catch (e) {
+              console.warn(`  ⚠ Failed to move unit ${unit.id}: ${e}`);
+            }
+          }
+        }
+
+        // Story 114: Autonomous Threat Detection
+        const enemyUnits = this.threatDetection.observeEnemyUnits(worldState);
+        const enemyStructures = this.threatDetection.observeEnemyStructures(worldState);
+        const friendlyAssets = this.threatDetection.observeFriendlyAssets(worldState);
+
+        const threatModel = this.threatDetection.buildThreatModel(
+          enemyUnits,
+          enemyStructures,
+          friendlyAssets
+        );
+
+        this.tracer.recordThreatScanCompleted(threatModel.activeThreatCount, threatModel.highestPriority);
+
+        // Record new threats
+        const newThreats = this.threatDetection.getNewThreats(threatModel);
+        for (const threat of newThreats) {
+          this.tracer.recordThreatDetected(threat.id, threat.threatType, threat.position, threat.priority);
+          console.log(`  🚨 Threat detected: ${threat.subType} at (${threat.position.x}, ${threat.position.y}), priority: ${(threat.priority * 100).toFixed(0)}%`);
+        }
+
+        // Record resolved threats
+        const resolvedThreats = this.threatDetection.getResolvedThreats(threatModel);
+        for (const threatId of resolvedThreats) {
+          this.tracer.recordThreatResolved(threatId);
+          console.log(`  ✓ Threat resolved: ${threatId}`);
+        }
+
+        this.threatDetection.updateThreatState(threatModel);
+
+        // Story 115: Autonomous Combat Decision Making
+        const combatUnits = tacticallUnits.map(u => ({
+          id: u.id,
+          position: u.position,
+          unitType: u.unitType,
+          health: 1.0,
+        }));
+
+        for (const unit of combatUnits) {
+          const combatDecision = this.combatDecisionMaker.decideCombatAction(
+            unit,
+            threatModel.threats,
+            combatUnits.length
+          );
+
+          this.tracer.recordCombatDecisionMade(combatDecision);
+
+          if (combatDecision.action === 'attack' && combatDecision.targetPosition && this.gameSession) {
+            try {
+              await this.gameSession.commandExecutor.executeCommand({
+                type: 'attack',
+                unitId: unit.id,
+                targetId: combatDecision.targetId,
+                targetPosition: combatDecision.targetPosition,
+              });
+              this.tracer.recordCombatAttackIssued(
+                unit.id,
+                combatDecision.targetId || '',
+                combatDecision.targetPosition
+              );
+              console.log(`  🔥 Unit ${unit.id} attacking target ${combatDecision.targetId}`);
+            } catch (e) {
+              console.warn(`  ⚠ Failed to issue attack order: ${e}`);
+            }
+          } else if (combatDecision.action === 'retreat') {
+            this.tracer.recordCombatRetreatOrdered(unit.id, combatDecision.reason);
+            console.log(`  🏃 Unit ${unit.id} retreating (${combatDecision.reason})`);
+          }
+        }
+
+        // Story 116: Autonomous Army Coordination
+        const armyUnits = combatUnits.map(u => ({
+          id: u.id,
+          position: u.position,
+          unitType: u.unitType,
+          health: u.health,
+        }));
+
+        const armyGroups = this.armyCoordination.formMilitaryGroups(armyUnits);
+        this.tracer.recordArmyGroupsFormed(armyGroups.length, armyUnits.length);
+
+        const unitMap = new Map(armyUnits.map(u => [u.id, u]));
+        const armyObjective = threatModel.threats.length > 0
+          ? threatModel.threats[0].position
+          : null;
+
+        for (const group of armyGroups) {
+          const coordDecision = this.armyCoordination.decideGroupAction(
+            group,
+            unitMap,
+            armyObjective
+          );
+
+          this.tracer.recordArmyGroupCoordination(coordDecision);
+
+          if (coordDecision.action === 'advance' && armyObjective && this.gameSession) {
+            try {
+              for (const unitId of coordDecision.unitIds) {
+                await this.gameSession.commandExecutor.executeCommand({
+                  type: 'move',
+                  unitId,
+                  position: armyObjective,
+                });
+              }
+              console.log(`  🔗 Group ${group.id} advancing toward objective`);
+            } catch (e) {
+              console.warn(`  ⚠ Failed to coordinate group movement: ${e}`);
+            }
+          }
+        }
+
+        const newGroups = this.armyCoordination.getNewGroups(armyGroups);
+        for (const group of newGroups) {
+          console.log(`  🎖️  Army group formed: ${group.id} (${group.unitCount} units)`);
+        }
+
+        const disbandedGroups = this.armyCoordination.getDisbandedGroups(armyGroups);
+        for (const groupId of disbandedGroups) {
+          this.tracer.recordArmyGroupDisbanded(groupId, 'unit_loss');
+          console.log(`  💔 Army group disbanded: ${groupId}`);
+        }
+
+        this.armyCoordination.updateGroupState(armyGroups);
+
+        // Story 117: Scouting
+        const scouts = this.scouting.observeScouts(worldState);
+        for (const scout of scouts) {
+          this.scouting.recordExploration(scout.position);
+
+          const target = this.scouting.determineScoutTarget(scout.position);
+          this.tracer.recordScoutingTargetSelected(scout.id, target.position, target.priority);
+
+          const decision = this.scouting.decideScoutMovement(scout, target);
+
+          if (decision.shouldMove && this.gameSession) {
+            try {
+              await this.gameSession.commandExecutor.executeCommand({
+                type: 'move',
+                unitId: scout.id,
+                position: decision.targetPosition,
+              });
+              this.tracer.recordScoutingMovementStarted(
+                scout.id,
+                decision.currentPosition,
+                decision.targetPosition
+              );
+              console.log(`  🔭 Scout ${scout.id} moving to (${decision.targetPosition.x}, ${decision.targetPosition.y})`);
+            } catch (e) {
+              console.warn(`  ⚠ Failed to move scout: ${e}`);
+            }
+          }
+        }
+
+        const coverage = this.scouting.getExplorationCoverage();
+        if (scouts.length > 0 && coverage > 0) {
+          this.tracer.recordRegionExplored(scouts[0].position, coverage);
+        }
+
+        // Story 118: Fog of War Reasoning
+        for (const threat of threatModel.threats) {
+          this.fogOfWar.recordExploration(threat.position);
+        }
+
+        const updates = this.fogOfWar.updateEnemyKnowledge(threatModel.threats, this.currentTick);
+        for (const update of updates) {
+          if (update.eventType === 'enemy_discovered') {
+            this.tracer.recordEnemyDiscovered(update.enemyId, update.position, '');
+            console.log(`  ⚠️  Enemy discovered at (${update.position.x}, ${update.position.y})`);
+          } else if (update.eventType === 'position_updated') {
+            this.tracer.recordEnemyPositionUpdated(update.enemyId, update.position);
+          } else if (update.eventType === 'enemy_lost') {
+            this.tracer.recordEnemyLost(update.enemyId, update.position);
+            console.log(`  ❌ Enemy lost: ${update.enemyId}`);
+          }
+        }
+
+        const fowState = this.fogOfWar.getState(this.currentTick);
+        if (fowState.knownEnemies.length > 0) {
+          console.log(`  📊 Intelligence: ${(fowState.intelligenceQuality * 100).toFixed(0)}% quality, ${fowState.knownEnemies.length} known enemies`);
+        }
+
+        // Story 119: Base Defense
+        const structures = this.baseDefense.observeStructures(worldState);
+        const availableDefenders = armyUnits.map(u => u.id);
+
+        for (const structure of structures) {
+          const assignment = this.baseDefense.assessDefense(structure, threatModel.threats);
+          const decision = this.baseDefense.decideDefense(assignment, availableDefenders);
+
+          if (decision.shouldDefend && decision.assignedUnits.length > 0) {
+            this.tracer.recordDefenseAssigned(
+              decision.structureId,
+              decision.assignedUnits,
+              decision.defendPosition
+            );
+            console.log(`  🛡️  Defending structure ${structure.id} with ${decision.assignedUnits.length} unit(s)`);
+          }
+        }
+
+        // Story 120-124: Combat & Army Systems
+        try {
+          if (threatModel.threats.length > 0 && armyUnits.length > 0) {
+            const threat = threatModel.threats[0];
+            const unit = armyUnits[0];
+            this.combatExecution.startEngagement(unit.id, threat.id, threat.health || 100);
+
+            const distance = Math.sqrt(Math.pow(unit.position.x - threat.position.x, 2) + Math.pow(unit.position.y - threat.position.y, 2));
+            this.unitMicro.decideMicroAction(unit.id, unit.health / 100, unit.position, threat.position, distance);
+          }
+
+          for (const group of armyGroups) {
+            const need = this.armyReinforcement.assessReinforcement(group.id, group.units.length);
+            this.armyReinforcement.shouldReinforce(need, armyUnits.length);
+
+            this.armyStaging.decideStagingReadiness(group.units.length, group.health || 0.5, threatModel.threats.length);
+          }
+
+          const economyHealth = economyState.scalingFactor;
+          const militaryStrength = armyUnits.length > 0 ? Math.min(1, armyUnits.length / 4) : 0;
+          const threatLevel = threatModel.threats.length > 0 ? Math.min(1, threatModel.threats.length / 5) : 0;
+          this.attackTiming.decideAttackTiming(economyHealth, militaryStrength, threatLevel);
+        } catch (e) {
+          console.warn(`⚠️  Combat & Army systems error: ${e}`);
+        }
+
+        // Story 102: Handle resource gathering goal with observable events
+        let agentPos: { x: number; y: number } | null = null;
+        let hasArrived = false;
+
+        if (activeGoal.intent === 'gather-resources') {
+          agentPos = this.extractAgentPosition(worldState);
+          const availableFields = this.resourceGatherer.detectResourceFields(worldState, agentPos);
+
+          if (availableFields.length > 0) {
+            // Record field detection (once per mission)
+            if (!this.gatheringDetectedAtTick) {
+              availableFields.forEach(field => {
+                this.tracer.recordResourceFieldDetected(field.id, field.resourceType, field.amount, field.position);
+              });
+              this.gatheringDetectedAtTick = tickCount;
+            }
+
+            const selection = this.resourceGatherer.selectBestField(availableFields);
+
+            if (selection.selectedField && !this.gatheringTargetFieldId) {
+              this.gatheringTargetFieldId = selection.selectedField.id;
+              this.gatheringStartTick = tickCount;
+              this.gatheringSelectedAtTick = tickCount;
+
+              // Record field selection
+              this.tracer.recordResourceFieldSelected(
+                selection.selectedField.id,
+                selection.selectedField.resourceType,
+                selection.evaluations[0]?.score || 0,
+                selection.reasoning
+              );
+
+              // Record gathering start
+              this.tracer.recordGatheringStarted(
+                selection.selectedField.id,
+                selection.selectedField.resourceType,
+                selection.selectedField.amount
+              );
+
+              // Store resource fields for progress tracking
+              selection.evaluations.forEach(e => {
+                this.resourceFields.set(e.field.id, e.field);
+              });
+
+              console.log(`  💰 Selected resource field: ${selection.selectedField.resourceType} at (${selection.selectedField.position.x}, ${selection.selectedField.position.y})`);
+            }
+
+            // Story 104: Track real worker movement to resource field
+            if (this.gatheringTargetFieldId) {
+              const targetField = this.resourceFields.get(this.gatheringTargetFieldId);
+              if (targetField && agentPos) {
+                // Record movement start
+                if (!this.gatheringMovementStartTick) {
+                  this.gatheringMovementStartTick = tickCount;
+                  this.tracer.recordWorkerMovementStarted(
+                    this.gatheringTargetFieldId,
+                    targetField.position,
+                    agentPos
+                  );
+                }
+
+                // Track movement progress
+                const distance = this.workerMovement.calculateDistance(agentPos, targetField.position);
+                const initialDistance = this.workerMovement.calculateDistance(
+                  { x: agentPos.x, y: agentPos.y },
+                  targetField.position
+                );
+                const pathTraveled = Math.max(0, initialDistance - distance);
+                const pathPercent = initialDistance > 0 ? (pathTraveled / initialDistance) * 100 : 100;
+
+                // Detect arrival
+                hasArrived = this.workerMovement.detectArrival(agentPos, targetField.position);
+                if (hasArrived && !this.gatheringArrivalTick) {
+                  this.gatheringArrivalTick = tickCount;
+                  this.currentMovementPhase = 'arrived';
+                  this.tracer.recordWorkerArrivalDetected(
+                    this.gatheringTargetFieldId,
+                    agentPos,
+                    tickCount - (this.gatheringMovementStartTick || tickCount)
+                  );
+                  console.log(`  ✓ Worker arrived at ${this.gatheringTargetFieldId}`);
+                } else if (!hasArrived) {
+                  this.currentMovementPhase = 'traveling';
+                  this.tracer.recordWorkerPositionUpdated(
+                    this.gatheringTargetFieldId,
+                    agentPos,
+                    targetField.position,
+                    distance,
+                    Math.floor(pathPercent)
+                  );
+                }
+
+                // Begin gathering only after arrival
+                if (hasArrived && !this.tracer.getTrace().events.some(e => e.eventType === 'worker_gathering_begun' && (e.data as any).fieldId === this.gatheringTargetFieldId)) {
+                  this.currentMovementPhase = 'gathering';
+                  this.tracer.recordWorkerGatheringBegun(
+                    this.gatheringTargetFieldId,
+                    targetField.resourceType,
+                    targetField.amount
+                  );
+
+                  // Story 105: Issue gather command to game session
+                  if (this.gameSession && targetField) {
+                    try {
+                      await this.gameSession.commandExecutor.executeCommand({
+                        type: 'gather',
+                        targetId: this.gatheringTargetFieldId,
+                        targetPosition: targetField.position,
+                      });
+                      console.log(`  → Issued gather command for ${this.gatheringTargetFieldId}`);
+                    } catch (e) {
+                      console.warn(`  ⚠ Failed to issue gather command: ${e}`);
+                    }
+                  }
+                }
+              }
+
+              // Track actual resource collection from world state
+              if (this.gatheringTargetFieldId && hasArrived) {
+                const currentField = this.resourceFields.get(this.gatheringTargetFieldId);
+                if (currentField) {
+                  const gatheringProgress = this.resourceGatherer.calculateGatheringProgress(
+                    this.gatheringTargetFieldId,
+                    this.gatheringArrivalTick || tickCount,
+                    tickCount,
+                    this.resourceFields
+                  );
+
+                  if (gatheringProgress) {
+                    this.tracer.recordGatheringProgressUpdated(
+                      gatheringProgress.targetFieldId,
+                      gatheringProgress.resourceType,
+                      gatheringProgress.amountCollected,
+                      gatheringProgress.amountRemaining,
+                      gatheringProgress.percentComplete,
+                      gatheringProgress.status
+                    );
+
+                    if (gatheringProgress.status === 'complete' && this.lastGatheringProgress < 100) {
+                      this.tracer.recordGatheringCompleted(
+                        gatheringProgress.targetFieldId,
+                        gatheringProgress.resourceType,
+                        gatheringProgress.amountCollected
+                      );
+                      console.log(`  ✓ Gathering complete: ${gatheringProgress.amountCollected} ${gatheringProgress.resourceType}`);
+
+                      // Story 106: Transition to returning resources
+                      this.resourcesCollected = gatheringProgress.amountCollected;
+                      this.currentMovementPhase = 'returning';
+                      this.returningStartTick = tickCount;
+                      this.tracer.recordWorkerReturnStarted(
+                        gatheringProgress.targetFieldId,
+                        gatheringProgress.resourceType,
+                        gatheringProgress.amountCollected,
+                        this.basePosition
+                      );
+                      console.log(`  → Starting return to base with ${gatheringProgress.amountCollected} ${gatheringProgress.resourceType}`);
+
+                      this.gatheringTargetFieldId = null;
+                    }
+
+                    this.lastGatheringProgress = gatheringProgress.percentComplete;
+                  }
+                }
+              }
+            }
+          }
+        }
+
+        // Story 106: Track return to base
+        if (this.currentMovementPhase === 'returning' && agentPos) {
+          const hasArrivedAtBase = agentPos.x === this.basePosition.x && agentPos.y === this.basePosition.y;
+
+          if (hasArrivedAtBase) {
+            if (!this.returningArrivalTick) {
+              this.returningArrivalTick = tickCount;
+              this.tracer.recordWorkerReturnComplete(
+                this.basePosition,
+                this.resourcesCollected,
+                tickCount - (this.returningStartTick || tickCount)
+              );
+
+              // Issue deposit command
+              if (this.gameSession) {
+                try {
+                  await this.gameSession.commandExecutor.executeCommand({
+                    type: 'deposit',
+                    targetId: 'base',
+                    amount: this.resourcesCollected,
+                  });
+                  this.tracer.recordResourcesDeposited(this.resourcesCollected);
+                  console.log(`  ✓ Deposited ${this.resourcesCollected} resources at base`);
+
+                  // Reset for next gather cycle
+                  this.currentMovementPhase = 'idle';
+                  this.returningStartTick = null;
+                  this.returningArrivalTick = null;
+                  this.resourcesCollected = 0;
+                } catch (e) {
+                  console.warn(`  ⚠ Failed to deposit: ${e}`);
+                }
+              }
+            }
+          } else if (this.returningStartTick) {
+            // Track return movement
+            const distance = this.workerMovement.calculateDistance(agentPos, this.basePosition);
+            const startPos = { x: 0, y: 0 };
+            const initialDistance = this.workerMovement.calculateDistance(startPos, this.basePosition);
+            const pathTraveled = Math.max(0, initialDistance - distance);
+            const returnPercent = initialDistance > 0 ? (pathTraveled / initialDistance) * 100 : 100;
+
+            this.tracer.recordWorkerReturnProgress(
+              agentPos,
+              this.basePosition,
+              distance,
+              Math.floor(returnPercent)
+            );
+          }
+        }
+
+        // Transition to Executing when we start making progress on the goal
+        const currentState = this.goalLifecycleStates.get(activeGoal.id) || 'Queued';
+        if (currentState === 'Selected') {
+          this.tracer.recordGoalLifecycleTransitioned(
+            activeGoal.id,
+            activeGoal.intent,
+            'Selected',
+            'Executing',
+            'Plan is being executed'
+          );
+          this.goalLifecycleStates.set(activeGoal.id, 'Executing');
+        }
+
+        const progressData = this.progressEvaluator.evaluateProgress(activeGoal, worldState, tickCount);
         this.tracer.recordGoalProgressUpdated(progressData);
 
         // Track progress history (keep last 5)
@@ -444,8 +1289,8 @@ export class MissionAgent {
         // Check if trend changed
         if (progressData.trend !== this.lastProgressTrend) {
           this.tracer.recordGoalProgressTrendChanged(
-            goal.id,
-            goal.intent,
+            activeGoal.id,
+            activeGoal.intent,
             this.lastProgressTrend,
             progressData.trend
           );
@@ -458,13 +1303,25 @@ export class MissionAgent {
         );
 
         // Check if goal is satisfied in world state
-        if (await this.isGoalSatisfied(goal)) {
+        if (await this.isGoalSatisfied(activeGoal)) {
+          // Transition to Completed
+          const execState = this.goalLifecycleStates.get(activeGoal.id) || 'Executing';
+          if (execState !== 'Completed') {
+            this.tracer.recordGoalLifecycleTransitioned(
+              activeGoal.id,
+              activeGoal.intent,
+              execState,
+              'Completed',
+              'Goal satisfied'
+            );
+            this.goalLifecycleStates.set(activeGoal.id, 'Completed');
+          }
           const agent = worldState.agents?.[0];
           const position = agent?.customData?.position || 'unknown';
           console.log(
             `  ✓ Mission goal achieved: agent reached target (${this.targetX}, ${this.targetY}) at position ${position}`
           );
-          this.tracer.recordGoalCompleted(goal.id, goal.intent, progressData.progressPercent);
+          this.tracer.recordGoalCompleted(activeGoal.id, activeGoal.intent, progressData.progressPercent);
           this.isComplete = true;
           this.tracer.recordMissionCompleted();
         }
@@ -479,8 +1336,8 @@ export class MissionAgent {
         // Generate diagnosis
         const diagnosis = this.failureDiagnoser.diagnose({
           worldState,
-          goal,
-          plan: this.currentPlan ?? undefined,
+          goal: this.currentGoal,
+          plan: this.currentPlan || undefined,
           error: errorMsg,
         });
 
@@ -547,9 +1404,13 @@ export class MissionAgent {
       this.tracer.recordMissionFailed(`Incomplete after ${maxTicks} ticks`);
     }
 
+    // Snapshot final gameplay metrics
+    this.gameplayMetrics.snapshot(tickCount);
+
     // Report final metrics
     if (this.runtime) {
       const metrics = this.runtime.getMetrics();
+      const gameplayMetrics = this.gameplayMetrics.getLatestMetrics();
       console.log('\n✓ Mission execution complete');
       console.log('Final metrics:');
       console.log(`  Ticks executed: ${metrics.ticksExecuted}`);
@@ -557,6 +1418,13 @@ export class MissionAgent {
       console.log(`  Commands executed: ${metrics.commandsExecuted}`);
       console.log(`  Errors: ${metrics.errorsEncountered}`);
       console.log(`  Completion: ${this.isComplete ? 'SUCCESS' : 'TIMEOUT'}`);
+      console.log('\nGameplay metrics:');
+      console.log(`  Economy efficiency: ${gameplayMetrics.economyEfficiency.toFixed(2)}`);
+      console.log(`  Worker utilization: ${(gameplayMetrics.workerUtilization * 100).toFixed(1)}%`);
+      console.log(`  Military strength: ${(gameplayMetrics.militaryStrength * 100).toFixed(1)}%`);
+      console.log(`  APM: ${gameplayMetrics.apm.toFixed(2)}`);
+      console.log(`  Combat efficiency: ${(gameplayMetrics.combatEfficiency * 100).toFixed(1)}%`);
+      console.log(`  Overall score: ${gameplayMetrics.totalScore.toFixed(3)}`);
     }
   }
 
@@ -604,6 +1472,13 @@ export class MissionAgent {
    */
   getMetrics(): RuntimeMetrics | null {
     return this.metrics;
+  }
+
+  /**
+   * Get gameplay metrics (economy, military, combat efficiency, etc).
+   */
+  getGameplayMetrics() {
+    return this.gameplayMetrics.getLatestMetrics();
   }
 
   /**
@@ -659,6 +1534,13 @@ export class MissionAgent {
       return 'Replay report not available (mission not yet complete)';
     }
     return formatReplayReport(this.replayReport);
+  }
+
+  /**
+   * Get the agent runtime for diagnostic purposes.
+   */
+  getRuntime(): AgentRuntime | null {
+    return this.runtime;
   }
 
   /**

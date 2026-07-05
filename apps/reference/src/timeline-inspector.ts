@@ -72,6 +72,58 @@ export interface TickInspection {
     readonly evidence: Record<string, unknown>;
   } | null;
 
+  // Goal candidates (reconstructed from trace events)
+  readonly goalCandidates?: readonly {
+    readonly goalId: string;
+    readonly intent: string;
+    readonly score: number;
+    readonly statusFactor: number;
+    readonly priorityFactor: number;
+    readonly urgencyFactor: number;
+    readonly feasibilityFactor: number;
+    readonly reasoning: string;
+    readonly isSelected: boolean;
+  }[] | null;
+
+  // Goal lifecycles at this tick (reconstructed from trace events)
+  readonly goalLifecycles?: readonly {
+    readonly goalId: string;
+    readonly intent: string;
+    readonly lifecycleState: string;
+    readonly createdAtTick: number;
+    readonly transitions: readonly {
+      readonly tick: number;
+      readonly from: string;
+      readonly to: string;
+    }[];
+  }[] | null;
+
+  // Goal adaptation at this tick (if one occurred)
+  readonly goalAdaptation?: {
+    readonly previousGoalIntent: string;
+    readonly newGoalIntent: string;
+    readonly worldStateChange: string;
+    readonly previousScore: number;
+    readonly newScore: number;
+    readonly reasoning: string;
+  } | null;
+
+  // Resource gathering state (reconstructed from trace events)
+  readonly gatheringProgress?: {
+    readonly fieldId: string;
+    readonly resourceType: string;
+    readonly targetAmount: number;
+    readonly amountCollected: number;
+    readonly amountRemaining: number;
+    readonly percentComplete: number;
+    readonly status: 'traveling' | 'gathering' | 'returning' | 'complete';
+    readonly gatheringRate: number;
+    readonly estimatedCompletionTick: number | undefined;
+    readonly detectedAtTick: number;
+    readonly selectedAtTick: number;
+    readonly startedAtTick: number;
+  } | null;
+
   // All events for this tick
   readonly events: readonly TraceEvent[];
 }
@@ -164,6 +216,10 @@ export class TimelineInspector {
       worldDelta: this.extractWorldDelta(events) as any,
       metrics: this.extractMetrics(tick) as any,
       progress: this.extractProgress(events) as any,
+      goalCandidates: this.extractGoalCandidates(events) as any,
+      goalLifecycles: this.extractGoalLifecycles(events, tick) as any,
+      goalAdaptation: this.extractGoalAdaptation(events) as any,
+      gatheringProgress: this.extractGatheringProgress(tick) as any,
       events,
     });
 
@@ -518,6 +574,107 @@ export class TimelineInspector {
     };
   }
 
+  private extractGoalCandidates(events: TraceEvent[]): TickInspection['goalCandidates'] {
+    const candidatesEvent = events.find((e) => e.eventType === 'goal_candidates_evaluated');
+    if (!candidatesEvent) return undefined;
+
+    const evaluations = (candidatesEvent.data as any)?.evaluations || [];
+    const selectedGoalId = events.find((e) => e.eventType === 'goal_selected')?.data?.goalId;
+
+    return evaluations.map((evaluation: any) => ({
+      goalId: evaluation.goalId,
+      intent: evaluation.goalIntent,
+      score: evaluation.score,
+      statusFactor: evaluation.statusFactor,
+      priorityFactor: evaluation.priorityFactor,
+      urgencyFactor: evaluation.urgencyFactor,
+      feasibilityFactor: evaluation.feasibilityFactor,
+      reasoning: evaluation.reasoning,
+      isSelected: evaluation.goalId === selectedGoalId,
+    }));
+  }
+
+  private extractGoalLifecycles(events: TraceEvent[], currentTick: number): TickInspection['goalLifecycles'] {
+    if (!this.trace) return undefined;
+
+    // Find all unique goals created up to this tick
+    const goalIds = new Set<string>();
+    this.trace.events.forEach(e => {
+      if (e.eventType === 'goal_created' && e.tick <= currentTick) {
+        goalIds.add((e.data as any)?.goalId);
+      }
+    });
+
+    if (goalIds.size === 0) return undefined;
+
+    // Get lifecycle state for each goal
+    const lifecycles: any[] = [];
+
+    goalIds.forEach(goalId => {
+      // Find creation event
+      const creationEvent = this.trace!.events.find(
+        e => e.eventType === 'goal_created' && (e.data as any)?.goalId === goalId
+      );
+      if (!creationEvent) return;
+
+      const goalIntent = (creationEvent.data as any)?.goalIntent || 'unknown';
+      const createdAtTick = creationEvent.tick;
+
+      // Find all transitions up to current tick
+      const transitions = this.trace!.events
+        .filter(
+          e =>
+            e.eventType === 'goal_lifecycle_transitioned' &&
+            e.tick <= currentTick &&
+            (e.data as any)?.goalId === goalId
+        )
+        .map(e => ({
+          tick: e.tick,
+          from: (e.data as any)?.fromState || '',
+          to: (e.data as any)?.toState || '',
+        }));
+
+      // Derive current lifecycle state
+      let lifecycleState = 'Queued'; // Initial state
+      if (transitions.length > 0) {
+        lifecycleState = transitions[transitions.length - 1].to;
+      }
+
+      // Check for explicit completion
+      const completedEvent = this.trace!.events.find(
+        e => e.eventType === 'goal_completed' && e.tick <= currentTick && (e.data as any)?.goalId === goalId
+      );
+      if (completedEvent) {
+        lifecycleState = 'Completed';
+      }
+
+      lifecycles.push({
+        goalId,
+        intent: goalIntent,
+        lifecycleState,
+        createdAtTick,
+        transitions,
+      });
+    });
+
+    return lifecycles.length > 0 ? lifecycles : undefined;
+  }
+
+  private extractGoalAdaptation(events: TraceEvent[]): TickInspection['goalAdaptation'] {
+    const adaptationEvent = events.find((e) => e.eventType === 'goal_adapted');
+    if (!adaptationEvent) return undefined;
+
+    const data = adaptationEvent.data as any;
+    return {
+      previousGoalIntent: data.previousGoalIntent,
+      newGoalIntent: data.newGoalIntent,
+      worldStateChange: data.worldStateChange,
+      previousScore: data.previousScore,
+      newScore: data.newScore,
+      reasoning: data.reasoning,
+    };
+  }
+
   /**
    * Compare observations.
    */
@@ -598,6 +755,78 @@ export class TimelineInspector {
     return {
       changed,
       details: changed ? 'World state changed' : 'World state unchanged',
+    };
+  }
+
+  /**
+   * Extract resource gathering progress at any historical tick.
+   */
+  private extractGatheringProgress(
+    tick: number
+  ): TickInspection['gatheringProgress'] {
+    const allEvents = this.trace.events;
+
+    // Find all gathering-related events up to this tick
+    const detectedEvents = allEvents.filter(
+      e => e.eventType === 'resource_field_detected' && e.tick <= tick
+    );
+    const selectedEvents = allEvents.filter(
+      e => e.eventType === 'resource_field_selected' && e.tick <= tick
+    );
+    const startedEvents = allEvents.filter(
+      e => e.eventType === 'gathering_started' && e.tick <= tick
+    );
+    const progressEvents = allEvents.filter(
+      e => e.eventType === 'gathering_progress_updated' && e.tick <= tick
+    );
+    const completedEvents = allEvents.filter(
+      e => e.eventType === 'gathering_completed' && e.tick <= tick
+    );
+
+    // If no field was selected by this tick, no gathering
+    if (selectedEvents.length === 0) return null;
+
+    const lastSelected = selectedEvents[selectedEvents.length - 1];
+    if (!lastSelected) return null;
+
+    const selectedData = lastSelected.data as any;
+    const lastProgress = progressEvents.length > 0 ? progressEvents[progressEvents.length - 1] : null;
+    const lastStarted = startedEvents.length > 0 ? startedEvents[startedEvents.length - 1] : null;
+    const lastDetected = detectedEvents.length > 0 ? detectedEvents[detectedEvents.length - 1] : null;
+
+    // If we haven't started gathering yet, no progress
+    if (!lastProgress && !lastStarted) return null;
+
+    const progressData = lastProgress ? (lastProgress.data as any) : null;
+    const startedData = lastStarted ? (lastStarted.data as any) : null;
+
+    const amountCollected = progressData?.amountCollected || 0;
+    const amountRemaining = progressData?.amountRemaining || selectedData.targetAmount || 0;
+    const percentComplete = progressData?.percentComplete || 0;
+    const targetAmount = startedData?.targetAmount || selectedData.targetAmount || amountCollected + amountRemaining;
+    const status = progressData?.status || 'traveling';
+
+    // Calculate gathering rate (units per tick)
+    const ticksElapsed = (lastProgress?.tick || lastStarted?.tick || 0) - (lastDetected?.tick || 0);
+    const gatheringRate = ticksElapsed > 0 ? amountCollected / ticksElapsed : 0;
+
+    // Estimate completion tick
+    const ticksRemaining = gatheringRate > 0 ? Math.ceil(amountRemaining / gatheringRate) : 100;
+    const estimatedCompletionTick = (lastProgress?.tick || lastStarted?.tick || 0) + ticksRemaining;
+
+    return {
+      fieldId: String(selectedData.fieldId),
+      resourceType: String(selectedData.resourceType),
+      targetAmount: Number(targetAmount),
+      amountCollected: Number(amountCollected),
+      amountRemaining: Number(amountRemaining),
+      percentComplete: Number(percentComplete),
+      status: status as 'traveling' | 'gathering' | 'returning' | 'complete',
+      gatheringRate: Number(gatheringRate),
+      estimatedCompletionTick: percentComplete < 100 ? estimatedCompletionTick : undefined,
+      detectedAtTick: Number(lastDetected?.tick || 0),
+      selectedAtTick: Number(lastSelected.tick),
+      startedAtTick: Number(lastStarted?.tick || 0),
     };
   }
 }

@@ -3,7 +3,6 @@
   "version": "1.0.0",
   "description": "Canonical reference application demonstrating framework usage",
   "type": "module",
-  "main": "dist/index.js",
   "bin": {
     "reference-app": "dist/cli.js"
   },
