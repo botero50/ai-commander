@@ -44,6 +44,11 @@ import { ArmyCoordination } from './army-coordination.js';
 import { Scouting } from './scouting.js';
 import { FogOfWar } from './fog-of-war.js';
 import { BaseDefense } from './base-defense.js';
+import { CombatExecution } from './combat-execution.js';
+import { UnitMicro } from './unit-micro.js';
+import { ArmyReinforcement } from './army-reinforcement.js';
+import { ArmyStaging } from './army-staging.js';
+import { AttackTiming } from './attack-timing.js';
 import type { Command } from '@ai-commander/domain';
 
 /**
@@ -92,6 +97,11 @@ export class MissionAgent {
   private scouting = new Scouting();
   private fogOfWar = new FogOfWar();
   private baseDefense = new BaseDefense();
+  private combatExecution = new CombatExecution();
+  private unitMicro = new UnitMicro();
+  private armyReinforcement = new ArmyReinforcement();
+  private armyStaging = new ArmyStaging();
+  private attackTiming = new AttackTiming();
   private goalLifecycleStates: Map<string, 'Queued' | 'Candidate' | 'Selected' | 'Executing' | 'Completed'> = new Map();
   private currentGoalScore: number = 0;
   private lastEvaluationScores: Map<string, number> = new Map();
@@ -1004,6 +1014,32 @@ export class MissionAgent {
             );
             console.log(`  🛡️  Defending structure ${structure.id} with ${decision.assignedUnits.length} unit(s)`);
           }
+        }
+
+        // Story 120-124: Combat & Army Systems
+        try {
+          if (threatModel.threats.length > 0 && armyUnits.length > 0) {
+            const threat = threatModel.threats[0];
+            const unit = armyUnits[0];
+            this.combatExecution.startEngagement(unit.id, threat.id, threat.health || 100);
+
+            const distance = Math.sqrt(Math.pow(unit.position.x - threat.position.x, 2) + Math.pow(unit.position.y - threat.position.y, 2));
+            this.unitMicro.decideMicroAction(unit.id, unit.health / 100, unit.position, threat.position, distance);
+          }
+
+          for (const group of armyGroups) {
+            const need = this.armyReinforcement.assessReinforcement(group.id, group.units.length);
+            this.armyReinforcement.shouldReinforce(need, armyUnits.length);
+
+            this.armyStaging.decideStagingReadiness(group.units.length, group.health || 0.5, threatModel.threats.length);
+          }
+
+          const economyHealth = economyState.scalingFactor;
+          const militaryStrength = armyUnits.length > 0 ? Math.min(1, armyUnits.length / 4) : 0;
+          const threatLevel = threatModel.threats.length > 0 ? Math.min(1, threatModel.threats.length / 5) : 0;
+          this.attackTiming.decideAttackTiming(economyHealth, militaryStrength, threatLevel);
+        } catch (e) {
+          console.warn(`⚠️  Combat & Army systems error: ${e}`);
         }
 
         // Story 102: Handle resource gathering goal with observable events
