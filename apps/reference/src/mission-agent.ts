@@ -49,6 +49,7 @@ import { UnitMicro } from './unit-micro.js';
 import { ArmyReinforcement } from './army-reinforcement.js';
 import { ArmyStaging } from './army-staging.js';
 import { AttackTiming } from './attack-timing.js';
+import { GameplayMetricsCollector } from './gameplay-metrics.js';
 import type { Command } from '@ai-commander/domain';
 
 /**
@@ -102,6 +103,7 @@ export class MissionAgent {
   private armyReinforcement = new ArmyReinforcement();
   private armyStaging = new ArmyStaging();
   private attackTiming = new AttackTiming();
+  private gameplayMetrics = new GameplayMetricsCollector();
   private goalLifecycleStates: Map<string, 'Queued' | 'Candidate' | 'Selected' | 'Executing' | 'Completed'> = new Map();
   private currentGoalScore: number = 0;
   private lastEvaluationScores: Map<string, number> = new Map();
@@ -1402,9 +1404,13 @@ export class MissionAgent {
       this.tracer.recordMissionFailed(`Incomplete after ${maxTicks} ticks`);
     }
 
+    // Snapshot final gameplay metrics
+    this.gameplayMetrics.snapshot(tickCount);
+
     // Report final metrics
     if (this.runtime) {
       const metrics = this.runtime.getMetrics();
+      const gameplayMetrics = this.gameplayMetrics.getLatestMetrics();
       console.log('\n✓ Mission execution complete');
       console.log('Final metrics:');
       console.log(`  Ticks executed: ${metrics.ticksExecuted}`);
@@ -1412,6 +1418,13 @@ export class MissionAgent {
       console.log(`  Commands executed: ${metrics.commandsExecuted}`);
       console.log(`  Errors: ${metrics.errorsEncountered}`);
       console.log(`  Completion: ${this.isComplete ? 'SUCCESS' : 'TIMEOUT'}`);
+      console.log('\nGameplay metrics:');
+      console.log(`  Economy efficiency: ${gameplayMetrics.economyEfficiency.toFixed(2)}`);
+      console.log(`  Worker utilization: ${(gameplayMetrics.workerUtilization * 100).toFixed(1)}%`);
+      console.log(`  Military strength: ${(gameplayMetrics.militaryStrength * 100).toFixed(1)}%`);
+      console.log(`  APM: ${gameplayMetrics.apm.toFixed(2)}`);
+      console.log(`  Combat efficiency: ${(gameplayMetrics.combatEfficiency * 100).toFixed(1)}%`);
+      console.log(`  Overall score: ${gameplayMetrics.totalScore.toFixed(3)}`);
     }
   }
 
@@ -1459,6 +1472,13 @@ export class MissionAgent {
    */
   getMetrics(): RuntimeMetrics | null {
     return this.metrics;
+  }
+
+  /**
+   * Get gameplay metrics (economy, military, combat efficiency, etc).
+   */
+  getGameplayMetrics() {
+    return this.gameplayMetrics.getLatestMetrics();
   }
 
   /**
