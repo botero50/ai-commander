@@ -42,6 +42,7 @@ import { ThreatDetection } from './threat-detection.js';
 import { CombatDecisionMaker } from './combat-decision.js';
 import { ArmyCoordination } from './army-coordination.js';
 import { Scouting } from './scouting.js';
+import { FogOfWar } from './fog-of-war.js';
 import type { Command } from '@ai-commander/domain';
 
 /**
@@ -88,6 +89,7 @@ export class MissionAgent {
   private combatDecisionMaker = new CombatDecisionMaker();
   private armyCoordination = new ArmyCoordination();
   private scouting = new Scouting();
+  private fogOfWar = new FogOfWar();
   private goalLifecycleStates: Map<string, 'Queued' | 'Candidate' | 'Selected' | 'Executing' | 'Completed'> = new Map();
   private currentGoalScore: number = 0;
   private lastEvaluationScores: Map<string, number> = new Map();
@@ -959,6 +961,29 @@ export class MissionAgent {
         const coverage = this.scouting.getExplorationCoverage();
         if (scouts.length > 0 && coverage > 0) {
           this.tracer.recordRegionExplored(scouts[0].position, coverage);
+        }
+
+        // Story 118: Fog of War Reasoning
+        for (const threat of threatModel.threats) {
+          this.fogOfWar.recordExploration(threat.position);
+        }
+
+        const updates = this.fogOfWar.updateEnemyKnowledge(threatModel.threats, this.currentTick);
+        for (const update of updates) {
+          if (update.eventType === 'enemy_discovered') {
+            this.tracer.recordEnemyDiscovered(update.enemyId, update.position, '');
+            console.log(`  ⚠️  Enemy discovered at (${update.position.x}, ${update.position.y})`);
+          } else if (update.eventType === 'position_updated') {
+            this.tracer.recordEnemyPositionUpdated(update.enemyId, update.position);
+          } else if (update.eventType === 'enemy_lost') {
+            this.tracer.recordEnemyLost(update.enemyId, update.position);
+            console.log(`  ❌ Enemy lost: ${update.enemyId}`);
+          }
+        }
+
+        const fowState = this.fogOfWar.getState(this.currentTick);
+        if (fowState.knownEnemies.length > 0) {
+          console.log(`  📊 Intelligence: ${(fowState.intelligenceQuality * 100).toFixed(0)}% quality, ${fowState.knownEnemies.length} known enemies`);
         }
 
         // Story 102: Handle resource gathering goal with observable events

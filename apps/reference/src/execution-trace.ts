@@ -114,7 +114,10 @@ export type TraceEventType =
   | 'army_group_disbanded'
   | 'scouting_target_selected'
   | 'scouting_movement_started'
-  | 'region_explored';
+  | 'region_explored'
+  | 'enemy_discovered'
+  | 'enemy_position_updated'
+  | 'enemy_lost';
 
 export interface ExecutionTrace {
   readonly missionId: string;
@@ -790,6 +793,18 @@ export class ExecutionTracer {
     this.addEvent('region_explored', { position, coverage });
   }
 
+  recordEnemyDiscovered(enemyId: string, position: { x: number; y: number }, unitType: string): void {
+    this.addEvent('enemy_discovered', { enemyId, position, unitType });
+  }
+
+  recordEnemyPositionUpdated(enemyId: string, position: { x: number; y: number }): void {
+    this.addEvent('enemy_position_updated', { enemyId, position });
+  }
+
+  recordEnemyLost(enemyId: string, lastPosition: { x: number; y: number }): void {
+    this.addEvent('enemy_lost', { enemyId, lastPosition });
+  }
+
   getTrace(): ExecutionTrace {
     return Object.freeze({
       missionId: this.missionId,
@@ -1012,6 +1027,15 @@ export function formatTrace(trace: ExecutionTrace): string {
     } else if (event.eventType === 'region_explored') {
       lines.push(`    ✓ Region Explored`);
       lines.push(`    Position: (${(event.data.position as any).x}, ${(event.data.position as any).y}) | Coverage: ${((event.data.coverage as number) * 100).toFixed(1)}%`);
+    } else if (event.eventType === 'enemy_discovered') {
+      lines.push(`    ⚠️  Enemy Discovered`);
+      lines.push(`    Type: ${event.data.unitType} | Position: (${(event.data.position as any).x}, ${(event.data.position as any).y})`);
+    } else if (event.eventType === 'enemy_position_updated') {
+      lines.push(`    📍 Enemy Position Updated`);
+      lines.push(`    Enemy: ${event.data.enemyId} | New Position: (${(event.data.position as any).x}, ${(event.data.position as any).y})`);
+    } else if (event.eventType === 'enemy_lost') {
+      lines.push(`    ❌ Enemy Lost`);
+      lines.push(`    Enemy: ${event.data.enemyId} | Last Position: (${(event.data.lastPosition as any).x}, ${(event.data.lastPosition as any).y})`);
     }
 
     lines.push('');
