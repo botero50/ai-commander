@@ -317,27 +317,23 @@ describe('Story 098: Observable Multi-Objective Decision Making', () => {
       // Skipped: dashboard server internal API not exposed in tests
     });
 
-    it('should broadcast goal candidates via SSE', (done) => {
-      (async () => {
-        await agent.initialize();
+    it('should broadcast goal candidates via SSE', async () => {
+      await agent.initialize();
 
-        // Subscribe to updates
-        let receivedUpdate = false;
-        dashboard.onStateChange((newState) => {
-          if (newState.mission?.goalCandidates) {
-            receivedUpdate = true;
-          }
-        });
+      // Subscribe to updates
+      let receivedUpdate = false;
+      dashboard.onStateChange((newState) => {
+        if (newState.mission?.goalCandidates) {
+          receivedUpdate = true;
+        }
+      });
 
-        // Run agent in background
-        agent.run().catch(() => {});
+      // Run agent in background
+      agent.run().catch(() => {});
 
-        // Wait briefly for updates
-        setTimeout(() => {
-          expect(receivedUpdate || true).toBe(true); // SSE may not fire in tests
-          done();
-        }, 500);
-      })();
+      // Wait briefly for updates
+      await new Promise((resolve) => setTimeout(resolve, 500));
+      expect(receivedUpdate || true).toBe(true); // SSE may not fire in tests
     });
   });
 
