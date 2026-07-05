@@ -164,6 +164,7 @@ export class RuntimeMetricsCollector {
       'region_explored',
       'enemy_discovered',
       'enemy_position_updated',
+      'defense_assigned',
     ];
     const executionEventTypes = [
       'mission_tick',
@@ -209,6 +210,7 @@ export class RuntimeMetricsCollector {
       'army_group_disbanded',
       'scouting_movement_started',
       'enemy_lost',
+      'defense_recalled',
     ];
 
     const lifecycleEvents = lifecycleEventTypes.reduce(

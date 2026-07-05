@@ -117,7 +117,9 @@ export type TraceEventType =
   | 'region_explored'
   | 'enemy_discovered'
   | 'enemy_position_updated'
-  | 'enemy_lost';
+  | 'enemy_lost'
+  | 'defense_assigned'
+  | 'defense_recalled';
 
 export interface ExecutionTrace {
   readonly missionId: string;
@@ -805,6 +807,14 @@ export class ExecutionTracer {
     this.addEvent('enemy_lost', { enemyId, lastPosition });
   }
 
+  recordDefenseAssigned(structureId: string, unitIds: readonly string[], position: { x: number; y: number }): void {
+    this.addEvent('defense_assigned', { structureId, unitIds, position });
+  }
+
+  recordDefenseRecalled(unitId: string, reason: string): void {
+    this.addEvent('defense_recalled', { unitId, reason });
+  }
+
   getTrace(): ExecutionTrace {
     return Object.freeze({
       missionId: this.missionId,
@@ -1036,6 +1046,12 @@ export function formatTrace(trace: ExecutionTrace): string {
     } else if (event.eventType === 'enemy_lost') {
       lines.push(`    ❌ Enemy Lost`);
       lines.push(`    Enemy: ${event.data.enemyId} | Last Position: (${(event.data.lastPosition as any).x}, ${(event.data.lastPosition as any).y})`);
+    } else if (event.eventType === 'defense_assigned') {
+      lines.push(`    🛡️  Defense Assigned`);
+      lines.push(`    Structure: ${event.data.structureId} | Defenders: ${(event.data.unitIds as any[]).length}`);
+    } else if (event.eventType === 'defense_recalled') {
+      lines.push(`    📢 Defense Recalled`);
+      lines.push(`    Unit: ${event.data.unitId} | Reason: ${event.data.reason}`);
     }
 
     lines.push('');

@@ -43,6 +43,7 @@ import { CombatDecisionMaker } from './combat-decision.js';
 import { ArmyCoordination } from './army-coordination.js';
 import { Scouting } from './scouting.js';
 import { FogOfWar } from './fog-of-war.js';
+import { BaseDefense } from './base-defense.js';
 import type { Command } from '@ai-commander/domain';
 
 /**
@@ -90,6 +91,7 @@ export class MissionAgent {
   private armyCoordination = new ArmyCoordination();
   private scouting = new Scouting();
   private fogOfWar = new FogOfWar();
+  private baseDefense = new BaseDefense();
   private goalLifecycleStates: Map<string, 'Queued' | 'Candidate' | 'Selected' | 'Executing' | 'Completed'> = new Map();
   private currentGoalScore: number = 0;
   private lastEvaluationScores: Map<string, number> = new Map();
@@ -984,6 +986,24 @@ export class MissionAgent {
         const fowState = this.fogOfWar.getState(this.currentTick);
         if (fowState.knownEnemies.length > 0) {
           console.log(`  📊 Intelligence: ${(fowState.intelligenceQuality * 100).toFixed(0)}% quality, ${fowState.knownEnemies.length} known enemies`);
+        }
+
+        // Story 119: Base Defense
+        const structures = this.baseDefense.observeStructures(worldState);
+        const availableDefenders = armyUnits.map(u => u.id);
+
+        for (const structure of structures) {
+          const assignment = this.baseDefense.assessDefense(structure, threatModel.threats);
+          const decision = this.baseDefense.decideDefense(assignment, availableDefenders);
+
+          if (decision.shouldDefend && decision.assignedUnits.length > 0) {
+            this.tracer.recordDefenseAssigned(
+              decision.structureId,
+              decision.assignedUnits,
+              decision.defendPosition
+            );
+            console.log(`  🛡️  Defending structure ${structure.id} with ${decision.assignedUnits.length} unit(s)`);
+          }
         }
 
         // Story 102: Handle resource gathering goal with observable events
