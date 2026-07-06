@@ -17,5 +17,6 @@
     { "path": "./packages/agent-runtime" },
     { "path": "./packages/openra-adapter" }
   ],
-  "exclude": ["**/tests", "**/node_modules", "**/dist", "examples"]
+  "files": [],
+  "exclude": ["**/tests", "**/node_modules", "**/dist", "examples", "apps/reference"]
 }

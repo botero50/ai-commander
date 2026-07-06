@@ -24,12 +24,12 @@ export interface TokenUsage {
 }
 
 export interface OpenAIStats {
-  readonly apiCalls: number;
-  readonly totalTokens: number;
-  readonly totalCost: number; // estimated USD
-  readonly averageLatencyMs: number;
-  readonly errorCount: number;
-  readonly retryCount: number;
+  apiCalls: number;
+  totalTokens: number;
+  totalCost: number; // estimated USD
+  averageLatencyMs: number;
+  errorCount: number;
+  retryCount: number;
 }
 
 /**

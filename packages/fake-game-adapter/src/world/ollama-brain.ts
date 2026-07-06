@@ -27,13 +27,13 @@ export interface TokenUsage {
 }
 
 export interface OllamaStats {
-  readonly apiCalls: number;
-  readonly totalTokens: number;
-  readonly totalTimeMs: number; // cumulative thinking time
-  readonly averageLatencyMs: number;
-  readonly errorCount: number;
-  readonly retryCount: number;
-  readonly isLocal: boolean; // always true for Ollama
+  apiCalls: number;
+  totalTokens: number;
+  totalTimeMs: number; // cumulative thinking time
+  averageLatencyMs: number;
+  errorCount: number;
+  retryCount: number;
+  isLocal: boolean; // always true for Ollama
 }
 
 /**
