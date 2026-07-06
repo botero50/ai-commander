@@ -86,16 +86,16 @@ export class TournamentEngine {
     }
 
     const standings = this.calculateStandings();
-    const winner = standings.length > 0 ? standings[0].competitor : undefined;
+    const winner = standings.length > 0 ? standings[0]?.competitor : undefined;
     const endTime = performance.now();
 
     return {
       config: this.config,
       matches: this.matches,
       standings,
-      winner,
+      winner: winner ?? undefined,
       totalDurationMs: endTime - startTime,
-    };
+    } as TournamentResult;
   }
 
   /**
@@ -134,9 +134,13 @@ export class TournamentEngine {
       const pairings = this.swissPairings(standings);
 
       for (const pairing of pairings) {
+        const p1 = pairing[0];
+        const p2 = pairing[1];
+        if (!p1 || !p2) continue;
+
         const matchPairing: MatchPairing = {
-          player1: pairing[0].competitor,
-          player2: pairing[1].competitor,
+          player1: p1.competitor,
+          player2: p2.competitor,
         };
 
         const match = await this.playMatch(matchPairing);
@@ -144,14 +148,14 @@ export class TournamentEngine {
 
         // Update standings
         if (match.winner === 'player1') {
-          pairing[0].wins++;
-          pairing[1].losses++;
+          (p1 as any).wins++;
+          (p2 as any).losses++;
         } else if (match.winner === 'player2') {
-          pairing[1].wins++;
-          pairing[0].losses++;
+          (p2 as any).wins++;
+          (p1 as any).losses++;
         } else {
-          pairing[0].draws++;
-          pairing[1].draws++;
+          (p1 as any).draws++;
+          (p2 as any).draws++;
         }
       }
     }
@@ -284,26 +288,29 @@ export class TournamentEngine {
         continue;
       }
 
+      const s1 = standings[p1Index] as any;
+      const s2 = standings[p2Index] as any;
+
       if (match.winner === 'player1') {
-        standings[p1Index].wins++;
-        standings[p2Index].losses++;
+        s1.wins++;
+        s2.losses++;
       } else if (match.winner === 'player2') {
-        standings[p2Index].wins++;
-        standings[p1Index].losses++;
+        s2.wins++;
+        s1.losses++;
       } else {
-        standings[p1Index].draws++;
-        standings[p2Index].draws++;
+        s1.draws++;
+        s2.draws++;
       }
 
-      standings[p1Index].costUsd += match.replay.metrics.costPerPlayer.player1;
-      standings[p2Index].costUsd += match.replay.metrics.costPerPlayer.player2;
+      s1.costUsd += match.replay.metrics.costPerPlayer.player1;
+      s2.costUsd += match.replay.metrics.costPerPlayer.player2;
 
-      standings[p1Index].averageLatencyMs = Math.max(
-        standings[p1Index].averageLatencyMs,
+      s1.averageLatencyMs = Math.max(
+        s1.averageLatencyMs,
         match.replay.metrics.latencyPerPlayer.player1
       );
-      standings[p2Index].averageLatencyMs = Math.max(
-        standings[p2Index].averageLatencyMs,
+      s2.averageLatencyMs = Math.max(
+        s2.averageLatencyMs,
         match.replay.metrics.latencyPerPlayer.player2
       );
     }

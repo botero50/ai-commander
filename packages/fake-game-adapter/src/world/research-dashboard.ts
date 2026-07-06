@@ -118,7 +118,7 @@ export class ResearchDashboard {
           });
         }
 
-        const stats = modelStats.get(modelName)!;
+        const stats = modelStats.get(modelName)! as any;
         stats.tournamentCount++;
         stats.totalWins += standing.wins;
         stats.totalLosses += standing.losses;
@@ -131,17 +131,18 @@ export class ResearchDashboard {
     // Calculate derived metrics
     const comparisons: ModelComparison[] = [];
     for (const [, stats] of modelStats) {
-      const totalMatches = stats.totalWins + stats.totalLosses + stats.totalDraws;
-      const totalDecisions = stats.totalWins + stats.totalLosses;
+      const stat = stats as any;
+      const totalMatches = stat.totalWins + stat.totalLosses + stat.totalDraws;
+      const totalDecisions = stat.totalWins + stat.totalLosses;
 
-      stats.overallWinRate = totalDecisions > 0 ? stats.totalWins / totalDecisions : 0;
-      stats.costPerMatch = stats.totalCost / Math.max(1, stats.tournamentCount);
-      stats.averageLatencyMs = stats.averageLatencyMs / Math.max(1, stats.tournamentCount);
+      stat.overallWinRate = totalDecisions > 0 ? stat.totalWins / totalDecisions : 0;
+      stat.costPerMatch = stat.totalCost / Math.max(1, stat.tournamentCount);
+      stat.averageLatencyMs = stat.averageLatencyMs / Math.max(1, stat.tournamentCount);
 
       // Add strategies used
-      if (this.strategies.has(stats.modelName)) {
-        const modelStrategies = this.strategies.get(stats.modelName)!;
-        stats.strategiesUsed = Array.from(new Set(modelStrategies.map((s) => s.strategy)));
+      if (this.strategies.has(stat.modelName)) {
+        const modelStrategies = this.strategies.get(stat.modelName)!;
+        stat.strategiesUsed = Array.from(new Set(modelStrategies.map((s) => s.strategy)));
       }
 
       comparisons.push(stats);

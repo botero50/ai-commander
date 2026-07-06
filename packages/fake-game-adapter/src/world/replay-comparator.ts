@@ -149,11 +149,13 @@ export class ReplayComparator {
     const shifts: Array<{ tick: number; from: string; to: string }> = [];
 
     for (let i = 1; i < timeline.length; i++) {
-      if (timeline[i].goal !== timeline[i - 1].goal) {
+      const curr = timeline[i];
+      const prev = timeline[i - 1];
+      if (curr && prev && curr.goal !== prev.goal) {
         shifts.push({
-          tick: timeline[i].tick,
-          from: timeline[i - 1].goal,
-          to: timeline[i].goal,
+          tick: curr.tick,
+          from: prev.goal,
+          to: curr.goal,
         });
       }
     }
@@ -182,11 +184,11 @@ export class ReplayComparator {
       return { min: 0, max: 0, avg: 0, p95: 0 };
     }
 
-    const min = latencies[0];
-    const max = latencies[latencies.length - 1];
+    const min = latencies[0] ?? 0;
+    const max = latencies[latencies.length - 1] ?? 0;
     const avg = latencies.reduce((a, b) => a + b, 0) / latencies.length;
     const p95Index = Math.ceil(latencies.length * 0.95) - 1;
-    const p95 = latencies[p95Index];
+    const p95 = latencies[p95Index] ?? 0;
 
     return { min, max, avg, p95 };
   }
