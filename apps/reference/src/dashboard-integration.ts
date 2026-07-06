@@ -30,6 +30,7 @@ export class DashboardIntegration {
   isPaused: boolean = false;
   shouldStop: boolean = false;
   private lastTickBroadcast: number = 0;
+  private lastProcessedEventCount: number = 0;
 
   constructor(dashboard: DashboardServer) {
     this.dashboard = dashboard;
@@ -71,6 +72,7 @@ export class DashboardIntegration {
     this.runtime = runtime;
     this.trace = trace;
     this.metrics = metrics;
+    this.lastProcessedEventCount = (trace.events || []).length;
 
     // Initialize debugger with trace data
     this.dashboard.initializeDebugger(trace, metrics);
@@ -100,13 +102,8 @@ export class DashboardIntegration {
     this.trace = trace;
     this.metrics = metrics;
 
-    // Throttle updates to avoid overwhelming the browser
-    const now = Date.now();
-    if (now - this.lastTickBroadcast < 50) {
-      return;
-    }
-    this.lastTickBroadcast = now;
-
+    // Send updates every tick instead of throttling
+    // The browser connection might be slow to establish
     this.updateRuntimeState(currentTick);
     this.updateMissionState();
     this.updateWorldState();
@@ -151,7 +148,7 @@ export class DashboardIntegration {
    * Update mission state panel.
    */
   private updateMissionState(): void {
-    if (!this.trace || !this.metrics) return;
+    if (!this.trace) return;
 
     const progress = this.extractProgress();
     const goalCandidates = this.extractGoalCandidates();
@@ -195,25 +192,37 @@ export class DashboardIntegration {
   }
 
   /**
-   * Update timeline panel.
+   * Update timeline panel - only add events that haven't been added yet
    */
   private updateTimelineState(): void {
     if (!this.trace) return;
 
-    // Get last event from trace
     const events = this.trace.events || [];
-    if (events.length > 0) {
-      const lastEvent = events[events.length - 1];
-      if (!lastEvent) return;
+    const currentCount = events.length;
 
-      const event: DashboardTimelineEvent = Object.freeze({
-        tick: lastEvent.tick,
-        timestamp: Date.now(),
-        type: lastEvent.eventType,
-        detail: this.formatEventDetail(lastEvent),
-      });
+    // Only add events we haven't processed yet
+    if (currentCount > this.lastProcessedEventCount) {
+      // Add only new events (skip tick 0 initialization events and verbose plan events)
+      for (let i = this.lastProcessedEventCount; i < currentCount; i++) {
+        const traceEvent = events[i];
+        if (!traceEvent || traceEvent.tick === 0) continue;
 
-      this.dashboard.addTimelineEvent(event);
+        // Skip verbose plan events - only show plan_generated and plan_error
+        if (traceEvent.eventType === 'plan_invalidated' || traceEvent.eventType === 'plan_reused' || traceEvent.eventType === 'plan_empty') {
+          continue;
+        }
+
+        const event: DashboardTimelineEvent = Object.freeze({
+          tick: traceEvent.tick,
+          timestamp: Date.now(),
+          type: traceEvent.eventType,
+          detail: this.formatEventDetail(traceEvent),
+        });
+
+        this.dashboard.addTimelineEvent(event);
+      }
+
+      this.lastProcessedEventCount = currentCount;
     }
   }
 
@@ -526,8 +535,19 @@ export class DashboardIntegration {
         return `Assigned: ${(data as any)?.workerId || 'worker'} to ${(data as any)?.resourceType || 'resource'}`;
       case 'worker_reassigned':
         return `Reassigned: ${(data as any)?.workerId || 'worker'} to ${(data as any)?.newFieldId || 'field'} (${(data as any)?.reason || 'rebalance'})`;
+      case 'plan_generated':
+        return `Plan generated with ${(data as any)?.stepCount || 0} steps`;
+      case 'plan_invalidated':
+        return `Plan invalidated: ${(data as any)?.reason || 'unknown reason'}`;
+      case 'plan_reused':
+        return `Plan reused with ${(data as any)?.stepCount || 0} steps`;
+      case 'plan_empty':
+        return 'Plan is empty';
+      case 'plan_error':
+        return `Plan error: ${(data as any)?.error || 'unknown'}`;
       default:
-        return JSON.stringify(data).substring(0, 60);
+        return `${type}: event`;
+
     }
   }
 }

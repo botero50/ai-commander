@@ -244,7 +244,11 @@ export class DashboardServer {
       ...this.state,
       timeline,
     });
-    this.broadcastState();
+    // Only broadcast the new event, not the entire timeline
+    const eventData = JSON.stringify({ timeline: [event] });
+    this.clients.forEach((client) => {
+      client.write(`data: ${eventData}\n\n`);
+    });
   }
 
   /**
@@ -440,7 +444,12 @@ export class DashboardServer {
    * Handle root request (serve HTML dashboard).
    */
   private handleRootRequest(res: ServerResponse): void {
-    res.writeHead(200, { 'Content-Type': 'text/html; charset=utf-8' });
+    res.writeHead(200, {
+      'Content-Type': 'text/html; charset=utf-8',
+      'Cache-Control': 'no-cache, no-store, must-revalidate',
+      'Pragma': 'no-cache',
+      'Expires': '0'
+    });
     res.end(this.getHtml());
   }
 
@@ -688,6 +697,18 @@ export class DashboardServer {
     .timeline-detail {
       color: #cbd5e1;
       margin-top: 4px;
+    }
+
+    #timeline-panel {
+      grid-column: 1 / 2;
+      grid-row: 2 / 3;
+      min-height: 0;
+      overflow-y: auto;
+    }
+
+    #timeline-events {
+      flex: 1;
+      overflow-y: auto;
     }
 
     .controls {
@@ -956,6 +977,16 @@ export class DashboardServer {
   </div>
 
   <script>
+    // Clear any stale storage and browser cache
+    sessionStorage.clear();
+    localStorage.clear();
+
+    // Force reload to skip cache
+    if (window.location.hash !== '#cleared') {
+      window.location.hash = '#cleared';
+      window.location.reload();
+    }
+
     const state = {
       runtime: null,
       mission: null,
@@ -968,7 +999,14 @@ export class DashboardServer {
 
       eventSource.onmessage = (event) => {
         const newState = JSON.parse(event.data);
-        Object.assign(state, newState);
+        // Update other properties
+        if (newState.runtime) state.runtime = newState.runtime;
+        if (newState.mission) state.mission = newState.mission;
+        if (newState.world) state.world = newState.world;
+        // Only append new timeline events, never replace
+        if (newState.timeline && newState.timeline.length > 0) {
+          state.timeline = (state.timeline || []).concat(newState.timeline);
+        }
         updateDashboard();
       };
 
@@ -1059,7 +1097,7 @@ export class DashboardServer {
         const list = document.getElementById('goal-lifecycles-list');
         list.innerHTML = state.mission.goalLifecycles
           .map(lifecycle => {
-            const stateColors: Record<string, { bg: string; border: string; icon: string }> = {
+            const stateColors = {
               'Queued': { bg: '#f3f4f6', border: '#9ca3af', icon: '⏳' },
               'Candidate': { bg: '#fef3c7', border: '#f59e0b', icon: '🔍' },
               'Selected': { bg: '#dbeafe', border: '#3b82f6', icon: '👈' },
@@ -1114,7 +1152,7 @@ export class DashboardServer {
           document.getElementById('gathering-eta').textContent = '—';
         }
 
-        const statusEmoji: Record<string, string> = {
+        const statusEmoji = {
           'traveling': '🚶',
           'gathering': '⛏️',
           'returning': '↩️',
@@ -1146,7 +1184,7 @@ export class DashboardServer {
         timelineEvents.innerHTML = '<div class="empty">Waiting for events...</div>';
       } else {
         timelineEvents.innerHTML = state.timeline
-          .slice(-10)
+          .slice()
           .reverse()
           .map(
             (event) => {

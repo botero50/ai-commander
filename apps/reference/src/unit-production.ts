@@ -26,20 +26,27 @@ export class UnitProduction {
   private readonly workerBuildTime = 50;
 
   detectProductionBuildings(worldState: WorldState): ProductionBuilding[] {
-    if (!worldState || !worldState.buildings) return [];
+    if (!worldState) return [];
+    const buildings = (worldState as any).buildings || [];
+    if (!Array.isArray(buildings)) return [];
 
-    return worldState.buildings
+    return buildings
       .filter((b: any) => {
         const type = b.customData?.type?.toLowerCase();
         return type === 'barracks' || type === 'factory' || type === 'construction-yard';
       })
-      .map((b: any) => ({
-        id: b.id,
-        type: b.customData?.type?.toLowerCase(),
-        position: this.extractBuildingPosition(b),
-        isProducing: b.customData?.isProducing || false,
-      }))
-      .filter((b): b is ProductionBuilding => b.position !== null);
+      .map((b: any) => {
+        const type = b.customData?.type?.toLowerCase() as 'barracks' | 'factory' | 'construction-yard';
+        const position = this.extractBuildingPosition(b);
+        if (!position) return null;
+        return {
+          id: b.id,
+          type,
+          position,
+          isProducing: b.customData?.isProducing || false,
+        };
+      })
+      .filter((b): b is ProductionBuilding => b !== null);
   }
 
   canProduceWorker(currentResources: number): boolean {
@@ -47,9 +54,9 @@ export class UnitProduction {
   }
 
   selectProductionBuilding(buildings: ProductionBuilding[]): ProductionBuilding | null {
-    const available = buildings.filter(b => !b.isProducing);
+    const available = buildings.filter((b: ProductionBuilding) => !b.isProducing);
     if (available.length === 0) return null;
-    return available[0];
+    return available[0] || null;
   }
 
   calculateProductionProgress(
