@@ -9,12 +9,15 @@
     "skipLibCheck": true,
     "outDir": "./dist",
     "rootDir": "./src",
-    "composite": true,
-    "strict": false,
     "noImplicitAny": false,
     "strictNullChecks": false,
+    "noImplicitThis": false,
+    "alwaysStrict": false,
+    "noImplicitReturns": false,
+    "noFallthroughCasesInSwitch": false,
     "noUncheckedIndexedAccess": false,
-    "exactOptionalPropertyTypes": false
+    "noPropertyAccessFromIndexSignature": false,
+    "noImplicitAnyIndexErrors": false
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "tests"],

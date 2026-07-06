@@ -12,7 +12,6 @@
     { "path": "./packages/goals" },
     { "path": "./packages/planner" },
     { "path": "./packages/adapter" },
-    { "path": "./packages/fake-game-adapter" },
     { "path": "./packages/behavior-tree" },
     { "path": "./packages/agent-runtime" },
     { "path": "./packages/openra-adapter" }
