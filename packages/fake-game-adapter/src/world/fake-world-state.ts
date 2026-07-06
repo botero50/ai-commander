@@ -35,16 +35,23 @@ export interface EnemyPosition {
 }
 
 /**
+ * Game state: idle, playing, won, lost
+ */
+export type GameState = 'idle' | 'playing' | 'won' | 'lost';
+
+/**
  * Fake world state for the in-memory game adapter.
  *
  * Supports full RTS simulation:
  * - Economy: workers, resources
  * - Military: units, health, combat
  * - Fog of war: known enemies, scouting
+ * - Victory/defeat conditions
  * - Immutable snapshots
  */
 export interface FakeWorldSnapshot {
   readonly tick: number;
+  readonly gameState: GameState;
   readonly workers: ReadonlyArray<Worker>;
   readonly militaryUnits: ReadonlyArray<MilitaryUnit>; // Player's military
   readonly enemyUnits: ReadonlyArray<MilitaryUnit>; // Enemy military
@@ -85,6 +92,7 @@ export function createInitialWorld(): FakeWorldSnapshot {
 
   return Object.freeze({
     tick: 0,
+    gameState: 'playing' as GameState,
     workers: Object.freeze(workers),
     militaryUnits: Object.freeze([]),
     enemyUnits: Object.freeze(enemyUnits),
@@ -402,9 +410,48 @@ export function attackUnit(
     enemyUnits.splice(targetIndex, 1);
   }
 
-  return Object.freeze({
+  const newWorld = Object.freeze({
     ...world,
     enemyUnits: Object.freeze(enemyUnits),
     commandsExecuted: world.commandsExecuted + 1,
   });
+
+  // Check for victory condition
+  return checkVictory(newWorld);
+}
+
+/**
+ * Check victory condition: all enemy units destroyed.
+ */
+export function checkVictory(world: FakeWorldSnapshot): FakeWorldSnapshot {
+  if (world.gameState !== 'playing') {
+    return world; // Already won or lost
+  }
+
+  if (world.enemyUnits.length === 0 && world.militaryUnits.length > 0) {
+    return Object.freeze({
+      ...world,
+      gameState: 'won' as GameState,
+    });
+  }
+
+  return world;
+}
+
+/**
+ * Check defeat condition: player has no workers and no military units.
+ */
+export function checkDefeat(world: FakeWorldSnapshot): FakeWorldSnapshot {
+  if (world.gameState !== 'playing') {
+    return world; // Already won or lost
+  }
+
+  if (world.workers.length === 0 && world.militaryUnits.length === 0) {
+    return Object.freeze({
+      ...world,
+      gameState: 'lost' as GameState,
+    });
+  }
+
+  return world;
 }

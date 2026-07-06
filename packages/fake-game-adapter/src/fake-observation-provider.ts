@@ -127,8 +127,11 @@ export class FakeObservationProvider implements ObservationProvider {
     return createWorldState(gameTime, map, [player], [], agentSnapshots, {
       'commands-executed': snapshot.commandsExecuted,
       'adapter-type': 'fake',
+      'game-state': snapshot.gameState,
       'player-resources': snapshot.playerResources,
       'worker-count': snapshot.workers.length,
+      'military-unit-count': snapshot.militaryUnits.length,
+      'enemy-unit-count': snapshot.enemyUnits.length,
       'military-units': JSON.stringify(snapshot.militaryUnits.map((u) => ({ id: u.id, type: u.type, x: u.x, y: u.y, health: u.health }))),
       'enemy-units': JSON.stringify(snapshot.enemyUnits.map((u) => ({ id: u.id, type: u.type, x: u.x, y: u.y, health: u.health }))),
       'known-enemies': JSON.stringify(snapshot.knownEnemies.map((k) => ({ unitId: k.unitId, x: k.x, y: k.y, lastSeen: k.lastSeen }))),
