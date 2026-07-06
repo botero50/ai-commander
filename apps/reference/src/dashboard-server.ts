@@ -984,12 +984,33 @@ export class DashboardServer {
     function updateDashboard() {
       if (!state.runtime) return;
 
-      // Only update tick and elapsed time
+      // Update runtime panel (fast)
       const tickEl = document.getElementById('runtime-tick');
       const elapsedEl = document.getElementById('runtime-elapsed');
-
       if (tickEl) tickEl.textContent = state.runtime.currentTick;
       if (elapsedEl) elapsedEl.textContent = state.runtime.elapsedMs + 'ms';
+
+      // Update mission panel (fast text updates only)
+      if (state.mission) {
+        const missionGoal = document.getElementById('mission-goal');
+        const missionStatus = document.getElementById('mission-status');
+        if (missionGoal) missionGoal.textContent = state.mission.goalIntent || 'N/A';
+        if (missionStatus) missionStatus.textContent = state.mission.goalStatus || 'N/A';
+      }
+
+      // Update world panel (fast)
+      if (state.world) {
+        const friendlyEl = document.getElementById('world-friendly');
+        const enemyEl = document.getElementById('world-enemy');
+        if (friendlyEl) friendlyEl.textContent = state.world.friendlyUnits;
+        if (enemyEl) enemyEl.textContent = state.world.enemyUnits;
+      }
+
+      // Update timeline count only (no HTML generation)
+      if (state.timeline) {
+        const countEl = document.getElementById('timeline-count');
+        if (countEl) countEl.textContent = state.timeline.length;
+      }
     }
 
     function formatInspection(inspection) {
