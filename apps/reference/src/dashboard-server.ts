@@ -998,6 +998,9 @@ export class DashboardServer {
       const eventSource = new EventSource('/api/stream');
 
       let pendingUpdate = false;
+      let lastUpdateTime = 0;
+      const updateThrottle = 500; // Only update UI every 500ms max
+
       eventSource.onmessage = (event) => {
         const newState = JSON.parse(event.data);
         // Update other properties
@@ -1012,13 +1015,16 @@ export class DashboardServer {
             state.timeline = state.timeline.slice(-100);
           }
         }
-        // Schedule update via requestAnimationFrame to batch DOM operations
-        if (!pendingUpdate) {
+
+        // Throttle DOM updates to prevent blocking
+        const now = Date.now();
+        if (now - lastUpdateTime >= updateThrottle && !pendingUpdate) {
           pendingUpdate = true;
-          requestAnimationFrame(() => {
+          lastUpdateTime = now;
+          setTimeout(() => {
             updateDashboard();
             pendingUpdate = false;
-          });
+          }, 0);
         }
       };
 
