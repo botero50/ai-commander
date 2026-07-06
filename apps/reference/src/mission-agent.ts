@@ -1430,6 +1430,11 @@ export class MissionAgent {
         this.tracer.recordRecoveryCompleted(recovery.action, recoveryOutcome);
       }
 
+      // Update dashboard with current tick state
+      if (this.dashboardIntegration) {
+        this.dashboardIntegration.updateOnTick(tickCount);
+      }
+
       // Yield to event loop to process dashboard updates (prevent UI blocking)
       // Only add delay if explicitly configured (demo mode) or tickDelayMs > 0
       if (this.tickDelayMs > 0) {

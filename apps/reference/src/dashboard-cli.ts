@@ -168,11 +168,11 @@ async function main() {
     // Get runtime references for integration
     const runtime = (missionAgent as any).runtime as AgentRuntime;
     const trace = (missionAgent as any).tracer;
-    const initialMetrics = (missionAgent as any).metrics || {
-      totalDurationMs: 0,
-      successfulCommands: 0,
-      failedCommands: 0,
-    };
+
+    // Create a minimal metrics object for initialization
+    // It will be recalculated dynamically from the trace during execution
+    const { RuntimeMetricsCollector } = await import('./runtime-metrics.js');
+    const initialMetrics = RuntimeMetricsCollector.collect(trace);
 
     // Create integration
     const integration = new DashboardIntegration(dashboard);

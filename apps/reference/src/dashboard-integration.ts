@@ -111,6 +111,14 @@ export class DashboardIntegration {
   }
 
   /**
+   * Simple tick update that refreshes runtime state (elapsed time, etc).
+   */
+  updateOnTick(currentTick: number): void {
+    if (!this.trace || !this.metrics) return;
+    this.updateRuntimeState(currentTick);
+  }
+
+  /**
    * Update all dashboard panels.
    */
   private updateAllState(): void {
@@ -132,12 +140,17 @@ export class DashboardIntegration {
     const runtimeStatus = (this.runtime.getStatus?.() as any) || 'unknown';
     const executionMode = this.isPaused ? 'paused' : 'continuous';
 
+    // Calculate elapsed time dynamically from trace (not from stale metrics)
+    const elapsedMs = this.trace.endTime
+      ? this.trace.endTime - this.trace.startTime
+      : Date.now() - this.trace.startTime;
+
     const status = mapRuntimeStatus(runtimeStatus);
     const runtimeState: DashboardRuntimeState = Object.freeze({
       status,
       currentTick,
       missionId: this.trace.missionId,
-      elapsedMs: this.metrics.missionDurationMs,
+      elapsedMs,
       executionMode,
     });
 
