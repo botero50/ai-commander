@@ -107,6 +107,9 @@ export class FakeObservationProvider implements ObservationProvider {
       resourcePool,
       {
         position: positionId,
+        x: snapshot.agentX,
+        y: snapshot.agentY,
+        carrying: snapshot.agentCarrying,
       }
     );
 
@@ -115,6 +118,10 @@ export class FakeObservationProvider implements ObservationProvider {
     return createWorldState(gameTime, map, [player], [], [agentSnapshot], {
       'commands-executed': snapshot.commandsExecuted,
       'adapter-type': 'fake',
+      'player-resources': snapshot.playerResources,
+      'agent-carrying': snapshot.agentCarrying,
+      'resource-deposits': JSON.stringify(Array.from(snapshot.resourceDeposits.entries())),
+      'base-position': `${snapshot.baseX},${snapshot.baseY}`,
     });
   }
 }

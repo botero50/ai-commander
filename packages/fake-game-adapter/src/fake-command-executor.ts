@@ -2,7 +2,7 @@ import type { CommandExecutor, CommandExecutionResult } from '@ai-commander/adap
 import { AdapterErrorCode } from '@ai-commander/adapter';
 import type { Command } from '@ai-commander/domain';
 import type { FakeWorldSnapshot } from './world/fake-world-state.js';
-import { moveAgent, waitAgent } from './world/fake-world-state.js';
+import { moveAgent, waitAgent, gatherAgent, depositAgent } from './world/fake-world-state.js';
 import { parseFakeCommand } from './types/fake-command.js';
 
 /**
@@ -65,6 +65,10 @@ export class FakeCommandExecutor implements CommandExecutor {
         newWorld = moveAgent(this.world, fakeCmd.dx, fakeCmd.dy);
       } else if (fakeCmd.type === 'wait') {
         newWorld = waitAgent(this.world);
+      } else if (fakeCmd.type === 'gather') {
+        newWorld = gatherAgent(this.world);
+      } else if (fakeCmd.type === 'deposit') {
+        newWorld = depositAgent(this.world);
       } else {
         const _exhaustive: never = fakeCmd;
         const exhaustiveCheck = _exhaustive as unknown as Record<string, unknown>;

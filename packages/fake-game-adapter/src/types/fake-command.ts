@@ -4,6 +4,8 @@
  * Supported commands:
  * - Move: change agent position
  * - Wait: do nothing for one tick
+ * - Gather: collect resources from current location
+ * - Deposit: drop resources at base
  */
 
 export interface MoveCommand {
@@ -16,7 +18,15 @@ export interface WaitCommand {
   readonly type: 'wait';
 }
 
-export type FakeCommand = MoveCommand | WaitCommand;
+export interface GatherCommand {
+  readonly type: 'gather';
+}
+
+export interface DepositCommand {
+  readonly type: 'deposit';
+}
+
+export type FakeCommand = MoveCommand | WaitCommand | GatherCommand | DepositCommand;
 
 /**
  * Parse a framework Command into a FakeCommand.
@@ -36,6 +46,14 @@ export function parseFakeCommand(
 
   if (actionType === 'wait') {
     return { type: 'wait' };
+  }
+
+  if (actionType === 'gather') {
+    return { type: 'gather' };
+  }
+
+  if (actionType === 'deposit') {
+    return { type: 'deposit' };
   }
 
   return null;
