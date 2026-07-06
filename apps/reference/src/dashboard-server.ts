@@ -984,33 +984,41 @@ export class DashboardServer {
     function updateDashboard() {
       if (!state.runtime) return;
 
-      // Update runtime panel (fast)
-      const tickEl = document.getElementById('runtime-tick');
-      const elapsedEl = document.getElementById('runtime-elapsed');
-      if (tickEl) tickEl.textContent = state.runtime.currentTick;
-      if (elapsedEl) elapsedEl.textContent = state.runtime.elapsedMs + 'ms';
+      // Update runtime panel
+      document.getElementById('runtime-status').textContent = state.runtime.status;
+      document.getElementById('runtime-tick').textContent = state.runtime.currentTick;
+      document.getElementById('runtime-elapsed').textContent = state.runtime.elapsedMs + 'ms';
+      document.getElementById('runtime-mode').textContent = state.runtime.executionMode;
 
-      // Update mission panel (fast text updates only)
-      if (state.mission) {
-        const missionGoal = document.getElementById('mission-goal');
-        const missionStatus = document.getElementById('mission-status');
-        if (missionGoal) missionGoal.textContent = state.mission.goalIntent || 'N/A';
-        if (missionStatus) missionStatus.textContent = state.mission.goalStatus || 'N/A';
+      const badge = document.getElementById('status-badge');
+      if (badge) {
+        badge.textContent = state.runtime.status.toUpperCase();
+        badge.className = 'status-badge ' + state.runtime.status;
       }
 
-      // Update world panel (fast)
-      if (state.world) {
-        const friendlyEl = document.getElementById('world-friendly');
-        const enemyEl = document.getElementById('world-enemy');
-        if (friendlyEl) friendlyEl.textContent = state.world.friendlyUnits;
-        if (enemyEl) enemyEl.textContent = state.world.enemyUnits;
+      // Update mission panel
+      document.getElementById('mission-goal').textContent = state.mission?.goalIntent || 'N/A';
+      document.getElementById('mission-status').textContent = state.mission?.goalStatus || 'N/A';
+
+      // Update progress
+      if (state.mission?.progress) {
+        const progress = state.mission.progress;
+        const progressBar = document.getElementById('progress-bar');
+        if (progressBar) progressBar.style.width = progress.percent + '%';
+        document.getElementById('progress-percent').textContent = progress.percent + '%';
+
+        const trendEmoji = { 'improving': '↑', 'stable': '→', 'regressing': '↓' }[progress.trend] || '?';
+        document.getElementById('progress-trend').textContent = trendEmoji + ' ' + progress.trend;
+        document.getElementById('progress-evidence').textContent = progress.reason || '-';
       }
 
-      // Update timeline count only (no HTML generation)
-      if (state.timeline) {
-        const countEl = document.getElementById('timeline-count');
-        if (countEl) countEl.textContent = state.timeline.length;
-      }
+      // Update world panel
+      document.getElementById('world-friendly').textContent = state.world?.friendlyUnits || 0;
+      document.getElementById('world-enemy').textContent = state.world?.enemyUnits || 0;
+      document.getElementById('world-resources').textContent = state.world?.resources || 'N/A';
+
+      // Update timeline
+      document.getElementById('timeline-count').textContent = (state.timeline || []).length;
     }
 
     function formatInspection(inspection) {
