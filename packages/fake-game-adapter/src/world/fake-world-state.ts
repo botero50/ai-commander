@@ -40,6 +40,16 @@ export interface EnemyPosition {
 export type GameState = 'idle' | 'playing' | 'won' | 'lost';
 
 /**
+ * Failure reason for diagnostic reporting
+ */
+export type FailureReason =
+  | 'no-workers-no-military'
+  | 'army-defeated'
+  | 'no-resource-access'
+  | 'economy-failed'
+  | 'unknown';
+
+/**
  * Fake world state for the in-memory game adapter.
  *
  * Supports full RTS simulation:
@@ -49,6 +59,18 @@ export type GameState = 'idle' | 'playing' | 'won' | 'lost';
  * - Victory/defeat conditions
  * - Immutable snapshots
  */
+export interface MatchDiagnostics {
+  readonly failureReason?: FailureReason;
+  readonly failureTick?: number;
+  readonly resourcesEverGathered: number;
+  readonly workersProduced: number;
+  readonly militaryTrained: number;
+  readonly enemiesKilled: number;
+  readonly maxResources: number;
+  readonly peakWorkerCount: number;
+  readonly peakMilitaryCount: number;
+}
+
 export interface FakeWorldSnapshot {
   readonly tick: number;
   readonly gameState: GameState;
@@ -61,6 +83,7 @@ export interface FakeWorldSnapshot {
   readonly baseX: number;
   readonly baseY: number;
   readonly commandsExecuted: number;
+  readonly diagnostics: MatchDiagnostics;
 }
 
 /**
@@ -102,6 +125,15 @@ export function createInitialWorld(): FakeWorldSnapshot {
     baseX: 0,
     baseY: 0,
     commandsExecuted: 0,
+    diagnostics: Object.freeze({
+      resourcesEverGathered: 0,
+      workersProduced: 0,
+      militaryTrained: 0,
+      enemiesKilled: 0,
+      maxResources: 0,
+      peakWorkerCount: 1,
+      peakMilitaryCount: 0,
+    }),
   });
 }
 
@@ -193,11 +225,17 @@ export function gatherWorker(world: FakeWorldSnapshot, workerId: number): FakeWo
     carrying: worker.carrying + gatherAmount,
   });
 
+  const newDiagnostics = Object.freeze({
+    ...world.diagnostics,
+    resourcesEverGathered: world.diagnostics.resourcesEverGathered + gatherAmount,
+  });
+
   return Object.freeze({
     ...world,
     workers: Object.freeze(workers),
     resourceDeposits: newDeposits,
     commandsExecuted: world.commandsExecuted + 1,
+    diagnostics: newDiagnostics,
   });
 }
 
@@ -227,11 +265,18 @@ export function depositWorker(world: FakeWorldSnapshot, workerId: number): FakeW
     carrying: 0,
   });
 
+  const newResources = world.playerResources + worker.carrying;
+  const newDiagnostics = Object.freeze({
+    ...world.diagnostics,
+    maxResources: Math.max(world.diagnostics.maxResources, newResources),
+  });
+
   return Object.freeze({
     ...world,
     workers: Object.freeze(workers),
-    playerResources: world.playerResources + worker.carrying,
+    playerResources: newResources,
     commandsExecuted: world.commandsExecuted + 1,
+    diagnostics: newDiagnostics,
   });
 }
 
@@ -259,11 +304,18 @@ export function produceWorker(world: FakeWorldSnapshot): FakeWorldSnapshot {
 
   workers.push(newWorker);
 
+  const newDiagnostics = Object.freeze({
+    ...world.diagnostics,
+    workersProduced: world.diagnostics.workersProduced + 1,
+    peakWorkerCount: Math.max(world.diagnostics.peakWorkerCount, workers.length),
+  });
+
   return Object.freeze({
     ...world,
     workers: Object.freeze(workers),
     playerResources: world.playerResources - workerCost,
     commandsExecuted: world.commandsExecuted + 1,
+    diagnostics: newDiagnostics,
   });
 }
 
@@ -291,11 +343,18 @@ export function trainMilitaryUnit(world: FakeWorldSnapshot, unitType: 'infantry'
 
   units.push(newUnit);
 
+  const newDiagnostics = Object.freeze({
+    ...world.diagnostics,
+    militaryTrained: world.diagnostics.militaryTrained + 1,
+    peakMilitaryCount: Math.max(world.diagnostics.peakMilitaryCount, units.length),
+  });
+
   return Object.freeze({
     ...world,
     militaryUnits: Object.freeze(units),
     playerResources: world.playerResources - trainingCost,
     commandsExecuted: world.commandsExecuted + 1,
+    diagnostics: newDiagnostics,
   });
 }
 
@@ -400,6 +459,7 @@ export function attackUnit(
   const enemyUnits = Array.from(world.enemyUnits);
   const targetIndex = enemyUnits.findIndex((u) => u.id === targetId);
 
+  let enemiesKilledThisTurn = 0;
   if (newHealth > 0) {
     enemyUnits[targetIndex] = Object.freeze({
       ...target,
@@ -408,12 +468,19 @@ export function attackUnit(
   } else {
     // Enemy unit destroyed
     enemyUnits.splice(targetIndex, 1);
+    enemiesKilledThisTurn = 1;
   }
+
+  const newDiagnostics = Object.freeze({
+    ...world.diagnostics,
+    enemiesKilled: world.diagnostics.enemiesKilled + enemiesKilledThisTurn,
+  });
 
   const newWorld = Object.freeze({
     ...world,
     enemyUnits: Object.freeze(enemyUnits),
     commandsExecuted: world.commandsExecuted + 1,
+    diagnostics: newDiagnostics,
   });
 
   // Check for victory condition
@@ -447,9 +514,16 @@ export function checkDefeat(world: FakeWorldSnapshot): FakeWorldSnapshot {
   }
 
   if (world.workers.length === 0 && world.militaryUnits.length === 0) {
+    const newDiagnostics = Object.freeze({
+      ...world.diagnostics,
+      failureReason: 'no-workers-no-military' as FailureReason,
+      failureTick: world.tick,
+    });
+
     return Object.freeze({
       ...world,
       gameState: 'lost' as GameState,
+      diagnostics: newDiagnostics,
     });
   }
 
