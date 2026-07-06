@@ -1431,9 +1431,11 @@ export class MissionAgent {
       }
 
       // Yield to event loop to process dashboard updates (prevent UI blocking)
+      // Only add delay if explicitly configured (demo mode) or tickDelayMs > 0
       if (this.tickDelayMs > 0) {
         await new Promise(resolve => setTimeout(resolve, this.tickDelayMs));
       } else {
+        // Yield to event loop without delay for fast test execution
         await new Promise(resolve => setImmediate(resolve));
       }
     }

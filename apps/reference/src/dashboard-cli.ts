@@ -48,7 +48,7 @@ function parseArgs(): CLIArgs {
     port: getArg('--port', '3000'),
     targetX: getArg('--target-x', '3'),
     targetY: getArg('--target-y', '2'),
-    tickDelayMs: getArg('--tick-delay', '0'),
+    tickDelayMs: getArg('--tick-delay', '10'), // 10ms per tick keeps UI responsive
   };
 }
 
