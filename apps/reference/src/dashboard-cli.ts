@@ -29,6 +29,7 @@ interface CLIArgs {
   port: number;
   targetX: number;
   targetY: number;
+  tickDelayMs: number;
 }
 
 interface PrerequisiteStatus {
@@ -47,6 +48,7 @@ function parseArgs(): CLIArgs {
     port: getArg('--port', '3000'),
     targetX: getArg('--target-x', '3'),
     targetY: getArg('--target-y', '2'),
+    tickDelayMs: getArg('--tick-delay', '0'),
   };
 }
 
@@ -154,6 +156,11 @@ async function main() {
   // Create mission agent
   const missionAgent = new MissionAgent(args.targetX, args.targetY);
 
+  // Set tick delay if specified
+  if (args.tickDelayMs > 0) {
+    missionAgent.setTickDelay(args.tickDelayMs);
+  }
+
   // Initialize mission
   try {
     await missionAgent.initialize();
@@ -171,41 +178,24 @@ async function main() {
     const integration = new DashboardIntegration(dashboard);
     integration.initializeWithMission(missionAgent, runtime, trace, initialMetrics);
 
+    // Register integration callback with mission agent for real-time dashboard updates
+    missionAgent.setDashboardIntegration(integration);
+
     console.log('✓ Mission initialized');
     console.log('');
     console.log('Mission Running');
     console.log('');
 
-    // Execution loop with dashboard integration
-    let tickCount = 0;
-    const maxTicks = 100;
+    // Wait for browser to connect to dashboard stream
+    await new Promise((resolve) => setTimeout(resolve, 500));
+
     const startTime = Date.now();
 
-    while (tickCount < maxTicks && !integration.shouldStopExecution()) {
-      // Check for pause
-      if (integration.shouldPauseExecution()) {
-        process.stdout.write(`\r[Tick ${tickCount + 1}] Paused`);
-        await new Promise((resolve) => setTimeout(resolve, 100));
-        continue;
-      }
-
-      // Execute tick
-      await runtime.tick?.();
-      tickCount++;
-
-      const metrics = (missionAgent as any).metrics;
-      integration.updateAfterTick(tickCount, trace, metrics);
-
-      // Check mission completion
-      if ((trace as any).status === 'completed') {
-        break;
-      }
-
-      const percent = Math.floor((tickCount / maxTicks) * 100);
-      process.stdout.write(`\r[Tick ${tickCount}] Running (${percent}%)`);
-    }
+    // Run the mission - this handles all the ticks and trace recording
+    await missionAgent.run();
 
     const elapsedMs = Date.now() - startTime;
+    const tickCount = (missionAgent as any).currentTick || 0;
 
     console.log('');
     console.log('');

@@ -72,12 +72,14 @@ export class MissionAgent {
   private currentWorldState: WorldState | null = null;
   private isComplete: boolean = false;
   private tracer: ExecutionTracer;
+  private tickDelayMs: number = 0; // Delay between ticks in milliseconds (0 = no delay)
   private metrics: RuntimeMetrics | null = null;
   private replayReport: ReplayReport | null = null;
   private startTime: number = 0;
   private currentTick: number = 0;
   private currentGoal: any = null; // Goal for precondition checking
   private currentPlan: Plan | null = null; // Current plan being executed
+  private dashboardIntegration: any = null; // Dashboard integration callback
   private planValidator = new PlanValidator();
   private failureDiagnoser = new FailureDiagnoser();
   private recoveryStrategy = new RecoveryStrategy();
@@ -280,6 +282,21 @@ export class MissionAgent {
     };
 
     return decisionEngine;
+  }
+
+  /**
+   * Set the delay between ticks in milliseconds (for demo visualization).
+   * Default is 0 (no delay). Set to 100-500 to watch step-by-step.
+   */
+  setTickDelay(ms: number): void {
+    this.tickDelayMs = Math.max(0, ms);
+  }
+
+  /**
+   * Register the dashboard integration callback for updating UI after each tick.
+   */
+  setDashboardIntegration(integration: any): void {
+    this.dashboardIntegration = integration;
   }
 
   /**
@@ -547,7 +564,11 @@ export class MissionAgent {
         const activeGoal = this.currentGoal;
 
         // Execute one tick
-        await this.runtime.tick();
+        try {
+          await this.runtime.tick();
+        } catch (tickError) {
+          console.error(`  ✗ Runtime tick failed: ${tickError}`);
+        }
 
         // Verify goal completion using actual world state (not command count)
         const metrics = this.runtime.getMetrics();
@@ -1036,7 +1057,7 @@ export class MissionAgent {
             this.armyStaging.decideStagingReadiness(group.units.length, group.health || 0.5, threatModel.threats.length);
           }
 
-          const economyHealth = economyState.scalingFactor;
+          const economyHealth = economySnapshot.efficiency || 0.5;
           const militaryStrength = armyUnits.length > 0 ? Math.min(1, armyUnits.length / 4) : 0;
           const threatLevel = threatModel.threats.length > 0 ? Math.min(1, threatModel.threats.length / 5) : 0;
           this.attackTiming.decideAttackTiming(economyHealth, militaryStrength, threatLevel);
@@ -1301,6 +1322,17 @@ export class MissionAgent {
         console.log(
           `  📈 Progress: ${progressData.progressPercent}% (${progressData.trend}) - ${progressData.progressReason}`
         );
+
+        // Update dashboard with latest tick state
+        if (this.dashboardIntegration && this.runtime) {
+          const metrics = this.runtime.getMetrics();
+          this.dashboardIntegration.updateAfterTick(this.currentTick, this.tracer.getTrace(), metrics);
+        }
+
+        // Delay between ticks if configured (for visualization)
+        if (this.tickDelayMs > 0) {
+          await new Promise((resolve) => setTimeout(resolve, this.tickDelayMs));
+        }
 
         // Check if goal is satisfied in world state
         if (await this.isGoalSatisfied(activeGoal)) {
