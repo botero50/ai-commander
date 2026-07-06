@@ -1429,6 +1429,13 @@ export class MissionAgent {
         console.log(`  ✓ ${recoveryOutcome}`);
         this.tracer.recordRecoveryCompleted(recovery.action, recoveryOutcome);
       }
+
+      // Yield to event loop to process dashboard updates (prevent UI blocking)
+      if (this.tickDelayMs > 0) {
+        await new Promise(resolve => setTimeout(resolve, this.tickDelayMs));
+      } else {
+        await new Promise(resolve => setImmediate(resolve));
+      }
     }
 
     if (!this.isComplete) {
