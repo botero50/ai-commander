@@ -2,7 +2,7 @@
 
 **Project Phase**: Real Gameplay Validation (Milestones A-J)  
 **Objective**: Prove AI Commander can autonomously play real RTS games  
-**Status**: 50% Complete (5 of 10 milestones)  
+**Status**: 60% Complete (6 of 10 milestones)  
 
 ---
 
@@ -132,6 +132,36 @@
 
 ---
 
+## ✅ Milestone F: Failure Analysis & Diagnostics
+
+**Objective**: Detect and diagnose match failures with improvement suggestions
+
+**Achievements**:
+- Automatic failure detection system
+- Comprehensive metric tracking (resources, units, efficiency)
+- Bottleneck identification
+- Failure reason categorization
+- Actionable improvement suggestions
+- Human-readable diagnostic reports
+- Performance efficiency metrics
+- Severity classification (critical/major/minor)
+
+**Key Result**: Complete diagnostic framework for autonomous gameplay analysis
+
+**Tracked Metrics**:
+- Resources gathered (total and peak)
+- Workers produced and peak count
+- Military units trained and peak count
+- Enemies killed
+- Efficiency ratios (resource, worker, military, combat)
+- Command execution counts
+- Failure reason and tick
+
+**Tests**: 29 new failure analysis tests
+**Total Tests**: 1979 passing
+
+---
+
 ## Summary by Category
 
 ### What's Working
@@ -151,11 +181,11 @@
 ✅ Test coverage (1926 tests, 100% passing)
 
 ### What's Next
-🔄 Milestone F - Failure Analysis
-   - Automatic diagnostics of failures
-   - Decision point analysis
-   - Resource bottleneck detection
-   - Improvement suggestions
+🔄 Milestone G - AI Benchmark Platform
+   - Multiple LLM engines (Opus, Sonnet, Haiku)
+   - Comparable results across models
+   - Standardized testing conditions
+   - Performance metrics by model
 
 🔄 Milestone E - Full Match
    - Complete game from start to end
@@ -191,8 +221,8 @@
 
 ## Test Coverage
 
-**Total Tests**: 1950  
-**Passing**: 1950 (100%)  
+**Total Tests**: 1979  
+**Passing**: 1979 (100%)  
 **Skipped**: 8 (performance benchmarks)  
 **Failed**: 0
 
@@ -202,6 +232,7 @@
 - Economy system: 9 tests
 - Military system: 30 tests
 - Full match system: 24 tests
+- Failure analysis: 29 tests
 - Framework: 1870 tests
 
 ---
