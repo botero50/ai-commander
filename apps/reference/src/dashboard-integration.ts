@@ -31,6 +31,8 @@ export class DashboardIntegration {
   shouldStop: boolean = false;
   private lastTickBroadcast: number = 0;
   private lastProcessedEventCount: number = 0;
+  private lastDashboardUpdateTick: number = 0;
+  private updateThrottleInterval: number = 5; // Update every 5 ticks instead of every tick
 
   constructor(dashboard: DashboardServer) {
     this.dashboard = dashboard;
@@ -112,10 +114,16 @@ export class DashboardIntegration {
 
   /**
    * Simple tick update that refreshes runtime state (elapsed time, etc).
+   * Throttled to avoid overwhelming the browser.
    */
   updateOnTick(currentTick: number): void {
     if (!this.trace || !this.metrics) return;
-    this.updateRuntimeState(currentTick);
+
+    // Only update every N ticks to prevent overwhelming the browser
+    if (currentTick - this.lastDashboardUpdateTick >= this.updateThrottleInterval) {
+      this.updateRuntimeState(currentTick);
+      this.lastDashboardUpdateTick = currentTick;
+    }
   }
 
   /**
