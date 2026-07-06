@@ -42,7 +42,7 @@ describe('Adapter Validation - Milestone A', () => {
 
       const command = createCommand(
         createActionId('move'),
-        'agent-0',
+        'worker-0',
         'move',
         {
           dx: 1,
@@ -65,7 +65,7 @@ describe('Adapter Validation - Milestone A', () => {
 
       const command = createCommand(
         createActionId('wait'),
-        'agent-0',
+        'worker-0',
         'wait',
         {}
       );
@@ -85,7 +85,7 @@ describe('Adapter Validation - Milestone A', () => {
 
       const command = createCommand(
         createActionId('unknown'),
-        'agent-0',
+        'worker-0',
         'unknown-action',
         {}
       );
@@ -107,7 +107,7 @@ describe('Adapter Validation - Milestone A', () => {
 
       const moveCmd = createCommand(
         createActionId('move'),
-        'agent-0',
+        'worker-0',
         'move',
         {
           dx: 1,

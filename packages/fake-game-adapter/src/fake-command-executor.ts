@@ -2,7 +2,13 @@ import type { CommandExecutor, CommandExecutionResult } from '@ai-commander/adap
 import { AdapterErrorCode } from '@ai-commander/adapter';
 import type { Command } from '@ai-commander/domain';
 import type { FakeWorldSnapshot } from './world/fake-world-state.js';
-import { moveAgent, waitAgent, gatherAgent, depositAgent } from './world/fake-world-state.js';
+import {
+  moveWorker,
+  waitWorker,
+  gatherWorker,
+  depositWorker,
+  produceWorker,
+} from './world/fake-world-state.js';
 import { parseFakeCommand } from './types/fake-command.js';
 
 /**
@@ -30,7 +36,7 @@ export class FakeCommandExecutor implements CommandExecutor {
       return Promise.resolve(false);
     }
 
-    const fakeCmd = parseFakeCommand(command.actionType, command.parameters);
+    const fakeCmd = parseFakeCommand(command.actionType, command.parameters, command.agentId);
     return Promise.resolve(fakeCmd !== null);
   }
 
@@ -46,7 +52,7 @@ export class FakeCommandExecutor implements CommandExecutor {
       };
     }
 
-    const fakeCmd = parseFakeCommand(command.actionType, command.parameters);
+    const fakeCmd = parseFakeCommand(command.actionType, command.parameters, command.agentId);
     if (!fakeCmd) {
       return {
         success: false,
@@ -62,13 +68,15 @@ export class FakeCommandExecutor implements CommandExecutor {
       let newWorld: FakeWorldSnapshot;
 
       if (fakeCmd.type === 'move') {
-        newWorld = moveAgent(this.world, fakeCmd.dx, fakeCmd.dy);
+        newWorld = moveWorker(this.world, fakeCmd.workerId, fakeCmd.dx, fakeCmd.dy);
       } else if (fakeCmd.type === 'wait') {
-        newWorld = waitAgent(this.world);
+        newWorld = waitWorker(this.world, fakeCmd.workerId);
       } else if (fakeCmd.type === 'gather') {
-        newWorld = gatherAgent(this.world);
+        newWorld = gatherWorker(this.world, fakeCmd.workerId);
       } else if (fakeCmd.type === 'deposit') {
-        newWorld = depositAgent(this.world);
+        newWorld = depositWorker(this.world, fakeCmd.workerId);
+      } else if (fakeCmd.type === 'produce') {
+        newWorld = produceWorker(this.world);
       } else {
         const _exhaustive: never = fakeCmd;
         const exhaustiveCheck = _exhaustive as unknown as Record<string, unknown>;

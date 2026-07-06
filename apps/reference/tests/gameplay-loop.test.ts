@@ -45,7 +45,7 @@ describe('Milestone B: Closed Gameplay Loop', () => {
       for (let i = 0; i < 20; i++) {
         const moveCmd = createCommand(
           createActionId(`move-x-${i}`),
-          'agent-0',
+          'worker-0',
           'move',
           { dx: 1, dy: 0 }
         );
@@ -55,7 +55,7 @@ describe('Milestone B: Closed Gameplay Loop', () => {
       for (let i = 0; i < 20; i++) {
         const moveCmd = createCommand(
           createActionId(`move-y-${i}`),
-          'agent-0',
+          'worker-0',
           'move',
           { dx: 0, dy: 1 }
         );
@@ -65,7 +65,7 @@ describe('Milestone B: Closed Gameplay Loop', () => {
       // Now at (20, 20), gather
       const gatherCmd = createCommand(
         createActionId('gather-1'),
-        'agent-0',
+        'worker-0',
         'gather',
         {}
       );
@@ -75,7 +75,8 @@ describe('Milestone B: Closed Gameplay Loop', () => {
 
       // Check agent is carrying resources
       const state = await session.observationProvider.getWorldState();
-      const carrying = (state as any).customData?.['agent-carrying'] || 0;
+      const firstAgent = (state as any).agents?.[0];
+      const carrying = firstAgent?.customData?.carrying || 0;
       expect(carrying).toBeGreaterThan(0);
     });
 
@@ -83,7 +84,7 @@ describe('Milestone B: Closed Gameplay Loop', () => {
       // Gather at (0, 0) where no resources exist
       const gatherCmd = createCommand(
         createActionId('gather-empty'),
-        'agent-0',
+        'worker-0',
         'gather',
         {}
       );
@@ -93,7 +94,8 @@ describe('Milestone B: Closed Gameplay Loop', () => {
 
       // But agent should have no resources
       const state = await session.observationProvider.getWorldState();
-      const carrying = (state as any).customData?.['agent-carrying'] || 0;
+      const firstAgent = (state as any).agents?.[0];
+      const carrying = firstAgent?.customData?.carrying || 0;
       expect(carrying).toBe(0);
     });
 
@@ -102,7 +104,7 @@ describe('Milestone B: Closed Gameplay Loop', () => {
       for (let i = 0; i < 20; i++) {
         const moveCmd = createCommand(
           createActionId(`move-x2-${i}`),
-          'agent-0',
+          'worker-0',
           'move',
           { dx: 1, dy: 0 }
         );
@@ -112,7 +114,7 @@ describe('Milestone B: Closed Gameplay Loop', () => {
       for (let i = 0; i < 20; i++) {
         const moveCmd = createCommand(
           createActionId(`move-y2-${i}`),
-          'agent-0',
+          'worker-0',
           'move',
           { dx: 0, dy: 1 }
         );
@@ -123,7 +125,7 @@ describe('Milestone B: Closed Gameplay Loop', () => {
       for (let i = 0; i < 5; i++) {
         const gatherCmd = createCommand(
           createActionId(`gather-${i}`),
-          'agent-0',
+          'worker-0',
           'gather',
           {}
         );
@@ -131,7 +133,8 @@ describe('Milestone B: Closed Gameplay Loop', () => {
       }
 
       const state = await session.observationProvider.getWorldState();
-      const carrying = (state as any).customData?.['agent-carrying'] || 0;
+      const firstAgent = (state as any).agents?.[0];
+      const carrying = firstAgent?.customData?.carrying || 0;
 
       // Should have gathered at least 50 resources (5 x 10 per command, capped at 50)
       expect(carrying).toBeGreaterThan(0);
@@ -145,7 +148,7 @@ describe('Milestone B: Closed Gameplay Loop', () => {
       for (let i = 0; i < 20; i++) {
         const moveCmd = createCommand(
           createActionId(`move-x3-${i}`),
-          'agent-0',
+          'worker-0',
           'move',
           { dx: 1, dy: 0 }
         );
@@ -155,7 +158,7 @@ describe('Milestone B: Closed Gameplay Loop', () => {
       for (let i = 0; i < 20; i++) {
         const moveCmd = createCommand(
           createActionId(`move-y3-${i}`),
-          'agent-0',
+          'worker-0',
           'move',
           { dx: 0, dy: 1 }
         );
@@ -165,21 +168,23 @@ describe('Milestone B: Closed Gameplay Loop', () => {
       // Gather resources
       const gatherCmd = createCommand(
         createActionId('gather-deposit-test'),
-        'agent-0',
+        'worker-0',
         'gather',
         {}
       );
       await session.commandExecutor.executeCommand(gatherCmd);
 
       const beforeDeposit = await session.observationProvider.getWorldState();
-      const carryingBefore = (beforeDeposit as any).customData?.['agent-carrying'] || 0;
+      // Get carrying from the first agent (worker 0)
+      const firstAgent = (beforeDeposit as any).agents?.[0];
+      const carryingBefore = firstAgent?.customData?.carrying || 0;
       expect(carryingBefore).toBeGreaterThan(0);
 
       // Move back to base (0, 0)
       for (let i = 0; i < 20; i++) {
         const moveCmd = createCommand(
           createActionId(`return-x-${i}`),
-          'agent-0',
+          'worker-0',
           'move',
           { dx: -1, dy: 0 }
         );
@@ -189,7 +194,7 @@ describe('Milestone B: Closed Gameplay Loop', () => {
       for (let i = 0; i < 20; i++) {
         const moveCmd = createCommand(
           createActionId(`return-y-${i}`),
-          'agent-0',
+          'worker-0',
           'move',
           { dx: 0, dy: -1 }
         );
@@ -199,7 +204,7 @@ describe('Milestone B: Closed Gameplay Loop', () => {
       // Deposit
       const depositCmd = createCommand(
         createActionId('deposit-1'),
-        'agent-0',
+        'worker-0',
         'deposit',
         {}
       );
@@ -209,7 +214,8 @@ describe('Milestone B: Closed Gameplay Loop', () => {
       // Check player resources increased
       const afterDeposit = await session.observationProvider.getWorldState();
       const playerResources = (afterDeposit as any).customData?.['player-resources'] || 0;
-      const carryingAfter = (afterDeposit as any).customData?.['agent-carrying'] || 0;
+      const firstAgentAfter = (afterDeposit as any).agents?.[0];
+      const carryingAfter = firstAgentAfter?.customData?.carrying || 0;
 
       expect(playerResources).toBeGreaterThan(0);
       expect(carryingAfter).toBe(0);
@@ -220,7 +226,7 @@ describe('Milestone B: Closed Gameplay Loop', () => {
       for (let i = 0; i < 5; i++) {
         const moveCmd = createCommand(
           createActionId(`move-away-x-${i}`),
-          'agent-0',
+          'worker-0',
           'move',
           { dx: 1, dy: 0 }
         );
@@ -230,7 +236,7 @@ describe('Milestone B: Closed Gameplay Loop', () => {
       for (let i = 0; i < 5; i++) {
         const moveCmd = createCommand(
           createActionId(`move-away-y-${i}`),
-          'agent-0',
+          'worker-0',
           'move',
           { dx: 0, dy: 1 }
         );
@@ -240,7 +246,7 @@ describe('Milestone B: Closed Gameplay Loop', () => {
       // Try to deposit (should have nothing to deposit)
       const depositCmd = createCommand(
         createActionId('deposit-fail'),
-        'agent-0',
+        'worker-0',
         'deposit',
         {}
       );
@@ -260,7 +266,7 @@ describe('Milestone B: Closed Gameplay Loop', () => {
       for (let i = 0; i < 20; i++) {
         const moveCmd = createCommand(
           createActionId(`loop-move-x-${i}`),
-          'agent-0',
+          'worker-0',
           'move',
           { dx: 1, dy: 0 }
         );
@@ -270,7 +276,7 @@ describe('Milestone B: Closed Gameplay Loop', () => {
       for (let i = 0; i < 20; i++) {
         const moveCmd = createCommand(
           createActionId(`loop-move-y-${i}`),
-          'agent-0',
+          'worker-0',
           'move',
           { dx: 0, dy: 1 }
         );
@@ -280,7 +286,7 @@ describe('Milestone B: Closed Gameplay Loop', () => {
       // 2. Gather
       const gatherCmd = createCommand(
         createActionId('loop-gather'),
-        'agent-0',
+        'worker-0',
         'gather',
         {}
       );
@@ -290,7 +296,7 @@ describe('Milestone B: Closed Gameplay Loop', () => {
       for (let i = 0; i < 20; i++) {
         const moveCmd = createCommand(
           createActionId(`loop-return-x-${i}`),
-          'agent-0',
+          'worker-0',
           'move',
           { dx: -1, dy: 0 }
         );
@@ -300,7 +306,7 @@ describe('Milestone B: Closed Gameplay Loop', () => {
       for (let i = 0; i < 20; i++) {
         const moveCmd = createCommand(
           createActionId(`loop-return-y-${i}`),
-          'agent-0',
+          'worker-0',
           'move',
           { dx: 0, dy: -1 }
         );
@@ -310,7 +316,7 @@ describe('Milestone B: Closed Gameplay Loop', () => {
       // 4. Deposit
       const depositCmd = createCommand(
         createActionId('loop-deposit'),
-        'agent-0',
+        'worker-0',
         'deposit',
         {}
       );
@@ -319,9 +325,10 @@ describe('Milestone B: Closed Gameplay Loop', () => {
       // 5. Verify resources increased
       const finalState = await session.observationProvider.getWorldState();
       const playerResources = (finalState as any).customData?.['player-resources'] || 0;
-      const agentCarrying = (finalState as any).customData?.['agent-carrying'] || 0;
-      const agentX = (finalState as any).agents?.[0]?.customData?.x || 0;
-      const agentY = (finalState as any).agents?.[0]?.customData?.y || 0;
+      const finalAgent = (finalState as any).agents?.[0];
+      const agentCarrying = finalAgent?.customData?.carrying || 0;
+      const agentX = finalAgent?.customData?.x || 0;
+      const agentY = finalAgent?.customData?.y || 0;
 
       expect(playerResources).toBeGreaterThan(0);
       expect(agentCarrying).toBe(0);
@@ -337,7 +344,7 @@ describe('Milestone B: Closed Gameplay Loop', () => {
         for (let i = 0; i < 20; i++) {
           const moveCmd = createCommand(
             createActionId(`loop${loop}-move-x-${i}`),
-            'agent-0',
+            'worker-0',
             'move',
             { dx: 1, dy: 0 }
           );
@@ -347,7 +354,7 @@ describe('Milestone B: Closed Gameplay Loop', () => {
         for (let i = 0; i < 20; i++) {
           const moveCmd = createCommand(
             createActionId(`loop${loop}-move-y-${i}`),
-            'agent-0',
+            'worker-0',
             'move',
             { dx: 0, dy: 1 }
           );
@@ -357,7 +364,7 @@ describe('Milestone B: Closed Gameplay Loop', () => {
         // Gather
         const gatherCmd = createCommand(
           createActionId(`loop${loop}-gather`),
-          'agent-0',
+          'worker-0',
           'gather',
           {}
         );
@@ -367,7 +374,7 @@ describe('Milestone B: Closed Gameplay Loop', () => {
         for (let i = 0; i < 20; i++) {
           const moveCmd = createCommand(
             createActionId(`loop${loop}-return-x-${i}`),
-            'agent-0',
+            'worker-0',
             'move',
             { dx: -1, dy: 0 }
           );
@@ -377,7 +384,7 @@ describe('Milestone B: Closed Gameplay Loop', () => {
         for (let i = 0; i < 20; i++) {
           const moveCmd = createCommand(
             createActionId(`loop${loop}-return-y-${i}`),
-            'agent-0',
+            'worker-0',
             'move',
             { dx: 0, dy: -1 }
           );
@@ -387,7 +394,7 @@ describe('Milestone B: Closed Gameplay Loop', () => {
         // Deposit
         const depositCmd = createCommand(
           createActionId(`loop${loop}-deposit`),
-          'agent-0',
+          'worker-0',
           'deposit',
           {}
         );
@@ -396,9 +403,11 @@ describe('Milestone B: Closed Gameplay Loop', () => {
 
       const finalState = await session.observationProvider.getWorldState();
       const playerResources = (finalState as any).customData?.['player-resources'] || 0;
+      const workerCount = (finalState as any).customData?.['worker-count'] || 0;
 
       // Should have gathered from multiple loops
       expect(playerResources).toBeGreaterThan(0);
+      expect(workerCount).toBe(1); // Still just one worker
     });
   });
 });

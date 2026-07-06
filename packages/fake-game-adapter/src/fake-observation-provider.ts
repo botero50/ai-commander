@@ -12,6 +12,7 @@ import {
   createAgent,
   createPlayerId,
   createResourcePool,
+  AgentState as AgentStateEnum,
 } from '@ai-commander/domain';
 import type { FakeWorldSnapshot } from './world/fake-world-state.js';
 
@@ -92,34 +93,37 @@ export class FakeObservationProvider implements ObservationProvider {
     const tick = createTick(snapshot.tick);
     const gameTime = createGameTime(tick, null, `Tick ${snapshot.tick}`);
 
-    const positionId = `${snapshot.agentX},${snapshot.agentY}`;
-    const position = createPosition(positionId, `(${snapshot.agentX}, ${snapshot.agentY})`);
-    const map = createGameMap('fake-world', 'Fake World', [position], null, null);
+    // Create positions for all workers
+    const positions = snapshot.workers.map((worker) =>
+      createPosition(`${worker.x},${worker.y}`, `(${worker.x}, ${worker.y})`)
+    );
 
-    const agentId = createAgent('agent-0');
+    const map = createGameMap('fake-world', 'Fake World', positions, null, null);
+
     const playerId = createPlayerId('player-0');
     const resourcePool = createResourcePool([], []);
 
-    const agentSnapshot = createAgentSnapshot(
-      agentId,
-      playerId,
-      snapshot.agentState,
-      resourcePool,
-      {
+    // Create agent snapshots for all workers
+    const agentSnapshots = snapshot.workers.map((worker) => {
+      const agentId = createAgent(`worker-${worker.id}`);
+      const positionId = `${worker.x},${worker.y}`;
+
+      return createAgentSnapshot(agentId, playerId, AgentStateEnum.Idle, resourcePool, {
         position: positionId,
-        x: snapshot.agentX,
-        y: snapshot.agentY,
-        carrying: snapshot.agentCarrying,
-      }
-    );
+        x: worker.x,
+        y: worker.y,
+        carrying: worker.carrying,
+        workerId: worker.id,
+      });
+    });
 
     const player = createPlayer(playerId, 'Player', null, true, {});
 
-    return createWorldState(gameTime, map, [player], [], [agentSnapshot], {
+    return createWorldState(gameTime, map, [player], [], agentSnapshots, {
       'commands-executed': snapshot.commandsExecuted,
       'adapter-type': 'fake',
       'player-resources': snapshot.playerResources,
-      'agent-carrying': snapshot.agentCarrying,
+      'worker-count': snapshot.workers.length,
       'resource-deposits': JSON.stringify(Array.from(snapshot.resourceDeposits.entries())),
       'base-position': `${snapshot.baseX},${snapshot.baseY}`,
     });
