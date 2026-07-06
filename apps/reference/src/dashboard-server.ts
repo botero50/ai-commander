@@ -146,7 +146,6 @@ export class DashboardServer {
   private server: http.Server;
   private port: number;
   private state: DashboardState;
-  private clients: ServerResponse[] = [];
   private controlCallbacks: Map<string, (cmd: string) => Promise<void>> = new Map();
   private stateChangeCallbacks: Map<string, (state: DashboardState) => void> = new Map();
   private debugger: DashboardDebugger = new DashboardDebugger();
@@ -232,7 +231,6 @@ export class DashboardServer {
     if (callback) {
       callback(this.state);
     }
-    this.broadcastState();
   }
 
   /**
@@ -263,7 +261,6 @@ export class DashboardServer {
         progress,
       }),
     });
-    this.broadcastState();
   }
 
   /**
@@ -282,7 +279,6 @@ export class DashboardServer {
         goalSelectionReasoning: reasoning,
       }),
     });
-    this.broadcastState();
   }
 
   updateGoalLifecycles(lifecycles: readonly DashboardGoalLifecycle[]): void {
@@ -294,7 +290,6 @@ export class DashboardServer {
         goalLifecycles: lifecycles,
       }),
     });
-    this.broadcastState();
   }
 
   updateGoalAdaptation(adaptation: {
@@ -313,7 +308,6 @@ export class DashboardServer {
         lastGoalAdaptation: adaptation,
       }),
     });
-    this.broadcastState();
   }
 
   updateGatheringProgress(progress: {
@@ -338,7 +332,6 @@ export class DashboardServer {
         gatheringProgress: progress,
       }),
     });
-    this.broadcastState();
   }
 
   /**
@@ -398,8 +391,6 @@ export class DashboardServer {
         this.handleRootRequest(res);
       } else if (url === '/api/state' && req.method === 'GET') {
         this.handleStateRequest(res);
-      } else if (url === '/api/stream' && req.method === 'GET') {
-        this.handleStreamRequest(req, res);
       } else if (url === '/api/control' && req.method === 'POST') {
         this.handleControlRequest(req, res);
       } else if (url.startsWith('/api/debugger/select-tick/') && req.method === 'POST') {
@@ -464,28 +455,6 @@ export class DashboardServer {
   /**
    * Handle SSE stream request.
    */
-  private handleStreamRequest(req: IncomingMessage, res: ServerResponse): void {
-    res.writeHead(200, {
-      'Content-Type': 'text/event-stream',
-      'Cache-Control': 'no-cache',
-      Connection: 'keep-alive',
-    });
-
-    // Register client
-    this.clients.push(res);
-
-    // Send initial state
-    res.write(`data: ${JSON.stringify(this.state)}\n\n`);
-
-    // Handle client disconnect
-    req.on('close', () => {
-      const index = this.clients.indexOf(res);
-      if (index !== -1) {
-        this.clients.splice(index, 1);
-      }
-    });
-  }
-
   /**
    * Handle control requests (pause, resume, step, stop).
    */
