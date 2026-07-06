@@ -8,6 +8,10 @@ import {
   gatherWorker,
   depositWorker,
   produceWorker,
+  trainMilitaryUnit,
+  scoutArea,
+  moveMilitaryUnit,
+  attackUnit,
 } from './world/fake-world-state.js';
 import { parseFakeCommand } from './types/fake-command.js';
 
@@ -77,6 +81,14 @@ export class FakeCommandExecutor implements CommandExecutor {
         newWorld = depositWorker(this.world, fakeCmd.workerId);
       } else if (fakeCmd.type === 'produce') {
         newWorld = produceWorker(this.world);
+      } else if (fakeCmd.type === 'train') {
+        newWorld = trainMilitaryUnit(this.world, fakeCmd.unitType);
+      } else if (fakeCmd.type === 'scout') {
+        newWorld = scoutArea(this.world, fakeCmd.unitId);
+      } else if (fakeCmd.type === 'move-military') {
+        newWorld = moveMilitaryUnit(this.world, fakeCmd.unitId, fakeCmd.dx, fakeCmd.dy);
+      } else if (fakeCmd.type === 'attack') {
+        newWorld = attackUnit(this.world, fakeCmd.attackerId, fakeCmd.targetId);
       } else {
         const _exhaustive: never = fakeCmd;
         const exhaustiveCheck = _exhaustive as unknown as Record<string, unknown>;

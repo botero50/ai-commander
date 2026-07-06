@@ -49,7 +49,7 @@ describe('FakeCommandExecutor', () => {
   it('should reject unknown command', async () => {
     const command: Command = {
       agentId: 'agent-0',
-      actionType: 'attack',
+      actionType: 'invalid-action-type',
     };
 
     const canExecute = await session.commandExecutor.canExecuteCommand(command);

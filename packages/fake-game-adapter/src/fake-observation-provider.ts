@@ -93,9 +93,14 @@ export class FakeObservationProvider implements ObservationProvider {
     const tick = createTick(snapshot.tick);
     const gameTime = createGameTime(tick, null, `Tick ${snapshot.tick}`);
 
-    // Create positions for all workers
-    const positions = snapshot.workers.map((worker) =>
-      createPosition(`${worker.x},${worker.y}`, `(${worker.x}, ${worker.y})`)
+    // Create positions for all workers and military units
+    const allUnits = [
+      ...snapshot.workers.map((w) => ({ x: w.x, y: w.y })),
+      ...snapshot.militaryUnits.map((u) => ({ x: u.x, y: u.y })),
+      ...snapshot.enemyUnits.map((u) => ({ x: u.x, y: u.y })),
+    ];
+    const positions = allUnits.map((u) =>
+      createPosition(`${u.x},${u.y}`, `(${u.x}, ${u.y})`)
     );
 
     const map = createGameMap('fake-world', 'Fake World', positions, null, null);
@@ -124,6 +129,9 @@ export class FakeObservationProvider implements ObservationProvider {
       'adapter-type': 'fake',
       'player-resources': snapshot.playerResources,
       'worker-count': snapshot.workers.length,
+      'military-units': JSON.stringify(snapshot.militaryUnits.map((u) => ({ id: u.id, type: u.type, x: u.x, y: u.y, health: u.health }))),
+      'enemy-units': JSON.stringify(snapshot.enemyUnits.map((u) => ({ id: u.id, type: u.type, x: u.x, y: u.y, health: u.health }))),
+      'known-enemies': JSON.stringify(snapshot.knownEnemies.map((k) => ({ unitId: k.unitId, x: k.x, y: k.y, lastSeen: k.lastSeen }))),
       'resource-deposits': JSON.stringify(Array.from(snapshot.resourceDeposits.entries())),
       'base-position': `${snapshot.baseX},${snapshot.baseY}`,
     });

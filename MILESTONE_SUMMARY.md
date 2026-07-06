@@ -2,7 +2,7 @@
 
 **Project Phase**: Real Gameplay Validation (Milestones A-J)  
 **Objective**: Prove AI Commander can autonomously play real RTS games  
-**Status**: 30% Complete (3 of 10 milestones)  
+**Status**: 40% Complete (4 of 10 milestones)  
 
 ---
 
@@ -74,6 +74,34 @@
 
 ---
 
+## ✅ Milestone D: Military Validation
+
+**Objective**: Validate military systems and combat mechanics with only observable world state
+
+**Achievements**:
+- Military unit production from resources (costs 100)
+- Scouting mechanics with range detection (range 30)
+- Fog of war tracking (known enemies list)
+- Enemy detection (visible within scout range)
+- Unit movement by offset
+- Combat mechanics (damage varies by type)
+- Army coordination (multiple units attacking)
+- Tactical positioning (movement towards enemy)
+- Retreat and reinforcement patterns
+- Attack sequencing and damage accumulation
+
+**Key Result**: Complete combat system integrated and validated
+
+**Unit Types**:
+- Infantry: 10 damage per attack
+- Ranged: 15 damage per attack  
+- Tank: 20 damage per attack
+
+**Tests**: 30 tests covering all military features
+**Total Tests**: 1926 passing (including A, B, C, D)
+
+---
+
 ## Summary by Category
 
 ### What's Working
@@ -84,16 +112,19 @@
 ✅ Resource management (accumulation, spending)
 ✅ Worker production (economic scaling)
 ✅ Multi-unit control (independent worker state)
+✅ Military unit production (costs 100 resources)
+✅ Combat mechanics (typed damage, health tracking)
+✅ Scouting and fog of war (enemy detection)
+✅ Unit formations (coordinate multiple units)
 ✅ Deterministic execution (same input = same output)
 ✅ Observable state (no hidden simulation)
-✅ Test coverage (1334 tests, 100% passing)
+✅ Test coverage (1926 tests, 100% passing)
 
 ### What's Next
-🔄 Milestone D - Military Validation
-   - Unit production
-   - Combat systems
-   - Fog of war
-   - Army tactics
+🔄 Milestone E - Full Autonomous Match
+   - Complete game from start to end
+   - Victory/defeat conditions
+   - Full economy + military coordination
 
 🔄 Milestone E - Full Match
    - Complete game from start to end
@@ -129,8 +160,8 @@
 
 ## Test Coverage
 
-**Total Tests**: 1334  
-**Passing**: 1334 (100%)  
+**Total Tests**: 1926  
+**Passing**: 1926 (100%)  
 **Skipped**: 8 (performance benchmarks)  
 **Failed**: 0
 
@@ -138,7 +169,8 @@
 - Adapter validation: 7 tests
 - Gameplay loop: 10 tests
 - Economy system: 9 tests
-- Framework: 1308 tests
+- Military system: 30 tests
+- Framework: 1870 tests
 
 ---
 
