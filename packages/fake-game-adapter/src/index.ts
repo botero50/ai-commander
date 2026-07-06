@@ -5,8 +5,8 @@ export { FakeCommandExecutor } from './fake-command-executor.js';
 export {
   createInitialWorld,
   progressTick,
-  moveAgent,
-  waitAgent,
+  moveWorker,
+  waitWorker,
 } from './world/fake-world-state.js';
 export type { FakeWorldSnapshot } from './world/fake-world-state.js';
 export { parseFakeCommand } from './types/fake-command.js';
