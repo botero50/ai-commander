@@ -997,6 +997,7 @@ export class DashboardServer {
     function connectStream() {
       const eventSource = new EventSource('/api/stream');
 
+      let pendingUpdate = false;
       eventSource.onmessage = (event) => {
         const newState = JSON.parse(event.data);
         // Update other properties
@@ -1006,8 +1007,19 @@ export class DashboardServer {
         // Only append new timeline events, never replace
         if (newState.timeline && newState.timeline.length > 0) {
           state.timeline = (state.timeline || []).concat(newState.timeline);
+          // Keep only last 100 events to prevent memory bloat
+          if (state.timeline.length > 100) {
+            state.timeline = state.timeline.slice(-100);
+          }
         }
-        updateDashboard();
+        // Schedule update via requestAnimationFrame to batch DOM operations
+        if (!pendingUpdate) {
+          pendingUpdate = true;
+          requestAnimationFrame(() => {
+            updateDashboard();
+            pendingUpdate = false;
+          });
+        }
       };
 
       eventSource.onerror = () => {
@@ -1064,73 +1076,17 @@ export class DashboardServer {
       document.getElementById('mission-steps').textContent = state.mission.planSteps;
       document.getElementById('mission-current').textContent = state.mission.currentStep;
 
-      // Update goal candidates
-      if (state.mission.goalCandidates && state.mission.goalCandidates.length > 0) {
-        const list = document.getElementById('goal-candidates-list');
-        list.innerHTML = state.mission.goalCandidates
-          .map(candidate => {
-            const scoreColor = candidate.isSelected ? '#22c55e' : candidate.score > 0.7 ? '#f59e0b' : '#e5e7eb';
-            const bgColor = candidate.isSelected ? '#dcfce7' : candidate.score > 0.7 ? '#fef3c7' : '#f8fafc';
-            return \`
-              <div style="padding: 10px; margin-bottom: 8px; background: \${bgColor}; border-radius: 4px; border-left: 4px solid \${scoreColor};">
-                <div style="font-weight: 600; color: #1e293b; margin-bottom: 4px;">\${candidate.intent}</div>
-                <div style="font-size: 12px; color: #475569; margin-bottom: 4px;">
-                  Score: <span style="font-weight: 600; color: #1e293b;">\${candidate.score.toFixed(3)}</span>
-                </div>
-                <div style="font-size: 11px; color: #64748b; display: grid; grid-template-columns: 1fr 1fr; gap: 4px;">
-                  <div>Priority: \${candidate.priorityFactor.toFixed(2)}</div>
-                  <div>Status: \${candidate.statusFactor.toFixed(2)}</div>
-                  <div>Urgency: \${candidate.urgencyFactor.toFixed(2)}</div>
-                  <div>Feasibility: \${candidate.feasibilityFactor.toFixed(2)}</div>
-                </div>
-                \${candidate.isSelected ? '<div style="margin-top: 4px; font-size: 11px; color: #16a34a; font-weight: 600;">✓ Selected</div>' : ''}
-              </div>
-            \`;
-          })
-          .join('');
-      } else {
-        document.getElementById('goal-candidates-list').innerHTML = '';
-      }
+      // Update goal candidates - just show count for performance
+      const goalCandidatesCount = state.mission.goalCandidates ? state.mission.goalCandidates.length : 0;
+      document.getElementById('goal-candidates-list').textContent = goalCandidatesCount > 0
+        ? goalCandidatesCount + ' candidates evaluated'
+        : 'No candidates';
 
-      // Update goal lifecycles
-      if (state.mission.goalLifecycles && state.mission.goalLifecycles.length > 0) {
-        const list = document.getElementById('goal-lifecycles-list');
-        list.innerHTML = state.mission.goalLifecycles
-          .map(lifecycle => {
-            const stateColors = {
-              'Queued': { bg: '#f3f4f6', border: '#9ca3af', icon: '⏳' },
-              'Candidate': { bg: '#fef3c7', border: '#f59e0b', icon: '🔍' },
-              'Selected': { bg: '#dbeafe', border: '#3b82f6', icon: '👈' },
-              'Executing': { bg: '#d1fae5', border: '#10b981', icon: '▶️' },
-              'Completed': { bg: '#dcfce7', border: '#22c55e', icon: '✓' },
-              'Failed': { bg: '#fee2e2', border: '#ef4444', icon: '✗' },
-              'Blocked': { bg: '#f5e6ff', border: '#a855f7', icon: '🔒' },
-              'Cancelled': { bg: '#e5e7eb', border: '#6b7280', icon: '×' },
-            };
-            const colors = stateColors[lifecycle.lifecycleState] || stateColors['Queued'];
-
-            const transitionsHtml = lifecycle.transitions.length > 0
-              ? \`<div style="margin-top: 6px; font-size: 10px; color: #64748b;">
-                  Transitions: \${lifecycle.transitions.map(t => \`\${t.from}→\${t.to}\`).join(', ')}
-                </div>\`
-              : '';
-
-            return \`
-              <div style="padding: 8px; margin-bottom: 8px; background: \${colors.bg}; border-radius: 4px; border-left: 3px solid \${colors.border};">
-                <div style="display: flex; align-items: center; gap: 6px; font-weight: 600; color: #1e293b; margin-bottom: 3px;">
-                  <span>\${colors.icon}</span>
-                  <span>\${lifecycle.intent}</span>
-                  <span style="font-size: 11px; font-weight: normal; color: #64748b;">(\${lifecycle.lifecycleState})</span>
-                </div>
-                <div style="font-size: 10px; color: #64748b;">Created at tick \${lifecycle.createdAtTick}</div>
-                \${transitionsHtml}
-              </div>
-            \`;
-          })
-          .join('');
-      } else {
-        document.getElementById('goal-lifecycles-list').innerHTML = '';
-      }
+      // Update goal lifecycles - just show count for performance
+      const goalLifecyclesCount = state.mission.goalLifecycles ? state.mission.goalLifecycles.length : 0;
+      document.getElementById('goal-lifecycles-list').textContent = goalLifecyclesCount > 0
+        ? goalLifecyclesCount + ' goal transitions'
+        : 'No transitions';
 
       // Update resource gathering progress
       if (state.mission.gatheringProgress) {
@@ -1178,99 +1134,8 @@ export class DashboardServer {
       document.getElementById('mission-id').textContent = state.runtime.missionId;
       document.getElementById('timeline-count').textContent = state.timeline.length;
 
-      // Update timeline
-      const timelineEvents = document.getElementById('timeline-events');
-      if (state.timeline.length === 0) {
-        timelineEvents.innerHTML = '<div class="empty">Waiting for events...</div>';
-      } else {
-        timelineEvents.innerHTML = state.timeline
-          .slice()
-          .reverse()
-          .map(
-            (event) => {
-              const iconMap = {
-                'resource_field_detected': '🔍',
-                'resource_field_selected': '🎯',
-                'gathering_started': '⛏️',
-                'gathering_progress_updated': '📦',
-                'gathering_completed': '✅',
-                'worker_movement_started': '🚶',
-                'worker_position_updated': '📍',
-                'worker_arrival_detected': '🎪',
-                'worker_gathering_begun': '⚙️',
-                'worker_return_started': '🔄',
-                'worker_return_progress': '🔀',
-                'worker_return_complete': '🏠',
-                'resources_deposited': '📥',
-                'production_started': '🏗️',
-                'production_progress_updated': '⚒️',
-                'production_completed': '✅',
-                'unit_spawned': '👷',
-                'worker_assigned': '📌',
-                'worker_reassigned': '🔁',
-                'goal_candidates_evaluated': '🤔',
-                'goal_selected': '👈',
-                'goal_lifecycle_transitioned': '🔄',
-                'goal_adapted': '🔀',
-                'goal_progress_updated': '📈',
-                'decision_selected': '⚡',
-                'command_executed': '▶️',
-                'plan_generated': '📋',
-                'mission_completed': '🏁',
-                'mission_failed': '❌',
-                'mission_tick': '⏱️',
-              };
-
-              const colorMap = {
-                'resource_field_detected': '#8b5cf6',
-                'resource_field_selected': '#a78bfa',
-                'gathering_started': '#d946ef',
-                'gathering_progress_updated': '#ec4899',
-                'gathering_completed': '#06b6d4',
-                'worker_movement_started': '#f97316',
-                'worker_position_updated': '#fb923c',
-                'worker_arrival_detected': '#fbbf24',
-                'worker_gathering_begun': '#f59e0b',
-                'worker_return_started': '#06b6d4',
-                'worker_return_progress': '#0891b2',
-                'worker_return_complete': '#06b6d4',
-                'resources_deposited': '#10b981',
-                'production_started': '#f59e0b',
-                'production_progress_updated': '#f97316',
-                'production_completed': '#06b6d4',
-                'unit_spawned': '#ec4899',
-                'worker_assigned': '#8b5cf6',
-                'worker_reassigned': '#a78bfa',
-                'goal_candidates_evaluated': '#f59e0b',
-                'goal_selected': '#eab308',
-                'goal_lifecycle_transitioned': '#3b82f6',
-                'goal_adapted': '#10b981',
-                'goal_progress_updated': '#14b8a6',
-                'decision_selected': '#f97316',
-                'command_executed': '#06b6d4',
-                'plan_generated': '#0ea5e9',
-                'mission_completed': '#22c55e',
-                'mission_failed': '#ef4444',
-                'mission_tick': '#6b7280',
-              };
-
-              const icon = iconMap[event.type] || '•';
-              const color = colorMap[event.type] || '#6b7280';
-
-              return \`
-          <div class="timeline-event" title="\${event.detail}" style="border-left: 3px solid \${color};">
-            <div class="timeline-tick">Tick \${event.tick}</div>
-            <div class="timeline-type"><span style="font-size: 14px; margin-right: 4px;">\${icon}</span>\${event.type.replace(/_/g, ' ')}</div>
-            <div class="timeline-detail">\${event.detail.substring(0, 50)}\${event.detail.length > 50 ? '...' : ''}</div>
-          </div>
-        \`;
-            }
-          )
-          .join('');
-      }
-
-      // Auto-scroll timeline
-      timelineEvents.scrollTop = timelineEvents.scrollHeight;
+      // Update timeline - only update summary, hide full timeline to improve performance
+      document.getElementById('timeline-count').textContent = state.timeline.length;
 
       // Update inspection panel
       const inspectionPanel = document.getElementById('inspection-panel');
