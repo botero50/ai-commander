@@ -994,47 +994,33 @@ export class DashboardServer {
       timeline: [],
     };
 
-    function connectStream() {
-      const eventSource = new EventSource('/api/stream');
+    // Use polling instead of SSE to avoid overwhelming the browser
+    async function pollState() {
+      try {
+        const response = await fetch('/api/state');
+        const newState = await response.json();
 
-      eventSource.onmessage = (event) => {
-        const newState = JSON.parse(event.data);
-        // Update state (fast operation, no DOM)
         if (newState.runtime) state.runtime = newState.runtime;
-        if (newState.mission) state.mission = newState.mission;
-        if (newState.world) state.world = newState.world;
-        if (newState.timeline && newState.timeline.length > 0) {
-          state.timeline = (state.timeline || []).concat(newState.timeline);
-          if (state.timeline.length > 100) {
-            state.timeline = state.timeline.slice(-100);
-          }
-        }
-        // Update DOM immediately but keep it minimal
         updateDashboard();
-      };
 
-      eventSource.onerror = () => {
-        eventSource.close();
-        setTimeout(connectStream, 1000);
-      };
+        // Poll every 200ms
+        setTimeout(pollState, 200);
+      } catch (error) {
+        console.error('Poll error:', error);
+        // Retry after 1 second if error
+        setTimeout(pollState, 1000);
+      }
     }
 
     function updateDashboard() {
       if (!state.runtime) return;
 
-      // Only update the elements that change (tick and elapsed time)
-      // Avoid touching other elements to minimize DOM thrashing
+      // Only update tick and elapsed time
       const tickEl = document.getElementById('runtime-tick');
       const elapsedEl = document.getElementById('runtime-elapsed');
 
-      if (tickEl && tickEl.textContent !== String(state.runtime.currentTick)) {
-        tickEl.textContent = state.runtime.currentTick;
-      }
-      if (elapsedEl && elapsedEl.textContent !== (state.runtime.elapsedMs + 'ms')) {
-        elapsedEl.textContent = state.runtime.elapsedMs + 'ms';
-      }
-      // Only update tick and elapsed - skip all other DOM updates during mission execution
-      // This keeps the page responsive while the mission runs
+      if (tickEl) tickEl.textContent = state.runtime.currentTick;
+      if (elapsedEl) elapsedEl.textContent = state.runtime.elapsedMs + 'ms';
     }
 
     function formatInspection(inspection) {
@@ -1146,13 +1132,13 @@ export class DashboardServer {
       }
     }
 
-    // Connect to stream and load initial state
+    // Load initial state and start polling
     fetch('/api/state')
       .then((r) => r.json())
       .then((s) => {
         Object.assign(state, s);
         updateDashboard();
-        connectStream();
+        pollState();
       });
   </script>
 </body>

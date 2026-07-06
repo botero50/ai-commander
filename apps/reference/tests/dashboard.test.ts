@@ -411,7 +411,7 @@ describe('Dashboard HTML', () => {
     const response = await fetch(server.getUrl());
     const html = await response.text();
 
-    expect(html).toContain('/api/stream');
+    expect(html).toContain('/api/state');
     expect(html).toContain('/api/state');
     expect(html).toContain('/api/control');
   });
