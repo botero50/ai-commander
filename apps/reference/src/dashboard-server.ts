@@ -997,35 +997,20 @@ export class DashboardServer {
     function connectStream() {
       const eventSource = new EventSource('/api/stream');
 
-      let pendingUpdate = false;
-      let lastUpdateTime = 0;
-      const updateThrottle = 500; // Only update UI every 500ms max
-
       eventSource.onmessage = (event) => {
         const newState = JSON.parse(event.data);
-        // Update other properties
+        // Update state (fast operation, no DOM)
         if (newState.runtime) state.runtime = newState.runtime;
         if (newState.mission) state.mission = newState.mission;
         if (newState.world) state.world = newState.world;
-        // Only append new timeline events, never replace
         if (newState.timeline && newState.timeline.length > 0) {
           state.timeline = (state.timeline || []).concat(newState.timeline);
-          // Keep only last 100 events to prevent memory bloat
           if (state.timeline.length > 100) {
             state.timeline = state.timeline.slice(-100);
           }
         }
-
-        // Throttle DOM updates to prevent blocking
-        const now = Date.now();
-        if (now - lastUpdateTime >= updateThrottle && !pendingUpdate) {
-          pendingUpdate = true;
-          lastUpdateTime = now;
-          setTimeout(() => {
-            updateDashboard();
-            pendingUpdate = false;
-          }, 0);
-        }
+        // Update DOM immediately but keep it minimal
+        updateDashboard();
       };
 
       eventSource.onerror = () => {
@@ -1037,128 +1022,19 @@ export class DashboardServer {
     function updateDashboard() {
       if (!state.runtime) return;
 
-      // Update runtime panel
-      document.getElementById('runtime-status').textContent = state.runtime.status;
-      document.getElementById('runtime-tick').textContent = state.runtime.currentTick;
-      document.getElementById('runtime-elapsed').textContent = state.runtime.elapsedMs + 'ms';
-      document.getElementById('runtime-mode').textContent = state.runtime.executionMode;
+      // Only update the elements that change (tick and elapsed time)
+      // Avoid touching other elements to minimize DOM thrashing
+      const tickEl = document.getElementById('runtime-tick');
+      const elapsedEl = document.getElementById('runtime-elapsed');
 
-      // Update status badge
-      const badge = document.getElementById('status-badge');
-      badge.textContent = state.runtime.status.toUpperCase();
-      badge.className = 'status-badge ' + state.runtime.status;
-
-      // Update mission panel
-      document.getElementById('mission-goal').textContent = state.mission.goalIntent;
-      document.getElementById('mission-status').textContent = state.mission.goalStatus;
-
-      // Update progress
-      if (state.mission.progress) {
-        const progress = state.mission.progress;
-        document.getElementById('progress-bar').style.width = progress.percent + '%';
-        document.getElementById('progress-percent').textContent = progress.percent + '%';
-
-        // Trend indicator
-        const trendEmoji = {
-          'improving': '↑',
-          'stable': '→',
-          'regressing': '↓'
-        }[progress.trend] || '?';
-        document.getElementById('progress-trend').textContent = trendEmoji + ' ' + progress.trend;
-
-        // Evidence
-        const evidence = progress.evidence;
-        const evidenceText = evidence.currentX !== undefined && evidence.targetX !== undefined
-          ? \`(\${evidence.currentX},\${evidence.currentY}) → (\${evidence.targetX},\${evidence.targetY})\\nDistance: \${evidence.currentDistance}m\`
-          : progress.reason;
-        document.getElementById('progress-evidence').textContent = evidenceText;
-      } else {
-        document.getElementById('progress-bar').style.width = '0%';
-        document.getElementById('progress-percent').textContent = '0%';
-        document.getElementById('progress-trend').textContent = '-';
-        document.getElementById('progress-evidence').textContent = '-';
+      if (tickEl && tickEl.textContent !== String(state.runtime.currentTick)) {
+        tickEl.textContent = state.runtime.currentTick;
       }
-
-      document.getElementById('mission-steps').textContent = state.mission.planSteps;
-      document.getElementById('mission-current').textContent = state.mission.currentStep;
-
-      // Update goal candidates - just show count for performance
-      const goalCandidatesCount = state.mission.goalCandidates ? state.mission.goalCandidates.length : 0;
-      document.getElementById('goal-candidates-list').textContent = goalCandidatesCount > 0
-        ? goalCandidatesCount + ' candidates evaluated'
-        : 'No candidates';
-
-      // Update goal lifecycles - just show count for performance
-      const goalLifecyclesCount = state.mission.goalLifecycles ? state.mission.goalLifecycles.length : 0;
-      document.getElementById('goal-lifecycles-list').textContent = goalLifecyclesCount > 0
-        ? goalLifecyclesCount + ' goal transitions'
-        : 'No transitions';
-
-      // Update resource gathering progress
-      if (state.mission.gatheringProgress) {
-        const gathering = state.mission.gatheringProgress;
-        document.getElementById('gathering-progress').style.display = 'block';
-        document.getElementById('gathering-empty').style.display = 'none';
-        document.getElementById('gathering-field').textContent = gathering.fieldId;
-        document.getElementById('gathering-type').textContent = gathering.resourceType;
-        document.getElementById('gathering-percent').textContent = gathering.percentComplete + '%';
-        document.getElementById('gathering-bar').style.width = gathering.percentComplete + '%';
-        document.getElementById('gathering-collected').textContent = gathering.amountCollected + ' / ' + gathering.targetAmount;
-        document.getElementById('gathering-rate').textContent = gathering.gatheringRate.toFixed(1) + '/tick';
-
-        if (gathering.estimatedCompletionTick) {
-          const currentTick = parseInt(document.getElementById('runtime-ticks').textContent, 10);
-          const ticksRemaining = gathering.estimatedCompletionTick - currentTick;
-          document.getElementById('gathering-eta').textContent = ticksRemaining > 0 ? ticksRemaining + ' ticks' : 'now';
-        } else {
-          document.getElementById('gathering-eta').textContent = '—';
-        }
-
-        const statusEmoji = {
-          'traveling': '🚶',
-          'gathering': '⛏️',
-          'returning': '↩️',
-          'complete': '✓'
-        };
-        document.getElementById('gathering-status').textContent = (statusEmoji[gathering.status] || '•') + ' ' + gathering.status;
-      } else {
-        document.getElementById('gathering-progress').style.display = 'none';
-        document.getElementById('gathering-empty').style.display = 'block';
+      if (elapsedEl && elapsedEl.textContent !== (state.runtime.elapsedMs + 'ms')) {
+        elapsedEl.textContent = state.runtime.elapsedMs + 'ms';
       }
-
-      // Update world panel
-      document.getElementById('world-friendly').textContent = state.world.friendlyUnits;
-      document.getElementById('world-enemy').textContent = state.world.enemyUnits;
-      document.getElementById('world-resources').textContent = state.world.resources;
-      document.getElementById('world-observation').textContent = state.world.lastObservationMs + 'ms';
-
-      // Update decision panel
-      document.getElementById('decision-value').textContent = state.mission.lastDecision;
-      document.getElementById('command-value').textContent = state.mission.lastCommand;
-
-      // Update details panel
-      document.getElementById('mission-id').textContent = state.runtime.missionId;
-      document.getElementById('timeline-count').textContent = state.timeline.length;
-
-      // Update timeline - only update summary, hide full timeline to improve performance
-      document.getElementById('timeline-count').textContent = state.timeline.length;
-
-      // Update inspection panel
-      const inspectionPanel = document.getElementById('inspection-panel');
-      const inspectionContent = document.getElementById('inspection-content');
-      if (state.debugger && state.debugger.selectedTick !== null) {
-        inspectionPanel.style.display = 'block';
-        const inspection = state.debugger.inspection;
-        if (inspection) {
-          inspectionContent.innerHTML = \`
-            <div style="padding: 8px; background: #1a1a1a; border-radius: 4px; overflow-x: auto;">
-              <pre style="margin: 0; font-size: 11px; white-space: pre-wrap; word-break: break-word;">\${formatInspection(inspection)}</pre>
-            </div>
-          \`;
-        }
-      } else {
-        inspectionPanel.style.display = 'none';
-      }
+      // Only update tick and elapsed - skip all other DOM updates during mission execution
+      // This keeps the page responsive while the mission runs
     }
 
     function formatInspection(inspection) {
