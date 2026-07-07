@@ -302,6 +302,12 @@ importers:
         specifier: ^0.34.0
         version: 0.34.6
 
+  packages/optimizer:
+    dependencies:
+      '@ai-commander/match-runner':
+        specifier: workspace:*
+        version: link:../match-runner
+
   packages/planner:
     dependencies:
       '@ai-commander/core':
