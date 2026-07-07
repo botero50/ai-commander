@@ -198,6 +198,8 @@ importers:
         specifier: workspace:*
         version: link:../tournament-engine
 
+  packages/community: {}
+
   packages/compliance: {}
 
   packages/config:
