@@ -1,0 +1,39 @@
+{
+  "version": "2.0.0",
+  "format": "swiss",
+  "rounds": 5,
+  "brains": [
+    {
+      "provider": "openai",
+      "openai": {
+        "apiKey": "${OPENAI_API_KEY}",
+        "model": "gpt-4",
+        "temperature": 0.7
+      }
+    },
+    {
+      "provider": "claude",
+      "claude": {
+        "apiKey": "${ANTHROPIC_API_KEY}",
+        "model": "claude-3-opus-20240229"
+      }
+    },
+    {
+      "provider": "ollama",
+      "ollama": {
+        "endpoint": "http://localhost:11434",
+        "model": "mistral"
+      }
+    },
+    {
+      "provider": "gemini",
+      "gemini": {
+        "apiKey": "${GOOGLE_API_KEY}",
+        "model": "gemini-pro"
+      }
+    }
+  ],
+  "mapSeeds": [100, 200, 300],
+  "maxTicksPerMatch": 150,
+  "gameAdapterId": "openra"
+}

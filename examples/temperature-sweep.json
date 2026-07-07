@@ -1,0 +1,44 @@
+{
+  "version": "2.0.0",
+  "name": "Temperature Sweep",
+  "variants": [
+    {
+      "id": "temp-0.3",
+      "label": "Temperature 0.3 (Deterministic)",
+      "brainConfig": {
+        "provider": "openai",
+        "openai": {
+          "apiKey": "${OPENAI_API_KEY}",
+          "model": "gpt-4",
+          "temperature": 0.3
+        }
+      }
+    },
+    {
+      "id": "temp-0.7",
+      "label": "Temperature 0.7 (Balanced)",
+      "brainConfig": {
+        "provider": "openai",
+        "openai": {
+          "apiKey": "${OPENAI_API_KEY}",
+          "model": "gpt-4",
+          "temperature": 0.7
+        }
+      }
+    },
+    {
+      "id": "temp-1.0",
+      "label": "Temperature 1.0 (Creative)",
+      "brainConfig": {
+        "provider": "openai",
+        "openai": {
+          "apiKey": "${OPENAI_API_KEY}",
+          "model": "gpt-4",
+          "temperature": 1.0
+        }
+      }
+    }
+  ],
+  "tournamentsPerVariant": 2,
+  "mapsPerTournament": 3
+}
