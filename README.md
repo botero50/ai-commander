@@ -1,397 +1,213 @@
-# AI Commander
+# AI Commander v2.0
 
-**v1.0.0 — Production-Ready Framework for Strategy Game AI**
-
-![License: MIT](https://img.shields.io/badge/license-MIT-blue.svg)
-![Node.js: >=22.0.0](https://img.shields.io/badge/node.js-%3E%3D22.0.0-brightgreen)
-![TypeScript: 5.6+](https://img.shields.io/badge/typescript-5.6%2B-blue)
-![Tests: 1870+](https://img.shields.io/badge/tests-1870%2B-brightgreen)
-![Status: Stable](https://img.shields.io/badge/status-stable-brightgreen)
-
----
-
-## Experience AI Commander in 5 Minutes
-
-Start here. Clone, install, and run your first mission:
-
-```bash
-git clone https://github.com/anthropics/ai-commander
-cd ai-commander
-pnpm install
-pnpm run mission
-```
-
-This executes an autonomous AI mission to reach a target location. You'll see:
-- **Real-time execution** with goal evaluation at each tick
-- **Decision reasoning** showing why each action was chosen
-- **Progress tracking** toward the goal
-- **Execution trace** of every decision and action
-
-For detailed setup instructions, see the [Quick Start Guide](./docs/QUICK_START.md).
-
----
-
-## What is AI Commander?
-
-AI Commander is a **framework for building autonomous AI agents that play strategy games**. It provides production-ready infrastructure for:
-
-- **Observation:** Reading game state and converting to unified world model
-- **Planning:** Transforming goals into ordered action sequences
-- **Decision-Making:** Selecting next action to execute
-- **Command Execution:** Translating AI decisions into game commands
-- **Determinism:** Ensuring identical behavior across runs for testing and replay
-
-The framework is **game-agnostic** and **AI-agnostic**: you integrate any game (via GameAdapter) and any planning/decision algorithm (via Planner and DecisionEngine contracts).
-
-### Key Characteristics
-
-✅ **Thoroughly Tested:** 1870+ tests, 100% passing rate, covering all systems  
-✅ **Deterministic:** Identical inputs produce identical outputs for reproducible testing  
-✅ **Composable:** Build agents by assembling simple components  
-✅ **TypeScript:** Type-safe with strict mode enabled  
-✅ **Observable:** Complete execution traces with 100+ event types  
-✅ **Debuggable:** Browser dashboard and CLI tools for analysis  
-✅ **Zero Heavy Dependencies:** Only 'open' package, minimal external libraries
-
----
+🎮 The best open-source platform for comparing, benchmarking, replaying and understanding autonomous LLMs playing games under identical conditions.
 
 ## Features
 
-### Browser Runtime Dashboard
+- **5 Brain Providers**: OpenAI, Claude, Gemini, Ollama (local), Builtin RTS AI
+- **4 Tournament Formats**: Round Robin, Swiss, Best of N, Elimination
+- **Comprehensive Analysis**: ELO ratings, strategy classification, decision divergence
+- **Multiple Game Adapters**: OpenRA RTS, Checkers (and extensible for more)
+- **Real Cost Tracking**: USD per token with per-provider pricing
+- **Rich Reports**: HTML, Markdown, JSON, CSV exports
+- **Hyperparameter Tuning**: Compare temperatures, models, reasoning styles
+- **Research Dashboard**: Web UI for tournament analysis and visualization
 
-A real-time debugger showing:
-- Mission execution progress (tick counter, elapsed time)
-- Runtime state (status, current tick, execution mode)
-- Mission info (goal, plan status, decisions, commands)
-- World state (agents, resources, observations)
-- **Live timeline** of all execution events
-- **Tick inspection** — click events to examine AI reasoning
-- **Tick comparison** — see what changed between any two moments
-- **Step controls** — pause, resume, step through execution
-
-### Complete Observability
-
-Every mission produces:
-- **Execution Trace** — Comprehensive event recording of every decision, action, and state change
-- **Runtime Metrics** — Performance measurements (timing, tick count, command success rate)
-- **Replay Report** — Validation of execution consistency
-- **JSON Export** — For analysis and integration with external tools
-
-### Deterministic Execution
-
-- Same agent + same world = same execution every time
-- Perfect for testing, benchmarking, and reproducible AI development
-- No randomness, no hidden state, no surprises
-
----
-
-## Installation
-
-### Prerequisites
-
-- **Node.js 22+** — Download from [nodejs.org](https://nodejs.org/)
-- **pnpm** — Package manager (install with `npm install -g pnpm`)
-
-### Quick Setup
+## Quick Start
 
 ```bash
-# Clone the repository
-git clone https://github.com/anthropics/ai-commander
+git clone <repo>
 cd ai-commander
-
-# Install dependencies
 pnpm install
-
-# Run the demo
-pnpm demo
+pnpm build
 ```
 
-The demo will:
-1. Verify your Node.js version
-2. Start a browser dashboard on http://localhost:3000
-3. Open your browser automatically
-4. Run an autonomous AI mission
-5. Let you inspect and analyze the execution
-
----
-
-## Use Cases
-
-### 1. Learning AI Programming
-
-Understand how autonomous agents work:
+Set API keys:
 ```bash
-pnpm demo  # See a complete agent in action
+export OPENAI_API_KEY=sk-...
+export ANTHROPIC_API_KEY=sk-ant-...
+export GOOGLE_API_KEY=...
 ```
 
-Then explore:
-- `apps/reference/src/mission-agent.ts` — Agent orchestration
-- `apps/reference/src/movement-planner.ts` — Planning implementation
-- `packages/behavior-tree/` — Decision structure
-
-### 2. Building Custom Agents
-
-Create your own planner or decision engine:
+Run a tournament:
 ```typescript
-import { Planner, PlanningResult, PlanningRequest } from '@ai-commander/planner';
+import { BrainManager } from '@ai-commander/brain';
+import { TournamentEngine } from '@ai-commander/tournament-engine';
+import { BenchmarkReporter } from '@ai-commander/benchmark-reporter';
 
-class MyPlanner implements Planner {
-  async plan(request: PlanningRequest): Promise<PlanningResult> {
-    // Your planning algorithm here
-  }
-}
-
-// Use it in any agent
-const runtime = createAgentRuntime({
-  planner: new MyPlanner(),
-  // ... other config
+const gpt4 = await BrainManager.create({
+  provider: 'openai',
+  openai: { apiKey: process.env.OPENAI_API_KEY!, model: 'gpt-4' },
 });
+
+const claude = await BrainManager.create({
+  provider: 'claude',
+  claude: { apiKey: process.env.ANTHROPIC_API_KEY!, model: 'claude-3-sonnet-20240229' },
+});
+
+const result = await TournamentEngine.roundRobin({
+  brains: [gpt4, claude],
+  mapSeeds: [12345],
+  maxTicksPerMatch: 200,
+  gameAdapterId: 'openra',
+});
+
+const report = BenchmarkReporter.generateReport(result);
+console.log(BenchmarkReporter.toMarkdown(report));
 ```
 
-### 3. Game Integration
+## Architecture
 
-Connect to your game via GameAdapter:
+### Brain SDK
+
+Universal interface for decision makers. All providers implement:
+
 ```typescript
-import { GameAdapter, GameSession } from '@ai-commander/adapter';
-
-class MyGameAdapter implements GameAdapter {
-  async initialize() { /* ... */ }
-  async createSession() { /* returns GameSession */ }
-  async shutdown() { /* ... */ }
-  
-  getCapabilities() {
-    return {
-      deterministic: true,
-      supportsReplay: true,
-      pauseResume: true,
-    };
-  }
+interface Brain {
+  decide(observation, goals, commands, memory): Promise<BrainDecision>;
+  getMetrics?(): { totalTokensUsed, totalCost };
 }
+```
 
-// Use with framework
-const adapter = new MyGameAdapter();
-const session = await adapter.createSession();
-const agent = createAgentRuntime({
-  gameSession: session,
-  // ... other config
+### Observation Protocol
+
+Canonical JSON format + identical prompt template ensure fair comparison:
+
+```typescript
+interface WorldObservation {
+  tick, timestamp, missionId,
+  agent: { position, health, resources },
+  units, resources, structures, visibility
+}
+```
+
+### Packages
+
+- `@ai-commander/brain` — Core interfaces, BrainManager factory
+- `@ai-commander/brain-openai` — OpenAI provider (gpt-4, gpt-4-turbo, gpt-3.5-turbo)
+- `@ai-commander/brain-claude` — Claude provider (opus, sonnet, haiku)
+- `@ai-commander/brain-gemini` — Gemini provider (gemini-pro, gemini-pro-vision)
+- `@ai-commander/brain-ollama` — Ollama local models (llama2, qwen, deepseek, gemma)
+- `@ai-commander/match-runner` — Execute single match between two brains
+- `@ai-commander/tournament-engine` — Orchestrate tournaments (4 formats)
+- `@ai-commander/rating-system` — ELO ratings, confidence intervals, history
+- `@ai-commander/benchmark-reporter` — Export reports (HTML/MD/JSON/CSV)
+- `@ai-commander/replay-player` — Replay viewer, divergence analysis
+- `@ai-commander/strategy-analyzer` — Strategy classification (Rush, Turtle, etc.)
+- `@ai-commander/experiment-runner` — Hyperparameter experiments
+- `@ai-commander/research-dashboard` — Web dashboard for analysis
+- `@ai-commander/checkers-adapter` — Example: Checkers game (multi-game validation)
+
+## Providers
+
+| Provider | Models | Cost Tracking | Local | Notes |
+|----------|--------|---|---|---|
+| OpenAI | gpt-4, gpt-4-turbo, gpt-3.5-turbo | ✅ | ❌ | Highest quality |
+| Claude | opus, sonnet, haiku | ✅ | ❌ | Best long-context |
+| Gemini | gemini-pro, gemini-pro-vision | ✅ | ❌ | Multi-modal |
+| Ollama | llama2, qwen, deepseek, mistral, gemma | ✅ | ✅ | Run locally |
+| Builtin | N/A | N/A | ✅ | RTS AI baseline |
+
+## Tournament Formats
+
+- **Round Robin**: All brains play all other brains on all maps. Best for comprehensive comparison.
+- **Swiss**: Seeded by rating, opponents matched by score each round. Efficient for many players.
+- **Best of N**: Play N games per pairing, aggregate wins. Reduces variance.
+- **Elimination**: Single elimination bracket. Fast, determines clear winner.
+
+## Example: Compare GPT-4 vs Claude vs Local Ollama
+
+```typescript
+import { ExperimentRunner } from '@ai-commander/experiment-runner';
+
+const variants = ExperimentRunner.createVariants({
+  provider: 'openai',
+  openai: { apiKey: process.env.OPENAI_API_KEY!, model: 'gpt-4' },
 });
+
+const comparison = await ExperimentRunner.runExperiment({
+  name: 'Temperature Sweep',
+  variants,
+  tournamentsPerVariant: 3,
+  mapsPerTournament: 5,
+});
+
+console.log(ExperimentRunner.generateReport(comparison));
 ```
 
-### 4. AI Experimentation
+## Example: Analyze Strategy from Replay
 
-Compare different algorithms:
-```bash
-# Run benchmarks
-cd apps/reference
-pnpm benchmark
+```typescript
+import { StrategyAnalyzer } from '@ai-commander/strategy-analyzer';
+import { ReplayPlayer } from '@ai-commander/replay-player';
 
-# Compare planner implementations
-# Compare decision engine implementations
-# Measure performance improvements
+const strategy = StrategyAnalyzer.generateStrategyReport(replay);
+console.log(`Red strategy: ${strategy.redStrategy.strategy} (confidence: ${strategy.redStrategy.confidence.toFixed(2)})`);
+console.log(`Blue strategy: ${strategy.blueStrategy.strategy}`);
+console.log(`Matchup analysis: ${strategy.analysis.advantage}`);
+
+const comparison = ReplayPlayer.analyze(replay);
+console.log(`Divergences: ${comparison.divergences.length}`);
+const html = ReplayPlayer.generateHTML(comparison);
+fs.writeFileSync('replay.html', html);
 ```
 
----
+## Example: View Dashboard
 
-## Project Structure
+```typescript
+import { ResearchDashboard } from '@ai-commander/research-dashboard';
 
+const html = ResearchDashboard.generateHTML({
+  tournaments: [roundRobinResult, swissResult],
+  ratingHistory: ratingSystem.getHistory(),
+  selectedModels: ['GPT-4', 'Claude Sonnet', 'Ollama Mistral'],
+});
+
+fs.writeFileSync('dashboard.html', html);
+// Open in browser
 ```
-ai-commander/
-├── apps/
-│   └── reference/          # Reference application (demo, CLI, tests)
-│       ├── src/
-│       │   ├── dashboard-cli.ts         # Demo entry point
-│       │   ├── mission-agent.ts         # Agent orchestration
-│       │   ├── movement-planner.ts      # Example planner
-│       │   └── dashboard-server.ts      # Browser dashboard
-│       └── tests/
-├── packages/               # Framework packages
-│   ├── core/              # Infrastructure (event bus, scheduler, etc.)
-│   ├── domain/            # Game domain models
-│   ├── engine/            # Tick-based execution engine
-│   ├── adapter/           # Game integration contracts
-│   ├── fake-game-adapter/ # Test implementation
-│   ├── planner/           # Planning layer contracts
-│   ├── decision/          # Decision layer contracts
-│   ├── agent-runtime/     # Agent execution loop
-│   ├── behavior-tree/     # Decision structure framework
-│   └── openra-adapter/    # Real game integration (OpenRA)
-└── .foundation/
-    ├── docs/ARCHITECTURE.md  # Frozen architecture specification
-    ├── adr/                  # Architecture Decision Records
-    └── state/                # Project state documents
-```
-
----
 
 ## Documentation
 
-- **[ARCHITECTURE.md](.foundation/docs/ARCHITECTURE.md)** — Frozen architecture specification
-- **[Developer Guide](/docs/DEVELOPER_GUIDE.md)** — Building with AI Commander
-- **[Quick Start](/docs/QUICK_START.md)** — 10-minute onboarding
-- **[API Reference](packages/*/README.md)** — Package documentation
+- [Quick Start](./docs/QUICK_START.md) — 5-minute getting started guide
+- [API Reference](./docs/API_REFERENCE.md) — Complete API documentation
+- [Architecture](./docs/ARCHITECTURE.md) — System design and patterns
 
----
+## Multi-Game Validation
 
-## Commands
+Add new games without changing framework:
 
-### Demo and Development
+```typescript
+// CheckersGame demonstrates universal Brain SDK
+const game = new CheckersGame();
+const observation = game.getObservation(playerId);
+const moves = game.getAvailableMoves();
 
-```bash
-# Run the demo (recommended starting point)
-pnpm demo
-
-# Run all tests
-pnpm test
-
-# Watch mode (re-run tests on changes)
-pnpm test:watch
-
-# Build everything
-pnpm build
-
-# Type check
-pnpm typecheck
-
-# Lint code
-pnpm lint
-
-# Format code
-pnpm format
-
-# Run all checks (CI equivalent)
-pnpm doctor
+// Any brain works: GPT-4, Claude, Ollama, builtin
+const decision = await brain.decide(observation, goals, moves, memory);
 ```
 
-### Reference App
+## Cost Tracking
 
-```bash
-cd apps/reference
+All providers track real USD costs:
 
-# Run a mission
-pnpm mission run
-
-# See mission trace
-pnpm mission trace
-
-# View metrics
-pnpm mission metrics
-
-# Validate mission consistency
-pnpm mission replay
-
-# Get everything in one report
-pnpm mission report
-
-# Run CLI
-pnpm reference run --help
+```typescript
+const metrics = brain.getMetrics();
+console.log(`Tokens used: ${metrics.totalTokensUsed}`);
+console.log(`Cost: $${metrics.totalCost.toFixed(4)}`);
 ```
 
----
+## Extensibility
 
-## Architecture Overview
-
-### Layered Design
-
-```
-Browser Dashboard (Visualization)
-         ↓
-   Agent Runtime (Orchestration)
-    ↙    ↓    ↘
-Planner  Adapter  Decision Engine
-    ↘    ↓    ↙
-      Engine (Ticks)
-         ↓
-      Domain (Types)
-```
-
-### No Coupling Between Layers
-
-Each layer depends only on contracts from lower layers:
-
-- **Adapter:** How to interact with the game
-- **Planner:** Transform goals into action sequences
-- **Decision Engine:** Pick next action from a plan
-- **Runtime:** Orchestrate the loop (observe → plan → decide → execute)
-- **Dashboard:** Visualize execution in real-time
-
-Swap any component (planner, decision engine, game adapter) without changing others.
-
----
-
-## Getting Help
-
-### Common Issues
-
-**"Node.js 22+ required"**  
-→ Install from [nodejs.org](https://nodejs.org/). Check version: `node --version`
-
-**"Cannot find module..."**  
-→ Run `pnpm install` to install dependencies
-
-**"Browser didn't open"**  
-→ Visit http://localhost:3000 manually
-
-**"Mission failed"**  
-→ Check console for error message. Review logs with `pnpm mission trace`
-
-### Learn More
-
-- Study the [reference application](apps/reference/src/)
-- Read [ARCHITECTURE.md](.foundation/docs/ARCHITECTURE.md)
-- Review [test examples](apps/reference/tests/)
-- Join our community (GitHub issues/discussions)
-
----
-
-## Contributing
-
-AI Commander follows strict engineering standards:
-
-1. **Architecture is Frozen** — Changes require Architecture Decision Record (ADR)
-2. **Framework is Complete** — Focus on applications and integrations
-3. **Tests Required** — All code must be tested (919+ tests)
-4. **TypeScript Strict Mode** — Type safety is mandatory
-5. **No Technical Debt** — All code must be production-ready
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
-
----
+- Add new providers: Implement Brain interface
+- Add new games: Match WorldObservation/CommandOption/GoalOption pattern
+- Add new reports: Use BenchmarkReport data structure
+- Add new analyses: Consume MatchReplay for strategy/decision analysis
 
 ## License
 
-MIT License — See [LICENSE](LICENSE) for details
+MIT
 
----
+## Contributing
 
-## Citation
-
-If you use AI Commander in research or publications:
-
-```bibtex
-@software{aicommander2026,
-  title={AI Commander: Framework for Autonomous Game AI},
-  author={Anthropic},
-  year={2026},
-  url={https://github.com/anthropics/ai-commander}
-}
-```
-
----
-
-## What's Next?
-
-- ✅ Clone the repository
-- ✅ Run `pnpm install`
-- ✅ Run `pnpm demo`
-- 🎯 Experience AI Commander in action
-- 📚 Read the [Developer Guide](/docs/DEVELOPER_GUIDE.md)
-- 🔧 Build your own agents and adapters
-
-**Start now:**
-
-```bash
-git clone https://github.com/anthropics/ai-commander
-cd ai-commander
-pnpm install
-pnpm demo
-```
+We welcome contributions! See [CONTRIBUTING.md](./CONTRIBUTING.md)
