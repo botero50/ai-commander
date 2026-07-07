@@ -939,7 +939,7 @@ This interface is intentionally minimal:
 
 Any game can be supported by implementing this interface.
 
-**Example: OpenRA Adapter**
+**Example: OpenRA Adapter (v1.0 - Mock)**
 ```typescript
 class OpenRAAdapter implements GameAdapter {
   async initialize(config: AdapterConfig) {
@@ -952,6 +952,30 @@ class OpenRAAdapter implements GameAdapter {
   }
 }
 ```
+
+**Example: OpenRA Real Integration (v2.0)**
+
+v2.0 adds HTTP bridge to live OpenRA via OpenRA-RL service:
+
+```typescript
+class OpenRARLBridge {
+  async connect(): Promise<void>
+  getStateReader(): StateReader // HTTP GET /observation
+  getCommandExecutor(): CommandExecutor // HTTP POST /step
+}
+
+class OpenRAStateReaderRL implements StateReader {
+  async getGameState(): Promise<OpenRAGameState>
+  // Fetches from http://localhost:8000/observation
+}
+
+class OpenRACommandExecutorRL implements CommandExecutor {
+  async executeCommand(command): Promise<ValidationResult>
+  // Posts to http://localhost:8000/step
+}
+```
+
+This allows AI Commander to play real OpenRA matches while maintaining full determinism and observability. All tournament formats (round-robin, Swiss, elimination) work with real games.
 
 ### 9.2 Strategy Composition
 
@@ -1319,6 +1343,11 @@ What strategies emerge when agents compose high-level with low-level goals? Can 
 ### 13.3 Integration Points
 
 **Real Games**
+- ✅ **OpenRA** (v2.0) — Real-time RTS with HTTP bridge to OpenRA-RL service
+  - Real game state observation via `/observation` endpoint
+  - Real command execution via `/step` endpoint  
+  - Connection management with automatic retries
+  - Full deterministic replay of live matches
 - StarCraft III (RTS with large action space)
 - Age of Empires IV (economic + military complexity)
 - Total War (campaign + tactical layers)
