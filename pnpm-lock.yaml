@@ -124,6 +124,8 @@ importers:
         specifier: workspace:*
         version: link:../domain
 
+  packages/brain: {}
+
   packages/core: {}
 
   packages/decision:

@@ -1,0 +1,14 @@
+{
+  "name": "@ai-commander/brain",
+  "version": "1.0.0",
+  "description": "Brain SDK - Standard interface for LLM and AI decision makers",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "exports": {
+    ".": "./dist/index.js"
+  }
+}
