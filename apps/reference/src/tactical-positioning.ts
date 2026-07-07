@@ -55,7 +55,7 @@ export class TacticalPositioning {
         },
         unitType: a.customData?.unitType ?? 'unit',
       }))
-      .filter((u): u is MilitaryUnit => u.id && u.position);
+      .filter((u): u is MilitaryUnit => !!(u.id && u.position));
   }
 
   /**

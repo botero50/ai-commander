@@ -53,7 +53,7 @@ export class Scouting {
           y: a.customData?.position?.y ?? a.position?.y ?? 0,
         },
       }))
-      .filter((s): s is Scout => s.id && s.position);
+      .filter((s): s is Scout => !!(s.id && s.position));
   }
 
   /**

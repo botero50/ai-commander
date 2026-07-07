@@ -173,13 +173,6 @@ export class DashboardServer {
    */
   async stop(): Promise<void> {
     return new Promise((resolve) => {
-      // Close all SSE connections
-      this.clients.forEach((client) => {
-        client.end();
-      });
-      this.clients = [];
-
-      // Close server
       this.server.close(() => {
         resolve();
       });
@@ -241,11 +234,6 @@ export class DashboardServer {
     this.state = Object.freeze({
       ...this.state,
       timeline,
-    });
-    // Only broadcast the new event, not the entire timeline
-    const eventData = JSON.stringify({ timeline: [event] });
-    this.clients.forEach((client) => {
-      client.write(`data: ${eventData}\n\n`);
     });
   }
 
@@ -310,20 +298,7 @@ export class DashboardServer {
     });
   }
 
-  updateGatheringProgress(progress: {
-    fieldId: string;
-    resourceType: string;
-    targetAmount: number;
-    amountCollected: number;
-    amountRemaining: number;
-    percentComplete: number;
-    status: 'traveling' | 'gathering' | 'returning' | 'complete';
-    gatheringRate: number;
-    estimatedCompletionTick?: number;
-    detectedAtTick: number;
-    selectedAtTick: number;
-    startedAtTick: number;
-  }): void {
+  updateGatheringProgress(progress: any): void {
     const mission = this.state.mission;
     this.state = Object.freeze({
       ...this.state,
@@ -331,7 +306,7 @@ export class DashboardServer {
         ...mission,
         gatheringProgress: progress,
       }),
-    });
+    } as any);
   }
 
   /**
@@ -355,16 +330,6 @@ export class DashboardServer {
         inspection,
         comparison,
       },
-    });
-  }
-
-  /**
-   * Broadcast current state to all SSE clients.
-   */
-  private broadcastState(): void {
-    const data = JSON.stringify(this.state);
-    this.clients.forEach((client) => {
-      client.write(`data: ${data}\n\n`);
     });
   }
 
@@ -759,6 +724,15 @@ export class DashboardServer {
     ::-webkit-scrollbar-thumb:hover {
       background: rgba(100, 116, 139, 0.6);
     }
+
+    @keyframes pulse {
+      0%, 100% {
+        opacity: 1;
+      }
+      50% {
+        opacity: 0.5;
+      }
+    }
   </style>
 </head>
 <body>
@@ -767,8 +741,12 @@ export class DashboardServer {
       <div>
         <h1>AI Commander Dashboard</h1>
       </div>
-      <div>
+      <div style="display: flex; gap: 12px; align-items: center;">
         <span class="status-badge" id="status-badge">Initializing</span>
+        <span id="polling-indicator" style="font-size: 12px; color: #64748b; display: flex; align-items: center; gap: 4px;">
+          <span style="display: inline-block; width: 8px; height: 8px; background: #10b981; border-radius: 50%; animation: pulse 1.5s ease-in-out infinite;"></span>
+          Polling
+        </span>
       </div>
     </header>
 
@@ -969,8 +947,29 @@ export class DashboardServer {
         const response = await fetch('/api/state');
         const newState = await response.json();
 
+        // Update all state properties, not just runtime
         if (newState.runtime) state.runtime = newState.runtime;
+        if (newState.mission) state.mission = newState.mission;
+        if (newState.world) state.world = newState.world;
+        if (newState.timeline) state.timeline = newState.timeline;
+
         updateDashboard();
+
+        // Stop polling if mission is complete OR progress reaches 100%
+        const progressPercent = state.mission?.progress?.percent || 0;
+        const isComplete = state.runtime?.status === 'completed' || state.runtime?.status === 'failed' || state.runtime?.status === 'stopped';
+        const isFullProgress = progressPercent >= 100;
+
+        if (isComplete || isFullProgress) {
+          console.log('Mission finished (status: ' + state.runtime?.status + ', progress: ' + progressPercent + '%), stopping polling');
+          // Update UI to show polling has stopped
+          const pollingIndicator = document.getElementById('polling-indicator');
+          if (pollingIndicator) {
+            pollingIndicator.innerHTML = '<span style="display: inline-block; width: 8px; height: 8px; background: #ef4444; border-radius: 50%;"></span>Polling Stopped';
+            pollingIndicator.style.color = '#ef4444';
+          }
+          return;
+        }
 
         // Poll every 200ms
         setTimeout(pollState, 200);
@@ -984,11 +983,17 @@ export class DashboardServer {
     function updateDashboard() {
       if (!state.runtime) return;
 
+      // Safe element update helper
+      function setContent(id, value) {
+        const el = document.getElementById(id);
+        if (el) el.textContent = value;
+      }
+
       // Update runtime panel
-      document.getElementById('runtime-status').textContent = state.runtime.status;
-      document.getElementById('runtime-tick').textContent = state.runtime.currentTick;
-      document.getElementById('runtime-elapsed').textContent = state.runtime.elapsedMs + 'ms';
-      document.getElementById('runtime-mode').textContent = state.runtime.executionMode;
+      setContent('runtime-status', state.runtime.status);
+      setContent('runtime-tick', state.runtime.currentTick);
+      setContent('runtime-elapsed', state.runtime.elapsedMs + 'ms');
+      setContent('runtime-mode', state.runtime.executionMode);
 
       const badge = document.getElementById('status-badge');
       if (badge) {
@@ -997,28 +1002,210 @@ export class DashboardServer {
       }
 
       // Update mission panel
-      document.getElementById('mission-goal').textContent = state.mission?.goalIntent || 'N/A';
-      document.getElementById('mission-status').textContent = state.mission?.goalStatus || 'N/A';
+      setContent('mission-goal', state.mission?.goalIntent || 'N/A');
+
+      // Update goal status - show "done" if runtime is completed, otherwise show goal status
+      const goalStatusText = state.runtime?.status === 'completed' ? 'done' : (state.mission?.goalStatus || 'N/A');
+      setContent('mission-status', goalStatusText);
+
+      // Display goal lifecycle info
+      const goalLifecycles = state.mission?.goalLifecycles || [];
+      const currentGoal = goalLifecycles[goalLifecycles.length - 1];
+      if (currentGoal) {
+        setContent('mission-steps', currentGoal.intent + ' (' + currentGoal.lifecycleState + ')');
+      } else {
+        setContent('mission-steps', 'N/A');
+      }
+
+      // Display goal candidates count as current step
+      const candidates = state.mission?.goalCandidates || [];
+      setContent('mission-current', candidates.length + ' candidates');
 
       // Update progress
       if (state.mission?.progress) {
         const progress = state.mission.progress;
         const progressBar = document.getElementById('progress-bar');
         if (progressBar) progressBar.style.width = progress.percent + '%';
-        document.getElementById('progress-percent').textContent = progress.percent + '%';
+        setContent('progress-percent', progress.percent + '%');
 
         const trendEmoji = { 'improving': '↑', 'stable': '→', 'regressing': '↓' }[progress.trend] || '?';
-        document.getElementById('progress-trend').textContent = trendEmoji + ' ' + progress.trend;
-        document.getElementById('progress-evidence').textContent = progress.reason || '-';
+        setContent('progress-trend', trendEmoji + ' ' + progress.trend);
+        setContent('progress-evidence', progress.reason || '-');
+      }
+
+      // Update resource gathering progress if available
+      if (state.mission?.gatheringProgress) {
+        const g = state.mission.gatheringProgress;
+        const gatherDiv = document.getElementById('gathering-progress');
+        if (gatherDiv) {
+          gatherDiv.style.display = 'block';
+          setContent('gathering-field', g.fieldId || 'none');
+          setContent('gathering-type', g.resourceType || '—');
+          setContent('gathering-percent', g.percentComplete + '%');
+          setContent('gathering-collected', g.amountCollected + '/' + g.targetAmount);
+          const gatherBar = document.getElementById('gathering-bar');
+          if (gatherBar) gatherBar.style.width = g.percentComplete + '%';
+        }
+      } else {
+        const gatherDiv = document.getElementById('gathering-progress');
+        if (gatherDiv) gatherDiv.style.display = 'none';
       }
 
       // Update world panel
-      document.getElementById('world-friendly').textContent = state.world?.friendlyUnits || 0;
-      document.getElementById('world-enemy').textContent = state.world?.enemyUnits || 0;
-      document.getElementById('world-resources').textContent = state.world?.resources || 'N/A';
+      setContent('world-friendly', state.world?.friendlyUnits || 0);
+      setContent('world-enemy', state.world?.enemyUnits || 0);
+      setContent('world-resources', state.world?.resources || 'N/A');
+      setContent('world-observation', state.world?.lastObservationMs + 'ms' || 'N/A');
 
-      // Update timeline
-      document.getElementById('timeline-count').textContent = (state.timeline || []).length;
+      // Update decision panel
+      setContent('decision-value', state.mission?.lastDecision || 'none');
+      setContent('command-value', state.mission?.lastCommand || 'none');
+
+      // Update goal candidates list
+      const candidatesList = document.getElementById('goal-candidates-list');
+      if (candidatesList && state.mission?.goalCandidates) {
+        const candidates = state.mission.goalCandidates;
+        const goalIcons = {
+          'move-to-target': '🎯',
+          'defend-position': '🛡',
+          'gather-resources': '📦',
+          'explore-world': '🗺',
+          'build-structure': '🏗',
+          'attack-enemy': '⚔',
+          'retreat': '🏃',
+          'patrol': '🚶',
+          'scout': '👁',
+          'fortify': '🔒',
+          'expand-territory': '📈',
+          'resource-management': '💰'
+        };
+
+        if (candidates.length > 0) {
+          candidatesList.innerHTML = candidates.map(c => {
+            const goalKey = c.goalId || c.intent;
+            const icon = goalIcons[goalKey] || goalIcons[c.intent] || '◆';
+            const selected = c.isSelected ? '✓' : ' ';
+            return '<div style="padding: 8px; margin: 4px 0; background: ' + (c.isSelected ? '#e0f2fe' : '#f1f5f9') + '; border-left: 3px solid ' + (c.isSelected ? '#0284c7' : '#cbd5e1') + '; border-radius: 4px; font-size: 12px;">' +
+              '<div style="font-weight: 600; display: flex; align-items: center; gap: 6px;"><span>' + selected + '</span><span style="font-size: 16px;">' + icon + '</span><span>' + c.intent + '</span></div>' +
+              '<div style="color: #64748b; font-size: 11px; margin-top: 4px;">Score: ' + c.score.toFixed(3) + '</div>' +
+            '</div>';
+          }).join('');
+        } else {
+          candidatesList.innerHTML = '<div style="color: #94a3b8; font-size: 12px;">No candidates available</div>';
+        }
+      }
+
+      // Update goal lifecycles list
+      const lifecyclesList = document.getElementById('goal-lifecycles-list');
+      if (lifecyclesList && state.mission?.goalLifecycles) {
+        const lifecycles = state.mission.goalLifecycles;
+        const goalIcons = {
+          'move-to-target': '🎯',
+          'defend-position': '🛡',
+          'gather-resources': '📦',
+          'explore-world': '🗺',
+          'build-structure': '🏗',
+          'attack-enemy': '⚔',
+          'retreat': '🏃',
+          'patrol': '🚶',
+          'scout': '👁',
+          'fortify': '🔒',
+          'expand-territory': '📈',
+          'resource-management': '💰'
+        };
+        const stateIcons = {
+          'Candidate': '🔹',
+          'Queued': '⏳',
+          'Executing': '▶',
+          'Complete': '✓',
+          'Failed': '✗',
+          'Suspended': '⏸'
+        };
+
+        if (lifecycles.length > 0) {
+          lifecyclesList.innerHTML = lifecycles.map(l => {
+            const goalKey = l.goalId || l.intent;
+            const goalIcon = goalIcons[goalKey] || goalIcons[l.intent] || '◆';
+            const stateIcon = stateIcons[l.lifecycleState] || '•';
+            return '<div style="padding: 8px; margin: 4px 0; background: #f1f5f9; border-left: 3px solid #cbd5e1; border-radius: 4px; font-size: 12px;">' +
+              '<div style="font-weight: 600; display: flex; align-items: center; gap: 6px;"><span style="font-size: 16px;">' + goalIcon + '</span><span>' + l.intent + '</span></div>' +
+              '<div style="color: #64748b; font-size: 11px; margin-top: 4px;">State: <span style="font-size: 12px;">' + stateIcon + '</span> ' + l.lifecycleState + ' (Tick ' + l.createdAtTick + ')</div>' +
+            '</div>';
+          }).join('');
+        } else {
+          lifecyclesList.innerHTML = '<div style="color: #94a3b8; font-size: 12px;">No lifecycles recorded</div>';
+        }
+      }
+
+      // Update details panel
+      setContent('mission-id', state.runtime.missionId);
+      setContent('timeline-count', (state.timeline || []).length);
+
+      // Update timeline events display - show one representative event per tick
+      const timelineEvents = document.getElementById('timeline-events');
+      if (timelineEvents && state.timeline && state.timeline.length > 0) {
+        // Group events by tick and get the last event for each tick
+        const tickMap = {};
+        state.timeline.forEach(event => {
+          if (!tickMap[event.tick] || event.timestamp > tickMap[event.tick].timestamp) {
+            tickMap[event.tick] = event;
+          }
+        });
+        // Get all ticks, sorted in descending order (newest first)
+        const ticks = Object.keys(tickMap).map(Number).sort((a, b) => b - a);
+        const lastEvents = ticks.map(tick => tickMap[tick]);
+        console.log('Rendering timeline:', lastEvents.length, 'ticks from total', state.timeline.length, 'events');
+        const eventIcons = {
+          'mission_tick': '⏱',
+          'goal_selected': '🎯',
+          'goal_progress_updated': '📈',
+          'goal_status_changed': '🔄',
+          'goal_lifecycle_transitioned': '🔄',
+          'goal_candidates_evaluated': '🤔',
+          'decision_selected': '⚡',
+          'command_executed': '✓',
+          'command_failed': '✗',
+          'unit_moved': '🚀',
+          'unit_attacked': '⚔',
+          'resource_gathered': '📦',
+          'building_constructed': '🏗',
+          'building_observed': '🏛',
+          'building_decision': '🏗',
+          'unit_destroyed': '💥',
+          'retreat_triggered': '🏃',
+          'regrouping': '👥',
+          'waiting': '⏸',
+          'threat_scan_completed': '🔍',
+          'threat_detected': '⚠',
+          'tactical_positioning_observed': '📍',
+          'tactical_positioning_decision': '🗺',
+          'military_production_observed': '🤖',
+          'military_production_decision': '⚙',
+          'economy_observed': '💰',
+          'economy_scaling_decision': '📊',
+          'expansion_observed': '🌍',
+          'expansion_decision': '🔭',
+          'error': '⚠'
+        };
+
+        const html = lastEvents.map((event, idx) => {
+          const icon = eventIcons[event.type] || '•';
+          const label = event.type.replace(/_/g, ' ');
+          if (idx === 0) console.log('First event:', event.tick, event.type, icon);
+          return \`<div class="timeline-event" style="padding: 6px; border-left: 3px solid #3b82f6; margin: 4px 0; font-size: 12px; display: flex; gap: 6px; align-items: flex-start;">
+            <span style="font-size: 14px; min-width: 20px;">\${icon}</span>
+            <div style="flex: 1;">
+              <div style="font-weight: 600; color: #e0e7ff;">Tick \${event.tick}</div>
+              <div style="color: #a5b4fc;">\${label}</div>
+            </div>
+          </div>\`;
+        }).join('');
+        timelineEvents.innerHTML = html;
+        timelineEvents.classList.remove('empty');
+      } else if (timelineEvents && (!state.timeline || state.timeline.length === 0)) {
+        timelineEvents.innerHTML = '<div class="empty">Waiting for events...</div>';
+        timelineEvents.classList.add('empty');
+      }
     }
 
     function formatInspection(inspection) {

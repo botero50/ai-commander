@@ -6,7 +6,8 @@
     "noImplicitAny": false,
     "strictNullChecks": false,
     "noUncheckedIndexedAccess": false,
-    "exactOptionalPropertyTypes": false
+    "exactOptionalPropertyTypes": false,
+    "noEmitOnError": false
   },
   "include": ["src/**/*"],
   "exclude": ["node_modules", "dist", "tests"],

@@ -62,7 +62,7 @@ export class ThreatDetection {
         },
         unitType: a.customData?.unitType ?? 'unit',
       }))
-      .filter((u): u is EnemyUnit => u.id && u.position);
+      .filter((u): u is EnemyUnit => !!(u.id && u.position));
   }
 
   /**

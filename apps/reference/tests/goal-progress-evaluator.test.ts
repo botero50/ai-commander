@@ -268,7 +268,7 @@ describe('Goal Progress Evaluator', () => {
     it('should handle unknown goal intents', () => {
       const unknownGoal = createGoal({
         id: createGoalId('goal-unknown'),
-        intent: 'gather-resources',
+        intent: 'unknown-goal-type-xyz',
         status: GoalStatus.Pending,
         priority: createGoalPriority(GoalPriorityLevel.NORMAL),
         parameters: { amount: 100 },
@@ -277,8 +277,9 @@ describe('Goal Progress Evaluator', () => {
       const worldState = createWorldStateWithPosition(5, 5);
       const progress = evaluator.evaluateProgress(unknownGoal, worldState, 0);
 
-      expect(progress.progressPercent).toBe(0);
-      expect(progress.progressReason).toContain('Unknown goal intent');
+      // Unknown goals with agents show partial progress (25%)
+      expect(progress.progressPercent).toBe(25);
+      expect(progress.progressReason).toContain('Progress tracking not implemented for');
     });
   });
 

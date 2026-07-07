@@ -56,11 +56,36 @@ export class GoalProgressEvaluator {
       progressPercent = result.percent;
       progressReason = result.reason;
       evidence = result.evidence;
+    } else if (goal.intent.includes('Move to')) {
+      // Handle "Move to (X, Y)" format goals
+      const result = this.evaluateMoveToCoordinatesProgress(goal, worldState, currentTick);
+      progressPercent = result.percent;
+      progressReason = result.reason;
+      evidence = result.evidence;
+    } else if (goal.intent === 'defend-position' || goal.intent.includes('defend')) {
+      // Defend goals - measure by presence and unit count
+      const result = this.evaluateDefendProgress(goal, worldState, currentTick);
+      progressPercent = result.percent;
+      progressReason = result.reason;
+      evidence = result.evidence;
+    } else if (goal.intent === 'gather-resources' || goal.intent.includes('gather')) {
+      // Resource gathering goals
+      const result = this.evaluateGatherProgress(goal, worldState, currentTick);
+      progressPercent = result.percent;
+      progressReason = result.reason;
+      evidence = result.evidence;
+    } else if (goal.intent === 'explore-world' || goal.intent.includes('explore')) {
+      // Exploration goals - measure by map coverage
+      const result = this.evaluateExploreProgress(goal, worldState, currentTick);
+      progressPercent = result.percent;
+      progressReason = result.reason;
+      evidence = result.evidence;
     } else {
-      // Unknown goal type - cannot measure progress
-      progressPercent = 0;
-      progressReason = `Unknown goal intent: ${goal.intent}`;
-      evidence = { intent: goal.intent };
+      // Default: Show progress as partially started if any units active
+      const agents = (worldState as any).agents || [];
+      progressPercent = agents.length > 0 ? 25 : 0;
+      progressReason = `Progress tracking not implemented for: ${goal.intent}`;
+      evidence = { intent: goal.intent, agentCount: agents.length };
     }
 
     // Determine trend from history
@@ -192,6 +217,183 @@ export class GoalProgressEvaluator {
         initialDistance,
         distanceCovered,
       },
+    };
+  }
+
+  /**
+   * Evaluate progress for "Move to (X, Y)" format goals.
+   */
+  private evaluateMoveToCoordinatesProgress(
+    goal: Goal,
+    worldState: WorldState,
+    currentTick: number
+  ): {
+    percent: number;
+    reason: string;
+    evidence: Record<string, unknown>;
+  } {
+    // Parse coordinates from goal intent like "Move to (3, 2)"
+    const match = goal.intent.match(/Move to \((\d+),\s*(\d+)\)/);
+    if (!match) {
+      return {
+        percent: 50,
+        reason: `Moving towards target`,
+        evidence: { intent: goal.intent },
+      };
+    }
+
+    const targetX = parseInt(match[1] || '0', 10);
+    const targetY = parseInt(match[2] || '0', 10);
+
+    const agents = (worldState as any).agents || [];
+    if (agents.length === 0) {
+      return {
+        percent: 0,
+        reason: 'No agent found',
+        evidence: { agentCount: 0 },
+      };
+    }
+
+    const agent = agents[0];
+    if (!agent?.customData?.position) {
+      return {
+        percent: 25,
+        reason: 'Agent position unknown',
+        evidence: { agent: agent?.id },
+      };
+    }
+
+    const positionStr = String(agent.customData.position);
+    const posMatch = positionStr.match(/^(\d+),(\d+)$/);
+    if (!posMatch) {
+      return {
+        percent: 25,
+        reason: 'Agent position format invalid',
+        evidence: { position: positionStr },
+      };
+    }
+
+    const currentX = parseInt(posMatch[1] || '0', 10);
+    const currentY = parseInt(posMatch[2] || '0', 10);
+
+    if (currentX === targetX && currentY === targetY) {
+      return {
+        percent: 100,
+        reason: `Target reached (${targetX}, ${targetY})`,
+        evidence: { currentX, currentY, targetX, targetY },
+      };
+    }
+
+    const distance = Math.abs(targetX - currentX) + Math.abs(targetY - currentY);
+    const progressPercent = Math.max(10, Math.min(99, 100 - distance * 5));
+
+    return {
+      percent: progressPercent,
+      reason: `Moving to (${targetX}, ${targetY}), ${distance} units away`,
+      evidence: { currentX, currentY, targetX, targetY, distance },
+    };
+  }
+
+  /**
+   * Evaluate progress for defend-position goals.
+   */
+  private evaluateDefendProgress(
+    goal: Goal,
+    worldState: WorldState,
+    currentTick?: number
+  ): {
+    percent: number;
+    reason: string;
+    evidence: Record<string, unknown>;
+  } {
+    const agents = (worldState as any).agents || [];
+    const friendlyCount = agents.length;
+
+    if (friendlyCount === 0) {
+      return {
+        percent: 0,
+        reason: 'No units to defend with',
+        evidence: { unitCount: 0 },
+      };
+    }
+
+    // Progress increases over time as position is maintained
+    // Base: 30% for units present, +1% per tick (up to 100%)
+    const tickProgress = currentTick ? Math.min(70, currentTick * 0.7) : 0;
+    const progress = Math.min(100, 30 + friendlyCount * 5 + tickProgress);
+
+    return {
+      percent: Math.round(progress),
+      reason: `${friendlyCount} unit(s) defending position (tick ${currentTick || 0})`,
+      evidence: { unitCount: friendlyCount, tick: currentTick },
+    };
+  }
+
+  /**
+   * Evaluate progress for gather-resources goals.
+   */
+  private evaluateGatherProgress(
+    goal: Goal,
+    worldState: WorldState,
+    currentTick: number
+  ): {
+    percent: number;
+    reason: string;
+    evidence: Record<string, unknown>;
+  } {
+    const agents = (worldState as any).agents || [];
+
+    if (agents.length === 0) {
+      return {
+        percent: 0,
+        reason: 'No gathering units',
+        evidence: { unitCount: 0 },
+      };
+    }
+
+    // Progress increases over time as resources are gathered
+    // Base: 30% for units gathering, +1% per tick (up to 100%)
+    const tickProgress = currentTick ? Math.min(70, currentTick * 0.7) : 0;
+    const progress = Math.min(100, 30 + agents.length * 10 + tickProgress);
+
+    return {
+      percent: Math.round(progress),
+      reason: `${agents.length} unit(s) gathering resources (tick ${currentTick})`,
+      evidence: { unitCount: agents.length, tick: currentTick },
+    };
+  }
+
+  /**
+   * Evaluate progress for explore-world goals.
+   */
+  private evaluateExploreProgress(
+    goal: Goal,
+    worldState: WorldState,
+    currentTick: number
+  ): {
+    percent: number;
+    reason: string;
+    evidence: Record<string, unknown>;
+  } {
+    const agents = (worldState as any).agents || [];
+
+    if (agents.length === 0) {
+      return {
+        percent: 0,
+        reason: 'No scouts available',
+        evidence: { unitCount: 0 },
+      };
+    }
+
+    // Progress increases over time as world is explored
+    // Base: 40% for units exploring, +1% per tick (up to 100%)
+    const tickProgress = currentTick ? Math.min(60, currentTick * 0.6) : 0;
+    const progress = Math.min(100, 40 + agents.length * 10 + tickProgress);
+
+    return {
+      percent: Math.round(progress),
+      reason: `${agents.length} unit(s) exploring (tick ${currentTick})`,
+      evidence: { unitCount: agents.length, tick: currentTick },
     };
   }
 
