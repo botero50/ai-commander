@@ -217,6 +217,15 @@ importers:
         specifier: workspace:*
         version: link:../ecs
 
+  packages/experiment-runner:
+    dependencies:
+      '@ai-commander/brain':
+        specifier: workspace:*
+        version: link:../brain
+      '@ai-commander/tournament-engine':
+        specifier: workspace:*
+        version: link:../tournament-engine
+
   packages/fake-game-adapter:
     dependencies:
       '@ai-commander/adapter':
