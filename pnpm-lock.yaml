@@ -124,6 +124,12 @@ importers:
         specifier: workspace:*
         version: link:../domain
 
+  packages/benchmark-reporter:
+    dependencies:
+      '@ai-commander/tournament-engine':
+        specifier: workspace:*
+        version: link:../tournament-engine
+
   packages/brain: {}
 
   packages/brain-claude:
