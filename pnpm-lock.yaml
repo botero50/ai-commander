@@ -198,6 +198,8 @@ importers:
         specifier: workspace:*
         version: link:../tournament-engine
 
+  packages/compliance: {}
+
   packages/config:
     dependencies:
       '@ai-commander/brain':
