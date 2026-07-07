@@ -1,0 +1,1 @@
+{"version":3,"file":"world-mapper.d.ts","sourceRoot":"","sources":["world-mapper.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,gBAAgB,EAAE,MAAM,qBAAqB,CAAC;AAC5D,OAAO,KAAK,EAAE,eAAe,EAAkB,MAAM,gBAAgB,CAAC;AAEtE,qBAAa,WAAW;IACtB,MAAM,CAAC,gBAAgB,CAAC,SAAS,EAAE,eAAe,EAAE,UAAU,EAAE,MAAM,GAAG,gBAAgB;IAsDzF,OAAO,CAAC,MAAM,CAAC,qBAAqB;CAMrC"}
