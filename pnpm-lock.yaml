@@ -171,6 +171,33 @@ importers:
         specifier: workspace:*
         version: link:../brain
 
+  packages/cli:
+    dependencies:
+      '@ai-commander/benchmark-reporter':
+        specifier: workspace:*
+        version: link:../benchmark-reporter
+      '@ai-commander/brain':
+        specifier: workspace:*
+        version: link:../brain
+      '@ai-commander/experiment-runner':
+        specifier: workspace:*
+        version: link:../experiment-runner
+      '@ai-commander/match-runner':
+        specifier: workspace:*
+        version: link:../match-runner
+      '@ai-commander/replay-player':
+        specifier: workspace:*
+        version: link:../replay-player
+      '@ai-commander/research-dashboard':
+        specifier: workspace:*
+        version: link:../research-dashboard
+      '@ai-commander/strategy-analyzer':
+        specifier: workspace:*
+        version: link:../strategy-analyzer
+      '@ai-commander/tournament-engine':
+        specifier: workspace:*
+        version: link:../tournament-engine
+
   packages/core: {}
 
   packages/decision:

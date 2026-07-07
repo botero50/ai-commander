@@ -1,0 +1,20 @@
+{
+  "extends": "../../tsconfig.json",
+  "compilerOptions": {
+    "outDir": "./dist",
+    "rootDir": "./src",
+    "module": "esnext",
+    "target": "esnext"
+  },
+  "include": ["src"],
+  "references": [
+    { "path": "../brain" },
+    { "path": "../tournament-engine" },
+    { "path": "../match-runner" },
+    { "path": "../benchmark-reporter" },
+    { "path": "../strategy-analyzer" },
+    { "path": "../replay-player" },
+    { "path": "../experiment-runner" },
+    { "path": "../research-dashboard" }
+  ]
+}

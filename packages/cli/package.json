@@ -1,0 +1,29 @@
+{
+  "name": "@ai-commander/cli",
+  "version": "1.0.0",
+  "description": "Command-line interface for tournaments, experiments, and analysis",
+  "private": true,
+  "type": "module",
+  "bin": {
+    "ai-commander": "./dist/cli.js"
+  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "dependencies": {
+    "@ai-commander/brain": "workspace:*",
+    "@ai-commander/tournament-engine": "workspace:*",
+    "@ai-commander/match-runner": "workspace:*",
+    "@ai-commander/benchmark-reporter": "workspace:*",
+    "@ai-commander/strategy-analyzer": "workspace:*",
+    "@ai-commander/replay-player": "workspace:*",
+    "@ai-commander/experiment-runner": "workspace:*",
+    "@ai-commander/research-dashboard": "workspace:*"
+  }
+}
