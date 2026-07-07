@@ -1,0 +1,19 @@
+{
+  "name": "@ai-commander/checkers-adapter",
+  "version": "1.0.0",
+  "description": "Checkers game adapter for multi-game validation (no redesign)",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "dependencies": {
+    "@ai-commander/brain": "workspace:*"
+  }
+}
