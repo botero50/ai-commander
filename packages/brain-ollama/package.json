@@ -1,0 +1,14 @@
+{
+  "name": "@ai-commander/brain-ollama",
+  "version": "1.0.0",
+  "description": "Ollama provider for Brain SDK - local/open-source models",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@ai-commander/brain": "workspace:*"
+  }
+}
