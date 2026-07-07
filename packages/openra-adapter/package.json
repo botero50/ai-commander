@@ -1,21 +1,13 @@
 {
   "name": "@ai-commander/openra-adapter",
   "version": "1.0.0",
-  "description": "OpenRA integration for AI Commander - World state observation provider",
+  "description": "OpenRA game adapter: process management, state reading, command execution",
+  "private": true,
   "type": "module",
-  "exports": {
-    ".": "./src/index.ts"
-  },
-  "scripts": {
-    "build": "tsc",
-    "test": "vitest"
-  },
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
   "dependencies": {
-    "@ai-commander/adapter": "workspace:*",
-    "@ai-commander/domain": "workspace:*"
-  },
-  "devDependencies": {
-    "typescript": "^5.0.0",
-    "vitest": "^0.34.0"
+    "@ai-commander/brain": "workspace:*"
   }
 }

@@ -1,0 +1,1 @@
+{"version":3,"file":"decision-context.d.ts","sourceRoot":"","sources":["decision-context.ts"],"names":[],"mappings":"AAAA,OAAO,KAAK,EAAE,gBAAgB,EAAE,MAAM,sBAAsB,CAAC;AAC7D,OAAO,KAAK,EAAE,cAAc,EAAE,MAAM,sBAAsB,CAAC;AAE3D;;;;;GAKG;AACH,MAAM,WAAW,eAAe;IAC9B,QAAQ,CAAC,gBAAgB,EAAE,gBAAgB,CAAC;IAC5C,QAAQ,CAAC,MAAM,EAAE,cAAc,CAAC;CACjC"}

@@ -1,0 +1,222 @@
+/**
+ * Research Dashboard
+ *
+ * Aggregate and visualize results:
+ * - Model comparison charts (ELO, win rate, cost, latency)
+ * - Tournament history (all past tournaments)
+ * - Cost vs performance trade-offs
+ * - Latency profiles (p50, p95, p99)
+ * - Strategy distribution (which strategies per model)
+ * - Experiment results (hyperparameter importance)
+ */
+/**
+ * Research Dashboard - aggregate and analyze results
+ */
+export class ResearchDashboard {
+    constructor() {
+        this.tournaments = [];
+        this.strategies = new Map();
+        this.experiments = [];
+    }
+    /**
+     * Add tournament results
+     */
+    addTournament(tournament) {
+        this.tournaments.push(tournament);
+    }
+    /**
+     * Add strategy analysis
+     */
+    addStrategy(modelName, strategy) {
+        if (!this.strategies.has(modelName)) {
+            this.strategies.set(modelName, []);
+        }
+        this.strategies.get(modelName).push(strategy);
+    }
+    /**
+     * Add experiment results
+     */
+    addExperiment(experiment) {
+        this.experiments.push(experiment);
+    }
+    /**
+     * Generate complete dashboard data
+     */
+    generateDashboard() {
+        const comparisons = this.generateModelComparisons();
+        const costChart = this.generateCostChart(comparisons);
+        const latencyChart = this.generateLatencyChart(comparisons);
+        const winRateChart = this.generateWinRateChart(comparisons);
+        return {
+            generatedAt: Date.now(),
+            tournaments: this.tournaments,
+            modelComparisons: comparisons,
+            costChart,
+            latencyChart,
+            winRateChart,
+            experiments: this.experiments,
+        };
+    }
+    /**
+     * Generate model comparison across all tournaments
+     */
+    generateModelComparisons() {
+        const modelStats = new Map();
+        // Aggregate from all tournaments
+        for (const tournament of this.tournaments) {
+            for (const standing of tournament.standings) {
+                const modelName = standing.competitor.name;
+                if (!modelStats.has(modelName)) {
+                    modelStats.set(modelName, {
+                        modelName,
+                        tournamentCount: 0,
+                        totalWins: 0,
+                        totalLosses: 0,
+                        totalDraws: 0,
+                        overallWinRate: 0,
+                        averageRating: 1600,
+                        totalCost: 0,
+                        costPerMatch: 0,
+                        averageLatencyMs: 0,
+                        strategiesUsed: [],
+                    });
+                }
+                const stats = modelStats.get(modelName);
+                stats.tournamentCount++;
+                stats.totalWins += standing.wins;
+                stats.totalLosses += standing.losses;
+                stats.totalDraws += standing.draws;
+                stats.totalCost += standing.costUsd;
+                stats.averageLatencyMs += standing.averageLatencyMs;
+            }
+        }
+        // Calculate derived metrics
+        const comparisons = [];
+        for (const [, stats] of modelStats) {
+            const stat = stats;
+            const totalMatches = stat.totalWins + stat.totalLosses + stat.totalDraws;
+            const totalDecisions = stat.totalWins + stat.totalLosses;
+            stat.overallWinRate = totalDecisions > 0 ? stat.totalWins / totalDecisions : 0;
+            stat.costPerMatch = stat.totalCost / Math.max(1, stat.tournamentCount);
+            stat.averageLatencyMs = stat.averageLatencyMs / Math.max(1, stat.tournamentCount);
+            // Add strategies used
+            if (this.strategies.has(stat.modelName)) {
+                const modelStrategies = this.strategies.get(stat.modelName);
+                stat.strategiesUsed = Array.from(new Set(modelStrategies.map((s) => s.strategy)));
+            }
+            comparisons.push(stats);
+        }
+        // Sort by win rate
+        comparisons.sort((a, b) => b.overallWinRate - a.overallWinRate);
+        return comparisons;
+    }
+    /**
+     * Generate cost comparison chart
+     */
+    generateCostChart(comparisons) {
+        return comparisons.map((c) => ({
+            model: c.modelName,
+            cost: parseFloat(c.costPerMatch.toFixed(6)),
+        }));
+    }
+    /**
+     * Generate latency comparison chart
+     */
+    generateLatencyChart(comparisons) {
+        return comparisons.map((c) => ({
+            model: c.modelName,
+            latency: parseFloat(c.averageLatencyMs.toFixed(1)),
+        }));
+    }
+    /**
+     * Generate win rate comparison chart
+     */
+    generateWinRateChart(comparisons) {
+        return comparisons.map((c) => ({
+            model: c.modelName,
+            winRate: parseFloat((c.overallWinRate * 100).toFixed(1)),
+        }));
+    }
+    /**
+     * Get model rankings by metric
+     */
+    getRankings(metric) {
+        const comparisons = this.generateModelComparisons();
+        const rankings = [];
+        let sorted = comparisons;
+        if (metric === 'winRate') {
+            sorted = [...comparisons].sort((a, b) => b.overallWinRate - a.overallWinRate);
+        }
+        else if (metric === 'cost') {
+            sorted = [...comparisons].sort((a, b) => a.costPerMatch - b.costPerMatch);
+        }
+        else if (metric === 'latency') {
+            sorted = [...comparisons].sort((a, b) => a.averageLatencyMs - b.averageLatencyMs);
+        }
+        sorted.forEach((c, index) => {
+            let value = 0;
+            if (metric === 'winRate') {
+                value = c.overallWinRate * 100;
+            }
+            else if (metric === 'cost') {
+                value = c.costPerMatch;
+            }
+            else if (metric === 'latency') {
+                value = c.averageLatencyMs;
+            }
+            rankings.push({
+                rank: index + 1,
+                model: c.modelName,
+                value,
+            });
+        });
+        return rankings;
+    }
+    /**
+     * Get cost-performance trade-off analysis
+     */
+    getCostPerformanceAnalysis() {
+        const comparisons = this.generateModelComparisons();
+        return comparisons.map((c) => {
+            const efficiency = c.overallWinRate / Math.max(0.001, c.costPerMatch);
+            return {
+                model: c.modelName,
+                cost: parseFloat(c.costPerMatch.toFixed(6)),
+                performance: parseFloat((c.overallWinRate * 100).toFixed(1)),
+                efficiency: parseFloat(efficiency.toFixed(2)),
+            };
+        });
+    }
+    /**
+     * Get summary statistics
+     */
+    getSummary() {
+        let totalMatches = 0;
+        let totalCost = 0;
+        for (const tournament of this.tournaments) {
+            totalMatches += tournament.matches.length;
+            totalCost += tournament.matches.reduce((sum, m) => sum + m.replay.metrics.totalCostUsd, 0);
+        }
+        const comparisons = this.generateModelComparisons();
+        const sorted = [...comparisons].sort((a, b) => b.overallWinRate - a.overallWinRate);
+        const efficiency = this.getCostPerformanceAnalysis();
+        const mostEfficient = efficiency.sort((a, b) => b.efficiency - a.efficiency)[0];
+        return {
+            totalTournaments: this.tournaments.length,
+            totalMatches,
+            totalCost,
+            modelsCompared: comparisons.length,
+            bestPerformingModel: sorted[0]?.modelName || 'N/A',
+            mostEfficientModel: mostEfficient?.model || 'N/A',
+        };
+    }
+    /**
+     * Clear all data
+     */
+    reset() {
+        this.tournaments = [];
+        this.strategies.clear();
+        this.experiments = [];
+    }
+}
+//# sourceMappingURL=research-dashboard.js.map

@@ -1,0 +1,163 @@
+import { AgentStatus } from './types/agent-status.js';
+import { MetricsCollector } from './agent-metrics.js';
+export class DefaultAgentRuntime {
+    constructor(config) {
+        this.currentStatus = AgentStatus.Initializing;
+        this.active = false;
+        this.paused = false;
+        this.config = config;
+        this.agentId = config.agentId;
+        this.metricsCollector = new MetricsCollector();
+    }
+    get status() {
+        return this.currentStatus;
+    }
+    get metrics() {
+        return this.metricsCollector.getMetrics();
+    }
+    async initialize() {
+        if (this.active) {
+            throw new Error('Agent is already initialized');
+        }
+        this.currentStatus = AgentStatus.Initializing;
+        try {
+            const session = this.config.gameSession;
+            await session.start();
+            this.active = true;
+            this.paused = false;
+            this.currentStatus = AgentStatus.Idle;
+        }
+        catch (error) {
+            this.currentStatus = AgentStatus.Failed;
+            throw error;
+        }
+    }
+    async tick() {
+        if (!this.active) {
+            throw new Error('Agent is not active. Call initialize() first');
+        }
+        if (this.paused) {
+            throw new Error('Agent is paused. Call resume() first');
+        }
+        this.metricsCollector.recordTick();
+        try {
+            const session = this.config.gameSession;
+            const observationProvider = session.observationProvider;
+            if (!(await observationProvider.isObservationAvailable())) {
+                this.metricsCollector.recordError();
+                return;
+            }
+            const worldState = await observationProvider.getWorldState();
+            const planningStartTime = Date.now();
+            const planningPolicy = {};
+            const planningRequest = {
+                goal: this.config.goal,
+                worldState,
+                policy: planningPolicy,
+            };
+            const planningResult = await this.config.planner.plan(planningRequest);
+            const planningDuration = Date.now() - planningStartTime;
+            this.metricsCollector.recordPlanning(planningDuration);
+            if (planningResult.errors.length > 0 || !planningResult.plan) {
+                this.metricsCollector.recordError();
+                this.currentStatus = AgentStatus.Idle;
+                return;
+            }
+            const plan = planningResult.plan;
+            this.currentStatus = AgentStatus.Deciding;
+            const decisionStartTime = Date.now();
+            const decisionPolicy = {};
+            const decisionContext = {
+                executionContext: this.config.executionContext,
+                policy: decisionPolicy,
+            };
+            const decisionRequest = {
+                agentId: this.config.agentId,
+                worldState,
+                plan,
+                context: decisionContext,
+                metadata: {},
+            };
+            const decisionResult = await this.config.decisionEngine.decide(decisionRequest);
+            const decisionDuration = Date.now() - decisionStartTime;
+            this.metricsCollector.recordDecision(decisionDuration);
+            if (decisionResult.errors.length > 0 || !decisionResult.command) {
+                this.metricsCollector.recordError();
+                this.currentStatus = AgentStatus.Idle;
+                return;
+            }
+            const command = decisionResult.command;
+            this.currentStatus = AgentStatus.Executing;
+            const commandExecutor = session.commandExecutor;
+            if (!(await commandExecutor.isExecutionAvailable())) {
+                this.metricsCollector.recordError();
+                this.currentStatus = AgentStatus.Idle;
+                return;
+            }
+            const executionResult = await commandExecutor.executeCommand(command);
+            this.metricsCollector.recordCommandExecution(executionResult.success);
+            if (!executionResult.success) {
+                this.metricsCollector.recordError();
+            }
+            this.currentStatus = AgentStatus.Idle;
+        }
+        catch (error) {
+            this.metricsCollector.recordError();
+            this.currentStatus = AgentStatus.Failed;
+            throw error;
+        }
+    }
+    async pause() {
+        if (!this.active) {
+            throw new Error('Agent is not active');
+        }
+        if (this.paused) {
+            throw new Error('Agent is already paused');
+        }
+        this.paused = true;
+        this.currentStatus = AgentStatus.Paused;
+    }
+    async resume() {
+        if (!this.active) {
+            throw new Error('Agent is not active');
+        }
+        if (!this.paused) {
+            throw new Error('Agent is not paused');
+        }
+        this.paused = false;
+        this.currentStatus = AgentStatus.Idle;
+    }
+    async shutdown() {
+        if (!this.active) {
+            return;
+        }
+        try {
+            await this.config.gameSession.stop();
+            this.active = false;
+            this.paused = false;
+            this.currentStatus = AgentStatus.Stopped;
+        }
+        catch (error) {
+            this.currentStatus = AgentStatus.Failed;
+            throw error;
+        }
+    }
+    getStatus() {
+        return this.currentStatus;
+    }
+    getMetrics() {
+        return this.metricsCollector.getMetrics();
+    }
+    getRuntimeState() {
+        return Object.freeze({
+            agentId: this.config.agentId,
+            status: this.currentStatus,
+            metrics: this.metricsCollector.getMetrics(),
+            currentGoal: this.config.goal,
+        });
+    }
+}
+export function createAgentRuntime(config) {
+    return new DefaultAgentRuntime(config);
+}
+//# sourceMappingURL=agent-runtime.js.map
