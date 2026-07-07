@@ -260,6 +260,15 @@ importers:
         specifier: workspace:*
         version: link:../goals
 
+  packages/tournament-engine:
+    dependencies:
+      '@ai-commander/brain':
+        specifier: workspace:*
+        version: link:../brain
+      '@ai-commander/match-runner':
+        specifier: workspace:*
+        version: link:../match-runner
+
 packages:
 
   '@ai-commander/adapter@file:packages/adapter':
