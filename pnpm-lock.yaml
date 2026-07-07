@@ -135,6 +135,15 @@ importers:
         specifier: ^0.16.0
         version: 0.16.1
 
+  packages/brain-gemini:
+    dependencies:
+      '@ai-commander/brain':
+        specifier: workspace:*
+        version: link:../brain
+      '@google/generative-ai':
+        specifier: ^0.3.0
+        version: 0.3.1
+
   packages/brain-ollama:
     dependencies:
       '@ai-commander/brain':
@@ -450,6 +459,10 @@ packages:
   '@eslint/plugin-kit@0.7.2':
     resolution: {integrity: sha512-+CNAzxglkrpNf/kKywqQfk74QjtceuOE7Qm+AF8miRvPF/wmmK5+OJOgVh3AVTT3RP2mH3+FOaxlE5v72owk0A==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
+
+  '@google/generative-ai@0.3.1':
+    resolution: {integrity: sha512-Zh1EK5nCWqIhxPm3K1KOM2mOwwgBvp6lkze74yTj6+Zqibtf55Db1q87cbbzWZeET3ZbNgHMYjVf2JyMM6pI7A==}
+    engines: {node: '>=18.0.0'}
 
   '@humanfs/core@0.19.2':
     resolution: {integrity: sha512-UhXNm+CFMWcbChXywFwkmhqjs3PRCmcSa/hfBgLIb7oQ5HNb1wS0icWsGtSAUNgefHeI+eBrA8I1fxmbHsGdvA==}
@@ -1674,6 +1687,8 @@ snapshots:
     dependencies:
       '@eslint/core': 1.2.1
       levn: 0.4.1
+
+  '@google/generative-ai@0.3.1': {}
 
   '@humanfs/core@0.19.2':
     dependencies:

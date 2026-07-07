@@ -1,0 +1,15 @@
+{
+  "name": "@ai-commander/brain-gemini",
+  "version": "1.0.0",
+  "description": "Google Gemini provider for Brain SDK",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@ai-commander/brain": "workspace:*",
+    "@google/generative-ai": "^0.3.0"
+  }
+}
