@@ -286,6 +286,12 @@ importers:
         specifier: workspace:*
         version: link:../brain
 
+  packages/monitor:
+    dependencies:
+      '@ai-commander/profiler':
+        specifier: workspace:*
+        version: link:../profiler
+
   packages/openra-adapter:
     dependencies:
       '@ai-commander/adapter':

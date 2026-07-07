@@ -1,0 +1,19 @@
+{
+  "name": "@ai-commander/monitor",
+  "version": "1.0.0",
+  "description": "Real-time monitoring: live tournament updates, progress tracking, event streaming",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "dependencies": {
+    "@ai-commander/profiler": "workspace:*"
+  }
+}
