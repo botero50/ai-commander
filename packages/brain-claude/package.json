@@ -1,0 +1,15 @@
+{
+  "name": "@ai-commander/brain-claude",
+  "version": "1.0.0",
+  "description": "Anthropic Claude provider for Brain SDK",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@ai-commander/brain": "workspace:*",
+    "@anthropic-ai/sdk": "^0.16.0"
+  }
+}
