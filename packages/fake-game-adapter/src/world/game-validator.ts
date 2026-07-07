@@ -99,49 +99,40 @@ export class GameValidator {
     for (let i = 0; i < count; i++) {
       const world = createInitialWorld();
 
-      const baseInput: BrainInput = {
-        world,
-        memory: {
-          previousDecisions: Object.freeze([]),
-          knownStrategies: Object.freeze([]),
-          opponentModels: new Map(),
-        },
-        executionHistory: [],
-        availableGoals: [],
-        availableActions: [],
-      };
+      let availableGoals: any[] = [];
+      let availableActions: any[] = [];
 
       switch (gameType) {
         case 'rts':
-          baseInput.availableGoals = [
+          availableGoals = [
             { id: 'gather', name: 'gather', description: 'Gather resources', priority: 80, reward: 50 },
             { id: 'expand', name: 'expand', description: 'Expand base', priority: 60, reward: 40 },
           ];
-          baseInput.availableActions = [
+          availableActions = [
             { action: 'move', description: 'Move units' },
             { action: 'build', description: 'Build structure' },
           ];
           break;
 
         case 'turn-based-strategy':
-          baseInput.availableGoals = [
+          availableGoals = [
             { id: 'attack', name: 'attack-piece', description: 'Attack opponent piece', priority: 70, reward: 60 },
             { id: 'defend', name: 'defend-position', description: 'Defend position', priority: 60, reward: 50 },
             { id: 'advance', name: 'advance-piece', description: 'Advance own piece', priority: 50, reward: 30 },
           ];
-          baseInput.availableActions = [
+          availableActions = [
             { action: 'move-piece', description: 'Move piece to square' },
             { action: 'capture', description: 'Capture opponent piece' },
           ];
           break;
 
         case 'puzzle':
-          baseInput.availableGoals = [
+          availableGoals = [
             { id: 'clear', name: 'clear-lines', description: 'Clear lines', priority: 90, reward: 100 },
             { id: 'combo', name: 'build-combo', description: 'Build combo', priority: 60, reward: 50 },
             { id: 'survive', name: 'survive', description: 'Stay alive', priority: 80, reward: 10 },
           ];
-          baseInput.availableActions = [
+          availableActions = [
             { action: 'rotate', description: 'Rotate piece' },
             { action: 'move-left', description: 'Move left' },
             { action: 'move-right', description: 'Move right' },
@@ -150,29 +141,41 @@ export class GameValidator {
           break;
 
         case 'card-game':
-          baseInput.availableGoals = [
+          availableGoals = [
             { id: 'play-card', name: 'play-card', description: 'Play a card', priority: 70, reward: 40 },
             { id: 'draw', name: 'draw-card', description: 'Draw a card', priority: 50, reward: 20 },
             { id: 'pass', name: 'pass-turn', description: 'Pass turn', priority: 30, reward: 10 },
           ];
-          baseInput.availableActions = [
+          availableActions = [
             { action: 'play', description: 'Play card from hand' },
             { action: 'discard', description: 'Discard card' },
           ];
           break;
 
         case 'simulation':
-          baseInput.availableGoals = [
+          availableGoals = [
             { id: 'grow', name: 'grow-city', description: 'Grow city', priority: 70, reward: 50 },
             { id: 'specialize', name: 'specialize', description: 'Specialize district', priority: 60, reward: 40 },
             { id: 'innovate', name: 'innovate', description: 'Innovate technology', priority: 50, reward: 60 },
           ];
-          baseInput.availableActions = [
+          availableActions = [
             { action: 'build', description: 'Build structure' },
             { action: 'research', description: 'Research technology' },
           ];
           break;
       }
+
+      const baseInput: BrainInput = {
+        world,
+        memory: {
+          previousDecisions: Object.freeze([]),
+          knownStrategies: Object.freeze([]),
+          opponentModels: new Map(),
+        },
+        executionHistory: [],
+        availableGoals,
+        availableActions,
+      };
 
       inputs.push(baseInput);
     }

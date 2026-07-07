@@ -18,10 +18,7 @@ export declare class BuiltinBrain implements Brain {
     constructor(decisionEngine: {
         selectGoal(options: ReadonlyArray<GoalOption>): Promise<string>;
         planGoal(goal: string, observation: WorldObservation): Promise<readonly string[]>;
-        selectCommands(plan: readonly string[], available: ReadonlyArray<CommandOption>, observation: WorldObservation): Promise<ReadonlyArray<{
-            readonly commandId: string;
-            readonly priority: number;
-        }>>;
+        selectCommands(plan: readonly string[], available: ReadonlyArray<CommandOption>, observation: WorldObservation): Promise<readonly string[]>;
     });
     decide(observation: WorldObservation, availableGoals: ReadonlyArray<GoalOption>, availableCommands: ReadonlyArray<CommandOption>, memory: ExecutionMemory): Promise<BrainDecision>;
 }

@@ -27,7 +27,30 @@
       "@ai-commander/planner": ["packages/planner/src/index.ts"],
       "@ai-commander/agent-runtime": ["packages/agent-runtime/src/index.ts"],
       "@ai-commander/fake-game-adapter": ["packages/fake-game-adapter/src/index.ts"],
-      "@ai-commander/behavior-tree": ["packages/behavior-tree/src/index.ts"]
+      "@ai-commander/behavior-tree": ["packages/behavior-tree/src/index.ts"],
+      "@ai-commander/brain": ["packages/brain/src/index.ts"],
+      "@ai-commander/brain-claude": ["packages/brain-claude/src/index.ts"],
+      "@ai-commander/brain-openai": ["packages/brain-openai/src/index.ts"],
+      "@ai-commander/brain-gemini": ["packages/brain-gemini/src/index.ts"],
+      "@ai-commander/brain-ollama": ["packages/brain-ollama/src/index.ts"],
+      "@ai-commander/tournament-engine": ["packages/tournament-engine/src/index.ts"],
+      "@ai-commander/match-runner": ["packages/match-runner/src/index.ts"],
+      "@ai-commander/benchmark-reporter": ["packages/benchmark-reporter/src/index.ts"],
+      "@ai-commander/strategy-analyzer": ["packages/strategy-analyzer/src/index.ts"],
+      "@ai-commander/replay-player": ["packages/replay-player/src/index.ts"],
+      "@ai-commander/experiment-runner": ["packages/experiment-runner/src/index.ts"],
+      "@ai-commander/research-dashboard": ["packages/research-dashboard/src/index.ts"],
+      "@ai-commander/rating-system": ["packages/rating-system/src/index.ts"],
+      "@ai-commander/profiler": ["packages/profiler/src/index.ts"],
+      "@ai-commander/cli": ["packages/cli/src/index.ts"],
+      "@ai-commander/server": ["packages/server/src/index.ts"],
+      "@ai-commander/monitor": ["packages/monitor/src/index.ts"],
+      "@ai-commander/optimizer": ["packages/optimizer/src/index.ts"],
+      "@ai-commander/fine-tuner": ["packages/fine-tuner/src/index.ts"],
+      "@ai-commander/openra-adapter": ["packages/openra-adapter/src/index.ts"],
+      "@ai-commander/chess-adapter": ["packages/chess-adapter/src/index.ts"],
+      "@ai-commander/checkers-adapter": ["packages/checkers-adapter/src/index.ts"],
+      "@ai-commander/community": ["packages/community/src/index.ts"]
     }
   }
 }

@@ -4,10 +4,11 @@
  * Connects to the OpenRA-RL service (Docker container or local instance)
  * and fetches live game state.
  *
- * OpenRA-RL exposes:
- * - GET /status → service health
- * - GET /observation → current game state
- * - POST /step → execute orders
+ * OpenRA-RL (OpenEnv API) exposes:
+ * - GET /health → service health check
+ * - POST /reset → start episode, returns initial observation
+ * - POST /step → execute action, returns observation + reward + done flag
+ * - GET /schema → action/observation/state schemas
  *
  * This reader replaces the mock StateReader with real data.
  */
@@ -29,6 +30,10 @@ export declare class OpenRAStateReaderRL {
     initialize(): Promise<void>;
     /**
      * Get current game state from OpenRA-RL
+     *
+     * Note: OpenRA-RL uses POST /step with a no-op action to get observations.
+     * The /step endpoint returns { observation, reward, done } structure.
+     * This is part of the OpenEnv standard API pattern.
      */
     getGameState(): Promise<OpenRAGameState>;
     /**
@@ -48,6 +53,7 @@ export declare class OpenRAStateReaderRL {
     }>;
     /**
      * Check if service is available
+     * Uses /health endpoint (OpenEnv standard API)
      */
     checkServiceAvailability(): Promise<boolean>;
     /**

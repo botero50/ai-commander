@@ -61,7 +61,7 @@ const commands: Record<string, CLICommand> = {
         output = BenchmarkReporter.toMarkdown(report);
       }
 
-      const outfile = args.output || `tournament-${Date.now()}.${format === 'markdown' ? 'md' : format}`;
+      const outfile = Array.isArray(args.output) ? args.output[0] : (args.output as string) || `tournament-${Date.now()}.${format === 'markdown' ? 'md' : format}`;
       fs.writeFileSync(outfile, output);
       console.log(`✅ Report saved to ${outfile}`);
     },
@@ -88,7 +88,7 @@ const commands: Record<string, CLICommand> = {
         gameAdapterId: args.game as string,
       });
 
-      const outfile = args.output || `match-${Date.now()}.json`;
+      const outfile = Array.isArray(args.output) ? args.output[0] : (args.output as string) || `match-${Date.now()}.json`;
       fs.writeFileSync(outfile, JSON.stringify(replay, null, 2));
       console.log(`✅ Replay saved to ${outfile}`);
 
@@ -111,7 +111,7 @@ const commands: Record<string, CLICommand> = {
       const comparison = await ExperimentRunner.runExperiment(config);
 
       const report = ExperimentRunner.generateReport(comparison);
-      const outfile = args.output || `experiment-${Date.now()}.md`;
+      const outfile = Array.isArray(args.output) ? args.output[0] : (args.output as string) || `experiment-${Date.now()}.md`;
       fs.writeFileSync(outfile, report);
       console.log(`✅ Report saved to ${outfile}`);
     },
@@ -136,7 +136,7 @@ const commands: Record<string, CLICommand> = {
       console.log(`Key moments: ${comparison.keyMoments.length}`);
 
       const html = ReplayPlayer.generateHTML(comparison);
-      const outfile = args.output || `replay-${Date.now()}.html`;
+      const outfile = Array.isArray(args.output) ? args.output[0] : (args.output as string) || `replay-${Date.now()}.html`;
       fs.writeFileSync(outfile, html);
       console.log(`✅ HTML replay saved to ${outfile}`);
     },
@@ -154,7 +154,7 @@ const commands: Record<string, CLICommand> = {
         selectedModels: (args.models as string[]) || [],
       });
 
-      const outfile = args.output || `dashboard-${Date.now()}.html`;
+      const outfile = Array.isArray(args.output) ? args.output[0] : (args.output as string) || `dashboard-${Date.now()}.html`;
       fs.writeFileSync(outfile, html);
       console.log(`✅ Dashboard saved to ${outfile}`);
     },
@@ -215,7 +215,7 @@ TOURNAMENT FORMATS:
 };
 
 async function main() {
-  const { positional, values } = parseArgs({
+  const { positionals, values } = parseArgs({
     allowPositionals: true,
     options: {
       config: { type: 'string' },
@@ -232,7 +232,7 @@ async function main() {
     },
   });
 
-  const [command] = positional;
+  const [command] = positionals;
 
   if (!command || !commands[command]) {
     await commands.help.run({});

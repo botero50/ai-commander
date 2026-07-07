@@ -47,12 +47,12 @@ export type TournamentFormat = 'round-robin' | 'swiss' | 'best-of-n' | 'eliminat
  */
 export class BenchmarkReporter {
   static generateReport(result: TournamentResult): BenchmarkReport {
-    const metrics = result.standings.map((standing) => {
+    const metrics = result.standings.map((standing: any) => {
       const brainMatches = result.matches.filter(
-        (m) => m.metrics.redPlayer === standing.brainName || m.metrics.bluePlayer === standing.brainName
+        (m: any) => m.metrics.redPlayer === standing.brainName || m.metrics.bluePlayer === standing.brainName
       );
 
-      const totalResources = brainMatches.reduce((sum, m) => {
+      const totalResources = brainMatches.reduce((sum: number, m: any) => {
         return (
           sum +
           (m.metrics.redPlayer === standing.brainName ? m.metrics.redScore : m.metrics.blueScore)
@@ -61,7 +61,7 @@ export class BenchmarkReporter {
 
       const avgDecisionTime =
         brainMatches.length > 0
-          ? brainMatches.reduce((sum, m) => sum + m.metrics.duration, 0) / brainMatches.length
+          ? brainMatches.reduce((sum: number, m: any) => sum + m.metrics.duration, 0) / brainMatches.length
           : 0;
 
       return {

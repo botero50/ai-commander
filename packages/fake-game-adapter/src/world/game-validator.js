@@ -75,6 +75,66 @@ export class GameValidator {
         const inputs = [];
         for (let i = 0; i < count; i++) {
             const world = createInitialWorld();
+            let availableGoals = [];
+            let availableActions = [];
+            switch (gameType) {
+                case 'rts':
+                    availableGoals = [
+                        { id: 'gather', name: 'gather', description: 'Gather resources', priority: 80, reward: 50 },
+                        { id: 'expand', name: 'expand', description: 'Expand base', priority: 60, reward: 40 },
+                    ];
+                    availableActions = [
+                        { action: 'move', description: 'Move units' },
+                        { action: 'build', description: 'Build structure' },
+                    ];
+                    break;
+                case 'turn-based-strategy':
+                    availableGoals = [
+                        { id: 'attack', name: 'attack-piece', description: 'Attack opponent piece', priority: 70, reward: 60 },
+                        { id: 'defend', name: 'defend-position', description: 'Defend position', priority: 60, reward: 50 },
+                        { id: 'advance', name: 'advance-piece', description: 'Advance own piece', priority: 50, reward: 30 },
+                    ];
+                    availableActions = [
+                        { action: 'move-piece', description: 'Move piece to square' },
+                        { action: 'capture', description: 'Capture opponent piece' },
+                    ];
+                    break;
+                case 'puzzle':
+                    availableGoals = [
+                        { id: 'clear', name: 'clear-lines', description: 'Clear lines', priority: 90, reward: 100 },
+                        { id: 'combo', name: 'build-combo', description: 'Build combo', priority: 60, reward: 50 },
+                        { id: 'survive', name: 'survive', description: 'Stay alive', priority: 80, reward: 10 },
+                    ];
+                    availableActions = [
+                        { action: 'rotate', description: 'Rotate piece' },
+                        { action: 'move-left', description: 'Move left' },
+                        { action: 'move-right', description: 'Move right' },
+                        { action: 'drop', description: 'Drop piece' },
+                    ];
+                    break;
+                case 'card-game':
+                    availableGoals = [
+                        { id: 'play-card', name: 'play-card', description: 'Play a card', priority: 70, reward: 40 },
+                        { id: 'draw', name: 'draw-card', description: 'Draw a card', priority: 50, reward: 20 },
+                        { id: 'pass', name: 'pass-turn', description: 'Pass turn', priority: 30, reward: 10 },
+                    ];
+                    availableActions = [
+                        { action: 'play', description: 'Play card from hand' },
+                        { action: 'discard', description: 'Discard card' },
+                    ];
+                    break;
+                case 'simulation':
+                    availableGoals = [
+                        { id: 'grow', name: 'grow-city', description: 'Grow city', priority: 70, reward: 50 },
+                        { id: 'specialize', name: 'specialize', description: 'Specialize district', priority: 60, reward: 40 },
+                        { id: 'innovate', name: 'innovate', description: 'Innovate technology', priority: 50, reward: 60 },
+                    ];
+                    availableActions = [
+                        { action: 'build', description: 'Build structure' },
+                        { action: 'research', description: 'Research technology' },
+                    ];
+                    break;
+            }
             const baseInput = {
                 world,
                 memory: {
@@ -83,67 +143,9 @@ export class GameValidator {
                     opponentModels: new Map(),
                 },
                 executionHistory: [],
-                availableGoals: [],
-                availableActions: [],
+                availableGoals,
+                availableActions,
             };
-            switch (gameType) {
-                case 'rts':
-                    baseInput.availableGoals = [
-                        { id: 'gather', name: 'gather', description: 'Gather resources', priority: 80, reward: 50 },
-                        { id: 'expand', name: 'expand', description: 'Expand base', priority: 60, reward: 40 },
-                    ];
-                    baseInput.availableActions = [
-                        { action: 'move', description: 'Move units' },
-                        { action: 'build', description: 'Build structure' },
-                    ];
-                    break;
-                case 'turn-based-strategy':
-                    baseInput.availableGoals = [
-                        { id: 'attack', name: 'attack-piece', description: 'Attack opponent piece', priority: 70, reward: 60 },
-                        { id: 'defend', name: 'defend-position', description: 'Defend position', priority: 60, reward: 50 },
-                        { id: 'advance', name: 'advance-piece', description: 'Advance own piece', priority: 50, reward: 30 },
-                    ];
-                    baseInput.availableActions = [
-                        { action: 'move-piece', description: 'Move piece to square' },
-                        { action: 'capture', description: 'Capture opponent piece' },
-                    ];
-                    break;
-                case 'puzzle':
-                    baseInput.availableGoals = [
-                        { id: 'clear', name: 'clear-lines', description: 'Clear lines', priority: 90, reward: 100 },
-                        { id: 'combo', name: 'build-combo', description: 'Build combo', priority: 60, reward: 50 },
-                        { id: 'survive', name: 'survive', description: 'Stay alive', priority: 80, reward: 10 },
-                    ];
-                    baseInput.availableActions = [
-                        { action: 'rotate', description: 'Rotate piece' },
-                        { action: 'move-left', description: 'Move left' },
-                        { action: 'move-right', description: 'Move right' },
-                        { action: 'drop', description: 'Drop piece' },
-                    ];
-                    break;
-                case 'card-game':
-                    baseInput.availableGoals = [
-                        { id: 'play-card', name: 'play-card', description: 'Play a card', priority: 70, reward: 40 },
-                        { id: 'draw', name: 'draw-card', description: 'Draw a card', priority: 50, reward: 20 },
-                        { id: 'pass', name: 'pass-turn', description: 'Pass turn', priority: 30, reward: 10 },
-                    ];
-                    baseInput.availableActions = [
-                        { action: 'play', description: 'Play card from hand' },
-                        { action: 'discard', description: 'Discard card' },
-                    ];
-                    break;
-                case 'simulation':
-                    baseInput.availableGoals = [
-                        { id: 'grow', name: 'grow-city', description: 'Grow city', priority: 70, reward: 50 },
-                        { id: 'specialize', name: 'specialize', description: 'Specialize district', priority: 60, reward: 40 },
-                        { id: 'innovate', name: 'innovate', description: 'Innovate technology', priority: 50, reward: 60 },
-                    ];
-                    baseInput.availableActions = [
-                        { action: 'build', description: 'Build structure' },
-                        { action: 'research', description: 'Research technology' },
-                    ];
-                    break;
-            }
             inputs.push(baseInput);
         }
         return inputs;

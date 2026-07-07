@@ -22,10 +22,10 @@ export interface StructuredObservation {
     readonly worldState: {
         readonly friendlyUnits: number;
         readonly enemyUnits: number;
-        readonly resources: {
-            readonly ore: number;
-            readonly gas: number;
-        };
+        readonly resources: ReadonlyArray<{
+            readonly type: string;
+            readonly amount: number;
+        }>;
         readonly visibility: {
             readonly explored: number;
             readonly visible: number;

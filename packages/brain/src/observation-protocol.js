@@ -41,12 +41,15 @@ Your role:
 4. Select specific commands to execute
 
 You must respond with a structured decision in JSON format.`;
+    const resourcesStr = observation.resources
+        .map((r) => `${r.type} ${r.amount}`)
+        .join(', ');
     const userPrompt = `Current Game State (Tick ${observation.tick}):
 - Agent Position: (${observation.agentPosition.x}, ${observation.agentPosition.y})
 - Agent Health: ${observation.agentHealth}
 - Friendly Units: ${observation.friendlyUnits.length}
 - Enemy Units: ${observation.enemyUnits.length}
-- Resources: Ore ${observation.resources.ore}, Gas ${observation.resources.gas}
+- Resources: ${resourcesStr}
 - Map Explored: ${observation.visibility.explored}/${observation.visibility.totalMap}
 
 Recent Decisions:

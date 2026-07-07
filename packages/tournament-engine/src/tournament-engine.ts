@@ -31,6 +31,7 @@ export interface TournamentStanding {
   readonly draws: number;
   readonly rating: number;
   readonly totalCost: number;
+  readonly totalMatches?: number;
 }
 
 export interface TournamentResult {
@@ -262,30 +263,55 @@ export class TournamentEngine {
     const red = standings.get(replay.metrics.redPlayer)!;
     const blue = standings.get(replay.metrics.bluePlayer)!;
 
-    red.totalCost += replay.metrics.redCost;
-    blue.totalCost += replay.metrics.blueCost;
+    let newRedWins = red.wins;
+    let newRedLosses = red.losses;
+    let newRedDraws = red.draws;
+    let newBlueWins = blue.wins;
+    let newBlueLosses = blue.losses;
+    let newBlueDraws = blue.draws;
+
+    let newRedRating = red.rating;
+    let newBlueRating = blue.rating;
 
     if (replay.metrics.winner === 'red') {
-      red.wins += 1;
-      blue.losses += 1;
+      newRedWins += 1;
+      newBlueLosses += 1;
     } else if (replay.metrics.winner === 'blue') {
-      blue.wins += 1;
-      red.losses += 1;
+      newBlueWins += 1;
+      newRedLosses += 1;
     } else {
-      red.draws += 1;
-      blue.draws += 1;
+      newRedDraws += 1;
+      newBlueDraws += 1;
     }
 
     // Simple ELO
     const kFactor = 32;
     const expected = 1 / (1 + Math.pow(10, (blue.rating - red.rating) / 400));
     if (replay.metrics.winner === 'red') {
-      red.rating += kFactor * (1 - expected);
-      blue.rating += kFactor * (0 - (1 - expected));
+      newRedRating += kFactor * (1 - expected);
+      newBlueRating += kFactor * (0 - (1 - expected));
     } else if (replay.metrics.winner === 'blue') {
-      blue.rating += kFactor * (1 - (1 - expected));
-      red.rating += kFactor * (0 - (1 - expected));
+      newBlueRating += kFactor * (1 - (1 - expected));
+      newRedRating += kFactor * (0 - (1 - expected));
     }
+
+    standings.set(red.brainName, {
+      brainName: red.brainName,
+      wins: newRedWins,
+      losses: newRedLosses,
+      draws: newRedDraws,
+      rating: newRedRating,
+      totalCost: red.totalCost + replay.metrics.redCost,
+    });
+
+    standings.set(blue.brainName, {
+      brainName: blue.brainName,
+      wins: newBlueWins,
+      losses: newBlueLosses,
+      draws: newBlueDraws,
+      rating: newBlueRating,
+      totalCost: blue.totalCost + replay.metrics.blueCost,
+    });
   }
 
   private static createSwissPairings(standings: ReadonlyArray<TournamentStanding>) {

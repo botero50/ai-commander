@@ -93,7 +93,7 @@ export class ClaudeBrain implements Brain {
           reasoning: parsed.reasoning,
           selectedGoal: selectedGoal?.id || availableGoals[0]?.id || 'none',
           plan: parsed.plan,
-          commands: parsed.commands
+          commands: (parsed.commands as string[])
             .map((cmd) => availableCommands.find((c) => c.action.includes(cmd))?.id || cmd)
             .filter((id, i, arr) => arr.indexOf(id) === i)
             .slice(0, 3),

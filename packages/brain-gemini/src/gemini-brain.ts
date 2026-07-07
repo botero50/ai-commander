@@ -92,7 +92,7 @@ export class GeminiBrain implements Brain {
           reasoning: parsed.reasoning,
           selectedGoal: selectedGoal?.id || availableGoals[0]?.id || 'none',
           plan: parsed.plan,
-          commands: parsed.commands
+          commands: (parsed.commands as string[])
             .map((cmd) => availableCommands.find((c) => c.action.includes(cmd))?.id || cmd)
             .filter((id, i, arr) => arr.indexOf(id) === i)
             .slice(0, 3),
@@ -116,14 +116,13 @@ export class GeminiBrain implements Brain {
   }> {
     const model = this.client.getGenerativeModel({
       model: this.config.model,
-      systemInstruction: prompt.system,
     });
 
     const result = await model.generateContent({
       contents: [
         {
           role: 'user',
-          parts: [{ text: prompt.user }],
+          parts: [{ text: `${prompt.system}\n\n${prompt.user}` }],
         },
       ],
       generationConfig: {

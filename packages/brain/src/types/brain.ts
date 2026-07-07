@@ -24,11 +24,10 @@ export interface WorldObservation {
     readonly health: number;
     readonly threat: number;
   }>;
-  readonly resources: {
-    readonly ore: number;
-    readonly gas: number;
-    readonly totalSpent: number;
-  };
+  readonly resources: ReadonlyArray<{
+    readonly type: string;
+    readonly amount: number;
+  }>;
   readonly structures: ReadonlyArray<{
     readonly id: string;
     readonly type: string;
@@ -40,13 +39,15 @@ export interface WorldObservation {
     readonly explored: number;
     readonly visible: number;
     readonly totalMap: number;
+    readonly visibleEnemyCount: number;
+    readonly visibleResourceCount: number;
   };
 }
 
 export interface GoalOption {
   readonly id: string;
   readonly intent: string;
-  readonly priority: number;
+  readonly priority: 'high' | 'medium' | 'low';
   readonly feasibility: number;
   readonly expectedDuration: number;
   readonly estimatedValue: number;
@@ -85,10 +86,7 @@ export interface BrainDecision {
   readonly reasoning: string;
   readonly selectedGoal: string;
   readonly plan: readonly string[];
-  readonly commands: ReadonlyArray<{
-    readonly commandId: string;
-    readonly priority: number;
-  }>;
+  readonly commands: readonly string[];
   readonly confidence: number;
 }
 

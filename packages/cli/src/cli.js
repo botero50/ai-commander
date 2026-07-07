@@ -48,7 +48,7 @@ const commands = {
             else {
                 output = BenchmarkReporter.toMarkdown(report);
             }
-            const outfile = args.output || `tournament-${Date.now()}.${format === 'markdown' ? 'md' : format}`;
+            const outfile = Array.isArray(args.output) ? args.output[0] : args.output || `tournament-${Date.now()}.${format === 'markdown' ? 'md' : format}`;
             fs.writeFileSync(outfile, output);
             console.log(`✅ Report saved to ${outfile}`);
         },
@@ -70,7 +70,7 @@ const commands = {
                 maxTicks: parseInt(args.ticks) || 200,
                 gameAdapterId: args.game,
             });
-            const outfile = args.output || `match-${Date.now()}.json`;
+            const outfile = Array.isArray(args.output) ? args.output[0] : args.output || `match-${Date.now()}.json`;
             fs.writeFileSync(outfile, JSON.stringify(replay, null, 2));
             console.log(`✅ Replay saved to ${outfile}`);
             // Show metrics
@@ -89,7 +89,7 @@ const commands = {
             console.log(`Running experiment: ${config.name}`);
             const comparison = await ExperimentRunner.runExperiment(config);
             const report = ExperimentRunner.generateReport(comparison);
-            const outfile = args.output || `experiment-${Date.now()}.md`;
+            const outfile = Array.isArray(args.output) ? args.output[0] : args.output || `experiment-${Date.now()}.md`;
             fs.writeFileSync(outfile, report);
             console.log(`✅ Report saved to ${outfile}`);
         },
@@ -110,7 +110,7 @@ const commands = {
             console.log(`Divergences: ${comparison.divergences.length}`);
             console.log(`Key moments: ${comparison.keyMoments.length}`);
             const html = ReplayPlayer.generateHTML(comparison);
-            const outfile = args.output || `replay-${Date.now()}.html`;
+            const outfile = Array.isArray(args.output) ? args.output[0] : args.output || `replay-${Date.now()}.html`;
             fs.writeFileSync(outfile, html);
             console.log(`✅ HTML replay saved to ${outfile}`);
         },
@@ -125,7 +125,7 @@ const commands = {
                 ratingHistory: [],
                 selectedModels: args.models || [],
             });
-            const outfile = args.output || `dashboard-${Date.now()}.html`;
+            const outfile = Array.isArray(args.output) ? args.output[0] : args.output || `dashboard-${Date.now()}.html`;
             fs.writeFileSync(outfile, html);
             console.log(`✅ Dashboard saved to ${outfile}`);
         },
@@ -184,7 +184,7 @@ TOURNAMENT FORMATS:
     },
 };
 async function main() {
-    const { positional, values } = parseArgs({
+    const { positionals, values } = parseArgs({
         allowPositionals: true,
         options: {
             config: { type: 'string' },
@@ -200,7 +200,7 @@ async function main() {
             models: { type: 'string', multiple: true },
         },
     });
-    const [command] = positional;
+    const [command] = positionals;
     if (!command || !commands[command]) {
         await commands.help.run({});
         process.exit(1);

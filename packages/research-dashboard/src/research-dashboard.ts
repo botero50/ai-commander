@@ -123,8 +123,8 @@ export class ResearchDashboard {
             </div>
             <div class="metric">
               <span class="metric-label">Total Cost:</span>
-              <span class="metric-value">$${data.tournaments.reduce((sum, t) =>
-                sum + t.standings.reduce((s2, st) => s2 + st.totalCost, 0), 0).toFixed(2)}</span>
+              <span class="metric-value">$${data.tournaments.reduce((sum: number, t: any) =>
+                sum + t.standings.reduce((s2: number, st: any) => s2 + st.totalCost, 0), 0).toFixed(2)}</span>
             </div>
           </div>
         </div>
@@ -186,7 +186,7 @@ export class ResearchDashboard {
   }
 
   private static generateCostChart(data: DashboardData): string {
-    const costs = data.tournaments.map((t) => t.standings.reduce((sum, s) => sum + s.totalCost, 0));
+    const costs = data.tournaments.map((t: any) => t.standings.reduce((sum: number, s: any) => sum + s.totalCost, 0));
     const avgCost = costs.reduce((a, b) => a + b) / costs.length;
     const totalCost = costs.reduce((a, b) => a + b);
 
@@ -209,7 +209,7 @@ export class ResearchDashboard {
     }
 
     const latest = data.ratingHistory[data.ratingHistory.length - 1];
-    const topModels = latest.ratings.slice(0, 5).map((r) => r.playerId);
+    const topModels = latest.ratings.slice(0, 5).map((r: any) => r.playerId);
 
     return `
       <div>
@@ -227,7 +227,7 @@ export class ResearchDashboard {
             ${latest.ratings
               .slice(0, 5)
               .map(
-                (r, i) => `
+                (r: any, i: number) => `
             <tr>
               <td>${i + 1}</td>
               <td>${r.playerId}</td>

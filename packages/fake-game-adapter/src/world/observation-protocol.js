@@ -57,7 +57,7 @@ export function renderPrompt(observation) {
         prompt += `Workers: ${observation.workers.length}\n`;
         for (const worker of observation.workers) {
             const status = worker.busy ? 'busy' : 'idle';
-            prompt += `  Worker ${worker.id}: (${worker.x},${worker.y}) carrying=${worker.carrying} [${status}]\n`;
+            prompt += `  Worker ${worker.id}: (${worker.position.x},${worker.position.y}) carrying=${worker.carrying} [${status}]\n`;
         }
     }
     prompt += '\n';
@@ -68,7 +68,7 @@ export function renderPrompt(observation) {
     else {
         prompt += `Units: ${observation.military.length}\n`;
         for (const unit of observation.military) {
-            prompt += `  ${unit.type.toUpperCase()}: (${unit.x},${unit.y}) health=${unit.health}\n`;
+            prompt += `  ${unit.type.toUpperCase()}: (${unit.position.x},${unit.position.y}) health=${unit.health}\n`;
         }
     }
     prompt += '\n';
@@ -80,7 +80,7 @@ export function renderPrompt(observation) {
         prompt += `Enemies: ${observation.knownEnemies.length}\n`;
         for (const enemy of observation.knownEnemies) {
             const age = 'unknown'; // Could calculate from lastSeen if we knew current tick
-            prompt += `  Enemy ${enemy.id}: (${enemy.x},${enemy.y}) last-seen=${age}\n`;
+            prompt += `  Enemy ${enemy.id}: (${enemy.position.x},${enemy.position.y}) last-seen=${age}\n`;
         }
     }
     prompt += '\n';

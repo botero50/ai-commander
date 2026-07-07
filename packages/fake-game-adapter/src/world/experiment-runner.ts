@@ -105,14 +105,19 @@ export class ExperimentRunner {
             wins: standing.wins,
             losses: standing.losses,
             draws: standing.draws,
-            winRate: standing.totalMatches > 0 ? standing.wins / standing.totalMatches : 0,
+            winRate: (standing.totalMatches ?? 0) > 0 ? standing.wins / (standing.totalMatches ?? 0) : 0,
             rating: 1600, // Would be from ratingTracker in full implementation
             totalCost: standing.costUsd,
             averageLatencyMs: standing.averageLatencyMs,
           };
 
           results.push(result);
-          ratingTracker.recordMatch(competitor.id, opponent.id, tournamentResult.winner || 'draw');
+          if (tournamentResult.winner) {
+            const winResult = tournamentResult.winner.id === competitor.id ? 'player1' : 'player2';
+            ratingTracker.recordMatch(competitor.id, opponent.id, winResult);
+          } else {
+            ratingTracker.recordMatch(competitor.id, opponent.id, 'draw');
+          }
         }
       }
     }

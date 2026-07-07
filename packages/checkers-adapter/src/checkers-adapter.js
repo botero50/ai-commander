@@ -45,19 +45,24 @@ export class CheckersGame {
             tick: this.moveHistory.length,
             timestamp: Date.now(),
             missionId: 'checkers-game',
-            agent: {
-                playerId,
-                position: { x: 4, y: 4 }, // center
-                health: 100,
-                resources: this.turn === 1 ? this.redPieces : this.blackPieces,
-            },
-            units: [],
+            agentId: playerId,
+            agentName: 'CheckersPlayer',
+            agentPosition: { x: 4, y: 4 }, // center
+            agentHealth: 100,
+            friendlyUnits: [],
+            enemyUnits: [],
             resources: [
                 { type: 'my-pieces', amount: this.turn === 1 ? this.redPieces : this.blackPieces },
                 { type: 'opponent-pieces', amount: this.turn === 1 ? this.blackPieces : this.redPieces },
             ],
             structures: [],
-            visibility: { visibleEnemyCount: this.turn === 1 ? this.blackPieces : this.redPieces, visibleResourceCount: 0 },
+            visibility: {
+                explored: 64,
+                visible: 64,
+                totalMap: 64,
+                visibleEnemyCount: this.turn === 1 ? this.blackPieces : this.redPieces,
+                visibleResourceCount: 0
+            },
         };
     }
     getAvailableMoves() {
@@ -120,7 +125,16 @@ export class CheckersGame {
         const observation = this.getObservation(playerId);
         const goals = this.getAvailableGoals();
         const commands = this.getAvailableMoves();
-        const memory = { recentEvents: [], recentDecisions: [], metrics: {} };
+        const memory = {
+            recentEvents: [],
+            recentDecisions: [],
+            metrics: {
+                commandsExecuted: 0,
+                commandsFailed: 0,
+                goalsCompleted: 0,
+                goalsAbandoned: 0,
+            },
+        };
         if (commands.length === 0) {
             // No moves: loss (simplified)
             return false;
@@ -129,7 +143,7 @@ export class CheckersGame {
         if (decision.commands.length > 0) {
             const moveId = decision.commands[0];
             const move = commands.find((c) => c.id === moveId);
-            if (move) {
+            if (move && typeof moveId === 'string') {
                 // Parse move coordinates
                 const match = moveId.match(/move-(\d+)-(\d+)-(\d+)-(\d+)/);
                 if (match) {

@@ -49,6 +49,7 @@ export interface TournamentStanding {
   readonly wins: number;
   readonly losses: number;
   readonly draws: number;
+  readonly totalMatches?: number;
   readonly costUsd: number;
   readonly averageLatencyMs: number;
 }

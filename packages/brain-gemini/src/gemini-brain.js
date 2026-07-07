@@ -67,13 +67,12 @@ export class GeminiBrain {
     async callGemini(prompt) {
         const model = this.client.getGenerativeModel({
             model: this.config.model,
-            systemInstruction: prompt.system,
         });
         const result = await model.generateContent({
             contents: [
                 {
                     role: 'user',
-                    parts: [{ text: prompt.user }],
+                    parts: [{ text: `${prompt.system}\n\n${prompt.user}` }],
                 },
             ],
             generationConfig: {

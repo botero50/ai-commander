@@ -130,13 +130,18 @@ export class MatchRunner {
         { id: 'defend', name: 'defend-base', description: 'Defend base', priority: 90, reward: 60 },
       ],
       availableActions: [
-        { action: 'move', description: 'Move units' },
-        { action: 'build', description: 'Build structures' },
-        { action: 'attack', description: 'Attack opponent' },
+        { action: 'move', description: 'Move units', precondition: 'has-units', estimatedDuration: 1 },
+        { action: 'build', description: 'Build structures', precondition: 'has-resources', estimatedDuration: 5 },
+        { action: 'attack', description: 'Attack opponent', precondition: 'has-units', estimatedDuration: 3 },
       ],
       memory: {
         previousDecisions: Object.freeze(
-          this.decisions.filter((d) => d.player === player).slice(-5)
+          this.decisions.filter((d) => d.player === player).slice(-5).map(d => ({
+            goal: d.goal,
+            commands: [] as any[],
+            tick: d.tick,
+            outcome: 'executed'
+          }))
         ),
         knownStrategies: Object.freeze([]),
         opponentModels: new Map(),

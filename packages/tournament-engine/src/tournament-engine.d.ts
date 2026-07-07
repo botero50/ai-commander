@@ -26,6 +26,7 @@ export interface TournamentStanding {
     readonly draws: number;
     readonly rating: number;
     readonly totalCost: number;
+    readonly totalMatches?: number;
 }
 export interface TournamentResult {
     readonly format: TournamentFormat;

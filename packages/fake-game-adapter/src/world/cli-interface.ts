@@ -38,7 +38,7 @@ export class CLIInterface {
    * Parse command-line arguments
    */
   static parseArgs(args: string[]): Partial<CLIConfig> {
-    const config: Partial<CLIConfig> = {};
+    const config: Record<string, any> = {};
 
     for (let i = 0; i < args.length; i++) {
       const arg = args[i];
@@ -62,7 +62,7 @@ export class CLIInterface {
       }
     }
 
-    return config;
+    return config as Partial<CLIConfig>;
   }
 
   /**

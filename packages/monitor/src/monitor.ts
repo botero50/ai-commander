@@ -66,8 +66,11 @@ export class TournamentMonitor {
   private matchDurations: number[] = [];
 
   initialize(tournamentId: string, totalMatches: number): void {
-    this.progress.tournamentId = tournamentId;
-    this.progress.totalMatches = totalMatches;
+    this.progress = {
+      ...this.progress,
+      tournamentId,
+      totalMatches,
+    };
     this.startTime = Date.now();
 
     this.emit({
@@ -87,22 +90,32 @@ export class TournamentMonitor {
 
     // Update progress
     if (event.type === 'match-end') {
-      this.progress.completedMatches += 1;
       const data = event.data as any;
       this.matchDurations.push(data.durationMs);
 
+      const newCompletedMatches = this.progress.completedMatches + 1;
+      let newAverageMatchDurationMs = this.progress.averageMatchDurationMs;
+
       if (this.matchDurations.length > 0) {
-        this.progress.averageMatchDurationMs =
+        newAverageMatchDurationMs =
           this.matchDurations.reduce((a, b) => a + b) / this.matchDurations.length;
       }
 
-      this.progress.progressPercent = Math.round(
-        (this.progress.completedMatches / this.progress.totalMatches) * 100
+      const newProgressPercent = Math.round(
+        (newCompletedMatches / this.progress.totalMatches) * 100
       );
 
-      const remainingMatches = this.progress.totalMatches - this.progress.completedMatches;
-      this.progress.estimatedSecondsRemaining =
-        Math.ceil((remainingMatches * this.progress.averageMatchDurationMs) / 1000);
+      const remainingMatches = this.progress.totalMatches - newCompletedMatches;
+      const newEstimatedSecondsRemaining =
+        Math.ceil((remainingMatches * newAverageMatchDurationMs) / 1000);
+
+      this.progress = {
+        ...this.progress,
+        completedMatches: newCompletedMatches,
+        averageMatchDurationMs: newAverageMatchDurationMs,
+        progressPercent: newProgressPercent,
+        estimatedSecondsRemaining: newEstimatedSecondsRemaining,
+      };
 
       // Update leaderboard
       const data2 = event.data as any;
@@ -112,7 +125,10 @@ export class TournamentMonitor {
     }
 
     if (event.type === 'round-start') {
-      this.progress.currentRound = (event.data as any).round;
+      this.progress = {
+        ...this.progress,
+        currentRound: (event.data as any).round,
+      };
     }
   }
 
@@ -179,23 +195,28 @@ export class TournamentMonitor {
   }
 
   private updateLeaderboard(redPlayer: string, bluePlayer: string, winner: 'red' | 'blue' | 'draw'): void {
-    if (!this.leaderboard[redPlayer]) {
-      this.leaderboard[redPlayer] = { wins: 0, losses: 0, draws: 0, rating: 1500, totalCost: 0 };
-    }
-    if (!this.leaderboard[bluePlayer]) {
-      this.leaderboard[bluePlayer] = { wins: 0, losses: 0, draws: 0, rating: 1500, totalCost: 0 };
-    }
+    const redEntry = this.leaderboard[redPlayer] || { wins: 0, losses: 0, draws: 0, rating: 1500, totalCost: 0 };
+    const blueEntry = this.leaderboard[bluePlayer] || { wins: 0, losses: 0, draws: 0, rating: 1500, totalCost: 0 };
+
+    let newRedEntry = redEntry;
+    let newBlueEntry = blueEntry;
 
     if (winner === 'red') {
-      this.leaderboard[redPlayer].wins += 1;
-      this.leaderboard[bluePlayer].losses += 1;
+      newRedEntry = { ...redEntry, wins: redEntry.wins + 1 };
+      newBlueEntry = { ...blueEntry, losses: blueEntry.losses + 1 };
     } else if (winner === 'blue') {
-      this.leaderboard[bluePlayer].wins += 1;
-      this.leaderboard[redPlayer].losses += 1;
+      newBlueEntry = { ...blueEntry, wins: blueEntry.wins + 1 };
+      newRedEntry = { ...redEntry, losses: redEntry.losses + 1 };
     } else {
-      this.leaderboard[redPlayer].draws += 1;
-      this.leaderboard[bluePlayer].draws += 1;
+      newRedEntry = { ...redEntry, draws: redEntry.draws + 1 };
+      newBlueEntry = { ...blueEntry, draws: blueEntry.draws + 1 };
     }
+
+    this.leaderboard = {
+      ...this.leaderboard,
+      [redPlayer]: newRedEntry,
+      [bluePlayer]: newBlueEntry,
+    };
   }
 }
 

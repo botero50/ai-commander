@@ -6,6 +6,10 @@
  * - Reader/Executor lifecycle
  * - Health checks
  * - Error recovery
+ *
+ * Note: OpenRA-RL (OpenEnv standard) requires calling /reset before first game observations.
+ * The bridge provides connect() which validates service is healthy, but match orchestration
+ * must call executor.reset() before the first step() to initialize the episode.
  */
 import { createOpenRAStateReaderRL } from "./openra-rl-state-reader";
 import { createOpenRACommandExecutorRL } from "./openra-rl-command-executor";

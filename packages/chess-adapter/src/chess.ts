@@ -28,16 +28,21 @@ export class ChessGame {
       tick: this.moveHistory.length,
       timestamp: Date.now(),
       missionId: "chess-game",
-      agent: {
-        playerId,
-        position: { x: 4, y: 7 },
-        health: 100,
-        resources: pieces,
-      },
-      units: [],
+      agentId: playerId,
+      agentName: playerId === "white" ? "White" : "Black",
+      agentPosition: { x: 4, y: 7 },
+      agentHealth: 100,
+      friendlyUnits: [],
+      enemyUnits: [],
       resources: [{ type: "pieces", amount: pieces }],
       structures: [],
-      visibility: { visibleEnemyCount: 16, visibleResourceCount: 0 },
+      visibility: {
+        explored: 64,
+        visible: 64,
+        totalMap: 64,
+        visibleEnemyCount: 16,
+        visibleResourceCount: 0,
+      },
     };
   }
 
@@ -46,7 +51,7 @@ export class ChessGame {
       {
         id: "checkmate",
         intent: "Checkmate opponent",
-        priority: "high",
+        priority: "high" as const,
         feasibility: 0.1,
         expectedDuration: 10,
         estimatedValue: 1000,
@@ -54,7 +59,7 @@ export class ChessGame {
       {
         id: "material",
         intent: "Gain material advantage",
-        priority: "high",
+        priority: "high" as const,
         feasibility: 0.8,
         expectedDuration: 5,
         estimatedValue: 100,
@@ -62,7 +67,7 @@ export class ChessGame {
       {
         id: "control",
         intent: "Control center",
-        priority: "medium",
+        priority: "medium" as const,
         feasibility: 0.7,
         expectedDuration: 3,
         estimatedValue: 30,
@@ -76,7 +81,12 @@ export class ChessGame {
     const memory: ExecutionMemory = {
       recentEvents: [],
       recentDecisions: [],
-      metrics: {},
+      metrics: {
+        commandsExecuted: 0,
+        commandsFailed: 0,
+        goalsCompleted: 0,
+        goalsAbandoned: 0,
+      },
     };
 
     // Simplified: just track that move was made

@@ -70,8 +70,10 @@ export class OpenAIBrain {
             model: this.config.model,
             temperature: this.config.temperature,
             max_tokens: this.config.maxTokens,
-            system: prompt.system,
-            messages: [{ role: 'user', content: prompt.user }],
+            messages: [
+                { role: 'system', content: prompt.system },
+                { role: 'user', content: prompt.user },
+            ],
         });
         const text = response.choices[0]?.message?.content || '';
         const pricing = this.modelTokenPricing[this.config.model];

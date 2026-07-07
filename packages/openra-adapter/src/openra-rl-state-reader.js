@@ -4,10 +4,11 @@
  * Connects to the OpenRA-RL service (Docker container or local instance)
  * and fetches live game state.
  *
- * OpenRA-RL exposes:
- * - GET /status → service health
- * - GET /observation → current game state
- * - POST /step → execute orders
+ * OpenRA-RL (OpenEnv API) exposes:
+ * - GET /health → service health check
+ * - POST /reset → start episode, returns initial observation
+ * - POST /step → execute action, returns observation + reward + done flag
+ * - GET /schema → action/observation/state schemas
  *
  * This reader replaces the mock StateReader with real data.
  */
@@ -38,16 +39,24 @@ export class OpenRAStateReaderRL {
     }
     /**
      * Get current game state from OpenRA-RL
+     *
+     * Note: OpenRA-RL uses POST /step with a no-op action to get observations.
+     * The /step endpoint returns { observation, reward, done } structure.
+     * This is part of the OpenEnv standard API pattern.
      */
     async getGameState() {
-        const response = await this.fetchWithRetry(`${this.baseUrl}/observation`, {
-            method: "GET",
+        const stepResponse = await this.fetchWithRetry(`${this.baseUrl}/step`, {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+                action: { action: "no_op" },
+            }),
         });
-        if (!response.ok) {
-            throw new Error(`Failed to fetch game state: ${response.status}`);
+        if (!stepResponse.ok) {
+            throw new Error(`Failed to fetch game state: ${stepResponse.status}`);
         }
-        const data = (await response.json());
-        return this.convertToGameState(data);
+        const data = (await stepResponse.json());
+        return this.convertToGameState(data.observation);
     }
     /**
      * Get units for a specific player
@@ -83,11 +92,12 @@ export class OpenRAStateReaderRL {
     }
     /**
      * Check if service is available
+     * Uses /health endpoint (OpenEnv standard API)
      */
     async checkServiceAvailability() {
         try {
             this.log("  Checking OpenRA-RL availability...");
-            const response = await this.fetchWithRetry(`${this.baseUrl}/status`, {
+            const response = await this.fetchWithRetry(`${this.baseUrl}/health`, {
                 method: "GET",
             });
             if (!response.ok) {
@@ -96,7 +106,7 @@ export class OpenRAStateReaderRL {
             }
             const data = (await response.json());
             this.log(`  ✓ Service is ${data.status}`);
-            return data.status === "ready" || data.status === "connecting";
+            return data.status === "healthy" || data.status === "degraded";
         }
         catch (error) {
             this.log(`  ✗ Connection failed: ${error instanceof Error ? error.message : String(error)}`);

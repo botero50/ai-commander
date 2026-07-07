@@ -23,16 +23,21 @@ export class ChessGame {
             tick: this.moveHistory.length,
             timestamp: Date.now(),
             missionId: "chess-game",
-            agent: {
-                playerId,
-                position: { x: 4, y: 7 },
-                health: 100,
-                resources: pieces,
-            },
-            units: [],
+            agentId: playerId,
+            agentName: playerId === "white" ? "White" : "Black",
+            agentPosition: { x: 4, y: 7 },
+            agentHealth: 100,
+            friendlyUnits: [],
+            enemyUnits: [],
             resources: [{ type: "pieces", amount: pieces }],
             structures: [],
-            visibility: { visibleEnemyCount: 16, visibleResourceCount: 0 },
+            visibility: {
+                explored: 64,
+                visible: 64,
+                totalMap: 64,
+                visibleEnemyCount: 16,
+                visibleResourceCount: 0,
+            },
         };
     }
     getAvailableGoals() {
@@ -69,7 +74,12 @@ export class ChessGame {
         const memory = {
             recentEvents: [],
             recentDecisions: [],
-            metrics: {},
+            metrics: {
+                commandsExecuted: 0,
+                commandsFailed: 0,
+                goalsCompleted: 0,
+                goalsAbandoned: 0,
+            },
         };
         // Simplified: just track that move was made
         this.moveHistory.push(`${playerId}-move-${this.moveHistory.length}`);

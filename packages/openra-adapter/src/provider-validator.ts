@@ -190,15 +190,15 @@ export class ProviderValidator {
     if (obs1.agentHealth !== obs2.agentHealth) return false;
 
     // Compare unit IDs (friendly)
-    const ids1 = new Set(obs1.friendlyUnits.map((u) => u.id));
-    const ids2 = new Set(obs2.friendlyUnits.map((u) => u.id));
+    const ids1 = new Set(obs1.friendlyUnits.map((u: any) => u.id));
+    const ids2 = new Set(obs2.friendlyUnits.map((u: any) => u.id));
     for (const id of ids1) {
       if (!ids2.has(id)) return false;
     }
 
     // Compare enemy unit IDs
-    const eids1 = new Set(obs1.enemyUnits.map((u) => u.id));
-    const eids2 = new Set(obs2.enemyUnits.map((u) => u.id));
+    const eids1 = new Set(obs1.enemyUnits.map((u: any) => u.id));
+    const eids2 = new Set(obs2.enemyUnits.map((u: any) => u.id));
     for (const id of eids1) {
       if (!eids2.has(id)) return false;
     }

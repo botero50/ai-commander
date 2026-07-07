@@ -19,6 +19,6 @@ if ! docker images openra-rl:latest | grep -q openra-rl; then
 fi
 
 echo "Starting OpenRA-RL on port $PORT..."
-docker run -p "$PORT:9999" \
+docker run -p "$PORT:8000" \
   -v openra-content:/root/.config/openra/Content \
   openra-rl:latest

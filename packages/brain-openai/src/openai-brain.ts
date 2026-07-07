@@ -93,7 +93,7 @@ export class OpenAIBrain implements Brain {
           reasoning: parsed.reasoning,
           selectedGoal: selectedGoal?.id || availableGoals[0]?.id || 'none',
           plan: parsed.plan,
-          commands: parsed.commands
+          commands: (parsed.commands as string[])
             .map((cmd) => availableCommands.find((c) => c.action.includes(cmd))?.id || cmd)
             .filter((id, i, arr) => arr.indexOf(id) === i)
             .slice(0, 3),
@@ -118,9 +118,11 @@ export class OpenAIBrain implements Brain {
     const response = await this.client.chat.completions.create({
       model: this.config.model,
       temperature: this.config.temperature,
-      max_tokens: this.config.maxTokens,
-      system: prompt.system,
-      messages: [{ role: 'user', content: prompt.user }],
+      max_tokens: this.config.maxTokens!,
+      messages: [
+        { role: 'system', content: prompt.system },
+        { role: 'user', content: prompt.user },
+      ],
     });
 
     const text = response.choices[0]?.message?.content || '';

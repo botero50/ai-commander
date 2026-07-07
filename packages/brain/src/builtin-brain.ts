@@ -32,7 +32,7 @@ export class BuiltinBrain implements Brain {
         plan: readonly string[],
         available: ReadonlyArray<CommandOption>,
         observation: WorldObservation
-      ): Promise<ReadonlyArray<{ readonly commandId: string; readonly priority: number }>>;
+      ): Promise<readonly string[]>;
     }
   ) {}
 

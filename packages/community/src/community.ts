@@ -61,7 +61,9 @@ export class CommunityRegistry {
   getReplay(id: string): SharedReplay | undefined {
     const replay = this.replays.get(id);
     if (replay) {
-      replay.views += 1;
+      const updated = { ...replay, views: replay.views + 1 };
+      this.replays.set(id, updated);
+      return updated;
     }
     return replay;
   }

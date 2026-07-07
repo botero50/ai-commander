@@ -93,7 +93,7 @@ export class ReplayPlayer {
   }
 
   static getTickFrame(replay: MatchReplay, tickNumber: number): MatchTick | undefined {
-    return replay.trace.find((t) => t.tickNumber === tickNumber);
+    return replay.trace.find((t: any) => t.tickNumber === tickNumber);
   }
 
   static compareDecisions(tick: MatchTick): {
@@ -129,7 +129,7 @@ export class ReplayPlayer {
       }
     }
 
-    return replay.trace.map((tick) => ({
+    return replay.trace.map((tick: any) => ({
       tick: tick.tickNumber,
       redHealth: tick.redState.agent.health,
       blueHealth: tick.blueState.agent.health,
