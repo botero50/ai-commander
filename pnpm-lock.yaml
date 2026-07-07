@@ -314,6 +314,8 @@ importers:
         specifier: workspace:*
         version: link:../goals
 
+  packages/profiler: {}
+
   packages/rating-system: {}
 
   packages/replay-player:
