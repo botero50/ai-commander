@@ -25,7 +25,7 @@ export interface ProductionValidationResult {
     readonly replayRecording: boolean;
     readonly costCalculation: boolean;
     readonly ratingCalculation: boolean;
-    readonly fair Play: boolean;
+    readonly fairPlay: boolean;
   };
   readonly errors: string[];
   readonly performance: {
@@ -132,7 +132,7 @@ export class ProductionValidator {
         replayRecording,
         costCalculation,
         ratingCalculation,
-        "fair Play": fairPlay,
+        fairPlay,
       },
       errors,
       performance: {
@@ -238,7 +238,7 @@ export class ProductionValidator {
       `  Replay recording: ${result.checks.replayRecording ? "✅" : "❌"}`,
       `  Cost calculation: ${result.checks.costCalculation ? "✅" : "❌"}`,
       `  Rating calculation: ${result.checks.ratingCalculation ? "✅" : "❌"}`,
-      `  Fair play: ${result.checks["fair Play"] ? "✅" : "❌"}`,
+      `  Fair play: ${result.checks.fairPlay ? "✅" : "❌"}`,
       "",
       "Performance:",
       `  Average match time: ${result.performance.avgMatchTime}ms`,
