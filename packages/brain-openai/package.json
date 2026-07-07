@@ -1,0 +1,15 @@
+{
+  "name": "@ai-commander/brain-openai",
+  "version": "1.0.0",
+  "description": "OpenAI/GPT provider for Brain SDK",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@ai-commander/brain": "workspace:*",
+    "openai": "^4.0.0"
+  }
+}
