@@ -260,6 +260,8 @@ importers:
         specifier: workspace:*
         version: link:../goals
 
+  packages/rating-system: {}
+
   packages/tournament-engine:
     dependencies:
       '@ai-commander/brain':

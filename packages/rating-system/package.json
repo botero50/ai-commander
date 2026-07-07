@@ -1,0 +1,17 @@
+{
+  "name": "@ai-commander/rating-system",
+  "version": "1.0.0",
+  "description": "ELO ratings, win rates, confidence intervals, historical rankings",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.ts",
+      "import": "./dist/index.js"
+    }
+  },
+  "files": ["dist"],
+  "dependencies": {}
+}
