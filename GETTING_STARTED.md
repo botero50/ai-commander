@@ -14,11 +14,29 @@ Complete index to everything you need.
 
 ## The 3-Minute Version
 
-```bash
-# Terminal 1: Start game server
-cd ./docker-images && ./run.sh
+### First Time Setup (One command, ~2 minutes)
 
-# Terminal 2: Run a tournament
+**Windows (PowerShell/Git Bash):**
+```bash
+cd ./docker-images && bash load-and-run.sh
+```
+
+**Mac/Linux:**
+```bash
+cd ./docker-images && bash load-and-run.sh
+```
+
+### Then Run Tournament
+
+**Terminal 1: Start game server**
+
+```bash
+cd ./docker-images && bash run.sh
+```
+
+**Terminal 2: Run a tournament**
+
+```bash
 npm run build
 node ./packages/cli/dist/cli.js tournament --brain-a claude --brain-b gpt4 --games 3
 ```

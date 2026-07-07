@@ -15,12 +15,95 @@ Get a tournament running in 5 minutes.
 
 ## Step 1: Start the OpenRA Game Server (2 min)
 
-Terminal 1 - Start the game server:
+### Setup (First Time Only)
+
+This downloads the game content (~500 MB, ~2 minutes).
+
+#### **Windows (PowerShell or Git Bash)**
 
 ```bash
 cd ./docker-images
-./load-and-run.sh    # First time only
-./run.sh             # Start the server
+bash load-and-run.sh
+```
+
+Or manually:
+```bash
+# Load image
+docker load < openra-rl-latest.tar.gz
+
+# Create volume
+docker volume create openra-content
+
+# Download game content
+docker run --rm -v openra-content:/root/.config/openra/Content ^
+  openra-rl:latest bash -c "mkdir -p /root/.config/openra/Content/ra/v2/{expand,cnc} && cd /tmp && curl -sL -o ra.zip https://openra.baxxster.no/openra/ra-quickinstall.zip && unzip -q ra.zip && cp *.mix /root/.config/openra/Content/ra/v2/ && cp expand/* /root/.config/openra/Content/ra/v2/expand/ 2>/dev/null || true && cp cnc/* /root/.config/openra/Content/ra/v2/cnc/ 2>/dev/null || true"
+```
+
+#### **Mac (Terminal/zsh)**
+
+```bash
+cd ./docker-images
+bash load-and-run.sh
+```
+
+Or manually:
+```bash
+docker load < openra-rl-latest.tar.gz
+docker volume create openra-content
+docker run --rm -v openra-content:/root/.config/openra/Content \
+  openra-rl:latest bash -c "mkdir -p /root/.config/openra/Content/ra/v2/{expand,cnc} && cd /tmp && curl -sL -o ra.zip https://openra.baxxster.no/openra/ra-quickinstall.zip && unzip -q ra.zip && cp *.mix /root/.config/openra/Content/ra/v2/ && cp expand/* /root/.config/openra/Content/ra/v2/expand/ 2>/dev/null || true && cp cnc/* /root/.config/openra/Content/ra/v2/cnc/ 2>/dev/null || true"
+```
+
+#### **Linux (bash/zsh)**
+
+```bash
+cd ./docker-images
+bash load-and-run.sh
+```
+
+Or manually:
+```bash
+docker load < openra-rl-latest.tar.gz
+docker volume create openra-content
+docker run --rm -v openra-content:/root/.config/openra/Content \
+  openra-rl:latest bash -c "mkdir -p /root/.config/openra/Content/ra/v2/{expand,cnc} && cd /tmp && curl -sL -o ra.zip https://openra.baxxster.no/openra/ra-quickinstall.zip && unzip -q ra.zip && cp *.mix /root/.config/openra/Content/ra/v2/ && cp expand/* /root/.config/openra/Content/ra/v2/expand/ 2>/dev/null || true && cp cnc/* /root/.config/openra/Content/ra/v2/cnc/ 2>/dev/null || true"
+```
+
+### Start Server (Every Time)
+
+Terminal 1 - Start the game server:
+
+#### **Windows (PowerShell or Git Bash)**
+```bash
+cd ./docker-images
+bash run.sh
+```
+
+Or manually:
+```bash
+docker run -p 9999:9999 -v openra-content:/root/.config/openra/Content openra-rl:latest
+```
+
+#### **Mac (Terminal/zsh)**
+```bash
+cd ./docker-images
+bash run.sh
+```
+
+Or manually:
+```bash
+docker run -p 9999:9999 -v openra-content:/root/.config/openra/Content openra-rl:latest
+```
+
+#### **Linux (bash/zsh)**
+```bash
+cd ./docker-images
+bash run.sh
+```
+
+Or manually:
+```bash
+docker run -p 9999:9999 -v openra-content:/root/.config/openra/Content openra-rl:latest
 ```
 
 Expected output:

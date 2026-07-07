@@ -17,10 +17,46 @@ Complete summary showing exactly how to run tournaments with the OpenRA game env
 
 ### Step 1: Start the Game Server
 
+#### **Windows (PowerShell or Git Bash)**
+
+First time setup:
 ```bash
 cd ./docker-images
-./load-and-run.sh    # First time: downloads game content (~2 min)
-./run.sh             # Starts the server (every time after)
+bash load-and-run.sh
+```
+
+Then start server:
+```bash
+cd ./docker-images
+bash run.sh
+```
+
+#### **Mac (Terminal/zsh)**
+
+First time setup:
+```bash
+cd ./docker-images
+bash load-and-run.sh
+```
+
+Then start server:
+```bash
+cd ./docker-images
+bash run.sh
+```
+
+#### **Linux (bash/zsh)**
+
+First time setup:
+```bash
+cd ./docker-images
+bash load-and-run.sh
+```
+
+Then start server:
+```bash
+cd ./docker-images
+bash run.sh
 ```
 
 The gRPC server will be running on `localhost:9999`.

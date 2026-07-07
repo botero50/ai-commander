@@ -16,10 +16,46 @@ The complete OpenRA-RL Docker image is now stored in your project and ready to d
 
 ### To Deploy Anytime
 
+#### **Windows (PowerShell/Git Bash)**
+
+First time:
 ```bash
 cd ./docker-images
-./load-and-run.sh   # One-time setup
-./run.sh            # Start the server
+bash load-and-run.sh
+```
+
+Every time:
+```bash
+cd ./docker-images
+bash run.sh
+```
+
+#### **Mac (Terminal/zsh)**
+
+First time:
+```bash
+cd ./docker-images
+bash load-and-run.sh
+```
+
+Every time:
+```bash
+cd ./docker-images
+bash run.sh
+```
+
+#### **Linux (bash/zsh)**
+
+First time:
+```bash
+cd ./docker-images
+bash load-and-run.sh
+```
+
+Every time:
+```bash
+cd ./docker-images
+bash run.sh
 ```
 
 That's it! The gRPC server will be running on `localhost:9999`.
