@@ -339,6 +339,24 @@ importers:
         specifier: workspace:*
         version: link:../tournament-engine
 
+  packages/server:
+    dependencies:
+      '@ai-commander/benchmark-reporter':
+        specifier: workspace:*
+        version: link:../benchmark-reporter
+      '@ai-commander/brain':
+        specifier: workspace:*
+        version: link:../brain
+      '@ai-commander/config':
+        specifier: workspace:*
+        version: link:../config
+      '@ai-commander/match-runner':
+        specifier: workspace:*
+        version: link:../match-runner
+      '@ai-commander/tournament-engine':
+        specifier: workspace:*
+        version: link:../tournament-engine
+
   packages/strategy-analyzer:
     dependencies:
       '@ai-commander/match-runner':
