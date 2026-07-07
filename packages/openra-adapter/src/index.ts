@@ -1,4 +1,4 @@
-// Adapter layer
+// Adapter layer (mock)
 export { OpenRAProcessManager } from "./process-manager";
 export type { OpenRAConfig } from "./process-manager";
 
@@ -11,6 +11,12 @@ export type { OpenRACommand, CommandValidationResult } from "./command-executor"
 
 export { EventSynchronizer } from "./event-synchronizer";
 export type { GameEvent } from "./event-synchronizer";
+
+// Real OpenRA-RL integration
+export { OpenRAStateReaderRL, createOpenRAStateReaderRL } from "./openra-rl-state-reader";
+export { OpenRACommandExecutorRL, createOpenRACommandExecutorRL } from "./openra-rl-command-executor";
+export { OpenRARLBridge, createOpenRARLBridge } from "./openra-rl-bridge";
+export type { OpenRARLBridgeConfig, OpenRARLBridgeState } from "./openra-rl-bridge";
 
 // Validators
 export { WorkerValidator } from "./worker-validator";
