@@ -17,6 +17,19 @@ export type {
   BrainExecutionTelemetry,
 } from './execution/brain-executor.js';
 
+export { ExecutionMonitor } from './execution/execution-monitor.js';
+export type { ExecutionMonitorConfig, ExecutionMetrics } from './execution/execution-monitor.js';
+
+export { StateMetrics } from './execution/state-metrics.js';
+export type { StateMetricsConfig, StateSnapshot, StateMetricsResult } from './execution/state-metrics.js';
+
+export { IntegrationValidator } from './execution/integration-validator.js';
+export type {
+  IntegrationValidationResult,
+  ValidationMetrics,
+  CycleValidationResult,
+} from './execution/integration-validator.js';
+
 export { ExternalSystemLifecycle, ExternalSystemHealthStatus } from './lifecycle/external-system-lifecycle.js';
 export type {
   ExternalSystemLifecycleConfig,
