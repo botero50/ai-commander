@@ -109,3 +109,5 @@ export type {
   FormattedMatchEntry,
   TournamentDashboardState,
 } from './tournament/tournament-dashboard.js';
+export { MatchReplay } from './tournament/match-replay.js';
+export type { ReplayEvent, ReplayFrame } from './tournament/match-replay.js';
