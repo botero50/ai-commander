@@ -35,6 +35,7 @@ export { MatchLoop } from './match/match-loop.js';
 export { MatchMonitor } from './match/match-monitor.js';
 export { MatchTelemetry } from './match/match-telemetry.js';
 export { MatchValidator } from './match/match-validator.js';
+export { BrainAdapter } from './match/brain-adapter.js';
 export type { MatchConfig, MatchMetadata } from './match/match-config.js';
 export type { LoopConfig, LoopMetrics, LoopCallbacks } from './match/match-loop.js';
 export type { MonitorConfig, MatchState } from './match/match-monitor.js';

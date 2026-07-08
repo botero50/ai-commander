@@ -1,6 +1,14 @@
 import { WorldState, Command } from '@ai-commander/domain';
 import { Match } from './match.js';
 import { Logger } from '../config/logger.js';
+import { BrainAdapter } from './brain-adapter.js';
+
+// Brain interface - injected via dependency, no SDK imports
+interface Brain {
+  readonly name: string;
+  readonly version: string;
+  decide(observation: any, goals: any, commands: any, memory: any): Promise<any>;
+}
 
 export interface LoopConfig {
   tickDurationMs: number;
@@ -31,6 +39,7 @@ export class MatchLoop {
   private logger: Logger;
   private config: LoopConfig;
   private callbacks: LoopCallbacks;
+  private brain: Brain | null = null;
   private running: boolean = false;
   private loopInterval: NodeJS.Timeout | null = null;
   private iterationCount: number = 0;
@@ -38,13 +47,14 @@ export class MatchLoop {
   private decideLatencies: number[] = [];
   private executeLatencies: number[] = [];
 
-  constructor(match: Match, config: LoopConfig, callbacks: LoopCallbacks, logger: Logger) {
+  constructor(match: Match, config: LoopConfig, callbacks: LoopCallbacks, logger: Logger, brain?: Brain) {
     this.match = match;
     this.config = {
       observeTimeoutMs: 5000,
       ...config,
     };
     this.callbacks = callbacks;
+    this.brain = brain ?? null;
     this.logger = logger;
   }
 
@@ -194,7 +204,30 @@ export class MatchLoop {
     }
   }
 
+  setBrain(brain: Brain): void {
+    this.brain = brain;
+  }
+
   private async decide(state: WorldState): Promise<Command[]> {
+    // If Brain is injected, use it instead of callback
+    if (this.brain) {
+      try {
+        const observation = BrainAdapter.worldStateToObservation(state, this.match.matchId, 'primary-agent');
+        const goals = BrainAdapter.getDefaultGoals();
+        const availableCommands = BrainAdapter.getDefaultCommands();
+        const memory = BrainAdapter.getExecutionMemory();
+
+        const decision = await this.brain.decide(observation, goals, availableCommands, memory);
+        const commands = BrainAdapter.brainDecisionToCommands(decision, 'primary-agent', state.time.currentTick.number);
+
+        return commands;
+      } catch (err) {
+        this.logger.error('Brain decision error', err);
+        return [];
+      }
+    }
+
+    // Fall back to callback if no Brain injected
     if (!this.callbacks.onDecide) {
       return [];
     }
