@@ -7,3 +7,5 @@ export type { SpringGameState } from './mapper/observation-mapper.js';
 export { ObservationMapper } from './mapper/observation-mapper.js';
 export { GameProcessManager } from './process/game-process-manager.js';
 export { IPCBridgeImpl } from './ipc/ipc-bridge-impl.js';
+export { SpringRTSGameSession } from './session/game-session.js';
+export type { GameSessionConfig } from './session/game-session.js';
