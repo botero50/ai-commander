@@ -4,6 +4,7 @@ import { GameProcess } from './types/game-process.js';
 import { IPCBridge } from './types/ipc-bridge.js';
 import { ConfigurationLoader } from './config/configuration-loader.js';
 import { Logger } from './config/logger.js';
+import { GameProcessManager } from './process/game-process-manager.js';
 
 export class ZeroADAdapter implements GameAdapter {
   private config: ZeroADConfiguration;
@@ -15,14 +16,30 @@ export class ZeroADAdapter implements GameAdapter {
     this.config = ConfigurationLoader.load(configOverrides);
     this.logger = new Logger(this.config.logLevel, 'ZeroADAdapter');
     this.logger.info('Adapter initialized', { config: this.sanitizeConfig(this.config) });
+
+    this.process = new GameProcessManager(
+      {
+        executablePath: this.config.gameExecutablePath,
+        launchTimeout: this.config.launchTimeout!,
+        shutdownTimeout: this.config.shutdownTimeout!,
+      },
+      this.logger
+    );
   }
 
   async startGame(): Promise<GameSession> {
-    throw new Error('Not yet implemented');
+    if (!this.process) {
+      throw new Error('Process manager not initialized');
+    }
+
+    await this.process.start();
+    throw new Error('GameSession implementation pending (Story 3)');
   }
 
   async stopGame(): Promise<void> {
-    throw new Error('Not yet implemented');
+    if (this.process) {
+      await this.process.stop();
+    }
   }
 
   async getSession(): Promise<GameSession | null> {
@@ -35,6 +52,13 @@ export class ZeroADAdapter implements GameAdapter {
 
   getLogger(): Logger {
     return this.logger;
+  }
+
+  getProcess(): GameProcess {
+    if (!this.process) {
+      throw new Error('Process manager not initialized');
+    }
+    return this.process;
   }
 
   private sanitizeConfig(config: ZeroADConfiguration): object {
