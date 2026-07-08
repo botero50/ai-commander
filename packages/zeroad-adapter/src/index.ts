@@ -111,3 +111,11 @@ export type {
 } from './tournament/tournament-dashboard.js';
 export { MatchReplay } from './tournament/match-replay.js';
 export type { ReplayEvent, ReplayFrame } from './tournament/match-replay.js';
+export { ReplayStorage } from './web/replay-storage.js';
+export type { ReplayMetadata } from './web/replay-storage.js';
+export { ReplayService } from './web/replay-service.js';
+export { DecisionTimeline } from './web/decision-timeline.js';
+export type { DecisionTimelineEntry, ObservationData } from './web/decision-timeline.js';
+export { DecisionPlayback } from './web/decision-playback.js';
+export type { PlaybackFrame, PlaybackSpeed, PlaybackState } from './web/decision-playback.js';
+export { ReplayExport } from './web/replay-export.js';
