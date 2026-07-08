@@ -4,3 +4,5 @@ export type { AgentConfiguration, AgentRuntime, AgentRuntimeState } from './type
 
 export { createAgentRuntime } from './agent-runtime.js';
 export { MetricsCollector } from './agent-metrics.js';
+export { BrainExecutor } from './brain-executor.js';
+export type { BrainExecutionContext } from './brain-executor.js';
