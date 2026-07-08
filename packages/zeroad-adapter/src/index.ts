@@ -50,4 +50,6 @@ export type { ValidationRule, ValidationResult, ValidationIssue } from './match/
 export { runSimpleMatch, runDualBrainMatch } from './match/simple-match.js';
 export type { SimpleMatchConfig, DualBrainMatchConfig, BrainInterface, MatchResult } from './match/simple-match.js';
 export { runLiveMatch } from './match/live-match-runner.js';
-export type { LiveMatchConfig } from './match/live-match-runner.js';
+export type { LiveMatchConfig, LiveMatchResult } from './match/live-match-runner.js';
+export { DecisionOverlay } from './match/decision-overlay.js';
+export type { DecisionEvent, DecisionSubscriber } from './match/decision-overlay.js';

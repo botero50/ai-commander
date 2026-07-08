@@ -7,6 +7,7 @@
 
 import { GameLoop, BrainExecutor, ExternalSystemLifecycle, ExecutionMonitor, GameSession } from '@ai-commander/adapter';
 import { Logger } from '../config/logger.js';
+import type { DecisionOverlay } from './decision-overlay.js';
 
 /**
  * Generic Brain interface (avoid importing from @ai-commander/brain to stay within rootDir)
@@ -31,6 +32,7 @@ export interface DualBrainMatchConfig {
   readonly brain1: BrainInterface;
   readonly brain2: BrainInterface;
   readonly maxTicks?: number;
+  readonly decisionOverlay?: DecisionOverlay; // Optional overlay for real-time decision capture
 }
 
 /**
@@ -310,8 +312,10 @@ export async function runDualBrainMatch(
         const brain = currentPlayer === 1 ? brain1 : brain2;
         const monitor = currentPlayer === 1 ? monitor1 : monitor2;
         const lifecycle = currentPlayer === 1 ? lifecycle1 : lifecycle2;
+        const player = currentPlayer === 1 ? 'player1' : 'player2';
 
         try {
+          const startTime = Date.now();
           const decision = await brain.decide(
             state,
             [], // availableGoals
@@ -328,12 +332,26 @@ export async function runDualBrainMatch(
               },
             }
           );
+          const durationMs = Date.now() - startTime;
 
           logger.debug(`Brain ${currentPlayer} decision`, {
             brain: brain.name,
             reasoning: decision.reasoning?.substring(0, 50) || '(none)',
             commandCount: decision.commands?.length || 0,
+            durationMs,
           });
+
+          // Record decision in overlay (if provided)
+          if (matchConfig.decisionOverlay) {
+            matchConfig.decisionOverlay.recordDecision(
+              tickCount,
+              player,
+              brain.name,
+              decision.reasoning,
+              decision.commands || [],
+              durationMs
+            );
+          }
 
           // Alternate to next player for next tick
           currentPlayer = currentPlayer === 1 ? 2 : 1;

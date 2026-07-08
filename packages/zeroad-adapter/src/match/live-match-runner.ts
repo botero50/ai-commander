@@ -13,28 +13,40 @@ import { GameSession } from '@ai-commander/adapter';
 import { ZeroADAdapter } from '../adapter.js';
 import { BrainInterface, MatchResult } from './simple-match.js';
 import { runDualBrainMatch } from './simple-match.js';
+import { DecisionOverlay, DecisionSubscriber } from './decision-overlay.js';
 
 export interface LiveMatchConfig {
   readonly brain1: BrainInterface;
   readonly brain2: BrainInterface;
   readonly maxTicks?: number;
   readonly keepWindowOpen?: boolean; // Keep 0 A.D. window open after match
+  readonly onDecision?: DecisionSubscriber; // Real-time decision callback
+}
+
+export interface LiveMatchResult extends MatchResult {
+  readonly overlay: DecisionOverlay; // Access to all recorded decisions
 }
 
 /**
  * Run a live match with visible 0 A.D. window
- * Automatically launches the game, runs the match, returns results
+ * Automatically launches the game, runs the match, captures decisions in real-time
  */
 export async function runLiveMatch(
   adapter: ZeroADAdapter,
   config: LiveMatchConfig
-): Promise<MatchResult> {
+): Promise<LiveMatchResult> {
   const logger = new Logger('info', 'LiveMatch');
   const matchConfig = {
     brain1: config.brain1,
     brain2: config.brain2,
     maxTicks: config.maxTicks || 5000,
   };
+
+  // Create decision overlay for real-time capture
+  const overlay = new DecisionOverlay();
+  if (config.onDecision) {
+    overlay.subscribe(config.onDecision);
+  }
 
   logger.info(`Starting live match: ${config.brain1.name} vs ${config.brain2.name}`, {
     maxTicks: matchConfig.maxTicks,
@@ -60,19 +72,26 @@ export async function runLiveMatch(
       playersCount: initialState.players?.length || 0,
     });
 
-    // Run the match with both brains
-    const result = await runDualBrainMatch(
+    // Run the match with both brains, passing the overlay for decision capture
+    const matchResult = await runDualBrainMatch(
       session,
       config.brain1,
       config.brain2,
-      { maxTicks: matchConfig.maxTicks }
+      { maxTicks: matchConfig.maxTicks, decisionOverlay: overlay }
     );
 
     logger.info('Match completed', {
-      winner: result.winner,
-      ticksRan: result.ticksRan,
-      duration: result.duration,
+      winner: matchResult.winner,
+      ticksRan: matchResult.ticksRan,
+      duration: matchResult.duration,
+      totalDecisions: overlay.getStats().totalDecisions,
     });
+
+    // Build result with overlay
+    const result: LiveMatchResult = {
+      ...matchResult,
+      overlay,
+    };
 
     // If keepWindowOpen, pause observation but leave process running
     if (config.keepWindowOpen ?? true) {
