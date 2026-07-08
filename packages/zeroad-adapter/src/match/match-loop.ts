@@ -3,6 +3,7 @@ import { Match } from './match.js';
 import { Logger } from '../config/logger.js';
 import { BrainAdapter } from './brain-adapter.js';
 import { DecisionPipeline, type DecisionPipelineConfig } from './decision-pipeline.js';
+import { BrainLifecycle, type BrainLifecycleConfig } from './brain-lifecycle.js';
 
 // Brain interface - injected via dependency, no SDK imports
 interface Brain {
@@ -16,6 +17,7 @@ export interface LoopConfig {
   maxIterations?: number;
   observeTimeoutMs?: number;
   decisionPipeline?: Partial<DecisionPipelineConfig>;
+  brainLifecycle?: Partial<BrainLifecycleConfig>;
 }
 
 export interface LoopMetrics {
@@ -43,6 +45,7 @@ export class MatchLoop {
   private callbacks: LoopCallbacks;
   private brain: Brain | null = null;
   private decisionPipeline: DecisionPipeline;
+  private brainLifecycle: BrainLifecycle;
   private running: boolean = false;
   private loopInterval: NodeJS.Timeout | null = null;
   private iterationCount: number = 0;
@@ -60,6 +63,7 @@ export class MatchLoop {
     this.brain = brain ?? null;
     this.logger = logger;
     this.decisionPipeline = new DecisionPipeline(config.decisionPipeline ?? {}, logger);
+    this.brainLifecycle = new BrainLifecycle(config.brainLifecycle ?? {}, logger);
   }
 
   async start(): Promise<void> {
@@ -71,6 +75,20 @@ export class MatchLoop {
       throw new Error('Match not active');
     }
 
+    // Initialize Brain lifecycle if Brain is provided
+    if (this.brain) {
+      try {
+        await this.brainLifecycle.initialize();
+
+        if (!this.brainLifecycle.isReady()) {
+          throw new Error('Brain failed to initialize');
+        }
+      } catch (err) {
+        this.logger.error('Brain initialization failed', err);
+        throw err;
+      }
+    }
+
     this.running = true;
     this.iterationCount = 0;
     this.observeLatencies = [];
@@ -80,6 +98,7 @@ export class MatchLoop {
     this.logger.info('Starting match loop', {
       matchId: this.match.matchId,
       tickDurationMs: this.config.tickDurationMs,
+      brainReady: this.brainLifecycle.isReady(),
     });
 
     this.loopInterval = setInterval(() => {
@@ -97,6 +116,15 @@ export class MatchLoop {
     if (this.loopInterval) {
       clearInterval(this.loopInterval);
       this.loopInterval = null;
+    }
+
+    // Shutdown Brain lifecycle if Brain is provided
+    if (this.brain && this.brainLifecycle.isReady()) {
+      try {
+        await this.brainLifecycle.shutdown();
+      } catch (err) {
+        this.logger.error('Brain shutdown error', err);
+      }
     }
 
     this.logger.info('Match loop stopped', {
@@ -216,10 +244,30 @@ export class MatchLoop {
     return this.decisionPipeline;
   }
 
+  getBrainLifecycle(): BrainLifecycle {
+    return this.brainLifecycle;
+  }
+
   private async decide(state: WorldState): Promise<Command[]> {
-    // If Brain is injected, use decision pipeline
-    if (this.brain) {
+    // If Brain is injected, use decision pipeline with lifecycle management
+    if (this.brain && this.brainLifecycle.isReady()) {
       const tick = state.time.currentTick.number;
+
+      // Check Brain health before decision
+      const health = await this.brainLifecycle.performHealthCheck();
+
+      if (!health.isHealthy && health.details.recentErrors > 0) {
+        this.logger.warn('Brain health degraded, attempting recovery', {
+          tick,
+          recentErrors: health.details.recentErrors,
+        });
+
+        const recovered = await this.brainLifecycle.attemptRecovery();
+        if (!recovered) {
+          this.logger.error('Brain recovery failed', { tick });
+          return [];
+        }
+      }
 
       const result = await this.decisionPipeline.executeDecision(
         async (token) => {
@@ -251,8 +299,10 @@ export class MatchLoop {
         return commands;
       }
 
-      // Pipeline failed - log and return empty
+      // Pipeline failed - record error and return empty
       if (result.error) {
+        this.brainLifecycle.recordError(result.error);
+
         this.logger.warn('Brain decision pipeline failed', {
           tick,
           attempts: result.attemptNumber,
