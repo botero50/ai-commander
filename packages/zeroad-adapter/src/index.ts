@@ -64,3 +64,13 @@ export {
   bindMatchResultToViewer,
   matchResultToViewerState,
 } from './web/match-viewer-integration.js';
+export { MatchServer } from './web/match-server.js';
+export type { MatchClient, MatchServerConfig } from './web/match-server.js';
+export {
+  createMatchHandler,
+  getMatchHandler,
+  listMatchesHandler,
+  getStatsHandler,
+  closeMatchHandler,
+  setupMatchViewerRoutes,
+} from './web/express-integration.js';
