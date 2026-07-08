@@ -93,3 +93,11 @@ export type {
 } from './web/ui-components.js';
 export { MatchViewStateManager } from './web/match-view-state.js';
 export type { MatchViewState, StateUpdateCallback } from './web/match-view-state.js';
+export { TournamentRunner } from './tournament/tournament-runner.js';
+export type {
+  TournamentBrain,
+  TournamentMatchResult,
+  BrainStats,
+  TournamentConfig,
+  TournamentResult,
+} from './tournament/tournament-runner.js';
