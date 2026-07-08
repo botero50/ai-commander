@@ -16,3 +16,10 @@ export type {
   CancellationToken,
   BrainExecutionTelemetry,
 } from './execution/brain-executor.js';
+
+export { ExternalSystemLifecycle, ExternalSystemHealthStatus } from './lifecycle/external-system-lifecycle.js';
+export type {
+  ExternalSystemLifecycleConfig,
+  ExternalSystemHealthCheckResult,
+  ExternalSystemLifecycleEvent,
+} from './lifecycle/external-system-lifecycle.js';
