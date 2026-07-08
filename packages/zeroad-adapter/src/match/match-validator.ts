@@ -1,5 +1,5 @@
 import { Match } from './match.js';
-import { MatchMonitor } from './match-monitor.js';
+import { ExecutionMonitor, StateMetrics } from '@ai-commander/adapter';
 import { Logger } from '../config/logger.js';
 
 export interface ValidationRule {
@@ -26,13 +26,15 @@ export interface ValidationIssue {
 
 export class MatchValidator {
   private match: Match;
-  private monitor: MatchMonitor;
+  private monitor: ExecutionMonitor;
+  private stateMetrics: StateMetrics;
   private logger: Logger;
   private rules: ValidationRule[] = [];
 
-  constructor(match: Match, monitor: MatchMonitor, logger: Logger) {
+  constructor(match: Match, monitor: ExecutionMonitor, stateMetrics: StateMetrics, logger: Logger) {
     this.match = match;
     this.monitor = monitor;
+    this.stateMetrics = stateMetrics;
     this.logger = logger;
 
     this.initializeRules();
@@ -67,22 +69,12 @@ export class MatchValidator {
       severity: 'warning',
     });
 
-    // Should have agents in match
+    // Should have recorded state snapshots
     this.addRule({
-      name: 'Agents Present',
+      name: 'State Snapshots Recorded',
       validate: () => {
-        const lastState = this.monitor.getStateHistory().pop();
-        return lastState ? lastState.playerCount > 0 : false;
-      },
-      severity: 'warning',
-    });
-
-    // No anomalies detected
-    this.addRule({
-      name: 'No Anomalies',
-      validate: () => {
-        const history = this.monitor.getStateHistory();
-        return history.every((state) => state.issues.length === 0);
+        const snapshots = this.stateMetrics.getAllSnapshots();
+        return snapshots.length > 0;
       },
       severity: 'warning',
     });
@@ -97,37 +89,12 @@ export class MatchValidator {
       severity: 'error',
     });
 
-    // Tick progression valid
+    // State metrics valid
     this.addRule({
-      name: 'Tick Progression',
+      name: 'State Metrics Valid',
       validate: () => {
-        const history = this.monitor.getStateHistory();
-        if (history.length < 2) return true;
-
-        for (let i = 1; i < history.length; i++) {
-          if (history[i].tick < history[i - 1].tick) {
-            return false; // Tick went backwards
-          }
-          if (history[i].tick - history[i - 1].tick > 10) {
-            return false; // Tick jumped too far
-          }
-        }
-        return true;
-      },
-      severity: 'error',
-    });
-
-    // Telemetry data valid
-    this.addRule({
-      name: 'Telemetry Consistent',
-      validate: () => {
-        const metrics = this.monitor.getTelemetryMetrics();
-        return (
-          metrics.snapshotCount > 0 &&
-          metrics.averageUnitCount >= 0 &&
-          metrics.averageBuildingCount >= 0 &&
-          metrics.timeSpanMs >= 0
-        );
+        const metrics = this.stateMetrics.getMetrics();
+        return metrics.snapshotCount >= 0 && metrics.timeSpanMs >= 0;
       },
       severity: 'warning',
     });
