@@ -8,3 +8,11 @@ export { AdapterError, AdapterErrorCode } from './types/adapter-error.js';
 
 export { GameLoop } from './execution/game-loop.js';
 export type { GameLoopConfig, GameLoopMetrics, GameLoopCallbacks } from './execution/game-loop.js';
+
+export { BrainExecutor } from './execution/brain-executor.js';
+export type {
+  BrainExecutorConfig,
+  BrainExecutionResult,
+  CancellationToken,
+  BrainExecutionTelemetry,
+} from './execution/brain-executor.js';
