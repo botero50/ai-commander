@@ -12,3 +12,4 @@ export type { GameState, Unit, Building, Player, Resources, MapInfo, Position } 
 export { StateExtractor, type RawGameState } from './state/state-extractor.js';
 export { ObservationLoop, type ObservationConfig } from './state/observation-loop.js';
 export { WorldMapper } from './mapper/world-mapper.js';
+export { ObservationProvider, type ObservationProviderConfig } from './observation/observation-provider.js';
