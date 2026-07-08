@@ -10,3 +10,10 @@ export { formatBrainDecision, DecisionDisplayFormatter, LiveDecisionManager } fr
 export type { DecisionDisplay, ObservationSummary, DecisionPhase } from './decision-display.js';
 export { EventFactory, EventDisplayFormatter, EventFeed } from './event-feed.js';
 export type { EventFeedItem, EventType } from './event-feed.js';
+export {
+  generateRoundRobin,
+  generateSingleElimination,
+  calculateStandings,
+  TournamentBracket,
+} from './tournament-bracket.js';
+export type { BracketFormat, BracketParticipant, ScheduledMatch, TournamentStandings } from './tournament-bracket.js';
