@@ -29,3 +29,6 @@ export { CommandConverter } from './commands/command-converter.js';
 export { CommandInjector, type CommandInjectorConfig, type CommandResult } from './commands/command-injector.js';
 export { CommandVerifier, type VerificationResult } from './commands/command-verifier.js';
 export { isValidGameCommand, createCommandId } from './commands/command-types.js';
+export { Match } from './match/match.js';
+export { MatchFactory } from './match/match-factory.js';
+export type { MatchConfig, MatchMetadata } from './match/match-config.js';
