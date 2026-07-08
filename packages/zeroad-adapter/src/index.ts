@@ -13,3 +13,17 @@ export { StateExtractor, type RawGameState } from './state/state-extractor.js';
 export { ObservationLoop, type ObservationConfig } from './state/observation-loop.js';
 export { WorldMapper } from './mapper/world-mapper.js';
 export { ObservationProvider, type ObservationProviderConfig } from './observation/observation-provider.js';
+export type {
+  GameCommand,
+  MoveCommand,
+  AttackCommand,
+  GatherCommand,
+  BuildCommand,
+  TrainCommand,
+  PatrolCommand,
+  RepairCommand,
+  StopCommand,
+  ZeroADRawCommand,
+} from './commands/command-types.js';
+export { CommandConverter } from './commands/command-converter.js';
+export { isValidGameCommand, createCommandId } from './commands/command-types.js';
