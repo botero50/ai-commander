@@ -57,3 +57,10 @@ export { MatchTimeline } from './match/match-timeline.js';
 export type { TimelineSnapshot, TimelineEvent } from './match/match-timeline.js';
 export { MatchObserver, MatchObserverBuilder } from './match/match-observer.js';
 export type { ObserverCallback } from './match/match-observer.js';
+export { MatchViewer, MatchViewerManager } from './web/match-viewer.js';
+export type { MatchViewerState, MatchViewerEvent } from './web/match-viewer.js';
+export {
+  createViewerIntegration,
+  bindMatchResultToViewer,
+  matchResultToViewerState,
+} from './web/match-viewer-integration.js';
