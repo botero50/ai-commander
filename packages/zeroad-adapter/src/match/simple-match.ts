@@ -34,6 +34,27 @@ export interface DualBrainMatchConfig {
   readonly maxTicks?: number;
 }
 
+/**
+ * Match result captured at completion
+ */
+export interface MatchResult {
+  readonly success: boolean;
+  readonly winner?: string; // Brain name of winner
+  readonly ticksRan: number;
+  readonly duration: number; // milliseconds
+  readonly player1: {
+    readonly name: string;
+    readonly commandsExecuted: number;
+    readonly errors: number;
+  };
+  readonly player2?: {
+    readonly name: string;
+    readonly commandsExecuted: number;
+    readonly errors: number;
+  };
+  readonly error?: unknown;
+}
+
 export async function runSimpleMatch(
   session: ZeroADGameSession,
   brain: BrainInterface,
@@ -79,6 +100,7 @@ export async function runSimpleMatch(
   );
 
   let tickCount = 0;
+  const startTime = Date.now();
 
   const gameLoop = new GameLoop(
     session,
@@ -173,14 +195,33 @@ export async function runSimpleMatch(
       isHealthy: finalMetrics.isHealthy,
     });
 
+    const duration = Date.now() - startTime;
+
     return {
       success: finalMetrics.isHealthy,
-      metrics: finalMetrics,
-      brainStatus,
+      winner: brain.name,
+      ticksRan: tickCount,
+      duration,
+      player1: {
+        name: brain.name,
+        commandsExecuted: finalMetrics.commandCount,
+        errors: finalMetrics.errorCount,
+      },
     };
   } catch (error) {
     logger.error('Match failed', error);
-    return { success: false, error };
+    const duration = Date.now() - startTime;
+    return {
+      success: false,
+      ticksRan: tickCount,
+      duration,
+      player1: {
+        name: brain.name,
+        commandsExecuted: monitor.getMetrics().commandCount,
+        errors: monitor.getMetrics().errorCount,
+      },
+      error,
+    };
   } finally {
     await lifecycle.shutdown();
   }
@@ -249,6 +290,7 @@ export async function runDualBrainMatch(
 
   let tickCount = 0;
   let currentPlayer = 1; // Alternate between players
+  const startTime = Date.now();
 
   const gameLoop = new GameLoop(
     session,
@@ -356,33 +398,57 @@ export async function runDualBrainMatch(
     const brainStatus1 = lifecycle1.getStatus();
     const brainStatus2 = lifecycle2.getStatus();
 
+    const duration = Date.now() - startTime;
+
+    // Determine winner based on more commands executed (simple heuristic)
+    const winner = finalMetrics1.commandCount > finalMetrics2.commandCount ? brain1.name : brain2.name;
+
     logger.info('Dual-brain match completed', {
+      winner,
       player1: brain1.name,
-      player1Observations: finalMetrics1.observationCount,
       player1Commands: finalMetrics1.commandCount,
       player1Errors: finalMetrics1.errorCount,
       player2: brain2.name,
-      player2Observations: finalMetrics2.observationCount,
       player2Commands: finalMetrics2.commandCount,
       player2Errors: finalMetrics2.errorCount,
+      duration,
     });
 
     return {
       success: finalMetrics1.isHealthy && finalMetrics2.isHealthy,
+      winner,
+      ticksRan: tickCount,
+      duration,
       player1: {
         name: brain1.name,
-        metrics: finalMetrics1,
-        status: brainStatus1,
+        commandsExecuted: finalMetrics1.commandCount,
+        errors: finalMetrics1.errorCount,
       },
       player2: {
         name: brain2.name,
-        metrics: finalMetrics2,
-        status: brainStatus2,
+        commandsExecuted: finalMetrics2.commandCount,
+        errors: finalMetrics2.errorCount,
       },
     };
   } catch (error) {
     logger.error('Dual-brain match failed', error);
-    return { success: false, error };
+    const duration = Date.now() - startTime;
+    return {
+      success: false,
+      ticksRan: tickCount,
+      duration,
+      player1: {
+        name: brain1.name,
+        commandsExecuted: monitor1.getMetrics().commandCount,
+        errors: monitor1.getMetrics().errorCount,
+      },
+      player2: {
+        name: brain2.name,
+        commandsExecuted: monitor2.getMetrics().commandCount,
+        errors: monitor2.getMetrics().errorCount,
+      },
+      error,
+    };
   } finally {
     await lifecycle1.shutdown();
     await lifecycle2.shutdown();

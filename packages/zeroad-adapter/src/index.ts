@@ -48,4 +48,4 @@ export type { MonitorConfig, MatchState } from './match/match-monitor.js';
 export type { TelemetrySnapshot, TelemetryMetrics } from './match/match-telemetry.js';
 export type { ValidationRule, ValidationResult, ValidationIssue } from './match/match-validator.js';
 export { runSimpleMatch, runDualBrainMatch } from './match/simple-match.js';
-export type { SimpleMatchConfig, DualBrainMatchConfig, BrainInterface } from './match/simple-match.js';
+export type { SimpleMatchConfig, DualBrainMatchConfig, BrainInterface, MatchResult } from './match/simple-match.js';
