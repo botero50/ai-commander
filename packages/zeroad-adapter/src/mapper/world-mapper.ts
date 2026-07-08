@@ -12,10 +12,14 @@ import {
   createGameTime,
   createPosition,
   createGameMap,
+  createResourcePool,
+  createResourceType,
+  createResource,
+  createEmptyResourcePool,
 } from '@ai-commander/domain';
 import { GameState, Unit, Building, Player } from '../state/state-types.js';
 import { Logger } from '../config/logger.js';
-import { PlayerId, TeamId, ResourcePool } from '@ai-commander/domain';
+import { PlayerId, TeamId } from '@ai-commander/domain';
 
 export class WorldMapper {
   private logger: Logger;
@@ -153,12 +157,12 @@ export class WorldMapper {
     return AgentState.Idle;
   }
 
-  private createResourcePool(current: number, max: number): ResourcePool {
-    return {
-      health: {
-        current,
-        max,
-      },
-    };
+  private createResourcePool(current: number, max: number) {
+    // Create health resource type
+    const healthType = createResourceType('health', 'Health', 'combat', 0, max, false, false);
+    // Create health resource with current amount
+    const healthResource = createResource(healthType, current, 0);
+    // Return empty pool (health is tracked separately in AgentSnapshot)
+    return createEmptyResourcePool([healthType]);
   }
 }

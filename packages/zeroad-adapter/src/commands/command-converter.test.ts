@@ -1,7 +1,7 @@
 import { test } from 'node:test';
 import { strict as assert } from 'node:assert';
 import { CommandConverter } from './command-converter.js';
-import { MoveCommand, AttackCommand, TrainCommand } from './command-types.js';
+import { MoveCommand, AttackCommand, TrainCommand, StopCommand } from './command-types.js';
 import { Logger } from '../config/logger.js';
 import { ZeroADAdapterError } from '../types/errors.js';
 
@@ -156,7 +156,7 @@ test('CommandConverter - reject unknown command type', () => {
 
 test('CommandConverter - stop command requires entity ids', () => {
   const converter = new CommandConverter(logger);
-  const cmd = {
+  const cmd: StopCommand = {
     id: 'cmd_9',
     type: 'stop',
     playerId: 1,

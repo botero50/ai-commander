@@ -161,7 +161,7 @@ OPTIONS:
   --blue         Blue brain config (JSON)
   --seed         Map seed (number)
   --ticks        Max ticks per match (default: 200)
-  --game         Game adapter ID (default: openra)
+  --game         Game adapter ID (default: checkers)
   --format       Report format: markdown, html, json, csv (default: markdown)
   --output       Output file path
   --tournaments  Tournament files (can be repeated)

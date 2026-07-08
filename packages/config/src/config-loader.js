@@ -142,7 +142,7 @@ export class ConfigLoader {
         const defaults = {
             version: '2.0.0',
             defaults: {
-                gameAdapterId: 'openra',
+                gameAdapterId: 'checkers',
                 maxTicksPerMatch: 200,
                 reportFormat: 'markdown',
             },

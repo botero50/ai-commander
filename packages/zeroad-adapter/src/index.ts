@@ -23,8 +23,8 @@ export type {
   PatrolCommand,
   RepairCommand,
   StopCommand,
-  ZeroADRawCommand,
 } from './commands/command-types.js';
+export type { ZeroADRawCommand } from './commands/command-converter.js';
 export { CommandConverter } from './commands/command-converter.js';
 export { CommandInjector, type CommandInjectorConfig, type CommandResult } from './commands/command-injector.js';
 export { CommandVerifier, type VerificationResult } from './commands/command-verifier.js';

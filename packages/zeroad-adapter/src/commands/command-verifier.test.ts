@@ -165,9 +165,9 @@ test('CommandVerifier - track metrics', () => {
   const verifier = new CommandVerifier(logger);
 
   const previousState = createMockGameState(100);
-  const currentState = createMockGameState(101);
-  currentState.units[0].position = { x: 110, z: 210 };
-  currentState.units[0].orders = ['move'];
+  const currentState1 = createMockGameState(101);
+  currentState1.units[0].position = { x: 110, z: 210 };
+  currentState1.units[0].orders = ['move'];
 
   const cmd1: MoveCommand = {
     id: 'cmd_6',
@@ -179,7 +179,7 @@ test('CommandVerifier - track metrics', () => {
     targetZ: 250,
   };
 
-  verifier.verify(cmd1, currentState, previousState);
+  verifier.verify(cmd1, currentState1, previousState);
 
   const cmd2: MoveCommand = {
     id: 'cmd_7',
@@ -191,8 +191,10 @@ test('CommandVerifier - track metrics', () => {
     targetZ: 250,
   };
 
-  currentState.units[0].position = { x: 100, z: 200 }; // Reset position
-  verifier.verify(cmd2, currentState, previousState);
+  const currentState2 = createMockGameState(102);
+  currentState2.units[0].position = { x: 100, z: 200 }; // Unit didn't move
+  currentState2.units[0].orders = []; // No orders
+  verifier.verify(cmd2, currentState2, previousState);
 
   const metrics = verifier.getMetrics();
 

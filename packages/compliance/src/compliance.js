@@ -11,7 +11,7 @@ export class ComplianceTracker {
             mapSeed: cfg.mapSeed || 0,
             brainVersions: cfg.brainVersions || {},
             modelConfigs: cfg.modelConfigs || {},
-            gameAdapterId: cfg.gameAdapterId || 'openra',
+            gameAdapterId: cfg.gameAdapterId || 'checkers',
             maxTicks: cfg.maxTicks || 200,
             framework: 'ai-commander-v2.0',
         };

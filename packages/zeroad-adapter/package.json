@@ -9,7 +9,7 @@
   "files": ["dist"],
   "scripts": {
     "build": "tsc",
-    "test": "node --test dist/tests/**/*.test.js",
+    "test": "node --test 'dist/**/*.test.js'",
     "lint": "eslint src",
     "clean": "rm -rf dist"
   },
