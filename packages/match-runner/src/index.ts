@@ -6,3 +6,5 @@ export { MatchReportGenerator } from './match-report.js';
 export type { MatchReport, Timeline } from './match-report.js';
 export { MatchController } from './match-controller.js';
 export type { MatchControllerState, PlayerStatus, MatchEvent } from './match-controller.js';
+export { formatBrainDecision, DecisionDisplayFormatter, LiveDecisionManager } from './decision-display.js';
+export type { DecisionDisplay, ObservationSummary, DecisionPhase } from './decision-display.js';
