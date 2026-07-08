@@ -28,18 +28,38 @@ async function healthCheck(): Promise<boolean> {
 
 async function resetGame(): Promise<any> {
   try {
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 30000); // 30 second timeout
+
     const response = await fetch(`${GAME_API}/reset`, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({}),
+      signal: controller.signal,
     });
+    clearTimeout(timeoutId);
+
     if (!response.ok) {
       console.error(`Reset failed with status ${response.status}`);
+      const text = await response.text();
+      console.error(`Response: ${text}`);
+
+      if (response.status === 500) {
+        console.error("\n⚠️  Game server error - likely missing game content files");
+        console.error("Fix: Run setup-content.sh to download and initialize game content:");
+        console.error("  cd docker-images && bash setup-content.sh");
+      }
       return null;
     }
     return await response.json();
   } catch (error) {
-    console.error(`Reset error: ${error}`);
+    if (error instanceof Error && error.name === 'AbortError') {
+      console.error(`Reset timeout - game server took too long to initialize`);
+      console.error("This usually means the game content files are missing or the server is hung.");
+      console.error("Try running: cd docker-images && bash setup-content.sh");
+    } else {
+      console.error(`Reset error: ${error}`);
+    }
     return null;
   }
 }

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { VisibleActionDemo } from '../src/visible-action-demo.js';
-import type { IntegrationHostCallbacks } from '../src/openra-rl-integration-host.js';
+import type { IntegrationHostCallbacks } from '../src/game adapter-integration-host.js';
 import type { OpenRAGameState } from '@ai-commander/openra-adapter';
 
 describe('Visible Action Demo', () => {
@@ -395,7 +395,7 @@ describe('Visible Action Demo', () => {
 
       const report = demo.generateEvidenceReport();
 
-      expect(report).toContain('OpenRA-RL Service');
+      expect(report).toContain('game adapter Service');
       expect(report).toContain('Integration Host');
       expect(report).toContain('Adapter');
       expect(report).toContain('Game Engine');

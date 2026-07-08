@@ -12,7 +12,7 @@
  */
 
 import type { OpenRAGameState } from '@ai-commander/openra-adapter';
-import type { IntegrationHostCallbacks } from './openra-rl-integration-host.js';
+import type { IntegrationHostCallbacks } from './game adapter-integration-host.js';
 
 interface ActionEvidence {
   timestamp: number;
@@ -378,7 +378,7 @@ export class VisibleActionDemo {
       console.log('  1. ✓ Captured initial game state');
       console.log('  2. ✓ Identified target unit');
       console.log('  3. ✓ Issued MOVE command');
-      console.log('  4. ✓ Command acknowledged by OpenRA-RL');
+      console.log('  4. ✓ Command acknowledged by game adapter');
       console.log('  5. ✓ Waited for game execution');
       console.log('  6. ✓ Captured final game state');
       console.log('  7. ✓ Detected visible change\n');
@@ -410,7 +410,7 @@ export class VisibleActionDemo {
       console.log('✗ NO VISIBLE CHANGE DETECTED\n');
 
       console.log('Troubleshooting:');
-      console.log('  1. Check OpenRA-RL service logs');
+      console.log('  1. Check game adapter service logs');
       console.log('  2. Verify unit is not stuck or blocked');
       console.log('  3. Verify target location is valid');
       console.log('  4. Check if game is paused or in mode that prevents commands\n');
@@ -471,7 +471,7 @@ export class VisibleActionDemo {
     }
 
     lines.push('Layer Verification:\n');
-    lines.push('  ✓ OpenRA-RL Service: Responded to requests');
+    lines.push('  ✓ game adapter Service: Responded to requests');
     lines.push('  ✓ Integration Host: Successfully called all callbacks');
     lines.push('  ✓ Adapter: Converted commands to OpenRA format');
     lines.push('  ✓ Game Engine: Accepted and executed command\n');

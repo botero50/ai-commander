@@ -1,0 +1,36 @@
+# Fixed OpenRA-RL Dockerfile
+# Upgrades the base openra-rl:latest image with proper .NET runtime configuration
+
+FROM openra-rl:latest
+
+# Install .NET Runtime 8.0 with proper dependencies
+# The base image has .NET partially installed but misconfigured
+# This layer properly installs and configures it
+RUN apt-get update && apt-get install -y \
+    wget \
+    curl \
+    ca-certificates \
+    libssl3 \
+    libicu72 && \
+    # Download and install .NET 8.0 runtime directly to /opt/dotnet
+    wget -q https://dot.net/v1/dotnet-install.sh && \
+    chmod +x dotnet-install.sh && \
+    ./dotnet-install.sh --channel 8.0 --runtime aspnetcore --install-dir /opt/dotnet && \
+    rm dotnet-install.sh && \
+    # Create proper symlink
+    rm -f /usr/bin/dotnet && \
+    ln -s /opt/dotnet/dotnet /usr/bin/dotnet && \
+    # Verify installation
+    /usr/bin/dotnet --info && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set proper environment variables for .NET
+ENV DOTNET_ROOT=/opt/dotnet
+ENV PATH="/opt/dotnet:${PATH}"
+
+# Expose API port
+EXPOSE 8000
+
+# Default command (can be overridden)
+CMD ["python3", "-m", "openenv.core.env_server.http_server"]

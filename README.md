@@ -7,7 +7,7 @@
 - **5 Brain Providers**: OpenAI, Claude, Gemini, Ollama (local), Builtin RTS AI
 - **4 Tournament Formats**: Round Robin, Swiss, Best of N, Elimination
 - **Comprehensive Analysis**: ELO ratings, strategy classification, decision divergence
-- **Multiple Game Adapters**: OpenRA RTS, Checkers (and extensible for more)
+- **Multiple Game Adapters**: Checkers, Fake Game (and extensible for more)
 - **Real Cost Tracking**: USD per token with per-provider pricing
 - **Rich Reports**: HTML, Markdown, JSON, CSV exports
 - **Hyperparameter Tuning**: Compare temperatures, models, reasoning styles
@@ -47,9 +47,8 @@ const claude = await BrainManager.create({
 
 const result = await TournamentEngine.roundRobin({
   brains: [gpt4, claude],
-  mapSeeds: [12345],
   maxTicksPerMatch: 200,
-  gameAdapterId: 'openra',
+  gameAdapterId: 'checkers',
 });
 
 const report = BenchmarkReporter.generateReport(result);

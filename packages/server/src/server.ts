@@ -92,7 +92,7 @@ export class AICommanderServer {
       blueBrain,
       mapSeed: body.mapSeed,
       maxTicks: body.maxTicks || 200,
-      gameAdapterId: body.gameAdapterId || 'openra',
+      gameAdapterId: body.gameAdapterId || 'checkers',
     });
 
     res.writeHead(200, { 'Content-Type': 'application/json' });

@@ -6,7 +6,7 @@ describe('Story 130: Bot Tournament', () => {
     it('should register contestants', () => {
       const tournament = new BotTournament();
       tournament.registerContestant('AICommander', '1.0');
-      tournament.registerContestant('OpenRA', '1.0');
+      tournament.registerContestant('TestBot', '1.0');
 
       const standings = tournament.computeStandings();
       expect(standings).toHaveLength(2);
@@ -101,17 +101,17 @@ describe('Story 130: Bot Tournament', () => {
     it('should format tournament results', () => {
       const tournament = new BotTournament();
       const c1 = { name: 'AICommander', version: '1.0' };
-      const c2 = { name: 'OpenRA', version: '1.0' };
+      const c2 = { name: 'TestBot', version: '1.0' };
 
       tournament.registerContestant('AICommander', '1.0');
-      tournament.registerContestant('OpenRA', '1.0');
+      tournament.registerContestant('TestBot', '1.0');
 
       tournament.recordMatch(c1, c2, 85, 75);
 
       const results = tournament.formatResults();
       expect(results).toContain('Tournament Results');
       expect(results).toContain('AICommander');
-      expect(results).toContain('OpenRA');
+      expect(results).toContain('TestBot');
     });
 
     it('should show match history', () => {

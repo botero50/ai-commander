@@ -1,0 +1,60 @@
+# Optimized OpenRA-RL Dockerfile
+# Fixes broken openra-rl:latest image and adds comprehensive environment configuration
+
+FROM openra-rl:latest
+
+# Install all required dependencies for graphics, sound, and rendering
+RUN apt-get update && apt-get install -y \
+    wget \
+    curl \
+    ca-certificates \
+    libssl3 \
+    libicu72 \
+    libgl1-mesa-glx \
+    libgl1-mesa-dri \
+    libglx0 \
+    libsdl2-2.0-0 \
+    libsdl2-dev \
+    libvulkan1 \
+    libopenal1 \
+    libopenal-dev \
+    libfreetype6 \
+    libfreetype6-dev \
+    xvfb \
+    x11-xserver-utils && \
+    # Download and install .NET 8.0 runtime directly to /opt/dotnet
+    wget -q https://dot.net/v1/dotnet-install.sh && \
+    chmod +x dotnet-install.sh && \
+    ./dotnet-install.sh --channel 8.0 --runtime aspnetcore --install-dir /opt/dotnet && \
+    rm dotnet-install.sh && \
+    # Create proper symlink
+    rm -f /usr/bin/dotnet && \
+    ln -s /opt/dotnet/dotnet /usr/bin/dotnet && \
+    # Verify installation
+    /usr/bin/dotnet --info && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
+# Set proper environment variables for .NET
+ENV DOTNET_ROOT=/opt/dotnet
+ENV PATH="/opt/dotnet:${PATH}"
+
+# Graphics and rendering environment variables
+ENV DISPLAY=:99
+ENV LIBGL_ALWAYS_SOFTWARE=1
+ENV MESA_GL_VERSION_OVERRIDE=3.3
+ENV LIBGL_DRI3_DISABLE=0
+ENV MESA_DEBUG=silent
+
+# gRPC configuration
+ENV RL_GRPC_PORT=9999
+ENV GRPC_VERBOSITY=ERROR
+
+# OpenRA configuration
+ENV OPENRA_PATH=/opt/openra
+
+# Expose API and gRPC ports
+EXPOSE 8000 9999
+
+# Default command (can be overridden)
+CMD ["python3", "-m", "openenv.core.env_server.http_server"]

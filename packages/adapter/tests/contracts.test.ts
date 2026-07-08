@@ -60,13 +60,13 @@ describe('Game Adapter Contracts', () => {
         supportsCompleteWorldState: true,
         supportsMultipleAgents: true,
         metadata: {
-          name: 'OpenRA',
-          version: '20240101',
-          supportedMaps: ['Egypt', 'Snow'],
+          name: 'Generic Game',
+          version: '1.0.0',
+          supportedMaps: ['Default'],
         },
       };
 
-      expect(capabilities.metadata?.name).toBe('OpenRA');
+      expect(capabilities.metadata?.name).toBe('Generic Game');
     });
 
     it('should be readonly at type level', () => {

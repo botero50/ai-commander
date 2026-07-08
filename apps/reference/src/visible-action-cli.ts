@@ -10,17 +10,17 @@
  *   # Run demonstration
  *   pnpm --filter reference exec ts-node src/visible-action-cli.ts
  *
- *   # Custom OpenRA-RL URL
+ *   # Custom game adapter URL
  *   pnpm --filter reference exec ts-node src/visible-action-cli.ts --openra-url http://custom:8000
  *
  *   # Verbose logging
  *   pnpm --filter reference exec ts-node src/visible-action-cli.ts --verbose
  *
- * Before running, ensure OpenRA-RL is active:
- *   docker run -p 8000:8000 -p 9999:9999 openra-rl
+ * Before running, ensure game adapter is active:
+ *   docker run -p 8000:8000 -p 9999:9999 game adapter
  */
 
-import { createOpenRAIntegrationHost } from './openra-rl-integration-host.js';
+import { createOpenRAIntegrationHost } from './game adapter-integration-host.js';
 import { VisibleActionDemo } from './visible-action-demo.js';
 
 interface CLIArgs {
@@ -43,10 +43,10 @@ async function main(): Promise<void> {
   console.log('        Visible Action Demonstration with Real OpenRA');
   console.log('═══════════════════════════════════════════════════════════════\n');
 
-  console.log(`OpenRA-RL Service: ${args.openraUrl}\n`);
+  console.log(`game adapter Service: ${args.openraUrl}\n`);
 
   // Step 1: Initialize integration host
-  console.log('Step 1: Connecting to OpenRA-RL Service');
+  console.log('Step 1: Connecting to game adapter Service');
   console.log('───────────────────────────────────────────────────────────────');
 
   let host;
@@ -57,12 +57,12 @@ async function main(): Promise<void> {
       retries: 2,
       verbose: args.verbose,
     });
-    console.log('✓ Connected to OpenRA-RL\n');
+    console.log('✓ Connected to game adapter\n');
   } catch (error) {
-    console.error('✗ Failed to connect to OpenRA-RL:');
+    console.error('✗ Failed to connect to game adapter:');
     console.error(`  ${error instanceof Error ? error.message : String(error)}`);
-    console.error('\nEnsure OpenRA-RL is running:');
-    console.error('  docker run -p 8000:8000 -p 9999:9999 openra-rl\n');
+    console.error('\nEnsure game adapter is running:');
+    console.error('  docker run -p 8000:8000 -p 9999:9999 game adapter\n');
     process.exit(1);
   }
 
@@ -106,7 +106,7 @@ async function main(): Promise<void> {
     }
 
     console.log('Confidence: HIGH');
-    console.log('  ✓ OpenRA-RL service running');
+    console.log('  ✓ game adapter service running');
     console.log('  ✓ Real world state retrieved');
     console.log('  ✓ Command issued successfully');
     console.log('  ✓ Game acknowledged command');

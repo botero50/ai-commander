@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { IntegrationValidator } from '../src/integration-validator.js';
-import type { IntegrationHostCallbacks } from '../src/openra-rl-integration-host.js';
+import type { IntegrationHostCallbacks } from '../src/game adapter-integration-host.js';
 import type { OpenRAGameState } from '@ai-commander/openra-adapter';
 
 describe('Integration Validator', () => {

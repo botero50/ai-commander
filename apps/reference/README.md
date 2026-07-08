@@ -25,7 +25,6 @@ This application has multiple implementations:
 1. **Bootstrap Application** (`ReferenceApp`) — Validates framework integration and public API usage
 2. **Mission Agent** (`MissionAgent`) — First autonomous agent demonstrating complete mission execution
 3. **Browser Dashboard** — Real-time visualization of mission execution with interactive controls
-4. **OpenRA Integration** — Real game integration demonstrating production-grade adapter usage
 
 All use only public APIs from the framework and demonstrate core architectural concepts.
 
@@ -1004,7 +1003,7 @@ Future enhancements might include:
 
 1. **Multiple Mission Types** — Add different goal types and planners
 2. **Behavior Tree Integration** — Use BehaviorTree as DecisionEngine
-3. **Real Game Adapters** — Integrate OpenRA, StarCraft, or other games
+3. **Real Game Adapters** — Integrate StarCraft, Age of Empires 2, or other strategy games
 4. **Multi-Agent Missions** — Coordinate multiple agents on shared goals
 5. **Metrics Visualization** — Dashboard for runtime metrics
 6. **Event Logging** — Replay execution from event traces

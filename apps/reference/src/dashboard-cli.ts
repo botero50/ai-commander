@@ -35,7 +35,7 @@ interface CLIArgs {
 interface PrerequisiteStatus {
   nodeVersion: boolean;
   docker: boolean;
-  openraRl: boolean;
+  gameAdapter: boolean;
 }
 
 function parseArgs(): CLIArgs {
@@ -71,9 +71,9 @@ async function checkDocker(): Promise<boolean> {
   }
 }
 
-async function checkOpenRARL(): Promise<boolean> {
+async function checkGameAdapter(): Promise<boolean> {
   try {
-    // For this demo, we're using FakeGameAdapter, so OpenRA-RL is optional
+    // For this demo, we're using FakeGameAdapter, so game adapter is optional
     // In a real scenario, we'd check if the service is running on a specific port
     return true;
   } catch {
@@ -87,7 +87,7 @@ async function verifyPrerequisites(): Promise<PrerequisiteStatus> {
 
   const nodeVersion = await checkNodeVersion();
   const docker = await checkDocker();
-  const openraRl = await checkOpenRARL();
+  const gameAdapter = await checkGameAdapter();
 
   if (nodeVersion) {
     console.log('✓ Node.js 22+ detected');
@@ -103,8 +103,8 @@ async function verifyPrerequisites(): Promise<PrerequisiteStatus> {
     console.log('  Install from: https://www.docker.com/');
   }
 
-  if (openraRl) {
-    console.log('✓ OpenRA-RL availability verified');
+  if (gameAdapter) {
+    console.log('✓ game adapter availability verified');
   }
 
   console.log('');
@@ -114,7 +114,7 @@ async function verifyPrerequisites(): Promise<PrerequisiteStatus> {
     process.exit(1);
   }
 
-  return { nodeVersion, docker, openraRl };
+  return { nodeVersion, docker, gameAdapter };
 }
 
 async function main() {
