@@ -40,6 +40,8 @@ export { DecisionPipeline } from './match/decision-pipeline.js';
 export type { DecisionPipelineConfig, DecisionAttemptResult, CancellationToken, DecisionTelemetry } from './match/decision-pipeline.js';
 export { BrainLifecycle, BrainHealthStatus } from './match/brain-lifecycle.js';
 export type { BrainLifecycleConfig, HealthCheckResult, LifecycleEvent } from './match/brain-lifecycle.js';
+export { BrainIntegrationValidator } from './match/brain-integration-validator.js';
+export type { BrainIntegrationValidationResult, CycleValidationResult } from './match/brain-integration-validator.js';
 export type { MatchConfig, MatchMetadata } from './match/match-config.js';
 export type { LoopConfig, LoopMetrics, LoopCallbacks } from './match/match-loop.js';
 export type { MonitorConfig, MatchState } from './match/match-monitor.js';
