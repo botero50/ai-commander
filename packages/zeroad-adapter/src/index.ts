@@ -6,3 +6,5 @@ export { ZeroADAdapterError, ZeroADAdapterErrorCode } from './types/errors.js';
 export { ConfigurationLoader } from './config/configuration-loader.js';
 export { Logger, type LogLevel } from './config/logger.js';
 export { GameProcessManager, type GameProcessConfig } from './process/game-process-manager.js';
+export { IPCBridgeImpl, type IPCBridgeConfig } from './ipc/ipc-bridge-impl.js';
+export { IPCConnection, type IPCMessage } from './ipc/ipc-connection.js';
