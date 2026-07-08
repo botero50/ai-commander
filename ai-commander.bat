@@ -66,10 +66,9 @@ echo.
 goto :show_help
 
 :run_cli
-echo Running: ai-commander %*
 echo.
-REM Run the CLI with all arguments
-node --input-type=module -e "import { createCLI } from './packages/zeroad-adapter/dist/cli/index.js'; const cli = createCLI(); const args = process.argv.slice(2); const exitCode = await cli.run(['node', 'cli', ...args]); process.exit(exitCode);" %*
+REM Run the CLI using the Node.js entry point
+node "%SCRIPT_DIR%cli.js" %*
 exit /b %ERRORLEVEL%
 
 :show_version
