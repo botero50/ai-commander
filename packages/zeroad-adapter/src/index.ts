@@ -74,3 +74,22 @@ export {
   closeMatchHandler,
   setupMatchViewerRoutes,
 } from './web/express-integration.js';
+export {
+  formatDuration,
+  formatMatchStatus,
+  formatDecision,
+  formatPlayerStats,
+  getStatusColor,
+  getTrendColor,
+  getPlayerColor,
+  truncateText,
+  formatNumber,
+  getProgressWidth,
+} from './web/ui-components.js';
+export type {
+  FormattedMatchStatus,
+  FormattedDecision,
+  FormattedPlayerStats,
+} from './web/ui-components.js';
+export { MatchViewStateManager } from './web/match-view-state.js';
+export type { MatchViewState, StateUpdateCallback } from './web/match-view-state.js';

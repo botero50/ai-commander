@@ -43,7 +43,7 @@ export interface MatchViewerState {
  * Match viewer event sent to web clients
  */
 export interface MatchViewerEvent {
-  readonly type: 'state_update' | 'decision' | 'milestone' | 'error' | 'complete';
+  readonly type: 'initial_state' | 'state_update' | 'decision' | 'milestone' | 'error' | 'complete';
   readonly timestamp: number;
   readonly data: unknown;
 }
