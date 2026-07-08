@@ -36,6 +36,8 @@ export { MatchMonitor } from './match/match-monitor.js';
 export { MatchTelemetry } from './match/match-telemetry.js';
 export { MatchValidator } from './match/match-validator.js';
 export { BrainAdapter } from './match/brain-adapter.js';
+export { DecisionPipeline } from './match/decision-pipeline.js';
+export type { DecisionPipelineConfig, DecisionAttemptResult, CancellationToken, DecisionTelemetry } from './match/decision-pipeline.js';
 export type { MatchConfig, MatchMetadata } from './match/match-config.js';
 export type { LoopConfig, LoopMetrics, LoopCallbacks } from './match/match-loop.js';
 export type { MonitorConfig, MatchState } from './match/match-monitor.js';

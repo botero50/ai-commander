@@ -2,6 +2,7 @@ import { WorldState, Command } from '@ai-commander/domain';
 import { Match } from './match.js';
 import { Logger } from '../config/logger.js';
 import { BrainAdapter } from './brain-adapter.js';
+import { DecisionPipeline, type DecisionPipelineConfig } from './decision-pipeline.js';
 
 // Brain interface - injected via dependency, no SDK imports
 interface Brain {
@@ -14,6 +15,7 @@ export interface LoopConfig {
   tickDurationMs: number;
   maxIterations?: number;
   observeTimeoutMs?: number;
+  decisionPipeline?: Partial<DecisionPipelineConfig>;
 }
 
 export interface LoopMetrics {
@@ -40,6 +42,7 @@ export class MatchLoop {
   private config: LoopConfig;
   private callbacks: LoopCallbacks;
   private brain: Brain | null = null;
+  private decisionPipeline: DecisionPipeline;
   private running: boolean = false;
   private loopInterval: NodeJS.Timeout | null = null;
   private iterationCount: number = 0;
@@ -56,6 +59,7 @@ export class MatchLoop {
     this.callbacks = callbacks;
     this.brain = brain ?? null;
     this.logger = logger;
+    this.decisionPipeline = new DecisionPipeline(config.decisionPipeline ?? {}, logger);
   }
 
   async start(): Promise<void> {
@@ -208,23 +212,57 @@ export class MatchLoop {
     this.brain = brain;
   }
 
+  getDecisionPipeline(): DecisionPipeline {
+    return this.decisionPipeline;
+  }
+
   private async decide(state: WorldState): Promise<Command[]> {
-    // If Brain is injected, use it instead of callback
+    // If Brain is injected, use decision pipeline
     if (this.brain) {
-      try {
-        const observation = BrainAdapter.worldStateToObservation(state, this.match.matchId, 'primary-agent');
-        const goals = BrainAdapter.getDefaultGoals();
-        const availableCommands = BrainAdapter.getDefaultCommands();
-        const memory = BrainAdapter.getExecutionMemory();
+      const tick = state.time.currentTick.number;
 
-        const decision = await this.brain.decide(observation, goals, availableCommands, memory);
-        const commands = BrainAdapter.brainDecisionToCommands(decision, 'primary-agent', state.time.currentTick.number);
+      const result = await this.decisionPipeline.executeDecision(
+        async (token) => {
+          // Check for cancellation before calling brain
+          if (token.isCancelled) {
+            throw new Error('Decision cancelled');
+          }
 
+          const observation = BrainAdapter.worldStateToObservation(state, this.match.matchId, 'primary-agent');
+          const goals = BrainAdapter.getDefaultGoals();
+          const availableCommands = BrainAdapter.getDefaultCommands();
+          const memory = BrainAdapter.getExecutionMemory();
+
+          const decision = await this.brain!.decide(observation, goals, availableCommands, memory);
+
+          // Check again after brain.decide() completes
+          if (token.isCancelled) {
+            throw new Error('Decision cancelled');
+          }
+
+          return decision;
+        },
+        tick,
+        { matchId: this.match.matchId, agents: state.agents.length }
+      );
+
+      if (result.success && result.decision) {
+        const commands = BrainAdapter.brainDecisionToCommands(result.decision, 'primary-agent', tick);
         return commands;
-      } catch (err) {
-        this.logger.error('Brain decision error', err);
-        return [];
       }
+
+      // Pipeline failed - log and return empty
+      if (result.error) {
+        this.logger.warn('Brain decision pipeline failed', {
+          tick,
+          attempts: result.attemptNumber,
+          timeout: result.timeoutOccurred,
+          cancelled: result.wasCancelled,
+          error: result.error.message,
+        });
+      }
+
+      return [];
     }
 
     // Fall back to callback if no Brain injected
