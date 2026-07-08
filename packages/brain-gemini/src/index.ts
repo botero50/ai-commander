@@ -1,2 +1,2 @@
-export { GeminiBrain } from './gemini-brain';
-export type { GeminiBrainConfig } from './gemini-brain';
+export { GeminiBrain } from './gemini-brain.js';
+export type { GeminiBrainConfig } from './gemini-brain.js';
