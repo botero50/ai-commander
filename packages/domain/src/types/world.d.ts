@@ -56,5 +56,5 @@ export declare function getPlayer(state: WorldState, playerId: string): Player |
 /**
  * Get team by ID.
  */
-export declare function getTeam(state: WorldState, teamId: string): Team | undefined;
+export declare function getTeam(state: WorldState, teamId: string): Team;
 //# sourceMappingURL=world.d.ts.map

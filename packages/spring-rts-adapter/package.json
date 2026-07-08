@@ -1,0 +1,28 @@
+{
+  "name": "@ai-commander/spring-rts-adapter",
+  "version": "1.0.0",
+  "description": "Spring RTS game adapter for AI Commander tournament framework",
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    }
+  },
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@ai-commander/adapter": "workspace:*",
+    "@ai-commander/brain": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "typescript": "^5.0.0",
+    "vitest": "^0.34.0"
+  }
+}

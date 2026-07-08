@@ -18,10 +18,11 @@
  */
 import { createCanonicalPrompt, parseLLMResponse } from '@ai-commander/brain';
 export class OllamaBrain {
+    name = 'OllamaBrain';
+    version = '1.0.0';
+    config;
+    totalTokensUsed = 0;
     constructor(config) {
-        this.name = 'OllamaBrain';
-        this.version = '1.0.0';
-        this.totalTokensUsed = 0;
         this.config = {
             temperature: 0.7,
             topK: 40,

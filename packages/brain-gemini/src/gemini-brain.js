@@ -11,15 +11,17 @@
 import { GoogleGenerativeAI } from '@google/generative-ai';
 import { createCanonicalPrompt, parseLLMResponse } from '@ai-commander/brain';
 export class GeminiBrain {
+    name = 'GeminiBrain';
+    version = '1.0.0';
+    client;
+    config;
+    totalTokensUsed = 0;
+    totalCost = 0;
+    modelTokenPricing = {
+        'gemini-pro': { input: 0.000125, output: 0.000375 },
+        'gemini-pro-vision': { input: 0.000125, output: 0.000375 },
+    };
     constructor(config) {
-        this.name = 'GeminiBrain';
-        this.version = '1.0.0';
-        this.totalTokensUsed = 0;
-        this.totalCost = 0;
-        this.modelTokenPricing = {
-            'gemini-pro': { input: 0.000125, output: 0.000375 },
-            'gemini-pro-vision': { input: 0.000125, output: 0.000375 },
-        };
         this.config = {
             temperature: 0.7,
             maxOutputTokens: 500,
@@ -86,7 +88,7 @@ export class GeminiBrain {
         const inputTokens = countResult.totalTokens || 0;
         const outputTokens = text.split(/\s+/).length; // Rough estimate
         const pricing = this.modelTokenPricing[this.config.model];
-        const totalCost = (inputTokens * pricing.input + outputTokens * pricing.output) / 1000000;
+        const totalCost = (inputTokens * pricing.input + outputTokens * pricing.output) / 1_000_000;
         return {
             text,
             tokenCost: {

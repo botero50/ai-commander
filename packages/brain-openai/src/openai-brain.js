@@ -11,16 +11,18 @@
 import { OpenAI } from 'openai';
 import { createCanonicalPrompt, parseLLMResponse } from '@ai-commander/brain';
 export class OpenAIBrain {
+    name = 'OpenAIBrain';
+    version = '1.0.0';
+    client;
+    config;
+    totalTokensUsed = 0;
+    totalCost = 0;
+    modelTokenPricing = {
+        'gpt-4': { input: 0.03, output: 0.06 },
+        'gpt-4-turbo': { input: 0.01, output: 0.03 },
+        'gpt-3.5-turbo': { input: 0.0005, output: 0.0015 },
+    };
     constructor(config) {
-        this.name = 'OpenAIBrain';
-        this.version = '1.0.0';
-        this.totalTokensUsed = 0;
-        this.totalCost = 0;
-        this.modelTokenPricing = {
-            'gpt-4': { input: 0.03, output: 0.06 },
-            'gpt-4-turbo': { input: 0.01, output: 0.03 },
-            'gpt-3.5-turbo': { input: 0.0005, output: 0.0015 },
-        };
         this.config = {
             temperature: 0.7,
             maxTokens: 500,
@@ -79,7 +81,7 @@ export class OpenAIBrain {
         const pricing = this.modelTokenPricing[this.config.model];
         const inputTokens = response.usage?.prompt_tokens || 0;
         const outputTokens = response.usage?.completion_tokens || 0;
-        const totalCost = (inputTokens * pricing.input + outputTokens * pricing.output) / 1000000;
+        const totalCost = (inputTokens * pricing.input + outputTokens * pricing.output) / 1_000_000;
         return {
             text,
             tokenCost: {

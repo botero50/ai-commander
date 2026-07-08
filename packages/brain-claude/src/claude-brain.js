@@ -11,16 +11,18 @@
 import Anthropic from '@anthropic-ai/sdk';
 import { createCanonicalPrompt, parseLLMResponse } from '@ai-commander/brain';
 export class ClaudeBrain {
+    name = 'ClaudeBrain';
+    version = '1.0.0';
+    client;
+    config;
+    totalTokensUsed = 0;
+    totalCost = 0;
+    modelTokenPricing = {
+        'claude-3-opus-20240229': { input: 0.015, output: 0.075 },
+        'claude-3-sonnet-20240229': { input: 0.003, output: 0.015 },
+        'claude-3-haiku-20240307': { input: 0.00025, output: 0.00125 },
+    };
     constructor(config) {
-        this.name = 'ClaudeBrain';
-        this.version = '1.0.0';
-        this.totalTokensUsed = 0;
-        this.totalCost = 0;
-        this.modelTokenPricing = {
-            'claude-3-opus-20240229': { input: 0.015, output: 0.075 },
-            'claude-3-sonnet-20240229': { input: 0.003, output: 0.015 },
-            'claude-3-haiku-20240307': { input: 0.00025, output: 0.00125 },
-        };
         this.config = {
             temperature: 0.7,
             maxTokens: 500,
@@ -77,7 +79,7 @@ export class ClaudeBrain {
         const pricing = this.modelTokenPricing[this.config.model];
         const inputTokens = response.usage.input_tokens;
         const outputTokens = response.usage.output_tokens;
-        const totalCost = (inputTokens * pricing.input + outputTokens * pricing.output) / 1000000;
+        const totalCost = (inputTokens * pricing.input + outputTokens * pricing.output) / 1_000_000;
         return {
             text,
             tokenCost: {

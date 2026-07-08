@@ -11,10 +11,11 @@
  * This allows the framework to work as it does today while providing the Brain interface.
  */
 export class BuiltinBrain {
+    decisionEngine;
+    name = 'BuiltinBrain';
+    version = '1.0.0';
     constructor(decisionEngine) {
         this.decisionEngine = decisionEngine;
-        this.name = 'BuiltinBrain';
-        this.version = '1.0.0';
     }
     async decide(observation, availableGoals, availableCommands, memory) {
         // Use existing decision engine

@@ -30,7 +30,7 @@ export declare enum AdapterErrorCode {
  */
 export declare class AdapterError extends Error {
     readonly code: AdapterErrorCode;
-    readonly details?: Record<string, unknown> | undefined;
+    readonly details?: Record<string, unknown>;
     /**
      * Create an adapter error.
      *
@@ -38,6 +38,6 @@ export declare class AdapterError extends Error {
      * @param code Error code for programmatic handling
      * @param details Optional error details
      */
-    constructor(message: string, code: AdapterErrorCode, details?: Record<string, unknown> | undefined);
+    constructor(message: string, code: AdapterErrorCode, details?: Record<string, unknown>);
 }
 //# sourceMappingURL=adapter-error.d.ts.map
