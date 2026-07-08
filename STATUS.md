@@ -1,7 +1,7 @@
 # AI Commander: Project Status
 
 **Last Updated:** 2026-07-07
-**Current Phase:** EPICS 7-8-10 COMPLETE ✅
+**Current Phase:** EPICS 7-8-10-11-12-13 COMPLETE ✅
 
 ## Executive Summary
 
@@ -94,19 +94,38 @@ ADAPTERS (Game-Specific ~2,500 lines each)
 - Story 10.2: Categorize remaining adapter code (all game-specific)
 - Story 10.3: Final architecture assessment (85-90% framework coverage)
 
-## Next Steps (EPIC 11+)
+## Completed Epics
 
-### Phase 1: Validate Reusability (EPIC 11)
+### EPIC 11: First Playable Match ✅
+- Story 11.1: Local Ollama Integration
+- Story 11.2: Single AI Control
+- Story 11.3: Dual Ollama Match (two independent brains)
+- Story 11.4: Complete Match (results & winner detection)
+
+### EPIC 12: Live Match Window ✅
+- Story 12.1: Launch Game Automatically
+- Story 12.2: Live Decision Overlay (real-time AI reasoning)
+- Story 12.3: Match Timeline (temporal analysis)
+- Story 12.4: Live Observer Mode (real-time state watching)
+
+### EPIC 13: Web-based Visualization (IN PROGRESS)
+- Story 13.1: Web Match Viewer (event broadcasting & state management) ✅
+- Story 13.2: Express.js Server (WebSocket real-time streaming) [NEXT]
+- Story 13.3: Web UI (React dashboard) [PLANNED]
+
+## Next Steps
+
+### Phase 3: Web Server Integration (EPIC 13-14)
+- Story 13.2: Express.js server with WebSocket support
+- Story 13.3: React-based web UI dashboard
+- Story 14: Multi-brain tournament system
+
+### Phase 4: Multi-Game Expansion (EPIC 15+)
 - Build Spring RTS adapter (~2,025 lines expected)
 - Confirm framework works unchanged
 - Document adapter patterns
 
-### Phase 2: Multi-Game Expansion (EPIC 12+)
-- Implement additional game adapters
-- Refine patterns based on real-world usage
-- Create best-practices guide
-
-### Phase 3: Performance & Optimization (Optional)
+### Phase 5: Performance & Optimization (Optional)
 - Profile and optimize latency-critical paths
 - Add distributed tracing
 - Performance dashboards
