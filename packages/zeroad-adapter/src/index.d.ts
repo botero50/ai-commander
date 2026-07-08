@@ -19,4 +19,13 @@ export { CommandConverter } from './commands/command-converter.js';
 export { CommandInjector, type CommandInjectorConfig, type CommandResult } from './commands/command-injector.js';
 export { CommandVerifier, type VerificationResult } from './commands/command-verifier.js';
 export { isValidGameCommand, createCommandId } from './commands/command-types.js';
+export { Match } from './match/match.js';
+export { MatchFactory } from './match/match-factory.js';
+export { MatchLoop } from './match/match-loop.js';
+export { MatchMonitor } from './match/match-monitor.js';
+export { MatchTelemetry } from './match/match-telemetry.js';
+export type { MatchConfig, MatchMetadata } from './match/match-config.js';
+export type { LoopConfig, LoopMetrics, LoopCallbacks } from './match/match-loop.js';
+export type { MonitorConfig, MatchState } from './match/match-monitor.js';
+export type { TelemetrySnapshot, TelemetryMetrics } from './match/match-telemetry.js';
 //# sourceMappingURL=index.d.ts.map

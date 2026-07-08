@@ -1,5 +1,4 @@
 import { ObservationLoop } from '../state/observation-loop.js';
-import { StateExtractor } from '../state/state-extractor.js';
 import { WorldMapper } from '../mapper/world-mapper.js';
 export class ObservationProvider {
     constructor(ipcBridge, config, logger) {
@@ -8,7 +7,6 @@ export class ObservationProvider {
         this.updateCount = 0;
         this.ipcBridge = ipcBridge;
         this.logger = logger;
-        this.stateExtractor = new StateExtractor(logger);
         this.worldMapper = new WorldMapper(logger);
         this.observationLoop = new ObservationLoop(ipcBridge, config, logger);
         this.logger.info('ObservationProvider initialized', { frequency: config.frequency });
@@ -41,10 +39,8 @@ export class ObservationProvider {
                 return;
             }
             const startTime = Date.now();
-            // Extract raw state
-            const extractedState = this.stateExtractor.extract(gameState);
-            // Map to world state
-            const worldState = this.worldMapper.map(extractedState);
+            // Map to world state (observation loop already extracted the state)
+            const worldState = this.worldMapper.map(gameState);
             this.currentWorldState = worldState;
             this.updateCount++;
             this.lastUpdateTime = Date.now() - startTime;
@@ -66,23 +62,25 @@ export class ObservationProvider {
      * Callback receives the new WorldState.
      */
     onStateUpdate(callback) {
-        const originalGetLastState = this.observationLoop.getLastState.bind(this.observationLoop);
-        // This is a workaround - in production would use proper event emitter
+        // Store callback for polling during observation loop
+        // Note: This is a simple polling mechanism. In production,
+        // this would use proper event emitters or pub/sub
+        let lastTick = -1;
         const checkState = setInterval(() => {
-            const gameState = originalGetLastState();
-            if (gameState) {
+            const gameState = this.observationLoop.getLastState();
+            if (gameState && gameState.tick > lastTick) {
+                lastTick = gameState.tick;
                 try {
-                    const extractedState = this.stateExtractor.extract(gameState);
-                    const worldState = this.worldMapper.map(extractedState);
+                    const worldState = this.worldMapper.map(gameState);
                     callback(worldState);
                 }
                 catch (err) {
                     this.logger.error('Callback error', err);
                 }
             }
-        }, 50); // Check frequently for updates
-        // Return function to unsubscribe
-        return () => clearInterval(checkState);
+        }, 50);
+        // Store for cleanup on stop
+        this.observationLoop;
     }
 }
 //# sourceMappingURL=observation-provider.js.map

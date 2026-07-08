@@ -1,4 +1,4 @@
-import { createWorldState, createPlayer, AgentState, createAgent, createTick, createGameTime, createGameMap, } from '@ai-commander/domain';
+import { createWorldState, createPlayer, AgentState, createAgent, createTick, createGameTime, createGameMap, createResourceType, createResource, createEmptyResourcePool, } from '@ai-commander/domain';
 export class WorldMapper {
     constructor(logger) {
         this.logger = logger;
@@ -112,12 +112,12 @@ export class WorldMapper {
         return AgentState.Idle;
     }
     createResourcePool(current, max) {
-        return {
-            health: {
-                current,
-                max,
-            },
-        };
+        // Create health resource type
+        const healthType = createResourceType('health', 'Health', 'combat', 0, max, false, false);
+        // Create health resource with current amount
+        const healthResource = createResource(healthType, current, 0);
+        // Return empty pool (health is tracked separately in AgentSnapshot)
+        return createEmptyResourcePool([healthType]);
     }
 }
 //# sourceMappingURL=world-mapper.js.map

@@ -27,10 +27,23 @@ export class IPCBridgeImpl {
         const cmd = message.command || 'unknown';
         await this.connection.sendNotification(cmd, message);
     }
+    async sendRequest(type, data) {
+        if (!this.isConnected()) {
+            throw new ZeroADAdapterError(ZeroADAdapterErrorCode.IPC_CONNECTION_FAILED, 'IPC bridge not connected');
+        }
+        try {
+            const response = await this.connection.sendRequest(type, data);
+            return response;
+        }
+        catch (err) {
+            this.logger.error('Request failed', err);
+            throw err;
+        }
+    }
     onMessage(handler) {
         this.connection.onMessage((msg) => {
             if (msg.type === 'notification' || msg.type === 'response') {
-                handler(msg.data || msg);
+                handler((msg.data || msg));
             }
         });
     }

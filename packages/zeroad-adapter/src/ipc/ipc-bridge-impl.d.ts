@@ -15,6 +15,7 @@ export declare class IPCBridgeImpl implements IPCBridge {
     disconnect(): Promise<void>;
     isConnected(): boolean;
     sendMessage(message: object): Promise<void>;
+    sendRequest(type: string, data?: object): Promise<unknown>;
     onMessage(handler: (message: object) => void): void;
     heartbeat(): Promise<boolean>;
     private startHeartbeat;

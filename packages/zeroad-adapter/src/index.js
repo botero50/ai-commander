@@ -13,4 +13,9 @@ export { CommandConverter } from './commands/command-converter.js';
 export { CommandInjector } from './commands/command-injector.js';
 export { CommandVerifier } from './commands/command-verifier.js';
 export { isValidGameCommand, createCommandId } from './commands/command-types.js';
+export { Match } from './match/match.js';
+export { MatchFactory } from './match/match-factory.js';
+export { MatchLoop } from './match/match-loop.js';
+export { MatchMonitor } from './match/match-monitor.js';
+export { MatchTelemetry } from './match/match-telemetry.js';
 //# sourceMappingURL=index.js.map

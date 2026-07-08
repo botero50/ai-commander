@@ -6,14 +6,18 @@ import { ObservationProvider } from './observation/observation-provider.js';
 import { ZeroADGameSession } from './session/game-session.js';
 import { generateUUID } from './utils/uuid.js';
 const ZEROAD_CAPABILITIES = {
-    maxPlayers: 8,
-    minPlayers: 1,
-    supportsReplay: true,
     supportsPause: false,
-    supportsFastForward: false,
-    nativeDeterminism: true,
-    lockstepMultiplayer: true,
-    commandTypes: ['move', 'attack', 'gather', 'build', 'train', 'patrol', 'repair', 'stop'],
+    supportsSaveState: false,
+    supportsDeterministicMode: true,
+    supportsReplay: true,
+    supportsCompleteWorldState: true,
+    supportsMultipleAgents: true,
+    maxTicksPerSecond: 20,
+    metadata: {
+        name: '0 A.D. (Pyrogenesis)',
+        commandTypes: ['move', 'attack', 'gather', 'build', 'train', 'patrol', 'repair', 'stop'],
+        maxPlayers: 8,
+    },
 };
 export class ZeroADAdapter {
     constructor(configOverrides) {
@@ -91,7 +95,7 @@ export class ZeroADAdapter {
     async getAdapterInfo() {
         return {
             version: '1.0.0',
-            gameVersion: this.config.gameVersion || 'unknown',
+            gameVersion: '0 A.D. 0.26.0+',
             compatibility: '0 A.D. >= 0.26.0',
         };
     }

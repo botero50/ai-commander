@@ -6,7 +6,6 @@ export interface ObservationProviderConfig extends ObservationConfig {
 }
 export declare class ObservationProvider {
     private observationLoop;
-    private stateExtractor;
     private worldMapper;
     private logger;
     private ipcBridge;
