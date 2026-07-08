@@ -31,4 +31,6 @@ export { CommandVerifier, type VerificationResult } from './commands/command-ver
 export { isValidGameCommand, createCommandId } from './commands/command-types.js';
 export { Match } from './match/match.js';
 export { MatchFactory } from './match/match-factory.js';
+export { MatchLoop } from './match/match-loop.js';
 export type { MatchConfig, MatchMetadata } from './match/match-config.js';
+export type { LoopConfig, LoopMetrics, LoopCallbacks } from './match/match-loop.js';
