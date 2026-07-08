@@ -8,3 +8,5 @@ export { MatchController } from './match-controller.js';
 export type { MatchControllerState, PlayerStatus, MatchEvent } from './match-controller.js';
 export { formatBrainDecision, DecisionDisplayFormatter, LiveDecisionManager } from './decision-display.js';
 export type { DecisionDisplay, ObservationSummary, DecisionPhase } from './decision-display.js';
+export { EventFactory, EventDisplayFormatter, EventFeed } from './event-feed.js';
+export type { EventFeedItem, EventType } from './event-feed.js';
