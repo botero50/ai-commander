@@ -11,3 +11,4 @@ export { IPCConnection, type IPCMessage } from './ipc/ipc-connection.js';
 export type { GameState, Unit, Building, Player, Resources, MapInfo, Position } from './state/state-types.js';
 export { StateExtractor, type RawGameState } from './state/state-extractor.js';
 export { ObservationLoop, type ObservationConfig } from './state/observation-loop.js';
+export { WorldMapper } from './mapper/world-mapper.js';
