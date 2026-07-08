@@ -55,3 +55,5 @@ export { DecisionOverlay } from './match/decision-overlay.js';
 export type { DecisionEvent, DecisionSubscriber } from './match/decision-overlay.js';
 export { MatchTimeline } from './match/match-timeline.js';
 export type { TimelineSnapshot, TimelineEvent } from './match/match-timeline.js';
+export { MatchObserver, MatchObserverBuilder } from './match/match-observer.js';
+export type { ObserverCallback } from './match/match-observer.js';

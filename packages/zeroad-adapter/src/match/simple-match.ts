@@ -8,6 +8,7 @@
 import { GameLoop, BrainExecutor, ExternalSystemLifecycle, ExecutionMonitor, GameSession } from '@ai-commander/adapter';
 import { Logger } from '../config/logger.js';
 import type { DecisionOverlay } from './decision-overlay.js';
+import type { MatchObserver } from './match-observer.js';
 
 /**
  * Generic Brain interface (avoid importing from @ai-commander/brain to stay within rootDir)
@@ -33,6 +34,7 @@ export interface DualBrainMatchConfig {
   readonly brain2: BrainInterface;
   readonly maxTicks?: number;
   readonly decisionOverlay?: DecisionOverlay; // Optional overlay for real-time decision capture
+  readonly observer?: MatchObserver; // Optional observer for state tracking
 }
 
 /**
@@ -306,6 +308,11 @@ export async function runDualBrainMatch(
         monitor1.recordObservation();
         monitor2.recordObservation();
         logger.debug('Observed tick', { tick: tickCount });
+
+        // Record observation in observer (if provided)
+        if (matchConfig.observer) {
+          matchConfig.observer.recordObservation(tickCount, state);
+        }
       },
       onDecide: async (state) => {
         // Alternate which brain makes decisions

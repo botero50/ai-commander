@@ -11,6 +11,7 @@
 import { describe, it, expect } from 'vitest';
 import { DecisionOverlay, DecisionEvent } from './decision-overlay.js';
 import { MatchTimeline } from './match-timeline.js';
+import { MatchObserver } from './match-observer.js';
 import type { LiveMatchConfig, LiveMatchResult } from './live-match-runner.js';
 import type { BrainInterface, MatchResult } from './simple-match.js';
 
@@ -256,5 +257,44 @@ describe('Live Match Runner with Decision Overlay', () => {
     expect(analysis.unitCountTrend).toBe('increasing');
     expect(analysis.buildingCountTrend).toBe('increasing');
     expect(analysis.unitCountChange).toBe(10);
+  });
+
+  it('should include observer in live match result', () => {
+    const timeline = new MatchTimeline();
+    const overlay = new DecisionOverlay();
+    const observer = new MatchObserver(timeline, overlay);
+
+    const matchResult: MatchResult = {
+      success: true,
+      winner: 'TestBrain1',
+      ticksRan: 100,
+      duration: 10000,
+      player1: { name: 'TestBrain1', commandsExecuted: 20, errors: 0 },
+      player2: { name: 'TestBrain2', commandsExecuted: 18, errors: 1 },
+    };
+
+    const result: LiveMatchResult = {
+      ...matchResult,
+      overlay,
+      timeline,
+      observer,
+    };
+
+    expect(result.observer).toBeDefined();
+    expect(result.observer).toBe(observer);
+  });
+
+  it('should support onObserve callback in config', () => {
+    const observedStates: any[] = [];
+
+    const config: LiveMatchConfig = {
+      brain1: mockBrain1,
+      brain2: mockBrain2,
+      onObserve: (state) => {
+        observedStates.push(state);
+      },
+    };
+
+    expect(config.onObserve).toBeDefined();
   });
 });

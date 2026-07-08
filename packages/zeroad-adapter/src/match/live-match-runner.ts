@@ -15,6 +15,7 @@ import { BrainInterface, MatchResult } from './simple-match.js';
 import { runDualBrainMatch } from './simple-match.js';
 import { DecisionOverlay, DecisionSubscriber } from './decision-overlay.js';
 import { MatchTimeline } from './match-timeline.js';
+import { MatchObserver, MatchObserverBuilder, ObserverCallback } from './match-observer.js';
 
 export interface LiveMatchConfig {
   readonly brain1: BrainInterface;
@@ -22,11 +23,13 @@ export interface LiveMatchConfig {
   readonly maxTicks?: number;
   readonly keepWindowOpen?: boolean; // Keep 0 A.D. window open after match
   readonly onDecision?: DecisionSubscriber; // Real-time decision callback
+  readonly onObserve?: ObserverCallback; // Real-time state observation callback
 }
 
 export interface LiveMatchResult extends MatchResult {
   readonly overlay: DecisionOverlay; // Access to all recorded decisions
   readonly timeline: MatchTimeline; // Access to match progression timeline
+  readonly observer: MatchObserver; // Access to observer state
 }
 
 /**
@@ -44,7 +47,7 @@ export async function runLiveMatch(
     maxTicks: config.maxTicks || 5000,
   };
 
-  // Create decision overlay and timeline for real-time capture
+  // Create decision overlay, timeline, and observer for real-time capture
   const overlay = new DecisionOverlay();
   const timeline = new MatchTimeline();
 
@@ -56,6 +59,13 @@ export async function runLiveMatch(
   overlay.subscribe((decision) => {
     timeline.addDecisionToTimeline(decision);
   });
+
+  // Create observer with optional callback
+  const observerBuilder = new MatchObserverBuilder();
+  if (config.onObserve) {
+    observerBuilder.addObserver(config.onObserve);
+  }
+  const observer = observerBuilder.build(timeline, overlay);
 
   logger.info(`Starting live match: ${config.brain1.name} vs ${config.brain2.name}`, {
     maxTicks: matchConfig.maxTicks,
@@ -81,13 +91,19 @@ export async function runLiveMatch(
       playersCount: initialState.players?.length || 0,
     });
 
-    // Run the match with both brains, passing the overlay for decision capture
+    // Start observer before match
+    observer.start();
+
+    // Run the match with both brains, passing the overlay and observer for capture
     const matchResult = await runDualBrainMatch(
       session,
       config.brain1,
       config.brain2,
-      { maxTicks: matchConfig.maxTicks, decisionOverlay: overlay }
+      { maxTicks: matchConfig.maxTicks, decisionOverlay: overlay, observer }
     );
+
+    // Stop observer after match
+    observer.stop();
 
     logger.info('Match completed', {
       winner: matchResult.winner,
@@ -96,11 +112,12 @@ export async function runLiveMatch(
       totalDecisions: overlay.getStats().totalDecisions,
     });
 
-    // Build result with overlay and timeline
+    // Build result with overlay, timeline, and observer
     const result: LiveMatchResult = {
       ...matchResult,
       overlay,
       timeline,
+      observer,
     };
 
     // Record final game state in timeline
