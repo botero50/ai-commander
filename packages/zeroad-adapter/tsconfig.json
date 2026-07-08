@@ -7,8 +7,7 @@
     "declaration": true,
     "declarationMap": true
   },
-  "include": ["src/**/*.ts", "!src/**/*.test.ts"],
-  "exclude": ["node_modules", "dist", "**/*.test.ts"],
+  "exclude": ["node_modules", "dist", "src/**/*.test.ts", "**/*.test.ts", "vitest.config.ts"],
   "references": [
     { "path": "../adapter" }
   ]

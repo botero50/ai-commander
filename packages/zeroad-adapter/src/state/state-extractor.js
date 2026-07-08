@@ -1,4 +1,5 @@
 export class StateExtractor {
+    logger;
     constructor(logger) {
         this.logger = logger;
     }

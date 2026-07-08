@@ -1,9 +1,11 @@
 import { IPCConnection } from './ipc-connection.js';
 import { ZeroADAdapterError, ZeroADAdapterErrorCode } from '../types/errors.js';
 export class IPCBridgeImpl {
+    connection;
+    heartbeatInterval = null;
+    heartbeatTimeout = 5000;
+    logger;
     constructor(config, logger) {
-        this.heartbeatInterval = null;
-        this.heartbeatTimeout = 5000;
         this.logger = logger;
         this.connection = new IPCConnection(config.host, config.port, config.connectTimeout, logger);
     }

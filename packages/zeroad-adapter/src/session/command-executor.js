@@ -1,6 +1,10 @@
 import { CommandConverter } from '../commands/command-converter.js';
 import { CommandInjector } from '../commands/command-injector.js';
 export class ZeroADCommandExecutor {
+    ipcBridge;
+    logger;
+    converter;
+    injector;
     constructor(ipcBridge, logger) {
         this.ipcBridge = ipcBridge;
         this.logger = logger;

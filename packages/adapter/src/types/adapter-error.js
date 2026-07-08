@@ -37,6 +37,8 @@ export var AdapterErrorCode;
  * Used when adapter operations fail.
  */
 export class AdapterError extends Error {
+    code;
+    details;
     /**
      * Create an adapter error.
      *

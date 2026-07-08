@@ -1,7 +1,9 @@
 import { Match } from './match.js';
 export class MatchFactory {
+    adapter;
+    logger;
+    activeMatches = new Map();
     constructor(adapter, logger) {
-        this.activeMatches = new Map();
         this.adapter = adapter;
         this.logger = logger;
     }

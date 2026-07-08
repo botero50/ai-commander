@@ -248,7 +248,7 @@ export class StrategicIntelligence {
     }
     analyzeBehaviorPattern(world, previousWorlds) {
         const knownEnemies = world.knownEnemies.length; // Use scouted enemies, not all enemies
-        const enemyMovement = previousWorlds ? this.analyzeMovement(world, previousWorlds) : 0;
+        const enemyMovement = previousWorlds && previousWorlds.length > 0 ? this.analyzeMovement(world, previousWorlds[previousWorlds.length - 1]) : 0;
         let type = 'mixed';
         const indicators = [];
         if (knownEnemies > 5) {

@@ -14,10 +14,11 @@
     "clean": "rm -rf dist"
   },
   "dependencies": {
-    "@ai-commander/adapter": "*",
-    "@ai-commander/brain": "*"
+    "@ai-commander/adapter": "file:../adapter",
+    "@ai-commander/brain": "file:../brain",
+    "@ai-commander/domain": "file:../domain"
   },
   "devDependencies": {
-    "typescript": "*"
+    "typescript": "^5.0.0"
   }
 }

@@ -28,7 +28,6 @@
     "@ai-commander/engine": "file:../../packages/engine",
     "@ai-commander/fake-game-adapter": "file:../../packages/fake-game-adapter",
     "@ai-commander/goals": "file:../../packages/goals",
-    "@ai-commander/openra-adapter": "file:../../packages/openra-adapter",
     "@ai-commander/planner": "file:../../packages/planner",
     "open": "^10.0.0"
   }

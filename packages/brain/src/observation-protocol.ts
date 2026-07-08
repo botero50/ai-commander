@@ -6,7 +6,7 @@
  * This ensures reproducible benchmarking and fair comparison.
  */
 
-import type { CommandOption, ExecutionMemory, GoalOption, WorldObservation } from './types/brain';
+import type { CommandOption, ExecutionMemory, GoalOption, WorldObservation } from './types/brain.js';
 
 /**
  * Structured JSON observation — Machine-readable format

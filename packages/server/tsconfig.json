@@ -1,15 +1,34 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+        "composite": true,
     "outDir": "./dist",
     "rootDir": "./src"
   },
-  "include": ["src"],
+  "include": [
+    "src"
+  ],
   "references": [
-    { "path": "../brain" },
-    { "path": "../tournament-engine" },
-    { "path": "../match-runner" },
-    { "path": "../benchmark-reporter" },
-    { "path": "../config" }
+    {
+      "path": "../brain"
+    },
+    {
+      "path": "../tournament-engine"
+    },
+    {
+      "path": "../match-runner"
+    },
+    {
+      "path": "../benchmark-reporter"
+    },
+    {
+      "path": "../config"
+    }
+  ],
+  "exclude": [
+    "node_modules",
+    "src/**/*.test.ts",
+    "**/*.test.ts",
+    "dist"
   ]
 }

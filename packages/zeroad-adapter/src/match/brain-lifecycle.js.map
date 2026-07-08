@@ -1,0 +1,1 @@
+{"version":3,"file":"brain-lifecycle.js","sourceRoot":"","sources":["brain-lifecycle.ts"],"names":[],"mappings":"AAAA;;;;;;;GAOG;AAEH,OAAO,EAAE,uBAAuB,EAAE,MAAM,uBAAuB,CAAC;AAEhE,OAAO,EAAE,0BAA0B,IAAI,iBAAiB,EAAE,MAAM,uBAAuB,CAAC;AAOxF;;;GAGG;AACH,MAAM,OAAO,cAAe,SAAQ,uBAAuB;IACzD,YAAY,MAAoB,EAAE,MAAW;QAC3C,KAAK,CAAC,MAAM,EAAE,MAAM,CAAC,CAAC;IACxB,CAAC;CACF"}

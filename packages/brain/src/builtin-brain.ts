@@ -12,7 +12,7 @@ import type {
   ExecutionMemory,
   GoalOption,
   WorldObservation,
-} from './types/brain';
+} from './types/brain.js';
 
 /**
  * BuiltinBrain: Adapter for the existing AI Commander decision logic

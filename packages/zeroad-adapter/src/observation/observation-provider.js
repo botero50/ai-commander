@@ -1,10 +1,14 @@
 import { ObservationLoop } from '../state/observation-loop.js';
 import { WorldMapper } from '../mapper/world-mapper.js';
 export class ObservationProvider {
+    observationLoop;
+    worldMapper;
+    logger;
+    ipcBridge;
+    currentWorldState = null;
+    lastUpdateTime = 0;
+    updateCount = 0;
     constructor(ipcBridge, config, logger) {
-        this.currentWorldState = null;
-        this.lastUpdateTime = 0;
-        this.updateCount = 0;
         this.ipcBridge = ipcBridge;
         this.logger = logger;
         this.worldMapper = new WorldMapper(logger);

@@ -1,12 +1,16 @@
 import { StateExtractor } from './state-extractor.js';
 import { ZeroADAdapterError, ZeroADAdapterErrorCode } from '../types/errors.js';
 export class ObservationLoop {
+    extractor;
+    logger;
+    ipcBridge;
+    config;
+    loopInterval = null;
+    isRunning = false;
+    lastState = null;
+    observationCount = 0;
+    totalLatency = 0;
     constructor(ipcBridge, config, logger) {
-        this.loopInterval = null;
-        this.isRunning = false;
-        this.lastState = null;
-        this.observationCount = 0;
-        this.totalLatency = 0;
         this.ipcBridge = ipcBridge;
         this.config = this.validateConfig(config);
         this.logger = logger;

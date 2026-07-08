@@ -5,6 +5,8 @@ const LOG_LEVELS = {
     error: 3,
 };
 export class Logger {
+    level;
+    context;
     constructor(level = 'info', context = 'ZeroADAdapter') {
         this.level = level;
         this.context = context;

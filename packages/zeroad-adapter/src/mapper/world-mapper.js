@@ -1,5 +1,6 @@
 import { createWorldState, createPlayer, AgentState, createAgent, createTick, createGameTime, createGameMap, createResourceType, createResource, createEmptyResourcePool, } from '@ai-commander/domain';
 export class WorldMapper {
+    logger;
     constructor(logger) {
         this.logger = logger;
     }

@@ -1,4 +1,4 @@
-import { GameAdapter, GameSession } from '@ai-commander/adapter';
+import { GameAdapter, GameSession, GameCapabilities } from '@ai-commander/adapter';
 import { ZeroADConfiguration } from './types/configuration.js';
 import { GameProcess } from './types/game-process.js';
 import { IPCBridge } from './types/ipc-bridge.js';

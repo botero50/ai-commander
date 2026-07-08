@@ -1,11 +1,15 @@
 import { CommandConverter } from './command-converter.js';
 import { ZeroADAdapterError, ZeroADAdapterErrorCode } from '../types/errors.js';
 export class CommandInjector {
+    converter;
+    logger;
+    ipcBridge;
+    config;
+    commandHistory = new Map();
+    totalCommands = 0;
+    successfulCommands = 0;
+    failedCommands = 0;
     constructor(ipcBridge, config = {}, logger) {
-        this.commandHistory = new Map();
-        this.totalCommands = 0;
-        this.successfulCommands = 0;
-        this.failedCommands = 0;
         this.ipcBridge = ipcBridge;
         this.logger = logger;
         this.converter = new CommandConverter(logger);

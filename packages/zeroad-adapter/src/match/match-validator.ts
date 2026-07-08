@@ -84,7 +84,7 @@ export class MatchValidator {
       name: 'Metadata Valid',
       validate: () => {
         const metadata = this.match.getMetadata();
-        return metadata.matchId && metadata.status && metadata.createdAt > 0;
+        return !!(metadata.matchId && metadata.status && metadata.createdAt > 0);
       },
       severity: 'error',
     });

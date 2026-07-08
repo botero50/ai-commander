@@ -9,6 +9,7 @@
     "declarationMap": true,
     "sourceMap": true,
     "skipLibCheck": true,
+    "noImplicitAny": false,
     "verbatimModuleSyntax": false,
     "isolatedModules": true,
     "noUncheckedSideEffectImports": false,
@@ -47,7 +48,6 @@
       "@ai-commander/monitor": ["packages/monitor/src/index.ts"],
       "@ai-commander/optimizer": ["packages/optimizer/src/index.ts"],
       "@ai-commander/fine-tuner": ["packages/fine-tuner/src/index.ts"],
-      "@ai-commander/openra-adapter": ["packages/openra-adapter/src/index.ts"],
       "@ai-commander/chess-adapter": ["packages/chess-adapter/src/index.ts"],
       "@ai-commander/checkers-adapter": ["packages/checkers-adapter/src/index.ts"],
       "@ai-commander/community": ["packages/community/src/index.ts"]

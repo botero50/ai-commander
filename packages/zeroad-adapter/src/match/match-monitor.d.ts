@@ -1,12 +1,16 @@
-import { WorldState, Command } from '@ai-commander/domain';
-import { Match } from './match.js';
-import { TelemetryMetrics } from './match-telemetry.js';
-import { Logger } from '../config/logger.js';
-export interface MonitorConfig {
-    enableTelemetry?: boolean;
-    enableStateTracking?: boolean;
-    checkpointIntervalMs?: number;
-}
+/**
+ * DEPRECATED: MatchMonitor has been partially moved to the framework as ExecutionMonitor and StateMetrics.
+ *
+ * This adapter maintains backward-compatible MatchMonitor exports for existing code.
+ *
+ * Re-export and wrap framework components for backward compatibility.
+ */
+export { ExecutionMonitor as MatchMonitor } from '@ai-commander/adapter';
+export type { ExecutionMonitorConfig as MonitorConfig, ExecutionMetrics as MatchMetrics } from '@ai-commander/adapter';
+/**
+ * Type aliases for backward compatibility with game-specific types.
+ * Game-specific state tracking has been removed; use the underlying ExecutionMonitor.
+ */
 export interface MatchState {
     tick: number;
     timestamp: number;
@@ -15,34 +19,5 @@ export interface MatchState {
     buildingCount: number;
     isHealthy: boolean;
     issues: string[];
-}
-export declare class MatchMonitor {
-    private match;
-    private logger;
-    private config;
-    private telemetry;
-    private lastCheckpoint;
-    private observationCount;
-    private commandCount;
-    private errorCount;
-    private stateHistory;
-    private maxStateHistory;
-    constructor(match: Match, config: MonitorConfig, logger: Logger);
-    recordObservation(worldState: WorldState): void;
-    recordCommands(commands: Command[]): void;
-    recordError(error: Error): void;
-    private trackState;
-    private checkHealth;
-    getMetrics(): {
-        observationCount: number;
-        commandCount: number;
-        errorCount: number;
-        telemetry: TelemetryMetrics;
-        lastState: MatchState;
-    };
-    getStateHistory(): MatchState[];
-    getTelemetryMetrics(): TelemetryMetrics;
-    isHealthy(): boolean;
-    reset(): void;
 }
 //# sourceMappingURL=match-monitor.d.ts.map

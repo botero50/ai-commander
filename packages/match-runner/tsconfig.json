@@ -1,11 +1,22 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
+        "composite": true,
     "outDir": "./dist",
     "rootDir": "./src"
   },
-  "include": ["src"],
+  "include": [
+    "src"
+  ],
   "references": [
-    { "path": "../brain" }
+    {
+      "path": "../brain"
+    }
+  ],
+  "exclude": [
+    "node_modules",
+    "src/**/*.test.ts",
+    "**/*.test.ts",
+    "dist"
   ]
 }

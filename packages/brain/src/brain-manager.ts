@@ -5,7 +5,7 @@
  * Supports built-in, Claude, OpenAI, Gemini, and Ollama.
  */
 
-import type { Brain } from './types/brain';
+import type { Brain } from './types/brain.js';
 
 export type BrainProvider = 'builtin' | 'claude' | 'openai' | 'gemini' | 'ollama';
 
@@ -48,7 +48,7 @@ export class BrainManager {
     switch (config.provider) {
       case 'builtin':
         // Lazy load to avoid circular dependencies
-        const { BuiltinBrain } = await import('./builtin-brain');
+        const { BuiltinBrain } = await import('./builtin-brain.js');
         return new BuiltinBrain({
           selectGoal: async () => 'default-goal',
           planGoal: async () => [],

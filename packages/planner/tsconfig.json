@@ -7,7 +7,26 @@
     "declaration": true,
     "declarationMap": true
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "tests"],
-  "references": [{ "path": "../core" }, { "path": "../domain" }, { "path": "../goals" }]
+  "include": [
+    "src/**/*",
+    "!src/**/*.test.ts"
+  ],
+  "exclude": ["vitest.config.ts", 
+    "node_modules",
+    "dist",
+    "tests",
+    "src/**/*.test.ts",
+    "**/*.test.ts"
+  ],
+  "references": [
+    {
+      "path": "../core"
+    },
+    {
+      "path": "../domain"
+    },
+    {
+      "path": "../goals"
+    }
+  ]
 }

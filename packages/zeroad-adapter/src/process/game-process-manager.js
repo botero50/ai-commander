@@ -1,10 +1,12 @@
 import { spawn } from 'child_process';
 import { ZeroADAdapterError, ZeroADAdapterErrorCode } from '../types/errors.js';
 export class GameProcessManager {
+    pid = -1;
+    isRunning = false;
+    process = null;
+    logger;
+    config;
     constructor(config, logger) {
-        this.pid = -1;
-        this.isRunning = false;
-        this.process = null;
         this.config = config;
         this.logger = logger;
     }

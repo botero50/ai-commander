@@ -4,7 +4,7 @@
  * This adapter makes the framework continue working exactly as today,
  * while providing the standard Brain interface that LLM providers will implement.
  */
-import type { Brain, BrainDecision, CommandOption, ExecutionMemory, GoalOption, WorldObservation } from './types/brain';
+import type { Brain, BrainDecision, CommandOption, ExecutionMemory, GoalOption, WorldObservation } from './types/brain.js';
 /**
  * BuiltinBrain: Adapter for the existing AI Commander decision logic
  *

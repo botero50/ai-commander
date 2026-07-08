@@ -1,7 +1,8 @@
 export class CommandVerifier {
+    logger;
+    previousState = null;
+    verificationHistory = new Map();
     constructor(logger) {
-        this.previousState = null;
-        this.verificationHistory = new Map();
         this.logger = logger;
     }
     /**

@@ -1,11 +1,15 @@
 import { createConnection } from 'net';
 import { ZeroADAdapterError, ZeroADAdapterErrorCode } from '../types/errors.js';
 export class IPCConnection {
+    socket = null;
+    isConnected = false;
+    messageHandlers = new Map();
+    pendingRequests = new Map();
+    logger;
+    host;
+    port;
+    connectTimeout;
     constructor(host, port, connectTimeout, logger) {
-        this.socket = null;
-        this.isConnected = false;
-        this.messageHandlers = new Map();
-        this.pendingRequests = new Map();
         this.host = host;
         this.port = port;
         this.connectTimeout = connectTimeout;

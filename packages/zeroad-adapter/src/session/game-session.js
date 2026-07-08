@@ -1,9 +1,18 @@
 import { ZeroADCommandExecutor } from './command-executor.js';
 import { ZeroADObservationProvider } from './observation-provider.js';
 export class ZeroADGameSession {
+    sessionId;
+    capabilities;
+    process;
+    ipcBridge;
+    observationLoop;
+    logger;
+    config;
+    started = false;
+    paused = false;
+    observationProvider;
+    commandExecutor;
     constructor(sessionId, capabilities, process, ipcBridge, observationLoop, logger, config) {
-        this.started = false;
-        this.paused = false;
         this.sessionId = sessionId;
         this.capabilities = capabilities;
         this.process = process;

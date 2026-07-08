@@ -1,18 +1,20 @@
 {
+  "extends": "./tsconfig.base.json",
   "compilerOptions": {
-    "target": "ES2020",
-    "module": "ES2020",
-    "lib": ["ES2020"],
-    "moduleResolution": "node",
-    "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true,
-    "strict": true,
-    "esModuleInterop": true,
-    "skipLibCheck": true,
-    "forceConsistentCasingInFileNames": true,
-    "composite": true,
-    "resolveJsonModule": true
+    "noEmit": true
   },
-  "include": ["packages/*/src/**/*"]
+  "files": [],
+  "references": [
+    { "path": "packages/core" },
+    { "path": "packages/domain" },
+    { "path": "packages/engine" },
+    { "path": "packages/adapter" },
+    { "path": "packages/decision" },
+    { "path": "packages/goals" },
+    { "path": "packages/planner" },
+    { "path": "packages/agent-runtime" },
+    { "path": "packages/fake-game-adapter" },
+    { "path": "packages/behavior-tree" },
+    { "path": "packages/zeroad-adapter" }
+  ]
 }

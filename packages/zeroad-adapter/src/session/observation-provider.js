@@ -1,4 +1,6 @@
 export class ZeroADObservationProvider {
+    observationLoop;
+    logger;
     constructor(observationLoop, logger) {
         this.observationLoop = observationLoop;
         this.logger = logger;

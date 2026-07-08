@@ -1,9 +1,13 @@
 import { generateUUID } from '../utils/uuid.js';
 export class Match {
+    matchId;
+    adapter;
+    session = null;
+    logger;
+    metadata;
+    currentTick = 0;
+    tickHistory = new Map();
     constructor(adapter, config, logger) {
-        this.session = null;
-        this.currentTick = 0;
-        this.tickHistory = new Map();
         this.matchId = `match-${generateUUID()}`;
         this.adapter = adapter;
         this.logger = logger;

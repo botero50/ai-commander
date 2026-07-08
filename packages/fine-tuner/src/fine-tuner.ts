@@ -144,7 +144,7 @@ export class FineTuner {
     // Level 3: strong opponents (hard learning)
 
     const difficulty = Math.min(3, progressLevel);
-    const adjustedConfig = { ...brainConfig } as any;
+    const adjustedConfig = { ...(brainConfig as any) } as any;
 
     if (adjustedConfig.temperature) {
       adjustedConfig.temperature = 0.3 + difficulty * 0.2; // 0.3 to 0.9

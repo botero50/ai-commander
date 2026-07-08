@@ -1,5 +1,6 @@
 import { ZeroADAdapterError, ZeroADAdapterErrorCode } from '../types/errors.js';
 export class CommandConverter {
+    logger;
     constructor(logger) {
         this.logger = logger;
     }

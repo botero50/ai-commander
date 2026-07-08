@@ -66,8 +66,8 @@ export class MatchRunner {
     let currentRedState = this.createInitialWorldObservation(config, 'red');
     let currentBlueState = this.createInitialWorldObservation(config, 'blue');
 
-    const redMemory = { recentEvents: [], recentDecisions: [], metrics: {} };
-    const blueMemory = { recentEvents: [], recentDecisions: [], metrics: {} };
+    const redMemory: any = { recentEvents: [], recentDecisions: [], metrics: {} };
+    const blueMemory: any = { recentEvents: [], recentDecisions: [], metrics: {} };
 
     for (let tick = 0; tick < config.maxTicks; tick++) {
       // Red brain decision

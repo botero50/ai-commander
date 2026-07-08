@@ -1,19 +1,38 @@
 {
-  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
+    "target": "ES2022",
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "strict": false,
+    "declaration": true,
+    "declarationMap": true,
+    "sourceMap": true,
+    "skipLibCheck": true,
     "outDir": "./dist",
     "rootDir": "./src",
-    "composite": true,
-    "declaration": true,
-    "declarationMap": true
+    "composite": true
   },
-  "include": ["src/**/*"],
-  "exclude": ["node_modules", "dist", "tests"],
+  "include": [
+    "src/**/*.ts"
+  ],
+  "exclude": [
+    "src/**/*.test.ts"
+  ],
   "references": [
-    { "path": "../core" },
-    { "path": "../domain" },
-    { "path": "../engine" },
-    { "path": "../goals" },
-    { "path": "../planner" }
+    {
+      "path": "../core"
+    },
+    {
+      "path": "../domain"
+    },
+    {
+      "path": "../engine"
+    },
+    {
+      "path": "../goals"
+    },
+    {
+      "path": "../planner"
+    }
   ]
 }

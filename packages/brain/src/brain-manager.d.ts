@@ -4,7 +4,7 @@
  * Allows switching between providers without modifying gameplay code.
  * Supports built-in, Claude, OpenAI, Gemini, and Ollama.
  */
-import type { Brain } from './types/brain';
+import type { Brain } from './types/brain.js';
 export type BrainProvider = 'builtin' | 'claude' | 'openai' | 'gemini' | 'ollama';
 export interface BrainManagerConfig {
     readonly provider: BrainProvider;

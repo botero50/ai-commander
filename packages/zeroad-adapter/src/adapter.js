@@ -20,15 +20,17 @@ const ZEROAD_CAPABILITIES = {
     },
 };
 export class ZeroADAdapter {
+    adapterId = '0ad-adapter';
+    displayName = '0 A.D. Adapter';
+    capabilities = ZEROAD_CAPABILITIES;
+    config;
+    logger;
+    process = null;
+    ipcBridge = null;
+    observationProvider = null;
+    session = null;
+    initialized = false;
     constructor(configOverrides) {
-        this.adapterId = '0ad-adapter';
-        this.displayName = '0 A.D. Adapter';
-        this.capabilities = ZEROAD_CAPABILITIES;
-        this.process = null;
-        this.ipcBridge = null;
-        this.observationProvider = null;
-        this.session = null;
-        this.initialized = false;
         this.config = ConfigurationLoader.load(configOverrides);
         this.logger = new Logger(this.config.logLevel, 'ZeroADAdapter');
     }
