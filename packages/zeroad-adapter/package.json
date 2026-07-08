@@ -1,0 +1,23 @@
+{
+  "name": "@ai-commander/zeroad-adapter",
+  "version": "1.0.0",
+  "description": "0 A.D. game adapter for AI Commander tournaments",
+  "private": true,
+  "type": "module",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
+  "files": ["dist"],
+  "scripts": {
+    "build": "tsc",
+    "test": "node --test dist/tests/**/*.test.js",
+    "lint": "eslint src",
+    "clean": "rm -rf dist"
+  },
+  "dependencies": {
+    "@ai-commander/adapter": "*",
+    "@ai-commander/brain": "*"
+  },
+  "devDependencies": {
+    "typescript": "*"
+  }
+}
