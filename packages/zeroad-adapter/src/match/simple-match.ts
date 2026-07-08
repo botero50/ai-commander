@@ -5,9 +5,8 @@
  * for STORY 11.3: Dual Ollama Match (Two independent brains)
  */
 
-import { GameLoop, BrainExecutor, ExternalSystemLifecycle, ExecutionMonitor } from '@ai-commander/adapter';
+import { GameLoop, BrainExecutor, ExternalSystemLifecycle, ExecutionMonitor, GameSession } from '@ai-commander/adapter';
 import { Logger } from '../config/logger.js';
-import { ZeroADGameSession } from '../session/game-session.js';
 
 /**
  * Generic Brain interface (avoid importing from @ai-commander/brain to stay within rootDir)
@@ -56,7 +55,7 @@ export interface MatchResult {
 }
 
 export async function runSimpleMatch(
-  session: ZeroADGameSession,
+  session: GameSession,
   brain: BrainInterface,
   config: Partial<SimpleMatchConfig> = {}
 ) {
@@ -232,7 +231,7 @@ export async function runSimpleMatch(
  * Each brain has separate observation, memory, and decision context
  */
 export async function runDualBrainMatch(
-  session: ZeroADGameSession,
+  session: GameSession,
   brain1: BrainInterface,
   brain2: BrainInterface,
   config: Partial<DualBrainMatchConfig> = {}

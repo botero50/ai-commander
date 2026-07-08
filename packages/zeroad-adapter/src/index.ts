@@ -49,3 +49,5 @@ export type { TelemetrySnapshot, TelemetryMetrics } from './match/match-telemetr
 export type { ValidationRule, ValidationResult, ValidationIssue } from './match/match-validator.js';
 export { runSimpleMatch, runDualBrainMatch } from './match/simple-match.js';
 export type { SimpleMatchConfig, DualBrainMatchConfig, BrainInterface, MatchResult } from './match/simple-match.js';
+export { runLiveMatch } from './match/live-match-runner.js';
+export type { LiveMatchConfig } from './match/live-match-runner.js';
