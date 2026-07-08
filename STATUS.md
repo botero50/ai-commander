@@ -1,8 +1,8 @@
 # AI Commander: Project Status
 
 **Last Updated:** 2026-07-07
-**Current Phase:** EPICS 7-8-10-11-12-13 COMPLETE ✅
-**Stories Completed:** 13 Stories (3 EPICs fully implemented)
+**Current Phase:** EPICS 7-8-10-11-12-13-14 (Partial) COMPLETE ✅
+**Stories Completed:** 15 Stories (4 EPICs, 2/4 stories in EPIC 14)
 
 ## Executive Summary
 
@@ -113,6 +113,12 @@ ADAPTERS (Game-Specific ~2,500 lines each)
 - Story 13.1: Web Match Viewer (event broadcasting & state management)
 - Story 13.2: Express.js Server (WebSocket real-time streaming)
 - Story 13.3: Web UI Components (framework-agnostic formatting & state)
+
+### EPIC 14: Multi-Brain Tournament System (IN PROGRESS)
+- Story 14.1: Tournament Runner (match scheduling & results) ✅
+- Story 14.2: ELO Ranking System (competitive ratings) ✅
+- Story 14.3: Tournament UI Dashboard [PLANNED]
+- Story 14.4: Replay and Analysis Tools [PLANNED]
 
 ## Next Steps
 
