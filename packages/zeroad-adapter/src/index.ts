@@ -103,3 +103,9 @@ export type {
 } from './tournament/tournament-runner.js';
 export { EloRating } from './tournament/elo-rating.js';
 export type { BrainRating, RatingChange, EloConfig } from './tournament/elo-rating.js';
+export { TournamentDashboard, formatTournamentExport } from './tournament/tournament-dashboard.js';
+export type {
+  FormattedBrainRanking,
+  FormattedMatchEntry,
+  TournamentDashboardState,
+} from './tournament/tournament-dashboard.js';
