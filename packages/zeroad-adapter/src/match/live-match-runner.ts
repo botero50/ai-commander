@@ -14,6 +14,7 @@ import { ZeroADAdapter } from '../adapter.js';
 import { BrainInterface, MatchResult } from './simple-match.js';
 import { runDualBrainMatch } from './simple-match.js';
 import { DecisionOverlay, DecisionSubscriber } from './decision-overlay.js';
+import { MatchTimeline } from './match-timeline.js';
 
 export interface LiveMatchConfig {
   readonly brain1: BrainInterface;
@@ -25,6 +26,7 @@ export interface LiveMatchConfig {
 
 export interface LiveMatchResult extends MatchResult {
   readonly overlay: DecisionOverlay; // Access to all recorded decisions
+  readonly timeline: MatchTimeline; // Access to match progression timeline
 }
 
 /**
@@ -42,11 +44,18 @@ export async function runLiveMatch(
     maxTicks: config.maxTicks || 5000,
   };
 
-  // Create decision overlay for real-time capture
+  // Create decision overlay and timeline for real-time capture
   const overlay = new DecisionOverlay();
+  const timeline = new MatchTimeline();
+
   if (config.onDecision) {
     overlay.subscribe(config.onDecision);
   }
+
+  // Subscribe decisions to timeline for correlation
+  overlay.subscribe((decision) => {
+    timeline.addDecisionToTimeline(decision);
+  });
 
   logger.info(`Starting live match: ${config.brain1.name} vs ${config.brain2.name}`, {
     maxTicks: matchConfig.maxTicks,
@@ -87,11 +96,18 @@ export async function runLiveMatch(
       totalDecisions: overlay.getStats().totalDecisions,
     });
 
-    // Build result with overlay
+    // Build result with overlay and timeline
     const result: LiveMatchResult = {
       ...matchResult,
       overlay,
+      timeline,
     };
+
+    // Record final game state in timeline
+    timeline.recordMilestone(matchResult.ticksRan, 'Match complete', {
+      winner: matchResult.winner,
+      duration: matchResult.duration,
+    });
 
     // If keepWindowOpen, pause observation but leave process running
     if (config.keepWindowOpen ?? true) {

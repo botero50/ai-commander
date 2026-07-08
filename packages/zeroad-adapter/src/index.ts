@@ -53,3 +53,5 @@ export { runLiveMatch } from './match/live-match-runner.js';
 export type { LiveMatchConfig, LiveMatchResult } from './match/live-match-runner.js';
 export { DecisionOverlay } from './match/decision-overlay.js';
 export type { DecisionEvent, DecisionSubscriber } from './match/decision-overlay.js';
+export { MatchTimeline } from './match/match-timeline.js';
+export type { TimelineSnapshot, TimelineEvent } from './match/match-timeline.js';

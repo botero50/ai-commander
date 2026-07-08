@@ -10,6 +10,7 @@
 
 import { describe, it, expect } from 'vitest';
 import { DecisionOverlay, DecisionEvent } from './decision-overlay.js';
+import { MatchTimeline } from './match-timeline.js';
 import type { LiveMatchConfig, LiveMatchResult } from './live-match-runner.js';
 import type { BrainInterface, MatchResult } from './simple-match.js';
 
@@ -189,5 +190,71 @@ describe('Live Match Runner with Decision Overlay', () => {
 
     expect(overlay.getDecisions()).toHaveLength(0);
     expect(overlay.getStats().totalDecisions).toBe(0);
+  });
+
+  it('should include timeline in live match result', () => {
+    const overlay = new DecisionOverlay();
+    const timeline = new MatchTimeline();
+
+    timeline.recordSnapshot(1, 10, 3, 2, []);
+    timeline.recordSnapshot(2, 12, 4, 2, []);
+
+    const matchResult: MatchResult = {
+      success: true,
+      winner: 'TestBrain1',
+      ticksRan: 100,
+      duration: 10000,
+      player1: { name: 'TestBrain1', commandsExecuted: 20, errors: 0 },
+      player2: { name: 'TestBrain2', commandsExecuted: 18, errors: 1 },
+    };
+
+    const result: LiveMatchResult = {
+      ...matchResult,
+      overlay,
+      timeline,
+    };
+
+    expect(result.timeline).toBeDefined();
+    expect(result.timeline.getSnapshots()).toHaveLength(2);
+  });
+
+  it('should correlate decisions with timeline', () => {
+    const overlay = new DecisionOverlay();
+    const timeline = new MatchTimeline();
+
+    timeline.recordSnapshot(1, 10, 3, 2, []);
+
+    const decision: DecisionEvent = {
+      tick: 1,
+      timestamp: Date.now(),
+      player: 'player1',
+      brainName: 'Brain1',
+      reasoning: 'test',
+      commands: ['move'],
+      commandCount: 1,
+      durationMs: 100,
+    };
+
+    overlay.recordDecision(1, 'player1', 'Brain1', 'test', ['move'], 100);
+    timeline.addDecisionToTimeline(decision);
+
+    const snapshots = timeline.getSnapshots();
+    expect(snapshots[0].decisions).toHaveLength(1);
+    expect(snapshots[0].decisions[0].brainName).toBe('Brain1');
+  });
+
+  it('should analyze match progression', () => {
+    const timeline = new MatchTimeline();
+
+    timeline.recordSnapshot(1, 10, 3, 2, []);
+    timeline.recordSnapshot(2, 15, 5, 2, []);
+    timeline.recordSnapshot(3, 20, 7, 2, []);
+
+    const analysis = timeline.analyzeProgression();
+
+    expect(analysis.totalSnapshots).toBe(3);
+    expect(analysis.unitCountTrend).toBe('increasing');
+    expect(analysis.buildingCountTrend).toBe('increasing');
+    expect(analysis.unitCountChange).toBe(10);
   });
 });
