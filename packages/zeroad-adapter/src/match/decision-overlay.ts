@@ -4,8 +4,12 @@
  * Captures and streams AI decisions in real-time for live visualization.
  * - Records each brain decision with reasoning and commands
  * - Timestamp each decision for replay/analysis
+ * - Generates spectator-friendly summaries (never exposing reasoning)
  * - Stream decisions to subscribers (UI, logging, replay)
  */
+
+import type { DecisionSummary } from '../commentary/decision-summary.js';
+import { DecisionSummaryFactory } from '../commentary/decision-summary.js';
 
 /**
  * Single decision event captured during match
@@ -19,6 +23,7 @@ export interface DecisionEvent {
   readonly commands: readonly string[];
   readonly commandCount: number;
   readonly durationMs: number; // How long the decision took
+  readonly summary?: DecisionSummary; // Spectator-friendly summary (generated automatically)
 }
 
 /**
@@ -33,6 +38,7 @@ export class DecisionOverlay {
   private decisions: DecisionEvent[] = [];
   private subscribers: DecisionSubscriber[] = [];
   private maxDecisions: number = 10000; // Auto-rotate at limit
+  private summaryFactory = new DecisionSummaryFactory();
 
   /**
    * Record a brain decision
@@ -45,15 +51,28 @@ export class DecisionOverlay {
     commands: readonly string[],
     durationMs: number
   ): void {
+    const timestamp = Date.now();
+    const summary = this.summaryFactory.create(
+      tick,
+      timestamp,
+      player,
+      brainName,
+      reasoning,
+      commands,
+      commands.length,
+      durationMs
+    );
+
     const event: DecisionEvent = {
       tick,
-      timestamp: Date.now(),
+      timestamp,
       player,
       brainName,
       reasoning: reasoning?.substring(0, 500), // Truncate very long reasoning
       commands: [...commands],
       commandCount: commands.length,
       durationMs,
+      summary,
     };
 
     this.decisions.push(event);
