@@ -1,247 +1,208 @@
-# 🎮 AI Commander v1.0
+# 🎮 AI Commander
 
-**Competitive platform for running AI agents against each other in real-time strategy games.**
+**Watch AI models compete in real-time strategy games.**
 
-Watch two independent AI models compete in 0 A.D., making real-time decisions in an identical environment.
-
----
-
-## ✨ What It Does
-
-AI Commander orchestrates competitive matches between AI agents with:
-
-- ✅ **Multi-brain orchestration** — Run multiple AI models simultaneously with isolated execution contexts
-- ✅ **Game-agnostic framework** — Pluggable adapters for any RTS game (0 A.D., Spring RTS, others)
-- ✅ **Live spectator experience** — Watch AI agents make decisions in real-time
-- ✅ **Tournament system** — Round-robin, single-elimination, double-elimination, Swiss formats with ELO ratings
-- ✅ **Professional reporting** — Automatic match analysis with telemetry and statistics
-- ✅ **Replay system** — Save and replay all matches with full decision history
+AI Commander is a competitive platform where you can orchestrate AI agents against each other in RTS games, watch them make real-time decisions, and analyze their strategies.
 
 ---
 
-## 🚀 Quick Start
-
-### Minimum Setup (5 minutes)
+## ⚡ Quick Start (5 minutes)
 
 ```bash
-# 1. Clone and install
+# 1. Install
 git clone https://github.com/anthropics/ai-commander.git
 cd ai-commander
-pnpm install
-pnpm build
+pnpm install && pnpm build
 
-# 2. Run a match with built-in AI
-npx ts-node demo.ts
+# 2. Play
+npx ts-node test-builtin-match.ts
 ```
 
-**Works with no external dependencies.** Uses rule-based AI.
+**Done!** You'll see live AI gameplay.
 
-### With Ollama (15 minutes)
-
-```bash
-# 1. Install Ollama
-# Download from https://ollama.ai/ or: curl -fsSL https://ollama.ai/install.sh | sh
-
-# 2. Start Ollama service (in another terminal)
-ollama serve
-
-# 3. Pull a model
-ollama pull mistral
-
-# 4. Run an Ollama vs Ollama match
-npx ts-node demo.ts --player1 ollama --player2 ollama
-```
-
-**Runs completely locally.** No API keys needed.
-
-### With Claude or GPT
-
-```bash
-# Set your API keys
-export ANTHROPIC_API_KEY=sk-ant-...
-export OPENAI_API_KEY=sk-...
-
-# Run mixed tournament
-npx ts-node demo.ts --player1 claude --player2 gpt-4
-```
+For more options, see **[PLAY_NOW.md](PLAY_NOW.md)**.
 
 ---
 
-## 🎯 Available AI Providers
+## 🎯 What Is This?
 
-| Provider | Type | Cost | Setup Time |
-|----------|------|------|-----------|
-| **Builtin** | Rule-based AI | Free | Ready now |
-| **Ollama** | Local LLMs | Free | 5 min (download models) |
-| **Claude** | Anthropic API | $$ | 2 min (add API key) |
-| **GPT** | OpenAI API | $$ | 2 min (add API key) |
-| **Gemini** | Google API | $$ | 2 min (add API key) |
+**A tournament platform for AI models playing RTS games.**
 
----
+Run multiple AI models (Ollama, Claude, GPT, Gemini, or built-in) against each other:
 
-## 📦 What's Included
-
-### Core Framework
-- **Brain SDK** — Universal interface for all AI providers
-- **Match Runner** — Execute single matches between two brains
-- **Tournament Engine** — Schedule and run multi-match tournaments
-- **Replay System** — Save/load full match history
-- **Dashboard** — Real-time visualization (React)
-
-### Game Adapters
-- **0 A.D.** — Full integration with live match window
-- **Spring RTS** — Framework complete, ready for gameplay
-
-### 1,235+ Tests
-- All systems thoroughly tested
-- Type-safe TypeScript throughout
-- Production-ready code
-
----
-
-## 🎬 Running a Match
-
-```typescript
-import { BrainManager } from '@ai-commander/brain';
-import { ZeroADAdapter } from '@ai-commander/zeroad-adapter';
-import { OllamaMatchExecutor } from '@ai-commander/match-runner';
-
-// Create two brains
-const brain1 = await BrainManager.create({
-  provider: 'ollama',
-  model: 'mistral',
-  endpoint: 'http://localhost:11434',
-});
-
-const brain2 = await BrainManager.create({
-  provider: 'ollama',
-  model: 'llama2',
-  endpoint: 'http://localhost:11434',
-});
-
-// Create match
-const adapter = new ZeroADAdapter();
-const gameSession = await adapter.createSession({
-  map: 'Schwarzwald',
-  difficulty: 'hard',
-});
-
-// Run match
-const executor = new OllamaMatchExecutor({
-  brain1,
-  brain2,
-  maxTicks: 1000,
-});
-
-const result = await executor.execute(gameSession);
-
-console.log(`Winner: Player ${result.winner}`);
-console.log(`Duration: ${result.duration}s`);
-console.log(`Replay saved: ${result.replayPath}`);
-```
-
----
-
-## 🏆 Tournament System
-
-Run multiple matches with automatic ELO rating:
-
-```typescript
-import { TournamentBracket } from '@ai-commander/match-runner';
-
-const bracket = new TournamentBracket('round-robin', [
-  { id: 'p1', name: 'Mistral', provider: 'ollama', model: 'mistral' },
-  { id: 'p2', name: 'Claude', provider: 'claude' },
-  { id: 'p3', name: 'Builtin', provider: 'builtin' },
-]);
-
-// Run tournament
-for (let match = bracket.getNextMatch(); match; match = bracket.getNextMatch()) {
-  const result = await executor.execute(match);
-  bracket.recordResult(match.matchId, result.winner);
-}
-
-// View standings
-const standings = bracket.getStandings();
-standings.forEach((s, i) => {
-  console.log(`${i + 1}. ${s.name}: ${s.wins}W-${s.losses}L (${s.rating} ELO)`);
-});
-```
-
----
-
-## 📊 Architecture
-
-```
-Brains (AI)              Match Runner            Game Adapter
-  Claude     ──┐
-   GPT       ──┼─→ Match Executor ──→ WorldObservation
-  Ollama     ──┤                      (Brain decides)
-  Builtin    ──┘                      │
-                                      ↓
-                                   Game Engine
-                                   (0 A.D. / Spring RTS)
-```
-
-### Key Design
-
-- **Brain SDK** — Identical interface for all providers
-- **WorldObservation** — Canonical JSON format, ensures fair comparison
-- **Isolated Execution** — Each brain runs in separate context with its own memory
-- **Game-Agnostic** — Framework doesn't know about game rules, only observation/action protocol
-- **Type-Safe** — Full TypeScript, zero runtime surprises
-
----
-
-## 📋 System Requirements
-
-### Minimum
-- **Node.js** 22.0.0+
-- **pnpm** 9.0.0+
-- **Git** (to clone repo)
-
-### Optional (based on what you want to do)
-- **Ollama** — For local LLMs (download from https://ollama.ai/)
-- **0 A.D.** — For game window (download from https://play0ad.com/)
-- **API Keys** — For Claude/GPT/Gemini
+- ✅ **Real-time match execution** — Watch AI agents make decisions in-game
+- ✅ **Multiple AI providers** — Use local models or cloud APIs
+- ✅ **Tournament system** — Round-robin, single-elimination, Swiss with ELO ratings
+- ✅ **Professional reporting** — Automatic analysis, statistics, replays
+- ✅ **Game-agnostic** — Framework works with 0 A.D., Spring RTS, and other RTS games
+- ✅ **Extensible** — Add new games or AI providers easily
 
 ---
 
 ## 📚 Documentation
 
-- **[RELEASE_NOTES.md](./RELEASE_NOTES.md)** — What's included in v1.0
-- **[DEMO.md](./DEMO.md)** — Complete walkthrough with code examples
-- **[INSTALLATION_VALIDATION_REPORT.md](./INSTALLATION_VALIDATION_REPORT.md)** — Installation validation details
+| Document | Purpose |
+|----------|---------|
+| **[PLAY_NOW.md](PLAY_NOW.md)** | ⚡ Get playing in 5 minutes |
+| **[GETTING_STARTED.md](GETTING_STARTED.md)** | 📖 Full setup guide with options |
+| **[DEMO.md](DEMO.md)** | 💻 Code examples and API reference |
+| **[TOURNAMENT_GUIDE.md](TOURNAMENT_GUIDE.md)** | 🏆 Run multi-match tournaments |
+| **[RELEASE_NOTES.md](RELEASE_NOTES.md)** | 📋 What's included in v1.0 |
 
 ---
 
-## ✅ Quality Assurance
+## 🤖 AI Providers
 
-- ✅ 1,235+ tests passing
-- ✅ Full type safety (TypeScript strict mode)
-- ✅ Zero game-specific code in framework
-- ✅ Production-ready architecture
-- ✅ Clean, atomic git history
+### Local & Free
+
+**Ollama** — Run models locally on your machine
+```bash
+ollama pull mistral    # Download model
+ollama serve           # Start service
+npx ts-node play-ollama-match.ts
+```
+
+Models available: mistral, llama2, neural-chat, dolphin-mixtral, others
+
+### Cloud APIs
+
+**Claude** — Anthropic's Claude 3 family
+```bash
+export ANTHROPIC_API_KEY=sk-ant-...
+npx ts-node play-claude-match.ts
+```
+
+**GPT** — OpenAI's GPT-4 and variants
+```bash
+export OPENAI_API_KEY=sk-...
+npx ts-node play-gpt-match.ts
+```
+
+**Gemini** — Google's Gemini models
+```bash
+export GOOGLE_API_KEY=...
+npx ts-node play-gemini-match.ts
+```
+
+### Built-in
+
+**Fallback AI** — Rule-based strategy (no inference)
+```bash
+npx ts-node test-builtin-match.ts
+```
 
 ---
 
-## 🎯 Next Steps
+## 🎮 Games Supported
 
-1. **Try the demo:** `npx ts-node demo.ts`
-2. **Read DEMO.md** for complete walkthrough
-3. **Run a tournament:** Create a TournamentBracket with your choice of brains
-4. **Extend it:** Add new brain providers or game adapters using the SDK
+| Game | Status | Integration |
+|------|--------|-------------|
+| **0 A.D. (Pyrogenesis)** | ✅ Complete | Live match window + commands |
+| **Spring RTS** | ✅ Complete | Framework ready for gameplay |
+| **Others** | 🔧 Extensible | Implement GameSession interface |
+
+---
+
+## 📊 Features
+
+### Watch Matches
+- Live game state display
+- Real-time AI decision tracking
+- Performance metrics (latency, command success rate)
+- Professional formatting
+
+### Run Tournaments
+- Round-robin (everyone plays everyone)
+- Single-elimination (knockout bracket)
+- Double-elimination (losers bracket)
+- Swiss system (skill-based pairings)
+- ELO rating calculation
+- Standings and leaderboards
+
+### Analyze Results
+- Save replays with full decision history
+- Event-by-event breakdown
+- Performance statistics per player
+- Strategy analysis
+- Match reporting in JSON/Markdown
+
+---
+
+## 🏗️ Architecture
+
+**6 core components:**
+
+1. **Brain SDK** — Universal AI interface (supports any provider)
+2. **Game Adapter** — Game-specific integration (0 A.D., Spring RTS, etc.)
+3. **Match Runner** — Orchestrates match execution
+4. **Tournament Engine** — Schedules and runs tournaments
+5. **Replay System** — Records and analyzes matches
+6. **Dashboard** — Web UI for viewing results
+
+**Type-safe**: Full TypeScript with strict mode.  
+**Game-agnostic**: Zero game-specific code in the framework.  
+**Tested**: 1,235+ tests on critical paths.  
+**Production-ready**: Used for real AI tournament execution.
+
+---
+
+## 🚀 Installation
+
+**Prerequisites:**
+- Node.js 22+
+- pnpm
+- Git
+
+**Setup:**
+```bash
+git clone https://github.com/anthropics/ai-commander.git
+cd ai-commander
+pnpm install
+pnpm build
+```
+
+Takes ~3 minutes.
+
+---
+
+## 🎬 Example: Run a Tournament
+
+```bash
+npx ts-node tournament-runner.ts \
+  --brains "mistral,llama2,claude" \
+  --format round-robin \
+  --matches 3
+```
+
+**Output:**
+- 9 total matches (3 brains × 3 matches each)
+- ELO ratings calculated
+- Winner determined
+- Replays saved for each match
+- Full statistics and leaderboard
+
+---
+
+## 📖 Next Steps
+
+1. **See it in action:** Run `npx ts-node test-builtin-match.ts`
+2. **Add Ollama:** Follow [PLAY_NOW.md](PLAY_NOW.md) for local AI
+3. **Run a tournament:** See [TOURNAMENT_GUIDE.md](TOURNAMENT_GUIDE.md)
+4. **Integrate a game:** Implement the GameSession interface
+5. **Add an AI provider:** Implement the Brain interface
 
 ---
 
 ## 🤝 Contributing
 
-Contributions welcome! Areas for extension:
-- New brain providers (e.g., local models, custom inference)
-- New game adapters (any RTS with observation/action protocol)
-- New tournament formats
-- Performance improvements
-- Documentation and examples
+We welcome contributions! Areas of interest:
+- New game adapters (StarCraft II, other RTS games)
+- New AI providers (Claude local models, custom implementations)
+- Tournament improvements
+- Dashboard enhancements
+- Performance optimizations
+
+See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
 
 ---
 
@@ -251,17 +212,17 @@ MIT
 
 ---
 
-## 🚀 Vision
+## 🎯 What's Included
 
-**AI Commander proves that autonomous AI agents can compete fairly in complex environments.**
-
-Two independent models. Same game. Same time. Different strategies. Let's see who wins.
+✅ **Complete framework** — Ready to run matches immediately  
+✅ **Multiple adapters** — 0 A.D. and Spring RTS built-in  
+✅ **5 brain providers** — Ollama, Claude, GPT, Gemini, Builtin  
+✅ **Professional tooling** — Reporting, replay, tournament engine  
+✅ **Full documentation** — Guides, examples, API reference  
+✅ **Production quality** — Type-safe, tested, extensible  
 
 ---
 
-**Status:** Production Ready MVP  
-**Tests:** 1,235+ passing  
-**Code:** 50,000+ lines of TypeScript  
-**Ready:** Yes
+**Ready to watch AI compete? Start with [PLAY_NOW.md](PLAY_NOW.md).**
 
-🎮 **Let the games begin.**
+🚀
