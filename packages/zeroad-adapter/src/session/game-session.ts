@@ -23,6 +23,7 @@ import { ObjectiveTracker } from '../status/objective-tracker.js';
 import { EventAnnotations } from '../match/event-annotations.js';
 import { ReplayDirector } from '../match/replay-director.js';
 import { SlowMotionManager } from '../match/slow-motion.js';
+import { InstantReplayManager } from '../match/instant-replay.js';
 import { BroadcastStatusCache } from '../status/status-cache.js';
 
 export class ZeroADGameSession implements GameSession {
@@ -48,6 +49,7 @@ export class ZeroADGameSession implements GameSession {
   private eventAnnotations: EventAnnotations | null = null;
   private replayDirector: ReplayDirector | null = null;
   private slowMotionManager: SlowMotionManager | null = null;
+  private instantReplayManager: InstantReplayManager | null = null;
   private broadcastStatusCache: BroadcastStatusCache | null = null;
   private decisionOverlay: DecisionOverlay;
   private eventFeed: EventFeed;
@@ -188,6 +190,10 @@ export class ZeroADGameSession implements GameSession {
         this.slowMotionManager = new SlowMotionManager();
         this.logger.info('Slow motion manager initialized');
 
+        // Initialize instant replay manager for capturing moments
+        this.instantReplayManager = new InstantReplayManager(100, 1000); // 100MB buffer, 1000 tick window
+        this.logger.info('Instant replay manager initialized');
+
         // Initialize broadcast status cache for optimization
         this.broadcastStatusCache = new BroadcastStatusCache(5); // 5 second TTL
         this.logger.info('Broadcast status cache initialized');
@@ -327,6 +333,12 @@ export class ZeroADGameSession implements GameSession {
       if (this.slowMotionManager) {
         this.slowMotionManager.destroy();
         this.slowMotionManager = null;
+      }
+
+      // Stop instant replay manager
+      if (this.instantReplayManager) {
+        this.instantReplayManager.destroy();
+        this.instantReplayManager = null;
       }
 
       // Stop broadcast status cache
@@ -485,6 +497,14 @@ export class ZeroADGameSession implements GameSession {
    */
   getSlowMotionManager(): SlowMotionManager | null {
     return this.slowMotionManager;
+  }
+
+  /**
+   * Get instant replay manager (if started)
+   * For capturing and replaying important moments
+   */
+  getInstantReplayManager(): InstantReplayManager | null {
+    return this.instantReplayManager;
   }
 
   /**
