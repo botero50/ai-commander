@@ -63,6 +63,8 @@ export { InstantReplayManager } from './match/instant-replay.js';
 export type { InstantReplayState, InstantReplay, ReplayTrigger, ReplayBuffer } from './match/instant-replay.js';
 export { HighlightGenerator } from './match/highlight-generator.js';
 export type { HighlightGeneratorState, HighlightReel, HighlightMarker, HighlightType } from './match/highlight-generator.js';
+export { OBSIntegration } from './web/obs-integration.js';
+export type { OBSOverlayData, OBSIntegrationConfig } from './web/obs-integration.js';
 export { LiveCommentary } from './commentary/live-commentary.js';
 export type { CommentaryEntry, CommentarySubscriber, GameStateSnapshot } from './commentary/live-commentary.js';
 export { GameStateHUD } from './hud/game-state-hud.js';
