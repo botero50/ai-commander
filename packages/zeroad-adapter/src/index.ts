@@ -235,3 +235,20 @@ export type {
   PlayerPerformancePrediction,
   TurningPointPrediction,
 } from './analytics/prediction-system.js';
+export { HighlightDetector } from './highlight/highlight-detector.js';
+export type {
+  HighlightType,
+  HighlightMoment,
+  HighlightSequence,
+  DetectionMetrics,
+} from './highlight/highlight-detector.js';
+export { ClipEditor } from './highlight/clip-editor.js';
+export type {
+  EditPoint,
+  TransitionConfig,
+  TextOverlay,
+  AudioTrack,
+  ClipSegment,
+  EditedClip,
+  ExportConfig,
+} from './highlight/clip-editor.js';
