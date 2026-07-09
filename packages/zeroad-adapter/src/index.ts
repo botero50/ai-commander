@@ -63,6 +63,8 @@ export { AIStatusService } from './status/ai-status.js';
 export type { AIStatus, AIStatusState } from './status/ai-status.js';
 export { ObjectiveTracker } from './status/objective-tracker.js';
 export type { ObjectiveTrackerState, ObjectiveHistory, ObjectiveChange } from './status/objective-tracker.js';
+export { StatusCache, BroadcastStatusCache } from './status/status-cache.js';
+export type { CacheEntry, CacheStats } from './status/status-cache.js';
 export { MinimapService } from './hud/minimap.js';
 export type { MinimapState, MinimapUnit, MapPosition } from './hud/minimap.js';
 export { MatchTimeline } from './match/match-timeline.js';

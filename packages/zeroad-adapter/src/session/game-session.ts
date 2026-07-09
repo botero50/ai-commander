@@ -21,6 +21,7 @@ import { MinimapService } from '../hud/minimap.js';
 import { AIStatusService } from '../status/ai-status.js';
 import { ObjectiveTracker } from '../status/objective-tracker.js';
 import { EventAnnotations } from '../match/event-annotations.js';
+import { BroadcastStatusCache } from '../status/status-cache.js';
 
 export class ZeroADGameSession implements GameSession {
   readonly sessionId: string;
@@ -43,6 +44,7 @@ export class ZeroADGameSession implements GameSession {
   private minimapService: MinimapService | null = null;
   private objectiveTracker: ObjectiveTracker | null = null;
   private eventAnnotations: EventAnnotations | null = null;
+  private broadcastStatusCache: BroadcastStatusCache | null = null;
   private decisionOverlay: DecisionOverlay;
   private eventFeed: EventFeed;
 
@@ -173,6 +175,10 @@ export class ZeroADGameSession implements GameSession {
         // Initialize event annotations for broadcast event tracking
         this.eventAnnotations = new EventAnnotations();
         this.logger.info('Event annotations initialized');
+
+        // Initialize broadcast status cache for optimization
+        this.broadcastStatusCache = new BroadcastStatusCache(5); // 5 second TTL
+        this.logger.info('Broadcast status cache initialized');
       } catch (playbackErr) {
         this.logger.warn('Failed to initialize playback controller', playbackErr);
         // Continue without playback controls
@@ -297,6 +303,12 @@ export class ZeroADGameSession implements GameSession {
       if (this.eventAnnotations) {
         this.eventAnnotations.destroy();
         this.eventAnnotations = null;
+      }
+
+      // Stop broadcast status cache
+      if (this.broadcastStatusCache) {
+        this.broadcastStatusCache.destroy();
+        this.broadcastStatusCache = null;
       }
 
       // Stop playback controller
@@ -433,6 +445,14 @@ export class ZeroADGameSession implements GameSession {
    */
   getEventAnnotations(): EventAnnotations | null {
     return this.eventAnnotations;
+  }
+
+  /**
+   * Get broadcast status cache (if started)
+   * For optimizing broadcast performance via caching and change detection
+   */
+  getBroadcastStatusCache(): BroadcastStatusCache | null {
+    return this.broadcastStatusCache;
   }
 
   /**
