@@ -150,6 +150,14 @@ export type {
   BracketNode,
   TournamentMetadata,
 } from './tournament/tournament-manager.js';
+export { SpectatorCoordinator } from './tournament/spectator-coordinator.js';
+export type {
+  SpectatorSession,
+  ViewportState,
+  BroadcastState,
+  BroadcastEvent,
+  SpectatorViewUpdate,
+} from './tournament/spectator-coordinator.js';
 export { EloRating } from './tournament/elo-rating.js';
 export type { BrainRating, RatingChange, EloConfig } from './tournament/elo-rating.js';
 export { TournamentDashboard, formatTournamentExport } from './tournament/tournament-dashboard.js';
