@@ -168,3 +168,13 @@ export { SpectatorFlowValidator, createStandardSpectatorFlow } from './web/spect
 export type { FlowStep, FlowValidationResult, FlowReport } from './web/spectator-flow-validator.js';
 export { PerformanceMonitor, PERFORMANCE_THRESHOLDS } from './web/performance-monitor.js';
 export type { PerformanceMetrics, PerformanceReport } from './web/performance-monitor.js';
+export { StatisticsAnalyzer } from './analytics/statistics-analyzer.js';
+export type {
+  EconomyMetrics,
+  MilitaryMetrics,
+  TechMetrics,
+  PlayerActivity,
+  GamePaceMetrics,
+  StatisticsSnapshot,
+  MatchStatistics,
+} from './analytics/statistics-analyzer.js';
