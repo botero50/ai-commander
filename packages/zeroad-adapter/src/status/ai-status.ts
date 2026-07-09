@@ -5,7 +5,7 @@
  */
 
 import type { DecisionEvent } from '../match/decision-overlay.js';
-import type { TimelineEntry } from '../web/decision-timeline.js';
+import type { DecisionTimelineEntry } from '../web/decision-timeline.js';
 import { LiveDecisionTimeline } from '../commentary/live-decision-timeline.js';
 import { DecisionOverlay } from '../match/decision-overlay.js';
 import { ObjectiveInferenceEngine, type DecisionCategory } from './objective-inference.js';

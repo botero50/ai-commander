@@ -3,7 +3,10 @@
  * Provides REST API for UI components to fetch live match data
  */
 
-import type { Router, Request, Response } from 'express';
+// TODO: Install express and @types/express
+type Router = any;
+type Request = any;
+type Response = any;
 import { MatchDataService } from './match-data-service.js';
 
 export function setupMatchDataRoutes(router: Router, matchDataService: MatchDataService): void {
@@ -147,7 +150,8 @@ export function setupMatchDataRoutes(router: Router, matchDataService: MatchData
     try {
       const limit = Math.min(parseInt(req.query.limit as string) || 50, 500);
       const events = matchDataService.getEventAnnotations(limit);
-      res.json({ events, count: events.length });
+      const eventArray = Array.isArray(events) ? events : [];
+      res.json({ events: eventArray, count: eventArray.length });
     } catch (err) {
       res.status(500).json({ error: `Failed to get events: ${err}` });
     }

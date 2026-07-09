@@ -3,7 +3,7 @@
  * Detects interesting moments in real-time gameplay for directing and commentary
  */
 
-import { GameState, Unit, Building, Player } from '../state/state-types';
+import { GameState, Unit, Building, Player } from '../state/state-types.js';
 
 export type DetectedEventType =
   | 'army_collision'
@@ -405,15 +405,16 @@ export class EventDetector {
       const previousData = playerId === 1 ? this.previousSnapshot.player1 : this.previousSnapshot.player2;
 
       if (previousData.unitCount > 0 && currentData.unitCount === 0 && currentData.buildingCount === 0) {
+        const winnerId = (3 - playerId) as 1 | 2;
         events.push({
           type: 'player_elimination',
           timestamp: snapshot.timestamp,
           tick: snapshot.tick,
           severity: 'critical',
-          playerId: 3 - playerId, // winning player
-          title: `${this.getPlayerName(3 - playerId)} Eliminates ${this.getPlayerName(playerId)}`,
+          playerId: winnerId,
+          title: `${this.getPlayerName(winnerId)} Eliminates ${this.getPlayerName(playerId)}`,
           description: `Victory achieved`,
-          data: { winner: 3 - playerId },
+          data: { winner: winnerId },
         });
       }
     }

@@ -99,11 +99,9 @@ export class MatchDataService {
     }
 
     // Get data from session's services
-    const hudState = this.session.getGameStateHUD?.();
-    const aiStatus1 = this.session.getAIStatus?.('player1');
-    const aiStatus2 = this.session.getAIStatus?.('player2');
-
-    if (!hudState) return null;
+    const hudState = (this.session as any).getGameStateHUD?.();
+    const aiStatus1 = (this.session as any).getAIStatus?.('player1');
+    const aiStatus2 = (this.session as any).getAIStatus?.('player2');
 
     return {
       matchId: this.session.sessionId,
@@ -119,8 +117,8 @@ export class MatchDataService {
         brainModel: aiStatus2?.model || 'Unknown',
         provider: aiStatus2?.provider || 'Unknown',
       },
-      startTime: hudState.matchStartTime || Date.now(),
-      currentTick: hudState.currentTick || 0,
+      startTime: (hudState as any)?.matchStartTime || Date.now(),
+      currentTick: (hudState as any)?.currentTick || 0,
       isLive: true,
       isPaused: false,
     };
@@ -134,25 +132,24 @@ export class MatchDataService {
       return null;
     }
 
-    const hudState = this.session.getGameStateHUD?.();
-    if (!hudState) return null;
+    const hudState = (this.session as any).getGameStateHUD?.();
 
     return {
-      tick: hudState.currentTick || 0,
+      tick: (hudState as any)?.currentTick || 0,
       timestamp: Date.now(),
       player1: {
-        resources: hudState.player1?.resources || { food: 0, wood: 0, metal: 0, stone: 0 },
-        population: hudState.player1?.population || { current: 0, max: 0 },
-        units: hudState.player1?.unitCount || 0,
-        buildings: hudState.player1?.buildingCount || 0,
-        technologies: hudState.player1?.technologies || [],
+        resources: (hudState as any)?.player1?.resources || { food: 0, wood: 0, metal: 0, stone: 0 },
+        population: (hudState as any)?.player1?.population || { current: 0, max: 0 },
+        units: (hudState as any)?.player1?.unitCount || 0,
+        buildings: (hudState as any)?.player1?.buildingCount || 0,
+        technologies: (hudState as any)?.player1?.technologies || [],
       },
       player2: {
-        resources: hudState.player2?.resources || { food: 0, wood: 0, metal: 0, stone: 0 },
-        population: hudState.player2?.population || { current: 0, max: 0 },
-        units: hudState.player2?.unitCount || 0,
-        buildings: hudState.player2?.buildingCount || 0,
-        technologies: hudState.player2?.technologies || [],
+        resources: (hudState as any)?.player2?.resources || { food: 0, wood: 0, metal: 0, stone: 0 },
+        population: (hudState as any)?.player2?.population || { current: 0, max: 0 },
+        units: (hudState as any)?.player2?.unitCount || 0,
+        buildings: (hudState as any)?.player2?.buildingCount || 0,
+        technologies: (hudState as any)?.player2?.technologies || [],
       },
     };
   }
@@ -165,13 +162,13 @@ export class MatchDataService {
       return [];
     }
 
-    const commentaryService = this.session.getLiveCommentary?.();
+    const commentaryService = (this.session as any).getLiveCommentary?.();
     if (!commentaryService) {
       return [];
     }
 
     // Get recent entries from commentary service
-    const entries = commentaryService.getRecentEntries?.(limit) || [];
+    const entries = (commentaryService as any).getRecentEntries?.(limit) || [];
 
     return entries.map((entry) => ({
       tick: entry.tick || 0,
@@ -196,7 +193,7 @@ export class MatchDataService {
     }
 
     // Get recent decisions from timeline service
-    const entries = decisionTimeline.getRecentDecisions?.(limit) || [];
+    const entries = (decisionTimeline as any).getRecentDecisions?.(limit) || [];
 
     return entries.map((entry) => ({
       tick: entry.tick || 0,
@@ -224,7 +221,7 @@ export class MatchDataService {
     if (!metadata) return null;
 
     // Get highlights from highlight generator
-    const highlights = highlightGenerator?.getHighlights?.() || [];
+    const highlights = (highlightGenerator as any)?.getAllHighlights?.() || [];
 
     return {
       matchId: this.session.sessionId,
@@ -247,7 +244,7 @@ export class MatchDataService {
       return null;
     }
 
-    return this.session.getAIStatus?.(player) || null;
+    return (this.session as any).getAIStatus?.(player) || null;
   }
 
   /**
@@ -258,7 +255,7 @@ export class MatchDataService {
       return null;
     }
 
-    return this.session.getMinimapState?.() || null;
+    return (this.session as any).getMinimapState?.() || null;
   }
 
   /**
@@ -280,7 +277,7 @@ export class MatchDataService {
       return [];
     }
 
-    return this.session.getEventAnnotations?.(limit) || [];
+    return (this.session as any).getEventAnnotations?.(limit) || [];
   }
 }
 

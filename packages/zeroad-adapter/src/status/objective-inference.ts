@@ -69,7 +69,7 @@ export class ObjectiveInferenceEngine {
 
     // Check for strong patterns
     const militaryRecent = recentCounts.military || 0;
-    const economicRecent = recentCounts.economic || 0;
+    const economyRecent = recentCounts.economy || 0;
     const techRecent = recentCounts.tech || 0;
     const scoutingRecent = recentCounts.scouting || 0;
 
@@ -88,14 +88,14 @@ export class ObjectiveInferenceEngine {
       }
     }
 
-    // Pattern 2: Expanding Economy (3+ consecutive economic)
-    if (economicRecent >= 3) {
-      const economicPattern = this.checkConsecutivePattern(recentDecisions, 'economy', 3);
-      if (economicPattern) {
-        evidence.push(`${economicRecent} recent economic decisions`);
+    // Pattern 2: Expanding Economy (3+ consecutive economy)
+    if (economyRecent >= 3) {
+      const economyPattern = this.checkConsecutivePattern(recentDecisions, 'economy', 3);
+      if (economyPattern) {
+        evidence.push(`${economyRecent} recent economy decisions`);
         return {
           objective: 'Expanding Economy',
-          confidence: Math.min(1, 0.6 + economicRecent * 0.15),
+          confidence: Math.min(1, 0.6 + economyRecent * 0.15),
           evidence,
         };
       }
@@ -128,8 +128,8 @@ export class ObjectiveInferenceEngine {
     }
 
     // Pattern 5: Defensive Posture (military + economy mix, defensive category)
-    if (militaryRecent >= 1 && economicRecent >= 1) {
-      evidence.push('Mixed military and economic decisions');
+    if (militaryRecent >= 1 && economyRecent >= 1) {
+      evidence.push('Mixed military and economy decisions');
       return {
         objective: 'Defending & Consolidating',
         confidence: 0.5,
@@ -139,10 +139,10 @@ export class ObjectiveInferenceEngine {
 
     // Pattern 6: Overall category dominance in mid-term history
     const midMilitary = midCounts.military || 0;
-    const midEconomic = midCounts.economic || 0;
+    const midEconomic = midCounts.economy || 0;
 
     if (midMilitary > midEconomic + 2) {
-      evidence.push(`${midMilitary} military vs ${midEconomic} economic decisions (mid-term)`);
+      evidence.push(`${midMilitary} military vs ${midEconomic} economy decisions (mid-term)`);
       return {
         objective: 'Military Expansion',
         confidence: Math.min(1, 0.4 + (midMilitary - midEconomic) * 0.05),
@@ -151,7 +151,7 @@ export class ObjectiveInferenceEngine {
     }
 
     if (midEconomic > midMilitary + 2) {
-      evidence.push(`${midEconomic} economic vs ${midMilitary} military decisions (mid-term)`);
+      evidence.push(`${midEconomic} economy vs ${midMilitary} military decisions (mid-term)`);
       return {
         objective: 'Economic Growth',
         confidence: Math.min(1, 0.4 + (midEconomic - midMilitary) * 0.05),

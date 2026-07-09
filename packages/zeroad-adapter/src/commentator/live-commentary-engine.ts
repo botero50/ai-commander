@@ -240,7 +240,7 @@ export class LiveCommentaryEngine {
    * Get commentary by event type
    */
   getCommentaryByType(eventType: string): CommentaryLine[] {
-    return this.commentary.filter((c) => c.type === eventType);
+    return this.commentary.filter((c) => c.eventType === eventType);
   }
 
   /**

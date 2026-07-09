@@ -88,7 +88,7 @@ export class EndOfMatchAnalyzer {
     const losingStrategy = this.identifyStrategy(loser, playerStats);
 
     // Find MVP unit
-    const mvpUnit = this.identifyMVPUnit(winner, commentaryStats);
+    const mvpUnit = this.identifyMVPUnit(winner, { totalLines: commentaryStats.totalLines });
 
     // Analyze turning points
     const turningPoint = this.analyzeTurningPoint(storylineState.phases);
@@ -107,7 +107,7 @@ export class EndOfMatchAnalyzer {
     };
 
     // Build order highlights
-    const buildOrderHighlights = this.analyzeBuildOrder(commentaryStats);
+    const buildOrderHighlights = this.analyzeBuildOrder({ totalLines: commentaryStats.totalLines });
 
     // Calculate match duration
     const matchDuration = Math.round(
@@ -249,7 +249,7 @@ export class EndOfMatchAnalyzer {
     const allCommentary = this.commentaryEngine.getAllCommentary();
 
     // Find highest severity events
-    const criticalCommentary = allCommentary.filter((c) => c.severity === 'critical' || c.severity === 'major');
+    const criticalCommentary = allCommentary.filter((c) => c.severity === 'high');
 
     if (criticalCommentary.length === 0) {
       return 'No single critical event; match evolved steadily.';

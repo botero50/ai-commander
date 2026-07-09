@@ -62,7 +62,7 @@ export type { SlowMotionState, SlowMotionEffect, SlowMotionTrigger } from './mat
 export { InstantReplayManager } from './match/instant-replay.js';
 export type { InstantReplayState, InstantReplay, ReplayTrigger, ReplayBuffer } from './match/instant-replay.js';
 export { HighlightGenerator } from './match/highlight-generator.js';
-export type { HighlightGeneratorState, HighlightReel, HighlightMarker, HighlightType } from './match/highlight-generator.js';
+export type { HighlightGeneratorState, HighlightReel, HighlightMarker } from './match/highlight-generator.js';
 export { OBSIntegration } from './web/obs-integration.js';
 export type { OBSOverlayData, OBSIntegrationConfig } from './web/obs-integration.js';
 export { LiveCommentary } from './commentary/live-commentary.js';
@@ -78,7 +78,7 @@ export type { CacheEntry, CacheStats } from './status/status-cache.js';
 export { MinimapService } from './hud/minimap.js';
 export type { MinimapState, MinimapUnit, MapPosition } from './hud/minimap.js';
 export { MatchTimeline } from './match/match-timeline.js';
-export type { TimelineSnapshot, TimelineEvent } from './match/match-timeline.js';
+export type { TimelineSnapshot, TimelineEvent as MatchTimelineEvent } from './match/match-timeline.js';
 export { MatchObserver, MatchObserverBuilder } from './match/match-observer.js';
 export type { ObserverCallback } from './match/match-observer.js';
 export { EventDetector } from './director/event-detector.js';
