@@ -7,6 +7,8 @@ import { ObservationProvider } from '../observation/observation-provider.js';
 import { ZeroADCommandExecutor } from './command-executor.js';
 import { ZeroADObservationProvider } from './observation-provider.js';
 import { generateUUID } from '../utils/uuid.js';
+import { AutomaticCameraManager } from '../camera/automatic-camera-manager.js';
+import { EventFeed } from '../match/event-feed.js';
 
 export class ZeroADGameSession implements GameSession {
   readonly sessionId: string;
@@ -19,6 +21,8 @@ export class ZeroADGameSession implements GameSession {
   private config?: Record<string, unknown>;
   private started = false;
   private paused = false;
+  private cameraManager: AutomaticCameraManager | null = null;
+  private eventFeed: EventFeed;
 
   readonly observationProvider: IObservationProvider;
   readonly commandExecutor: CommandExecutor;
@@ -39,6 +43,7 @@ export class ZeroADGameSession implements GameSession {
     this.observationLoop = observationLoop;
     this.logger = logger;
     this.config = config;
+    this.eventFeed = new EventFeed();
 
     this.observationProvider = new ZeroADObservationProvider(observationLoop, logger);
     this.commandExecutor = new ZeroADCommandExecutor(ipcBridge, logger);
@@ -56,6 +61,20 @@ export class ZeroADGameSession implements GameSession {
 
       this.started = true;
       this.logger.info('Game session started', { sessionId: this.sessionId });
+
+      // Initialize camera manager for spectator experience
+      try {
+        this.cameraManager = new AutomaticCameraManager(
+          this.commandExecutor as any,
+          this.observationProvider as any,
+          this.eventFeed
+        );
+        this.cameraManager.start();
+        this.logger.info('Camera manager started');
+      } catch (cameraErr) {
+        this.logger.warn('Failed to start camera manager', cameraErr);
+        // Continue without camera, don't fail entire session
+      }
 
       const worldState = await this.observationProvider.getWorldState();
       if (!worldState) {
@@ -91,6 +110,12 @@ export class ZeroADGameSession implements GameSession {
     }
 
     try {
+      // Stop camera manager first
+      if (this.cameraManager) {
+        this.cameraManager.stop();
+        this.cameraManager = null;
+      }
+
       await this.observationLoop.stop();
       await this.ipcBridge.disconnect();
       await this.process.stop();
@@ -115,5 +140,19 @@ export class ZeroADGameSession implements GameSession {
     } catch {
       return false;
     }
+  }
+
+  /**
+   * Get camera manager (if started)
+   */
+  getCameraManager(): AutomaticCameraManager | null {
+    return this.cameraManager;
+  }
+
+  /**
+   * Get event feed for subscribing to camera/game events
+   */
+  getEventFeed(): EventFeed {
+    return this.eventFeed;
   }
 }
