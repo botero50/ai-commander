@@ -15,7 +15,6 @@ export type {
 export {
   createSetTargetCommand,
   createLookAtCommand,
-  createPanCommand,
   createFollowUnitCommand,
 } from './camera-commands.js';
 
@@ -26,3 +25,37 @@ export type { CameraInterest } from './camera-interest-calculator.js';
 export { SmoothCameraController } from './smooth-camera-controller.js';
 
 export { AutomaticCameraManager } from './automatic-camera-manager.js';
+
+export type {
+  EasingType,
+  CinematicActionType,
+  PanCommand,
+  ZoomCommand,
+  RotateCommand,
+  OrbitCommand,
+  Keyframe,
+  KeyframeCommand,
+  CinematicCommand,
+} from './cinematic-commands.js';
+
+export {
+  createPanCommand,
+  createZoomCommand,
+  createRotateCommand,
+  createOrbitCommand,
+  createKeyframeCommand,
+  validateCinematicCommand,
+} from './cinematic-commands.js';
+
+export { CinematicCameraController } from './cinematic-camera-controller.js';
+
+export type { CameraConfig } from './camera-config.js';
+
+export {
+  DEFAULT_CAMERA_CONFIG,
+  FAST_CAMERA_CONFIG,
+  CINEMATIC_CONFIG,
+  validateCameraConfig,
+  mergeConfig,
+  getPresetConfig,
+} from './camera-config.js';
