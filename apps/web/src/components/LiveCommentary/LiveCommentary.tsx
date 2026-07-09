@@ -73,11 +73,15 @@ export const LiveCommentary: React.FC<LiveCommentaryProps> = ({
       {/* Title */}
       <div
         style={{
-          padding: '0.75rem 1rem',
+          padding: '1rem 1.25rem',
           borderBottom: '1px solid #e5e7eb',
           fontWeight: '700',
-          fontSize: '0.875rem',
+          fontSize: '0.9375rem',
           color: '#1f2937',
+          lineHeight: '1.4',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.625rem',
         }}
       >
         📣 Live Commentary

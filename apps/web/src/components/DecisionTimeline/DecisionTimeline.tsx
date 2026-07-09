@@ -54,7 +54,7 @@ export const DecisionTimeline: React.FC<DecisionTimelineProps> = ({ gameSession,
   return (
     <div style={{ backgroundColor: '#fff', borderRadius: '0.5rem', boxShadow: '0 1px 3px rgba(0,0,0,0.1)', display: 'flex', flexDirection: 'column', height: '100%' }}>
       {/* Title */}
-      <div style={{ padding: '0.75rem 1rem', borderBottom: '1px solid #e5e7eb', fontWeight: '700', fontSize: '0.875rem', color: '#1f2937' }}>
+      <div style={{ padding: '1rem 1.25rem', borderBottom: '1px solid #e5e7eb', fontWeight: '700', fontSize: '0.9375rem', color: '#1f2937', lineHeight: '1.4', display: 'flex', alignItems: 'center', gap: '0.625rem' }}>
         📊 Live Decisions
       </div>
 

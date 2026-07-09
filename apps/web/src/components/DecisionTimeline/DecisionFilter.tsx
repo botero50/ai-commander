@@ -18,7 +18,7 @@ export const DecisionFilterPanel: React.FC<DecisionFilterProps> = ({ filter, cou
   ];
 
   return (
-    <div style={{ padding: '0.75rem', backgroundColor: '#f9fafb', borderBottom: '1px solid #e5e7eb', display: 'flex', gap: '0.5rem' }}>
+    <div style={{ padding: '1rem 1.25rem', backgroundColor: '#f9fafb', borderBottom: '1px solid #e5e7eb', display: 'flex', gap: '0.75rem', flexWrap: 'wrap' }}>
       {tabs.map((tab) => {
         const isActive = filter.player === tab.value;
         return (
@@ -26,15 +26,15 @@ export const DecisionFilterPanel: React.FC<DecisionFilterProps> = ({ filter, cou
             key={tab.label}
             onClick={() => onPlayerFilter(tab.value)}
             style={{
-              padding: '0.5rem 1rem',
+              padding: '0.5625rem 1.125rem',
               border: `2px solid ${isActive ? '#3b82f6' : '#d1d5db'}`,
               borderRadius: '0.375rem',
               backgroundColor: isActive ? '#eff6ff' : '#fff',
               color: isActive ? '#3b82f6' : '#6b7280',
               cursor: 'pointer',
-              fontSize: '0.875rem',
+              fontSize: '0.8125rem',
               fontWeight: isActive ? '600' : '500',
-              transition: 'all 0.2s',
+              transition: 'all 0.15s ease',
             }}
           >
             {tab.label}

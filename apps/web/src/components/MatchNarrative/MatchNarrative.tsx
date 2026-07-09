@@ -48,19 +48,20 @@ export const MatchNarrative: React.FC<MatchNarrativeProps> = ({
         backgroundColor: '#fff',
         borderRadius: '0.5rem',
         boxShadow: '0 1px 3px rgba(0,0,0,0.1)',
-        padding: '1.5rem',
+        padding: '1.75rem',
       }}
     >
       {/* Title */}
       <div
         style={{
-          fontSize: '1.25rem',
+          fontSize: '1.3125rem',
           fontWeight: '700',
           color: '#1f2937',
-          marginBottom: '1.5rem',
+          marginBottom: '1.75rem',
           display: 'flex',
           alignItems: 'center',
-          gap: '0.5rem',
+          gap: '0.625rem',
+          lineHeight: '1.3',
         }}
       >
         📖 Match Narrative
@@ -76,22 +77,25 @@ export const MatchNarrative: React.FC<MatchNarrativeProps> = ({
       {/* Footer Stats */}
       <div
         style={{
-          marginTop: '1.5rem',
-          paddingTop: '1rem',
+          marginTop: '1.75rem',
+          paddingTop: '1.25rem',
           borderTop: '1px solid #e5e7eb',
-          fontSize: '0.875rem',
+          fontSize: '0.8125rem',
           color: '#6b7280',
           display: 'flex',
-          gap: '2rem',
+          flexWrap: 'wrap',
+          gap: '2.5rem',
+          fontWeight: '500',
         }}
       >
-        <span>📊 {narrative.length} narrative segments</span>
-        <span>
-          ⏱️ {Math.round(matchResult.duration / 1000)} seconds
+        <span title="Number of narrative segments">
+          📊 {narrative.length} segments
         </span>
-        <span>
-          💬 {matchResult.player1Commands + matchResult.player2Commands}{' '}
-          total commands
+        <span title="Total match duration">
+          ⏱️ {Math.round(matchResult.duration / 1000)}s
+        </span>
+        <span title="Combined command count">
+          💬 {matchResult.player1Commands + matchResult.player2Commands} commands
         </span>
       </div>
     </div>
