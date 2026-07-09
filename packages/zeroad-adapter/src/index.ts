@@ -306,3 +306,11 @@ export type {
   PersonalityContext,
   MatchingMetrics,
 } from './personality/personality-matcher.js';
+export { LeaderboardManager } from './community/leaderboard.js';
+export type {
+  LeaderboardType,
+  RankingMetric,
+  PlayerRanking,
+  LeaderboardEntry,
+  LeaderboardStatistics,
+} from './community/leaderboard.js';
