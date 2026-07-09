@@ -263,3 +263,13 @@ export type {
   ExportJob,
   ExportPreset,
 } from './highlight/export-formats.js';
+export { HighlightReelGenerator } from './highlight/highlight-reel-generator.js';
+export type {
+  ReelTheme,
+  ReelStyle,
+  ReelPacing,
+  ReelTemplate,
+  MusicSelection,
+  ReelComposition,
+  GenerationOptions,
+} from './highlight/highlight-reel-generator.js';
