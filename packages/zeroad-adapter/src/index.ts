@@ -148,3 +148,5 @@ export type { MatchRecord, AIProfile } from './web/match-browser.js';
 export { MatchDataService, matchDataService } from './web/match-data-service.js';
 export type { MatchMetadataResponse, GameStateResponse, CommentaryEventResponse, DecisionEventResponse, ReplayDataResponse } from './web/match-data-service.js';
 export { setupMatchDataRoutes } from './web/match-data-routes.js';
+export { SpectatorFlowValidator, createStandardSpectatorFlow } from './web/spectator-flow-validator.js';
+export type { FlowStep, FlowValidationResult, FlowReport } from './web/spectator-flow-validator.js';
