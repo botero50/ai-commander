@@ -252,3 +252,14 @@ export type {
   EditedClip,
   ExportConfig,
 } from './highlight/clip-editor.js';
+export { ExportFormatter } from './highlight/export-formats.js';
+export type {
+  ExportFormatType,
+  VideoCodec as ExportVideoCodec,
+  AudioCodec as ExportAudioCodec,
+  Resolution,
+  FormatSpecification,
+  ExportProfile,
+  ExportJob,
+  ExportPreset,
+} from './highlight/export-formats.js';
