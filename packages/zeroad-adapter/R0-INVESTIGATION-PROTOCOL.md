@@ -19,6 +19,49 @@
 
 ---
 
+## AI Commander's Actual Requirements
+
+AI Commander needs **exactly six capabilities** from 0 A.D. — no more, no less.
+
+### 1. Launch Match (REQUIRED)
+**Can AI Commander start a match automatically?**
+
+### 2. Observe (REQUIRED)
+**Can AI Commander obtain the complete observable world state every simulation tick?**
+- Units, buildings, resources, technologies
+- Ownership, map visibility, game clock
+
+### 3. Execute (REQUIRED)
+**Can AI Commander issue game commands?**
+- Move, attack, gather, build, train, research, patrol, stop
+
+### 4. Match Lifecycle (REQUIRED)
+**Can AI Commander detect match events?**
+- Started, paused, resumed, player defeated, victory, ended
+
+### 5. Replay (REQUIRED)
+**Can AI Commander save and load replays?**
+
+### 6. Determinism (REQUIRED)
+**Can identical observations and commands reproduce identical results?**
+
+---
+
+## What's NOT Required (Optional Implementation Details)
+
+These are **NOT** requirements for AI Commander:
+- HTTP, WebSockets, REST APIs
+- Remote consoles, debug GUIs
+- Editor integrations, multiplayer administration
+- Profiling tools, streaming interfaces
+- Any "nice-to-have" features
+
+**Every investigation finding will be evaluated against these six requirements.**
+
+**If a capability doesn't serve the six requirements, it's out of scope.**
+
+---
+
 ## Investigation Stories
 
 ### Story R0.1: JavaScript Runtime Investigation
@@ -69,7 +112,14 @@
 
 ### Story R0.2: Engine Communication Investigation
 
-**Goal:** Identify ALL existing mechanisms that can transport observations or commands.
+**Goal:** Identify which existing mechanisms can satisfy AI Commander's six required capabilities.
+
+**Evaluation Lens:** For each mechanism found, ask:
+1. Which of the six required capabilities does it enable?
+2. Does it require: no changes / JS mod / small native / engine patch?
+3. Is it sustainable for 10+ years?
+
+**Focus:** Only mechanisms relevant to the six requirements. Other capabilities are out of scope.
 
 **Mechanisms to Investigate:**
 
@@ -129,7 +179,12 @@
 
 ### Story R0.3: Ecosystem Investigation
 
-**Goal:** Identify whether the problem is already solved in the 0 A.D. ecosystem.
+**Goal:** Identify whether any existing solution already provides AI Commander's six required capabilities.
+
+**Evaluation Lens:** For each project found, ask:
+1. Does it enable any of the six required capabilities?
+2. Is it maintained and compatible with current 0 A.D.?
+3. Would building on it be more sustainable than starting from scratch?
 
 **Search Areas:**
 
@@ -186,7 +241,14 @@
 
 ### Story R0.4: Architecture Recommendation
 
-**Goal:** Evaluate options and recommend ONE approach for 10-year sustainability.
+**Goal:** Recommend ONE approach that satisfies the six required capabilities with 10-year sustainability.
+
+**Core Question:** "What is the smallest upstream-compatible integration layer that satisfies all six AI Commander capabilities?"
+
+**Evaluation Lens:** For each option, assess:
+1. Does it satisfy ALL six required capabilities?
+2. Does it avoid unnecessary features?
+3. Is it simple, maintainable, and sustainable?
 
 **Options to Evaluate:**
 
@@ -309,6 +371,16 @@ For each option, evaluate across these dimensions:
 
 **Option X: [Name]**
 
+**Capabilities Satisfied:**
+- [ ] Launch Match
+- [ ] Observe (full world state every tick)
+- [ ] Execute (move, attack, gather, build, train, research, patrol, stop)
+- [ ] Match Lifecycle (started, paused, resumed, defeated, victory, ended)
+- [ ] Replay (save and load)
+- [ ] Determinism (identical results)
+
+**Requirements Met:** All six required capabilities satisfied with no unnecessary features.
+
 **Rationale:**
 
 [2-3 paragraphs explaining why this option best serves AI Commander over 10 years]
@@ -320,10 +392,11 @@ For each option, evaluate across these dimensions:
 - Upstream compatibility: [assessment]
 - Engine divergence: [assessment]
 - Long-term sustainability: [assessment]
+- Simplicity & Maintainability: [assessment]
 
 **Trade-offs Accepted:**
 
-[What we're sacrificing and why it's worth it]
+[What we're NOT implementing and why (e.g., no HTTP, no WebSockets, etc.)]
 
 **Risk Assessment:**
 
