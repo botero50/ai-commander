@@ -150,3 +150,5 @@ export type { MatchMetadataResponse, GameStateResponse, CommentaryEventResponse,
 export { setupMatchDataRoutes } from './web/match-data-routes.js';
 export { SpectatorFlowValidator, createStandardSpectatorFlow } from './web/spectator-flow-validator.js';
 export type { FlowStep, FlowValidationResult, FlowReport } from './web/spectator-flow-validator.js';
+export { PerformanceMonitor, PERFORMANCE_THRESHOLDS } from './web/performance-monitor.js';
+export type { PerformanceMetrics, PerformanceReport } from './web/performance-monitor.js';
