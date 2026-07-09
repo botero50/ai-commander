@@ -192,3 +192,11 @@ export type {
   ComparisonResult,
   MatchProfile,
 } from './analytics/match-comparison.js';
+export { PredictionSystem } from './analytics/prediction-system.js';
+export type {
+  PredictionModel,
+  MatchOutcomePrediction,
+  StrategyPrediction,
+  PlayerPerformancePrediction,
+  TurningPointPrediction,
+} from './analytics/prediction-system.js';
