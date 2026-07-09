@@ -49,6 +49,10 @@ export {
 
 export { CinematicCameraController } from './cinematic-camera-controller.js';
 
+export type { CameraMode, CinematicState } from './cinematic-mode-manager.js';
+
+export { CinematicModeManager } from './cinematic-mode-manager.js';
+
 export type { CameraConfig } from './camera-config.js';
 
 export {
