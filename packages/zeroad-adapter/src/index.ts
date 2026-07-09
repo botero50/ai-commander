@@ -145,3 +145,6 @@ export type { PlaybackFrame, PlaybackSpeed, PlaybackState } from './web/decision
 export { ReplayExport } from './web/replay-export.js';
 export { MatchBrowser } from './web/match-browser.js';
 export type { MatchRecord, AIProfile } from './web/match-browser.js';
+export { MatchDataService, matchDataService } from './web/match-data-service.js';
+export type { MatchMetadataResponse, GameStateResponse, CommentaryEventResponse, DecisionEventResponse, ReplayDataResponse } from './web/match-data-service.js';
+export { setupMatchDataRoutes } from './web/match-data-routes.js';

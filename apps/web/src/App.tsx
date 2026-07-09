@@ -4,6 +4,7 @@ import { DecisionTimeline } from '@/components/DecisionTimeline/DecisionTimeline
 import { ReplayControls } from '@/components/ReplayControls/ReplayControls';
 import { TournamentDashboard } from '@/components/TournamentDashboard/TournamentDashboard';
 import { useDecisionPlayback } from '@/hooks/useDecisionPlayback';
+import { MatchDataProvider, useMatchData } from '@/providers/MatchDataProvider';
 import type { DecisionEvent, TournamentState } from '@/types';
 
 type ViewType = 'match' | 'tournament' | 'replays';
@@ -113,11 +114,12 @@ const mockTournamentState: TournamentState = {
   ],
 };
 
-export const App: React.FC = () => {
+const AppContent: React.FC = () => {
   const [view, setView] = useState<ViewType>('match');
   const [wsUrl, setWsUrl] = useState('ws://localhost:3000/ws');
   const [isCustomUrl, setIsCustomUrl] = useState(false);
   const playback = useDecisionPlayback(mockDecisions, 10000);
+  const { metadata, gameState, commentaryEvents, decisionEvents, isLoading, connectionStatus } = useMatchData();
 
   const navStyle = {
     display: 'flex',
@@ -230,5 +232,13 @@ export const App: React.FC = () => {
         )}
       </main>
     </div>
+  );
+};
+
+export const App: React.FC = () => {
+  return (
+    <MatchDataProvider>
+      <AppContent />
+    </MatchDataProvider>
   );
 };
