@@ -314,3 +314,12 @@ export type {
   LeaderboardEntry,
   LeaderboardStatistics,
 } from './community/leaderboard.js';
+export { AchievementSystem } from './community/achievement-system.js';
+export type {
+  AchievementType,
+  AchievementRarity,
+  AchievementDefinition,
+  PlayerAchievement,
+  AchievementBadge,
+  AchievementStats,
+} from './community/achievement-system.js';
