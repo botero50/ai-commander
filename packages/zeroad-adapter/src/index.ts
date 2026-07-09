@@ -89,6 +89,8 @@ export { CinematicDirector } from './director/cinematic-director.js';
 export type { CameraStyle, CinematicDirectorState } from './director/cinematic-director.js';
 export { DirectorTimeline } from './director/director-timeline.js';
 export type { TimelineEvent, TimelineMarker, TimelineFilter, DirectorTimelineState } from './director/director-timeline.js';
+export { LiveCommentaryEngine } from './commentator/live-commentary-engine.js';
+export type { CommentaryLine, CommentaryState } from './commentator/live-commentary-engine.js';
 export { MatchViewer, MatchViewerManager } from './web/match-viewer.js';
 export type { MatchViewerState, MatchViewerEvent } from './web/match-viewer.js';
 export {
