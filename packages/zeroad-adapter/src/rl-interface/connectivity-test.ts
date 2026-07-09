@@ -179,7 +179,16 @@ export class ConnectivityTest {
 
     try {
       const start = Date.now();
-      const state = await this.client.reset();
+      const defaultScenario = {
+        settings: {
+          Map: 'Skirmish/Cantabria',
+          PlayerData: [
+            { Civ: 'athen' },
+            { Civ: 'gaul' },
+          ],
+        },
+      };
+      const state = await this.client.reset(defaultScenario);
       const elapsed = Date.now() - start;
 
       this.report.endpoints.reset.success = true;

@@ -110,8 +110,17 @@ export class RLInterfaceLauncher {
         url: `http://${this.config.rlInterfaceHost}:${this.config.rlInterfacePort}`,
       });
 
-      // Initialize game
-      const initialState = await this.httpClient.reset();
+      // Initialize game with default scenario
+      const defaultScenario = {
+        settings: {
+          Map: 'Skirmish/Cantabria',
+          PlayerData: [
+            { Civ: 'athen' },
+            { Civ: 'gaul' },
+          ],
+        },
+      };
+      const initialState = await this.httpClient.reset(defaultScenario);
       this.logger.info('Game initialized', {
         tick: initialState.tick,
         players: initialState.players?.length,

@@ -107,7 +107,16 @@ export async function runManualConnectivityTest(endpoint: string = '127.0.0.1:60
     // Phase 2: /reset endpoint
     console.log('[PHASE 2] Testing /reset endpoint...');
     const resetStart = Date.now();
-    const resetState = await client.reset();
+    const defaultScenario = {
+      settings: {
+        Map: 'Skirmish/Cantabria',
+        PlayerData: [
+          { Civ: 'athen' },
+          { Civ: 'gaul' },
+        ],
+      },
+    };
+    const resetState = await client.reset(defaultScenario);
     const resetTime = Date.now() - resetStart;
 
     report.endpoints.reset.success = true;

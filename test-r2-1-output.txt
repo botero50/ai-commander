@@ -1,0 +1,11 @@
+╔════════════════════════════════════════════════╗
+║  STORY R2.1 — PROTOCOL COMPLIANCE TEST      ║
+║  Verify all RL Interface endpoints work      ║
+╚════════════════════════════════════════════════╝
+
+[TEST 1] HTTP Endpoint Reachability
+──────────────────────────────────────────────────
+✗ Endpoint at 127.0.0.1:6000 not reachable
+
+❌ Cannot reach RL Interface. Make sure 0 A.D. is running:
+   pyrogenesis.exe --rl-interface=127.0.0.1:6000 --mod=public
