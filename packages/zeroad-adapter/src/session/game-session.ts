@@ -24,6 +24,7 @@ import { EventAnnotations } from '../match/event-annotations.js';
 import { ReplayDirector } from '../match/replay-director.js';
 import { SlowMotionManager } from '../match/slow-motion.js';
 import { InstantReplayManager } from '../match/instant-replay.js';
+import { HighlightGenerator } from '../match/highlight-generator.js';
 import { BroadcastStatusCache } from '../status/status-cache.js';
 
 export class ZeroADGameSession implements GameSession {
@@ -50,6 +51,7 @@ export class ZeroADGameSession implements GameSession {
   private replayDirector: ReplayDirector | null = null;
   private slowMotionManager: SlowMotionManager | null = null;
   private instantReplayManager: InstantReplayManager | null = null;
+  private highlightGenerator: HighlightGenerator | null = null;
   private broadcastStatusCache: BroadcastStatusCache | null = null;
   private decisionOverlay: DecisionOverlay;
   private eventFeed: EventFeed;
@@ -193,6 +195,10 @@ export class ZeroADGameSession implements GameSession {
         // Initialize instant replay manager for capturing moments
         this.instantReplayManager = new InstantReplayManager(100, 1000); // 100MB buffer, 1000 tick window
         this.logger.info('Instant replay manager initialized');
+
+        // Initialize highlight generator for automatic clip generation
+        this.highlightGenerator = new HighlightGenerator(this.sessionId);
+        this.logger.info('Highlight generator initialized');
 
         // Initialize broadcast status cache for optimization
         this.broadcastStatusCache = new BroadcastStatusCache(5); // 5 second TTL
@@ -339,6 +345,12 @@ export class ZeroADGameSession implements GameSession {
       if (this.instantReplayManager) {
         this.instantReplayManager.destroy();
         this.instantReplayManager = null;
+      }
+
+      // Stop highlight generator
+      if (this.highlightGenerator) {
+        this.highlightGenerator.destroy();
+        this.highlightGenerator = null;
       }
 
       // Stop broadcast status cache
@@ -505,6 +517,14 @@ export class ZeroADGameSession implements GameSession {
    */
   getInstantReplayManager(): InstantReplayManager | null {
     return this.instantReplayManager;
+  }
+
+  /**
+   * Get highlight generator (if started)
+   * For automatic highlight reel generation
+   */
+  getHighlightGenerator(): HighlightGenerator | null {
+    return this.highlightGenerator;
   }
 
   /**

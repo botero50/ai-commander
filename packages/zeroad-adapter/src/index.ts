@@ -61,6 +61,8 @@ export { SlowMotionManager } from './match/slow-motion.js';
 export type { SlowMotionState, SlowMotionEffect, SlowMotionTrigger } from './match/slow-motion.js';
 export { InstantReplayManager } from './match/instant-replay.js';
 export type { InstantReplayState, InstantReplay, ReplayTrigger, ReplayBuffer } from './match/instant-replay.js';
+export { HighlightGenerator } from './match/highlight-generator.js';
+export type { HighlightGeneratorState, HighlightReel, HighlightMarker, HighlightType } from './match/highlight-generator.js';
 export { LiveCommentary } from './commentary/live-commentary.js';
 export type { CommentaryEntry, CommentarySubscriber, GameStateSnapshot } from './commentary/live-commentary.js';
 export { GameStateHUD } from './hud/game-state-hud.js';
