@@ -14,6 +14,8 @@ import { EventFeed } from '../match/event-feed.js';
 import { PlaybackController } from './playback-controller.js';
 import { LiveDecisionTimeline } from '../commentary/live-decision-timeline.js';
 import { DecisionOverlay } from '../match/decision-overlay.js';
+import { LiveCommentary } from '../commentary/live-commentary.js';
+import type { GameStateSnapshot } from '../commentary/live-commentary.js';
 
 export class ZeroADGameSession implements GameSession {
   readonly sessionId: string;
@@ -30,6 +32,7 @@ export class ZeroADGameSession implements GameSession {
   private cinematicCamera: CinematicModeManager | null = null;
   private playbackController: PlaybackController | null = null;
   private decisionTimeline: LiveDecisionTimeline | null = null;
+  private commentaryService: LiveCommentary | null = null;
   private decisionOverlay: DecisionOverlay;
   private eventFeed: EventFeed;
 
@@ -92,6 +95,48 @@ export class ZeroADGameSession implements GameSession {
         // Initialize live decision timeline for spectator UI
         this.decisionTimeline = new LiveDecisionTimeline(this.decisionOverlay);
         this.logger.info('Decision timeline initialized');
+
+        // Initialize live commentary service for esports-style narration
+        const dramaticMomentDetector = (callback: (moment: any) => void) => {
+          return this.eventFeed.subscribe((type, data) => {
+            if (type === 'dramatic:moment') {
+              callback(data);
+            }
+          });
+        };
+
+        const gameStateProvider = () => {
+          try {
+            const worldState = (this.observationLoop as any).getLastObservation?.();
+            if (!worldState) return null;
+
+            return {
+              tick: worldState.tick,
+              players: worldState.players.map((p: any) => ({
+                id: p.id as 'player1' | 'player2',
+                food: p.food,
+                wood: p.wood,
+                stone: p.stone,
+                metal: p.metal,
+                populationCurrent: p.populationCurrent,
+                populationMax: p.populationMax,
+                unitCount: p.units?.length ?? 0,
+                buildingCount: p.buildings?.length ?? 0,
+              })),
+            } as GameStateSnapshot;
+          } catch {
+            return null;
+          }
+        };
+
+        this.commentaryService = new LiveCommentary(
+          this.decisionOverlay,
+          dramaticMomentDetector,
+          gameStateProvider,
+          this.logger
+        );
+        this.commentaryService.start();
+        this.logger.info('Live commentary service initialized');
       } catch (playbackErr) {
         this.logger.warn('Failed to initialize playback controller', playbackErr);
         // Continue without playback controls
@@ -182,6 +227,12 @@ export class ZeroADGameSession implements GameSession {
         this.decisionTimeline = null;
       }
 
+      // Stop live commentary service
+      if (this.commentaryService) {
+        this.commentaryService.destroy();
+        this.commentaryService = null;
+      }
+
       // Stop playback controller
       this.playbackController = null;
 
@@ -268,6 +319,14 @@ export class ZeroADGameSession implements GameSession {
    */
   getDecisionTimeline(): LiveDecisionTimeline | null {
     return this.decisionTimeline;
+  }
+
+  /**
+   * Get live commentary service (if started)
+   * For esports-style narration of gameplay
+   */
+  getCommentaryService(): LiveCommentary | null {
+    return this.commentaryService;
   }
 
   /**
