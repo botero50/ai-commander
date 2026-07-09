@@ -21,6 +21,7 @@ import { MinimapService } from '../hud/minimap.js';
 import { AIStatusService } from '../status/ai-status.js';
 import { ObjectiveTracker } from '../status/objective-tracker.js';
 import { EventAnnotations } from '../match/event-annotations.js';
+import { ReplayDirector } from '../match/replay-director.js';
 import { BroadcastStatusCache } from '../status/status-cache.js';
 
 export class ZeroADGameSession implements GameSession {
@@ -44,6 +45,7 @@ export class ZeroADGameSession implements GameSession {
   private minimapService: MinimapService | null = null;
   private objectiveTracker: ObjectiveTracker | null = null;
   private eventAnnotations: EventAnnotations | null = null;
+  private replayDirector: ReplayDirector | null = null;
   private broadcastStatusCache: BroadcastStatusCache | null = null;
   private decisionOverlay: DecisionOverlay;
   private eventFeed: EventFeed;
@@ -176,6 +178,10 @@ export class ZeroADGameSession implements GameSession {
         this.eventAnnotations = new EventAnnotations();
         this.logger.info('Event annotations initialized');
 
+        // Initialize replay director for automatic moment detection
+        this.replayDirector = new ReplayDirector();
+        this.logger.info('Replay director initialized');
+
         // Initialize broadcast status cache for optimization
         this.broadcastStatusCache = new BroadcastStatusCache(5); // 5 second TTL
         this.logger.info('Broadcast status cache initialized');
@@ -303,6 +309,12 @@ export class ZeroADGameSession implements GameSession {
       if (this.eventAnnotations) {
         this.eventAnnotations.destroy();
         this.eventAnnotations = null;
+      }
+
+      // Stop replay director
+      if (this.replayDirector) {
+        this.replayDirector.destroy();
+        this.replayDirector = null;
       }
 
       // Stop broadcast status cache
@@ -445,6 +457,14 @@ export class ZeroADGameSession implements GameSession {
    */
   getEventAnnotations(): EventAnnotations | null {
     return this.eventAnnotations;
+  }
+
+  /**
+   * Get replay director (if started)
+   * For automatic detection and replay of major moments
+   */
+  getReplayDirector(): ReplayDirector | null {
+    return this.replayDirector;
   }
 
   /**

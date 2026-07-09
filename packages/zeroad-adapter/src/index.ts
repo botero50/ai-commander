@@ -55,6 +55,8 @@ export { DecisionOverlay } from './match/decision-overlay.js';
 export type { DecisionEvent, DecisionSubscriber } from './match/decision-overlay.js';
 export { EventAnnotations } from './match/event-annotations.js';
 export type { AnnotationState, GameEvent, EventType } from './match/event-annotations.js';
+export { ReplayDirector } from './match/replay-director.js';
+export type { ReplayDirectorState, ReplayMoment, MomentType, CameraKeyframe } from './match/replay-director.js';
 export { LiveCommentary } from './commentary/live-commentary.js';
 export type { CommentaryEntry, CommentarySubscriber, GameStateSnapshot } from './commentary/live-commentary.js';
 export { GameStateHUD } from './hud/game-state-hud.js';
