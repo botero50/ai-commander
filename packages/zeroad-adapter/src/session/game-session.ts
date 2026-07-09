@@ -17,6 +17,7 @@ import { DecisionOverlay } from '../match/decision-overlay.js';
 import { LiveCommentary } from '../commentary/live-commentary.js';
 import type { GameStateSnapshot } from '../commentary/live-commentary.js';
 import { GameStateHUD } from '../hud/game-state-hud.js';
+import { MinimapService } from '../hud/minimap.js';
 import { AIStatusService } from '../status/ai-status.js';
 
 export class ZeroADGameSession implements GameSession {
@@ -37,6 +38,7 @@ export class ZeroADGameSession implements GameSession {
   private commentaryService: LiveCommentary | null = null;
   private gameStateHUD: GameStateHUD | null = null;
   private aiStatusService: AIStatusService | null = null;
+  private minimapService: MinimapService | null = null;
   private decisionOverlay: DecisionOverlay;
   private eventFeed: EventFeed;
 
@@ -154,6 +156,11 @@ export class ZeroADGameSession implements GameSession {
           (this.config?.brainMetadata as any) || undefined
         );
         this.logger.info('AI status service initialized');
+
+        // Initialize minimap service for live map overview display
+        this.minimapService = new MinimapService(this.observationLoop as any);
+        this.minimapService.start();
+        this.logger.info('Minimap service initialized');
       } catch (playbackErr) {
         this.logger.warn('Failed to initialize playback controller', playbackErr);
         // Continue without playback controls
@@ -260,6 +267,12 @@ export class ZeroADGameSession implements GameSession {
       if (this.aiStatusService) {
         this.aiStatusService.destroy();
         this.aiStatusService = null;
+      }
+
+      // Stop minimap service
+      if (this.minimapService) {
+        this.minimapService.destroy();
+        this.minimapService = null;
       }
 
       // Stop playback controller
@@ -372,6 +385,14 @@ export class ZeroADGameSession implements GameSession {
    */
   getAIStatusService(): AIStatusService | null {
     return this.aiStatusService;
+  }
+
+  /**
+   * Get minimap service (if started)
+   * For real-time map overview with unit positions
+   */
+  getMinimapService(): MinimapService | null {
+    return this.minimapService;
   }
 
   /**
