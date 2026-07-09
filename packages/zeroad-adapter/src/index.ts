@@ -95,6 +95,8 @@ export { MatchStoryline } from './commentator/match-storyline.js';
 export type { MatchPhase, PhaseEvent, MatchPhaseData, StorylineState } from './commentator/match-storyline.js';
 export { CastingStyleManager } from './commentator/casting-styles.js';
 export type { CastingStyle, StyleConfig, StyledCommentaryLine, StyledStoryline } from './commentator/casting-styles.js';
+export { EndOfMatchAnalyzer } from './commentator/end-of-match-analysis.js';
+export type { UnitAnalysis, StrategyAnalysis, PerformanceRating, MatchAnalysis } from './commentator/end-of-match-analysis.js';
 export { MatchViewer, MatchViewerManager } from './web/match-viewer.js';
 export type { MatchViewerState, MatchViewerEvent } from './web/match-viewer.js';
 export {
