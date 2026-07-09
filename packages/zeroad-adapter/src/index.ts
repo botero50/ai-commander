@@ -186,3 +186,9 @@ export type {
   MetaSnapshot,
   MetaTrend,
 } from './analytics/meta-gaming-trends.js';
+export { MatchComparisonEngine } from './analytics/match-comparison.js';
+export type {
+  MatchMetrics,
+  ComparisonResult,
+  MatchProfile,
+} from './analytics/match-comparison.js';
