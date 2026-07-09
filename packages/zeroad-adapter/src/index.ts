@@ -85,6 +85,8 @@ export { EventDetector } from './director/event-detector.js';
 export type { DetectedEvent, DetectedEventType } from './director/event-detector.js';
 export { DynamicCameraDirector } from './director/dynamic-camera-director.js';
 export type { CameraTarget, DirectorState } from './director/dynamic-camera-director.js';
+export { CinematicDirector } from './director/cinematic-director.js';
+export type { CameraStyle, CinematicDirectorState } from './director/cinematic-director.js';
 export { MatchViewer, MatchViewerManager } from './web/match-viewer.js';
 export type { MatchViewerState, MatchViewerEvent } from './web/match-viewer.js';
 export {
