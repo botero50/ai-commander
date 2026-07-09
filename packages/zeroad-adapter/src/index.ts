@@ -323,3 +323,18 @@ export type {
   AchievementBadge,
   AchievementStats,
 } from './community/achievement-system.js';
+export { SocialFeaturesManager } from './community/social-features.js';
+export type {
+  PlayerProfile,
+  SocialConnection,
+  Message,
+  Conversation,
+} from './community/social-features.js';
+export { SeasonalManagement } from './community/seasonal-management.js';
+export type {
+  SeasonStatus,
+  Season,
+  SeasonParticipant,
+  SeasonReward,
+  SeasonStatistics,
+} from './community/seasonal-management.js';
