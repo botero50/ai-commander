@@ -141,6 +141,15 @@ export type {
   TournamentConfig,
   TournamentResult,
 } from './tournament/tournament-runner.js';
+export { TournamentManager } from './tournament/tournament-manager.js';
+export type {
+  BracketFormat,
+  TournamentStatus,
+  Participant,
+  MatchSchedule,
+  BracketNode,
+  TournamentMetadata,
+} from './tournament/tournament-manager.js';
 export { EloRating } from './tournament/elo-rating.js';
 export type { BrainRating, RatingChange, EloConfig } from './tournament/elo-rating.js';
 export { TournamentDashboard, formatTournamentExport } from './tournament/tournament-dashboard.js';
