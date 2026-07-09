@@ -59,6 +59,8 @@ export { GameStateHUD } from './hud/game-state-hud.js';
 export type { HUDState, HUDPlayer } from './hud/game-state-hud.js';
 export { AIStatusService } from './status/ai-status.js';
 export type { AIStatus, AIStatusState } from './status/ai-status.js';
+export { ObjectiveTracker } from './status/objective-tracker.js';
+export type { ObjectiveTrackerState, ObjectiveHistory, ObjectiveChange } from './status/objective-tracker.js';
 export { MinimapService } from './hud/minimap.js';
 export type { MinimapState, MinimapUnit, MapPosition } from './hud/minimap.js';
 export { MatchTimeline } from './match/match-timeline.js';

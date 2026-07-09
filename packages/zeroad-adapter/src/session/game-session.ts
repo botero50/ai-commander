@@ -19,6 +19,7 @@ import type { GameStateSnapshot } from '../commentary/live-commentary.js';
 import { GameStateHUD } from '../hud/game-state-hud.js';
 import { MinimapService } from '../hud/minimap.js';
 import { AIStatusService } from '../status/ai-status.js';
+import { ObjectiveTracker } from '../status/objective-tracker.js';
 
 export class ZeroADGameSession implements GameSession {
   readonly sessionId: string;
@@ -39,6 +40,7 @@ export class ZeroADGameSession implements GameSession {
   private gameStateHUD: GameStateHUD | null = null;
   private aiStatusService: AIStatusService | null = null;
   private minimapService: MinimapService | null = null;
+  private objectiveTracker: ObjectiveTracker | null = null;
   private decisionOverlay: DecisionOverlay;
   private eventFeed: EventFeed;
 
@@ -161,6 +163,10 @@ export class ZeroADGameSession implements GameSession {
         this.minimapService = new MinimapService(this.observationLoop as any);
         this.minimapService.start();
         this.logger.info('Minimap service initialized');
+
+        // Initialize objective tracker for tracking AI strategy changes
+        this.objectiveTracker = new ObjectiveTracker();
+        this.logger.info('Objective tracker initialized');
       } catch (playbackErr) {
         this.logger.warn('Failed to initialize playback controller', playbackErr);
         // Continue without playback controls
@@ -273,6 +279,12 @@ export class ZeroADGameSession implements GameSession {
       if (this.minimapService) {
         this.minimapService.destroy();
         this.minimapService = null;
+      }
+
+      // Stop objective tracker
+      if (this.objectiveTracker) {
+        this.objectiveTracker.destroy();
+        this.objectiveTracker = null;
       }
 
       // Stop playback controller
@@ -393,6 +405,14 @@ export class ZeroADGameSession implements GameSession {
    */
   getMinimapService(): MinimapService | null {
     return this.minimapService;
+  }
+
+  /**
+   * Get objective tracker (if started)
+   * For tracking AI strategy changes over time
+   */
+  getObjectiveTracker(): ObjectiveTracker | null {
+    return this.objectiveTracker;
   }
 
   /**
