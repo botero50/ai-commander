@@ -17,6 +17,7 @@ import { DecisionOverlay } from '../match/decision-overlay.js';
 import { LiveCommentary } from '../commentary/live-commentary.js';
 import type { GameStateSnapshot } from '../commentary/live-commentary.js';
 import { GameStateHUD } from '../hud/game-state-hud.js';
+import { AIStatusService } from '../status/ai-status.js';
 
 export class ZeroADGameSession implements GameSession {
   readonly sessionId: string;
@@ -35,6 +36,7 @@ export class ZeroADGameSession implements GameSession {
   private decisionTimeline: LiveDecisionTimeline | null = null;
   private commentaryService: LiveCommentary | null = null;
   private gameStateHUD: GameStateHUD | null = null;
+  private aiStatusService: AIStatusService | null = null;
   private decisionOverlay: DecisionOverlay;
   private eventFeed: EventFeed;
 
@@ -143,6 +145,15 @@ export class ZeroADGameSession implements GameSession {
         // Initialize game state HUD for live broadcast display
         this.gameStateHUD = new GameStateHUD(this.observationLoop as any);
         this.logger.info('Game state HUD initialized');
+
+        // Initialize AI status service for live AI decision display
+        this.aiStatusService = new AIStatusService(
+          this.decisionOverlay,
+          this.decisionTimeline,
+          // Optional: pass brain metadata if available from config
+          (this.config?.brainMetadata as any) || undefined
+        );
+        this.logger.info('AI status service initialized');
       } catch (playbackErr) {
         this.logger.warn('Failed to initialize playback controller', playbackErr);
         // Continue without playback controls
@@ -243,6 +254,12 @@ export class ZeroADGameSession implements GameSession {
       if (this.gameStateHUD) {
         this.gameStateHUD.destroy();
         this.gameStateHUD = null;
+      }
+
+      // Stop AI status service
+      if (this.aiStatusService) {
+        this.aiStatusService.destroy();
+        this.aiStatusService = null;
       }
 
       // Stop playback controller
@@ -347,6 +364,14 @@ export class ZeroADGameSession implements GameSession {
    */
   getGameStateHUD(): GameStateHUD | null {
     return this.gameStateHUD;
+  }
+
+  /**
+   * Get AI status service (if started)
+   * For real-time display of AI decision-making status
+   */
+  getAIStatusService(): AIStatusService | null {
+    return this.aiStatusService;
   }
 
   /**
