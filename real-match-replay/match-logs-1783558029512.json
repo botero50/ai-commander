@@ -1,0 +1,147 @@
+[
+  {
+    "timestamp": "2026-07-09T00:46:57.614Z",
+    "event": "MATCH_START",
+    "details": {
+      "runtime": "real-ollama",
+      "model": "mistral:latest"
+    }
+  },
+  {
+    "timestamp": "2026-07-09T00:46:57.639Z",
+    "event": "STEP_1_VALIDATE_OLLAMA",
+    "details": "Connecting to real Ollama runtime..."
+  },
+  {
+    "timestamp": "2026-07-09T00:46:57.704Z",
+    "event": "STEP_1_RESULT",
+    "details": {
+      "status": "success",
+      "models_available": 1,
+      "models": [
+        "mistral:latest"
+      ]
+    }
+  },
+  {
+    "timestamp": "2026-07-09T00:46:57.704Z",
+    "event": "STEP_2_CREATE_BRAINS",
+    "details": "Creating two real Ollama brains..."
+  },
+  {
+    "timestamp": "2026-07-09T00:46:57.704Z",
+    "event": "STEP_2_RESULT",
+    "details": {
+      "brain1": "mistral:latest",
+      "brain2": "mistral:latest",
+      "status": "ready"
+    }
+  },
+  {
+    "timestamp": "2026-07-09T00:46:57.705Z",
+    "event": "STEP_3_CREATE_GAME_SESSION",
+    "details": "Creating fake game session..."
+  },
+  {
+    "timestamp": "2026-07-09T00:46:57.705Z",
+    "event": "STEP_3_RESULT",
+    "details": {
+      "game_session": "match-1783558017705",
+      "adapter": "fake-game",
+      "status": "created"
+    }
+  },
+  {
+    "timestamp": "2026-07-09T00:46:57.705Z",
+    "event": "STEP_4_EXECUTE_MATCH",
+    "details": "Running 100-tick match..."
+  },
+  {
+    "timestamp": "2026-07-09T00:46:57.777Z",
+    "event": "MATCH_PROGRESS_TICK_0",
+    "details": {
+      "tick": 0,
+      "p1_commands": 5,
+      "p2_commands": 6
+    }
+  },
+  {
+    "timestamp": "2026-07-09T00:46:59.964Z",
+    "event": "MATCH_PROGRESS_TICK_20",
+    "details": {
+      "tick": 20,
+      "p1_commands": 6,
+      "p2_commands": 6
+    }
+  },
+  {
+    "timestamp": "2026-07-09T00:47:02.016Z",
+    "event": "MATCH_PROGRESS_TICK_40",
+    "details": {
+      "tick": 40,
+      "p1_commands": 6,
+      "p2_commands": 5
+    }
+  },
+  {
+    "timestamp": "2026-07-09T00:47:04.981Z",
+    "event": "MATCH_PROGRESS_TICK_60",
+    "details": {
+      "tick": 60,
+      "p1_commands": 3,
+      "p2_commands": 4
+    }
+  },
+  {
+    "timestamp": "2026-07-09T00:47:07.370Z",
+    "event": "MATCH_PROGRESS_TICK_80",
+    "details": {
+      "tick": 80,
+      "p1_commands": 5,
+      "p2_commands": 3
+    }
+  },
+  {
+    "timestamp": "2026-07-09T00:47:09.509Z",
+    "event": "STEP_4_RESULT",
+    "details": {
+      "ticks_completed": 100,
+      "duration_ms": 11803.4306,
+      "duration_seconds": "11.80",
+      "total_commands": 906,
+      "total_errors": 6,
+      "error_rate_percent": "0.66"
+    }
+  },
+  {
+    "timestamp": "2026-07-09T00:47:09.509Z",
+    "event": "STEP_5_DETECT_WINNER",
+    "details": "Determining winner..."
+  },
+  {
+    "timestamp": "2026-07-09T00:47:09.509Z",
+    "event": "STEP_5_RESULT",
+    "details": {
+      "winner": "Player 1",
+      "basis": "simulated victory condition"
+    }
+  },
+  {
+    "timestamp": "2026-07-09T00:47:09.509Z",
+    "event": "STEP_6_SAVE_REPLAY",
+    "details": "Saving replay file..."
+  },
+  {
+    "timestamp": "2026-07-09T00:47:09.512Z",
+    "event": "STEP_6_RESULT",
+    "details": {
+      "replay_path": "C:\\Users\\boter\\ai-commander\\real-match-replay\\match-real-1783558029509.json",
+      "file_size_bytes": 15690
+    }
+  },
+  {
+    "timestamp": "2026-07-09T00:47:09.512Z",
+    "event": "STEP_7_SAVE_LOGS",
+    "details": "Saving execution logs..."
+  }
+]
