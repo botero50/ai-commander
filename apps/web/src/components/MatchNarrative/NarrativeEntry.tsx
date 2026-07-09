@@ -57,26 +57,42 @@ export const NarrativeEntry: React.FC<NarrativeEntryProps> = ({ entry }) => {
   const confidencePercent = Math.round(entry.confidence * 100);
 
   return (
-    <div
-      style={{
-        padding: '1.125rem 1rem',
-        marginBottom: '0.875rem',
-        backgroundColor: colors.bg,
-        borderLeft: `4px solid ${colors.border}`,
-        borderRadius: '0.5rem',
-        display: 'flex',
-        gap: '1rem',
-        alignItems: 'flex-start',
-        transition: 'transform 0.15s ease, box-shadow 0.15s ease',
-        cursor: 'default',
-      }}
-      onMouseEnter={(e) => {
-        e.currentTarget.style.transform = 'translateX(2px)';
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.transform = 'translateX(0)';
-      }}
-    >
+    <>
+      <style>{`
+        @keyframes slideInLeft {
+          from {
+            opacity: 0;
+            transform: translateX(-8px);
+          }
+          to {
+            opacity: 1;
+            transform: translateX(0);
+          }
+        }
+      `}</style>
+      <div
+        style={{
+          padding: '1.125rem 1rem',
+          marginBottom: '0.875rem',
+          backgroundColor: colors.bg,
+          borderLeft: `4px solid ${colors.border}`,
+          borderRadius: '0.5rem',
+          display: 'flex',
+          gap: '1rem',
+          alignItems: 'flex-start',
+          transition: 'transform 0.2s ease, box-shadow 0.2s ease',
+          cursor: 'default',
+          animation: 'slideInLeft 0.3s ease-out',
+        }}
+        onMouseEnter={(e) => {
+          e.currentTarget.style.transform = 'translateX(3px)';
+          e.currentTarget.style.boxShadow = '0 2px 4px rgba(0,0,0,0.05)';
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.transform = 'translateX(0)';
+          e.currentTarget.style.boxShadow = 'none';
+        }}
+      >
       {/* Phase Icon */}
       <div
         style={{
@@ -154,6 +170,7 @@ export const NarrativeEntry: React.FC<NarrativeEntryProps> = ({ entry }) => {
           )}
         </div>
       </div>
-    </div>
+      </div>
+    </>
   );
 };

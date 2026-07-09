@@ -34,32 +34,45 @@ export const DecisionEntry: React.FC<DecisionEntryProps> = ({ entry, onClick }) 
   const categoryColor = getCategoryColor(entry.category);
 
   return (
-    <div
-      onClick={() => onClick?.(entry.tick)}
-      style={{
-        padding: '0.625rem 0.875rem',
-        borderBottom: '1px solid #e5e7eb',
-        backgroundColor: '#fff',
-        cursor: onClick ? 'pointer' : 'default',
-        transition: 'background-color 0.15s ease, border-left-color 0.15s ease',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.875rem',
-        minHeight: '3.25rem',
-        borderLeft: '3px solid transparent',
-        ':hover': onClick ? { backgroundColor: '#f9fafb' } : {},
-      }}
-      onMouseEnter={(e) => {
-        if (onClick) {
-          e.currentTarget.style.backgroundColor = '#f3f4f6';
-          e.currentTarget.style.borderLeftColor = '#3b82f6';
+    <>
+      <style>{`
+        @keyframes fadeInDown {
+          from {
+            opacity: 0;
+            transform: translateY(-4px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
         }
-      }}
-      onMouseLeave={(e) => {
-        e.currentTarget.style.backgroundColor = '#fff';
-        e.currentTarget.style.borderLeftColor = 'transparent';
-      }}
-    >
+      `}</style>
+      <div
+        onClick={() => onClick?.(entry.tick)}
+        style={{
+          padding: '0.625rem 0.875rem',
+          borderBottom: '1px solid #e5e7eb',
+          backgroundColor: '#fff',
+          cursor: onClick ? 'pointer' : 'default',
+          transition: 'background-color 0.15s ease, border-left-color 0.15s ease',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.875rem',
+          minHeight: '3.25rem',
+          borderLeft: '3px solid transparent',
+          animation: 'fadeInDown 0.25s ease-out',
+        }}
+        onMouseEnter={(e) => {
+          if (onClick) {
+            e.currentTarget.style.backgroundColor = '#f3f4f6';
+            e.currentTarget.style.borderLeftColor = '#3b82f6';
+          }
+        }}
+        onMouseLeave={(e) => {
+          e.currentTarget.style.backgroundColor = '#fff';
+          e.currentTarget.style.borderLeftColor = 'transparent';
+        }}
+      >
       {/* Player indicator */}
       <div
         style={{
@@ -141,6 +154,7 @@ export const DecisionEntry: React.FC<DecisionEntryProps> = ({ entry, onClick }) 
           ✨
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 };

@@ -40,20 +40,34 @@ export const CommentaryEntry: React.FC<CommentaryEntryProps> = ({
   const confidenceOpacity = 0.6 + entry.confidence * 0.4; // 0.6 to 1.0
 
   return (
-    <div
-      onClick={() => onClick?.(entry.tick)}
-      style={{
-        padding: '0.625rem 0.875rem',
-        borderBottom: '1px solid #e5e7eb',
-        backgroundColor: '#fff',
-        cursor: onClick ? 'pointer' : 'default',
-        transition: 'background-color 0.15s ease, border-left-color 0.15s ease',
-        display: 'flex',
-        alignItems: 'center',
-        gap: '0.875rem',
-        minHeight: '3.25rem',
-        borderLeft: `3px solid ${typeColor}`,
-      }}
+    <>
+      <style>{`
+        @keyframes fadeInDown {
+          from {
+            opacity: 0;
+            transform: translateY(-4px);
+          }
+          to {
+            opacity: 1;
+            transform: translateY(0);
+          }
+        }
+      `}</style>
+      <div
+        onClick={() => onClick?.(entry.tick)}
+        style={{
+          padding: '0.625rem 0.875rem',
+          borderBottom: '1px solid #e5e7eb',
+          backgroundColor: '#fff',
+          cursor: onClick ? 'pointer' : 'default',
+          transition: 'background-color 0.15s ease, border-left-color 0.15s ease',
+          display: 'flex',
+          alignItems: 'center',
+          gap: '0.875rem',
+          minHeight: '3.25rem',
+          borderLeft: `3px solid ${typeColor}`,
+          animation: 'fadeInDown 0.25s ease-out',
+        }}
       onMouseEnter={(e) => {
         if (onClick) e.currentTarget.style.backgroundColor = '#f3f4f6';
       }}
@@ -132,6 +146,7 @@ export const CommentaryEntry: React.FC<CommentaryEntryProps> = ({
           {entry.momentSeverity}%
         </div>
       )}
-    </div>
+      </div>
+    </>
   );
 };
