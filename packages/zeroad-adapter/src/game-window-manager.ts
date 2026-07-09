@@ -9,7 +9,7 @@
  * - Cross-platform compatibility
  */
 
-import { exec, spawn } from 'child_process';
+import { exec, spawn, ChildProcess } from 'child_process';
 import { promisify } from 'util';
 
 const execAsync = promisify(exec);
@@ -33,7 +33,7 @@ export interface LaunchGameOptions {
 
 export class GameWindowManager {
   private windows: Map<string, GameWindowInfo> = new Map();
-  private processMap: Map<string, NodeJS.Process> = new Map();
+  private processMap: Map<string, ChildProcess> = new Map();
 
   /**
    * Launch a game instance
@@ -197,7 +197,7 @@ export class GameWindowManager {
 
       // Check if process is still running
       const proc = this.processMap.get(windowId);
-      if (proc && proc.killed) {
+      if (proc && proc.exitCode !== null) {
         throw new Error('Game process terminated unexpectedly');
       }
 
@@ -223,7 +223,7 @@ export class GameWindowManager {
       return false;
     }
 
-    return !proc.killed;
+    return !proc.exitCode;
   }
 
   /**
@@ -246,8 +246,8 @@ export class GameWindowManager {
    */
   async closeWindow(windowId: string): Promise<void> {
     const proc = this.processMap.get(windowId);
-    if (proc && !proc.killed) {
-      proc.kill();
+    if (proc && !proc.exitCode) {
+      proc.kill('SIGTERM');
     }
 
     this.windows.delete(windowId);
