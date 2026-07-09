@@ -29,8 +29,8 @@ export interface RLInterfaceConfig {
 export const DEFAULT_RL_CONFIG: RLInterfaceConfig = {
   rlInterfacePort: 6000,
   rlInterfaceHost: '127.0.0.1',
-  launchTimeout: 30000,
-  startupGrace: 3000,
+  launchTimeout: 60000,
+  startupGrace: 20000,  // Give 0 A.D. more time to initialize RL Interface
   connectionTimeout: 10000,
   stepTimeout: 30000,
   modPath: 'public',

@@ -5,7 +5,7 @@
  * Minimal launcher - only handles process spawning and HTTP connectivity
  */
 
-import { spawn, ChildProcess } from 'child_process';
+import { spawn, exec, ChildProcess } from 'child_process';
 import { existsSync } from 'fs';
 import { join } from 'path';
 import { homedir } from 'os';
@@ -46,19 +46,22 @@ export class RLInterfaceLauncher {
       const executablePath = this.config.gameExecutablePath || this.findZeroADExecutable();
       this.logger.info('Found 0 A.D. executable', { path: executablePath });
 
-      // Spawn process
+      // Spawn process with RL Interface enabled
+      // Note: --autostart is required for headless mode, otherwise RL Interface may not start
       const args = [
         `--rl-interface=${this.config.rlInterfaceHost}:${this.config.rlInterfacePort}`,
         `--mod=${this.config.modPath || 'public'}`,
-        '--autostart-nonvisual',  // Start without waiting for menu
       ];
 
       this.logger.info('Spawning process', { executable: executablePath, args });
 
-      this.gameProcess = spawn(executablePath, args, {
-        stdio: ['ignore', 'pipe', 'pipe'],
+      // On Windows, use exec with properly formatted command to ensure proper argument passing
+      const command = `"${executablePath}" ${args.map(a => `"${a}"`).join(' ')}`;
+      this.logger.info('Command', { command });
+
+      this.gameProcess = exec(command, {
         windowsHide: false,
-      });
+      }) as any as ChildProcess;
 
       if (!this.gameProcess.pid) {
         throw new Error('Failed to spawn 0 A.D. process');
@@ -70,8 +73,8 @@ export class RLInterfaceLauncher {
       if (this.gameProcess.stdout) {
         this.gameProcess.stdout.on('data', (data) => {
           const output = data.toString().trim();
-          if (output.includes('RL') || output.includes('Interface') || output.includes('Network')) {
-            this.logger.debug('[0 A.D.] ' + output);
+          if (output) {
+            this.logger.info('[0 A.D. stdout] ' + output);
           }
         });
       }
@@ -79,7 +82,9 @@ export class RLInterfaceLauncher {
       if (this.gameProcess.stderr) {
         this.gameProcess.stderr.on('data', (data) => {
           const output = data.toString().trim();
-          this.logger.warn('[0 A.D. stderr] ' + output);
+          if (output) {
+            this.logger.info('[0 A.D. stderr] ' + output);
+          }
         });
       }
 
@@ -200,7 +205,7 @@ export class RLInterfaceLauncher {
    * Wait for HTTP connection with retries
    */
   private async waitForConnection(): Promise<boolean> {
-    const maxAttempts = 10;
+    const maxAttempts = 30;  // Try for up to 30 seconds
     let attempt = 0;
 
     while (attempt < maxAttempts) {
@@ -214,7 +219,7 @@ export class RLInterfaceLauncher {
 
       attempt++;
       if (attempt < maxAttempts) {
-        this.logger.debug('Connection attempt failed, retrying', { attempt, maxAttempts });
+        this.logger.info(`Connection attempt ${attempt}/${maxAttempts} failed, retrying...`, { attempt, maxAttempts });
         await this.sleep(1000);  // Wait 1 second before retrying
       }
     }
