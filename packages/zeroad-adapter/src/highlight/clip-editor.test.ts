@@ -428,13 +428,10 @@ describe('ClipEditor', () => {
     const clip = editor.createClip('Test', highlights);
     const initialMod = clip.modified;
 
-    // Wait a bit and make another edit
-    setTimeout(() => {
-      editor.setDescription(clip.clipId, 'Updated');
+    editor.setDescription(clip.clipId, 'Updated');
 
-      const updated = editor.getClip(clip.clipId);
-      expect(updated?.modified).toBeGreaterThanOrEqual(initialMod);
-    }, 10);
+    const updated = editor.getClip(clip.clipId);
+    expect(updated?.modified).toBeGreaterThanOrEqual(initialMod);
   });
 
   test('multiple audio tracks', () => {
