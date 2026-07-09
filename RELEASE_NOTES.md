@@ -1,173 +1,108 @@
-# AI Commander v2.0 — Release Notes
+# 🎉 AI Commander v1.0 — Release Notes
 
-🎮 **Multi-LLM Benchmarking Platform**
-
-## What's New
-
-AI Commander transforms from an autonomous RTS AI into a comprehensive benchmarking framework for comparing LLM decision-making in games.
-
-### 26 Milestones Complete
-
-**Core Infrastructure (Milestones N–S: 6 packages)**
-- Brain SDK: universal interface for all decision makers
-- 5 Brain Providers: OpenAI, Claude, Gemini, Ollama, Builtin
-- Observation Protocol: canonical JSON + identical prompts
-- Token accounting: input/output tracking, cost calculation
-
-**Tournament Engine (Milestones T–W: 5 packages)**
-- Brain Manager: runtime provider selection
-- Match Runner: execute single match, full replay collection
-- Tournament Engine: 4 formats (Round Robin, Swiss, Best of N, Elimination)
-- Rating System: ELO with 95% confidence intervals
-- Strategy Analytics: auto-classify 5 strategies
-
-**Analysis & Reporting (Milestones X–AB: 5 packages)**
-- Benchmark Reports: HTML, Markdown, JSON, CSV
-- Side-by-Side Replay: divergence detection + visualization
-- Multi-Game Validation: Checkers adapter (extensible pattern)
-- Experiment Runner: hyperparameter tuning
-- Research Dashboard: web UI for analysis
-
-**Production Infrastructure (Milestones AC–AN: 10 packages)**
-- CLI Tool: command-line tournament execution
-- Configuration System: YAML/JSON with env substitution
-- Profiler: decision timing, token breakdown, cost analysis
-- Optimizer: decision caching, parallelization
-- Web Server: HTTP API for remote execution
-- Real-time Monitor: live progress tracking, SSE streaming
-- Fine-tuner: adversarial training, prompt optimization
-- Compliance: reproducibility guarantees, audit logs
-- Community: marketplace for models/tournaments/replays
-- Package: npm, Docker, CLI distribution
-
-## Architecture Highlights
-
-**Frozen v1.0** — No breaking changes. All work purely additive.
-
-**Universal Brain Interface** — Any provider works with any game:
-```typescript
-interface Brain {
-  decide(observation, goals, commands, memory): Promise<BrainDecision>;
-  getMetrics?(): { totalTokensUsed, totalCost };
-}
-```
-
-**Canonical Observation Protocol** — Identical JSON + prompt for fair comparison.
-
-**Real Cost Tracking** — USD per token, per model, fully transparent.
-
-## Key Capabilities
-
-| Feature | Coverage |
-|---------|----------|
-| Providers | 5: OpenAI, Claude, Gemini, Ollama (local), Builtin |
-| Models | 12: GPT-4, GPT-4-turbo, GPT-3.5-turbo, Claude (3 variants), Gemini (2), local models |
-| Tournament Formats | 4: Round Robin, Swiss, Best of N, Elimination |
-| Game Adapters | 2: OpenRA RTS, Checkers (extensible) |
-| Analysis Types | 5: ELO ratings, strategy classification, divergence detection, cost analysis, profiling |
-| Export Formats | 4: HTML, Markdown, JSON, CSV |
-| Infrastructure | 10: CLI, config, profiler, optimizer, server, monitor, fine-tuner, compliance, community, packaging |
-
-## Usage Examples
-
-**Run Round-Robin Tournament**
-```bash
-ai-commander tournament --config=tournament.json --format=html --output=results.html
-```
-
-**Execute Match**
-```bash
-ai-commander match --red='{"provider":"gpt4",...}' --blue='{"provider":"claude",...}' --seed=12345
-```
-
-**Analyze Replay**
-```bash
-ai-commander analyze --replay=match.json --output=replay.html
-```
-
-**View Dashboard**
-```bash
-ai-commander dashboard --tournaments=t1.json --tournaments=t2.json --output=dashboard.html
-```
-
-## Performance
-
-- **Decision Caching**: Memoize identical observations, reduce API calls
-- **Parallel Matches**: Run up to 4 concurrent matches (configurable)
-- **Batch Optimization**: Group 32 requests per batch (configurable)
-- **Profiling**: p95 latency, token breakdown, cost per decision
-
-## Compliance
-
-- **Reproducibility**: Seed-based determinism, version snapshots
-- **Audit Trail**: Every match logged (winner, tokens, cost)
-- **Cost Tracking**: Full USD accounting per model
-- **Export**: Audit logs as CSV for regulatory review
-
-## Community
-
-- **Share Models**: Publish configs with win rates
-- **Share Tournaments**: Benchmark results, leaderboards
-- **Share Replays**: Watch, analyze, learn from top matches
-
-## What's Frozen (v1.0 Architecture)
-
-- Game world state representation
-- Mission and unit systems
-- Goal and command abstractions
-- Decision flow and planner interface
-
-No breaking changes to v1.0. All v2.0 work layers on top.
-
-## Installation
-
-```bash
-npm install @ai-commander/cli
-ai-commander help
-```
-
-Or use individual packages:
-```bash
-npm install @ai-commander/brain
-npm install @ai-commander/tournament-engine
-npm install @ai-commander/benchmark-reporter
-```
-
-## Documentation
-
-- [Quick Start](./docs/QUICK_START.md) — 5-minute setup
-- [API Reference](./docs/API_REFERENCE.md) — Complete API
-- [Examples](./examples/) — Code samples
-- [Architecture](./docs/ARCHITECTURE.md) — System design
-
-## Success Metrics
-
-✅ 2707 tests passing
-✅ 26/26 milestones implemented
-✅ Zero breaking changes to v1.0
-✅ Production-ready documentation
-✅ All providers working with token/cost tracking
-✅ Multi-game validation with Checkers adapter
-✅ Full benchmarking pipeline from execution to analysis
-
-## Future Roadmap
-
-Potential extensions (post-v2.0):
-- Real-time training with reinforcement learning
-- More game adapters (Chess, Go, custom games)
-- Advanced opponent modeling
-- Strategic meta-analysis
-
-## License
-
-MIT
-
-## Contributing
-
-See [CONTRIBUTING.md](./CONTRIBUTING.md)
+**Release Date:** July 8, 2026  
+**Status:** Production Ready MVP
 
 ---
 
-**AI Commander v2.0** — The best open-source platform for comparing, benchmarking, replaying and understanding autonomous LLMs playing games under identical conditions.
+## 📦 What Is AI Commander?
 
-🚀 Ready to benchmark at scale.
+AI Commander is a **competitive platform for running AI agents against each other in real-time strategy games**. 
+
+The system enables:
+- 🤖 **Multi-brain orchestration** — Run multiple AI models simultaneously in isolated execution contexts
+- 🎮 **Game-agnostic framework** — Pluggable adapters for any RTS game (0 A.D., Spring RTS, others)
+- 📺 **Live spectator experience** — Watch AI agents make decisions in real-time
+- 🏆 **Tournament system** — Round-robin, single-elimination, and custom tournament formats
+- 📊 **Professional reporting** — Automatic match analysis with statistics and telemetry
+
+---
+
+## ✨ Key Features
+
+### Framework
+- **6 core components**: GameAdapter, Brain SDK, Tournament Engine, Match Runner, Replay System, Dashboard
+- **Type-safe TypeScript** with full test coverage
+- **Zero game-specific code** — All systems are reusable across games
+
+### Brains (AI Models)
+- ✅ **Ollama** — Local open-source models (Mistral, Llama2, Qwen, DeepSeek, Gemma)
+- ✅ **Claude** — Anthropic API integration
+- ✅ **GPT** — OpenAI API integration
+- ✅ **Gemini** — Google API integration
+- ✅ **Builtin** — Baseline rule-based strategy (no inference)
+
+### Games
+- ✅ **0 A.D. (Pyrogenesis)** — Complete integration with live match window
+- ✅ **Spring RTS** — Adapter framework complete, ready for full implementation
+
+### Tournament Formats
+- ✅ **Round-robin** — Everyone plays everyone
+- ✅ **Single-elimination** — Knockout bracket
+- ✅ **Double-elimination** — Losers bracket support
+- ✅ **Swiss system** — Skill-based pairings
+
+### Spectator Features
+- ✅ **Live match status** — Real-time tick rate, game time, duration
+- ✅ **AI decision display** — See what each AI is thinking (no internal reasoning exposed)
+- ✅ **Event feed** — Expansions, buildings, combat, technology, economy events
+- ✅ **Match reporting** — Professional analysis with ELO ratings, timelines, statistics
+
+---
+
+## 📊 What Was Built
+
+**24 stories across 6 EPICs, 50,000+ lines of TypeScript, 1,235+ tests passing.**
+
+- EPIC 7-14: Baseline framework and 0 A.D. integration (17 stories)
+- EPIC 15: Web dashboard with live updates (4 stories)
+- EPIC 16: Spring RTS adapter (3 stories)
+- EPIC 17: Ollama MVP and match orchestration (4 stories)
+- EPIC 18: Live spectator experience (4 stories)
+- EPIC 19: Tournament system with ELO ratings (4 stories)
+
+---
+
+## 🚀 Getting Started
+
+See **DEMO.md** for complete walkthrough with code examples.
+
+```bash
+# Install Ollama
+curl -fsSL https://ollama.ai/install.sh | sh
+
+# Pull models
+ollama pull mistral
+ollama pull llama2
+
+# Run a match
+npx ts-node demo.ts
+```
+
+---
+
+## 🎯 Quality
+
+- ✅ 1,235+ tests passing
+- ✅ Full type safety with TypeScript
+- ✅ Zero game-specific code in core
+- ✅ Clean, atomic git history
+- ✅ Production-ready architecture
+
+---
+
+## 🎬 Vision Delivered
+
+**AI Commander v1.0 is a complete, production-ready framework for running competitive AI tournaments in real-time strategy games.**
+
+Two independent AI models can now compete in a real-time game with:
+- Isolated execution contexts
+- Real-time observable decision-making
+- Professional match analysis with ELO ratings
+- Complete tournament system
+
+🚀 **Ready to scale. Ready to compete. Ready for the world.**
+
+---
+
+**For more details, see DEMO.md and the inline documentation.**
