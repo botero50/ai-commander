@@ -12,6 +12,8 @@ import { CinematicModeManager } from '../camera/cinematic-mode-manager.js';
 import { CINEMATIC_CONFIG } from '../camera/camera-config.js';
 import { EventFeed } from '../match/event-feed.js';
 import { PlaybackController } from './playback-controller.js';
+import { LiveDecisionTimeline } from '../commentary/live-decision-timeline.js';
+import { DecisionOverlay } from '../match/decision-overlay.js';
 
 export class ZeroADGameSession implements GameSession {
   readonly sessionId: string;
@@ -27,6 +29,8 @@ export class ZeroADGameSession implements GameSession {
   private cameraManager: AutomaticCameraManager | null = null;
   private cinematicCamera: CinematicModeManager | null = null;
   private playbackController: PlaybackController | null = null;
+  private decisionTimeline: LiveDecisionTimeline | null = null;
+  private decisionOverlay: DecisionOverlay;
   private eventFeed: EventFeed;
 
   readonly observationProvider: IObservationProvider;
@@ -49,6 +53,7 @@ export class ZeroADGameSession implements GameSession {
     this.logger = logger;
     this.config = config;
     this.eventFeed = new EventFeed();
+    this.decisionOverlay = new DecisionOverlay();
 
     this.observationProvider = new ZeroADObservationProvider(observationLoop, logger);
     this.commandExecutor = new ZeroADCommandExecutor(ipcBridge, logger);
@@ -83,6 +88,10 @@ export class ZeroADGameSession implements GameSession {
         });
 
         this.logger.info('Playback controller initialized');
+
+        // Initialize live decision timeline for spectator UI
+        this.decisionTimeline = new LiveDecisionTimeline(this.decisionOverlay);
+        this.logger.info('Decision timeline initialized');
       } catch (playbackErr) {
         this.logger.warn('Failed to initialize playback controller', playbackErr);
         // Continue without playback controls
@@ -167,6 +176,12 @@ export class ZeroADGameSession implements GameSession {
     }
 
     try {
+      // Stop decision timeline
+      if (this.decisionTimeline) {
+        this.decisionTimeline.destroy();
+        this.decisionTimeline = null;
+      }
+
       // Stop playback controller
       this.playbackController = null;
 
@@ -237,6 +252,22 @@ export class ZeroADGameSession implements GameSession {
    */
   getPlaybackController(): PlaybackController | null {
     return this.playbackController;
+  }
+
+  /**
+   * Get decision overlay
+   * For recording brain decisions during match
+   */
+  getDecisionOverlay(): DecisionOverlay {
+    return this.decisionOverlay;
+  }
+
+  /**
+   * Get decision timeline (if started)
+   * For spectator UI real-time decision display
+   */
+  getDecisionTimeline(): LiveDecisionTimeline | null {
+    return this.decisionTimeline;
   }
 
   /**
