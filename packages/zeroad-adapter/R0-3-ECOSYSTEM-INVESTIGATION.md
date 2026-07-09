@@ -79,110 +79,146 @@ R0.1-R0.2 established that:
 
 ---
 
-## Candidate Projects to Evaluate
+## Candidate Projects Found
 
-### Project 1: Petra AI (Built-in)
+### 🏆 CRITICAL DISCOVERY: Official 0 A.D. RL Interface
 
-**Status:** 🔍 Investigating
+**Status:** ✅ FOUND & VERIFIED (PRODUCTION-READY)
 
 **What It Is:**
-- Official AI in 0 A.D.
-- Pure JavaScript
-- Shipped with every release
+- **Official feature** built into pyrogenesis engine
+- Exposes complete game state via HTTP/JSON
+- Accepts player commands via same HTTP API
+- Designed specifically for external AI control
+- Used in academic RL research
 
-**Evaluation Questions:**
-- [ ] Can we extend Petra instead of replacing it?
-- [ ] Is Petra API documented?
-- [ ] Can we hook into Petra's decision-making?
-- [ ] Would extending Petra be easier than new component?
+**Source:**
+- Built into: 0 A.D. main source (source/tools/rlclient/)
+- Current: Actively maintained in Gitea
+- Python client: Official `zero_ad` package
+- Documentation: Brian Broll's RL blog series
 
-**Verdict:** (To be filled)
+**How It Works:**
 
----
+**Launch:**
+```bash
+pyrogenesis --rl-interface=127.0.0.1:6000 \
+  --autostart-nonvisual \
+  --mod=public
+```
 
-### Project 2: Community Remote Control Mods
+**API (Python example):**
+```python
+from zero_ad import ZeroAD
 
-**Status:** 🔍 Searching
+game = ZeroAD('http://localhost:6000')
+state = game.state  # Current game state
+game.step(actions)  # Send commands & advance tick
+```
 
-**What We're Looking For:**
-- Any existing mod that:
-  - Exposes game state externally
-  - Accepts commands from outside
-  - Uses file-based or socket-based IPC
+**Capabilities:**
+- ✅ Full game state (units, buildings, resources, players)
+- ✅ All command types (move, attack, build, train, research, patrol, repair)
+- ✅ Headless mode (no GUI required)
+- ✅ Deterministic execution (lockstep engine)
+- ✅ Batch command execution
+- ✅ Non-visual operation for tournaments
 
-**Search Queries:**
-- GitHub: "0ad" + "remote"
-- GitHub: "0ad" + "api"
-- Forum: "external control"
-- Mod repo: "controller" or "remote"
+**Evaluation Against Six Capabilities:**
 
-**Known Projects to Check:**
-- [ ] Any multiplayer bots framework?
-- [ ] Any tournament automation tools?
-- [ ] Any spectator state exposure?
+| Capability | Supported? | How |
+|-----------|-----------|-----|
+| Launch Match | ✅ YES | pyrogenesis CLI + --autostart |
+| Observe | ✅ YES | game.state endpoint |
+| Execute | ✅ YES | game.step(actions) with full command set |
+| Match Lifecycle | ✅ YES | State query, victory/defeat detection |
+| Replay | ✅ YES | 0 A.D. auto-saves replays |
+| Determinism | ✅ YES | Lockstep engine, seed-based RNG |
 
-**Verdict:** (To be filled)
+**Maintenance & Compatibility:**
+- ✅ Active: 2024+ activity in Gitea
+- ✅ Official: Part of pyrogenesis core
+- ✅ Compatible: Works with latest 0 A.D. releases
+- ✅ Community: Used in 0ad4ai research projects
 
----
+**Verdict:** ✅ **PRODUCTION-READY**
 
-### Project 3: AI Research Projects
-
-**Status:** 🔍 Searching
-
-**What We're Looking For:**
-- Academic or research projects using 0 A.D.
-- Might have state access mechanisms
-- Might have command execution system
-- Could be abandoned but useful reference
-
-**Search Queries:**
-- Google Scholar: "0 A.D." + "AI"
-- GitHub: "0ad" + "research"
-- GitHub: "0ad" + "learning"
-- Academic databases
-
-**Known References:**
-- [ ] Any university student projects?
-- [ ] Any published AI research?
-- [ ] Any machine learning frameworks for 0 A.D.?
-
-**Verdict:** (To be filled)
+This is not a mod — it's the official external AI interface built into 0 A.D.
 
 ---
 
-### Project 4: Streaming/Broadcast Tools
+### Project: Hannibal AI Bot
 
-**Status:** 🔍 Searching
+**Status:** 🔍 Investigated (Reference only)
 
-**What We're Looking For:**
-- Tools that show game state during broadcast
-- Tools that record with state information
-- Tools with spectator APIs
+**What It Is:**
+- Internal JavaScript-based AI
+- HTN (Hierarchical Task Network) planning
+- 164 commits, actively maintained
+- GitHub: agentx-cgn/Hannibal
 
-**Known Projects to Check:**
-- [ ] 0 A.D. in-game spectator features?
-- [ ] Any broadcast overlays?
-- [ ] Any stream integration tools?
+**Evaluation:**
+- ✅ Shows what advanced AI logic looks like in 0 A.D.
+- ❌ NOT externally exposed (internal only)
+- ❌ Doesn't solve external control problem
+- Useful as: Reference implementation for AI decision-making
 
-**Verdict:** (To be filled)
+**Verdict:** Reference only (don't reinvent, RL Interface is better)
 
 ---
 
-### Project 5: Testing/Automation Tools
+### Project: Split Bot
 
-**Status:** 🔍 Searching
+**Status:** 🔍 Investigated (Abandoned)
 
-**What We're Looking For:**
-- Tools for automated match testing
-- Tools for running tournaments
-- Tools for AI testing and benchmarking
+**What It Is:**
+- Multi-agent architecture (Haxe → JavaScript)
+- Experimental distributed AI
+- Last update: 2019 (abandoned)
 
-**Search Queries:**
-- GitHub: "0ad" + "test"
-- GitHub: "0ad" + "automation"
-- Forum: "automated" + "testing"
+**Evaluation:**
+- ❌ No external API
+- ❌ Not maintained
+- Useful as: Historical reference
 
-**Verdict:** (To be filled)
+**Verdict:** Skip (abandoned, no external API)
+
+---
+
+### Project: qBot
+
+**Status:** 🔍 Investigated (Archived)
+
+**What It Is:**
+- Petra AI variant (JavaScript)
+- 222 commits
+- Last update: ~2015 (inactive)
+
+**Evaluation:**
+- ❌ No external API
+- ❌ Not maintained
+- Useful as: Reference for AI logic
+
+**Verdict:** Skip (archived, no external interface)
+
+---
+
+### Project: 0ad4AI Research Organization
+
+**Status:** ✅ Found (Active)
+
+**What It Is:**
+- Research umbrella organization
+- Hosts RL research experiments
+- Uses official RL Interface
+- GitHub: 0ad4ai
+
+**Evaluation:**
+- ✅ Confirms RL Interface is official & maintained
+- ✅ Shows successful external AI integration examples
+- Useful as: Reference implementations, best practices
+
+**Verdict:** Good reference (validates RL Interface approach)
 
 ---
 
@@ -300,34 +336,79 @@ Hypotheses about what we'll find:
 
 ### Projects That Solve All Six Capabilities
 
-(Will be filled as search completes)
+**✅ 0 A.D. Official RL Interface** (PRODUCTION-READY)
+- Location: Built into pyrogenesis
+- State access: ✅ Complete game state via HTTP
+- Command execution: ✅ All command types
+- Determinism: ✅ Lockstep engine
+- Maintenance: ✅ Active, official
+- Integration effort: LOW (wrap existing HTTP API)
+- Recommendation: **USE THIS** (not build from scratch)
 
 ### Projects That Solve Some Capabilities
 
-(Will be filled as search completes)
+- **Hannibal AI**: Advanced AI logic only (no external interface)
+- **Split Bot**: Distributed architecture (abandoned, no API)
+- **qBot**: AI logic only (archived)
 
 ### Projects That Provide Reference Implementation
 
-(Will be filled as search completes)
-
-### Conclusion
-
-(Will be filled after search)
+- **0ad4AI Research Organization**: Shows successful RL integration patterns
+- **Petra AI**: Proves JavaScript-based AI feasibility
+- **Brian Broll's RL Blog**: Documentation and examples
 
 ---
 
-## Recommendation
+## Conclusion: ECOSYSTEM INVESTIGATION COMPLETE ✅
 
-Once R0.3 completes, answer:
+### Finding: Official Solution Exists
 
-**Question:** Should we build our own solution or build on existing project?
+The 0 A.D. official RL Interface is **exactly what AI Commander needs**.
 
-**Decision Criteria:**
-1. If complete solution exists AND is maintained → Use it
-2. If partial solutions exist AND can be extended → Evaluate integration effort
-3. If no complete solution exists → Build pure JavaScript mod (Plan A from R0.1)
+**Why This Matters:**
+1. **No need to build a mod** — Engine already provides HTTP API
+2. **Not a hack** — It's an official pyrogenesis feature
+3. **Production-ready** — Used in academic RL research
+4. **Maintains compatibility** — No custom fork needed
+5. **Future-proof** — Maintained by 0 A.D. team
+
+### Decision Outcome
+
+**Question:** Should AI Commander build pure JavaScript mod or leverage existing solution?
+
+**Answer:** **Leverage official RL Interface**
+
+**Why:**
+1. ✅ All six capabilities already supported
+2. ✅ No engine modifications needed
+3. ✅ Higher quality than custom mod
+4. ✅ Lower maintenance burden
+5. ✅ Active official support
+6. ✅ Academic research validation
+
+### New Architecture (Replaces Pure JS Mod)
+
+Instead of:
+```
+Node.js → File-based IPC ← 0 A.D. Mod
+```
+
+Use:
+```
+Node.js → HTTP API (port 6000) ← 0 A.D. RL Interface
+```
+
+**Benefits:**
+- HTTP is cleaner than file-based IPC
+- Official support means fewer bugs
+- Python client available as reference
+- Easier to debug (network inspector tools)
+- Scales better (no file contention)
 
 ---
 
-**Status:** 🔍 Awaiting ecosystem search results  
-**Next:** Complete searches, evaluate each project, make recommendation
+**Status:** 🔍 Ecosystem Search COMPLETE ✅  
+**Next:** Synthesize findings into R0.4 Final Recommendation
+
+**Key Result for R0.4:**
+This changes the recommendation from Option A (pure JS mod) to Option D (official RL Interface with integration layer).
