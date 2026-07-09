@@ -273,3 +273,25 @@ export type {
   ReelComposition,
   GenerationOptions,
 } from './highlight/highlight-reel-generator.js';
+export { PersonalityProfileManager } from './personality/personality-profile.js';
+export type {
+  PersonalityArchetype,
+  VoiceGender,
+  SpeakingPace,
+  EmotionalStyle,
+  VoiceCharacteristics,
+  PersonalityTraits,
+  CommentaryStyle,
+  PersonalityBehavior,
+  PersonalityProfile,
+} from './personality/personality-profile.js';
+export { VoiceSynthesizer } from './personality/voice-synthesis.js';
+export type {
+  SynthesisEngine,
+  AudioFormat,
+  VoiceSettings,
+  TextToSpeechRequest,
+  SynthesizedAudio,
+  VoiceVariation,
+  AudioCache,
+} from './personality/voice-synthesis.js';
