@@ -295,3 +295,14 @@ export type {
   VoiceVariation,
   AudioCache,
 } from './personality/voice-synthesis.js';
+export { PersonalityCommentaryGenerator } from './personality/personality-commentary.js';
+export type {
+  CommentarySegment,
+  PersonalityCommentary,
+} from './personality/personality-commentary.js';
+export { PersonalityMatcher } from './personality/personality-matcher.js';
+export type {
+  PersonalityMatch,
+  PersonalityContext,
+  MatchingMetrics,
+} from './personality/personality-matcher.js';
