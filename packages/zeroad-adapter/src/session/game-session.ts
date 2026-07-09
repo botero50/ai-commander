@@ -22,6 +22,7 @@ import { AIStatusService } from '../status/ai-status.js';
 import { ObjectiveTracker } from '../status/objective-tracker.js';
 import { EventAnnotations } from '../match/event-annotations.js';
 import { ReplayDirector } from '../match/replay-director.js';
+import { SlowMotionManager } from '../match/slow-motion.js';
 import { BroadcastStatusCache } from '../status/status-cache.js';
 
 export class ZeroADGameSession implements GameSession {
@@ -46,6 +47,7 @@ export class ZeroADGameSession implements GameSession {
   private objectiveTracker: ObjectiveTracker | null = null;
   private eventAnnotations: EventAnnotations | null = null;
   private replayDirector: ReplayDirector | null = null;
+  private slowMotionManager: SlowMotionManager | null = null;
   private broadcastStatusCache: BroadcastStatusCache | null = null;
   private decisionOverlay: DecisionOverlay;
   private eventFeed: EventFeed;
@@ -182,6 +184,10 @@ export class ZeroADGameSession implements GameSession {
         this.replayDirector = new ReplayDirector();
         this.logger.info('Replay director initialized');
 
+        // Initialize slow motion manager for cinematic effects
+        this.slowMotionManager = new SlowMotionManager();
+        this.logger.info('Slow motion manager initialized');
+
         // Initialize broadcast status cache for optimization
         this.broadcastStatusCache = new BroadcastStatusCache(5); // 5 second TTL
         this.logger.info('Broadcast status cache initialized');
@@ -315,6 +321,12 @@ export class ZeroADGameSession implements GameSession {
       if (this.replayDirector) {
         this.replayDirector.destroy();
         this.replayDirector = null;
+      }
+
+      // Stop slow motion manager
+      if (this.slowMotionManager) {
+        this.slowMotionManager.destroy();
+        this.slowMotionManager = null;
       }
 
       // Stop broadcast status cache
@@ -465,6 +477,14 @@ export class ZeroADGameSession implements GameSession {
    */
   getReplayDirector(): ReplayDirector | null {
     return this.replayDirector;
+  }
+
+  /**
+   * Get slow motion manager (if started)
+   * For cinematic slow-motion effects during battles and victories
+   */
+  getSlowMotionManager(): SlowMotionManager | null {
+    return this.slowMotionManager;
   }
 
   /**

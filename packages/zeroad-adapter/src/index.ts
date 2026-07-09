@@ -57,6 +57,8 @@ export { EventAnnotations } from './match/event-annotations.js';
 export type { AnnotationState, GameEvent, EventType } from './match/event-annotations.js';
 export { ReplayDirector } from './match/replay-director.js';
 export type { ReplayDirectorState, ReplayMoment, MomentType, CameraKeyframe } from './match/replay-director.js';
+export { SlowMotionManager } from './match/slow-motion.js';
+export type { SlowMotionState, SlowMotionEffect, SlowMotionTrigger } from './match/slow-motion.js';
 export { LiveCommentary } from './commentary/live-commentary.js';
 export type { CommentaryEntry, CommentarySubscriber, GameStateSnapshot } from './commentary/live-commentary.js';
 export { GameStateHUD } from './hud/game-state-hud.js';
