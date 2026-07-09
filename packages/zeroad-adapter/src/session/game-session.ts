@@ -8,6 +8,8 @@ import { ZeroADCommandExecutor } from './command-executor.js';
 import { ZeroADObservationProvider } from './observation-provider.js';
 import { generateUUID } from '../utils/uuid.js';
 import { AutomaticCameraManager } from '../camera/automatic-camera-manager.js';
+import { CinematicModeManager } from '../camera/cinematic-mode-manager.js';
+import { CINEMATIC_CONFIG } from '../camera/camera-config.js';
 import { EventFeed } from '../match/event-feed.js';
 
 export class ZeroADGameSession implements GameSession {
@@ -22,6 +24,7 @@ export class ZeroADGameSession implements GameSession {
   private started = false;
   private paused = false;
   private cameraManager: AutomaticCameraManager | null = null;
+  private cinematicCamera: CinematicModeManager | null = null;
   private eventFeed: EventFeed;
 
   readonly observationProvider: IObservationProvider;
@@ -62,17 +65,38 @@ export class ZeroADGameSession implements GameSession {
       this.started = true;
       this.logger.info('Game session started', { sessionId: this.sessionId });
 
-      // Initialize camera manager for spectator experience
+      // Initialize camera managers for spectator experience
       try {
+        // Automatic camera (follows interesting locations)
         this.cameraManager = new AutomaticCameraManager(
           this.commandExecutor as any,
           this.observationProvider as any,
           this.eventFeed
         );
         this.cameraManager.start();
-        this.logger.info('Camera manager started');
+        this.logger.info('Automatic camera manager started');
+
+        // Cinematic camera (director-controlled movements)
+        this.cinematicCamera = new CinematicModeManager(CINEMATIC_CONFIG);
+        this.cinematicCamera.subscribe((event, data) => {
+          this.eventFeed.broadcast(`cinematic:${event}`, data);
+        });
+
+        // Connect dramatic moments to cinematic responses
+        this.cameraManager.onDramaticMoment((moment) => {
+          // In cinematic mode, respond to dramatic moments
+          if (this.cinematicCamera?.getMode() === 'cinematic') {
+            this.cinematicCamera
+              .focusOnLocation(moment.position.x, moment.position.z, 0.7)
+              .catch((err) => {
+                this.logger.warn('Failed to focus on dramatic moment', err);
+              });
+          }
+        });
+
+        this.logger.info('Cinematic camera manager started');
       } catch (cameraErr) {
-        this.logger.warn('Failed to start camera manager', cameraErr);
+        this.logger.warn('Failed to start camera managers', cameraErr);
         // Continue without camera, don't fail entire session
       }
 
@@ -110,10 +134,15 @@ export class ZeroADGameSession implements GameSession {
     }
 
     try {
-      // Stop camera manager first
+      // Stop camera managers first
       if (this.cameraManager) {
         this.cameraManager.stop();
         this.cameraManager = null;
+      }
+
+      if (this.cinematicCamera) {
+        this.cinematicCamera.clear();
+        this.cinematicCamera = null;
       }
 
       await this.observationLoop.stop();
@@ -143,10 +172,27 @@ export class ZeroADGameSession implements GameSession {
   }
 
   /**
-   * Get camera manager (if started)
+   * Get automatic camera manager (if started)
+   * Follows interesting locations automatically
+   */
+  getAutomaticCamera(): AutomaticCameraManager | null {
+    return this.cameraManager;
+  }
+
+  /**
+   * Get automatic camera manager (if started)
+   * Alias for backwards compatibility
    */
   getCameraManager(): AutomaticCameraManager | null {
     return this.cameraManager;
+  }
+
+  /**
+   * Get cinematic camera manager (if started)
+   * For director-controlled camera movements
+   */
+  getCinematicCamera(): CinematicModeManager | null {
+    return this.cinematicCamera;
   }
 
   /**
