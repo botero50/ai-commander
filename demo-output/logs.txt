@@ -1,0 +1,13 @@
+AI Commander Match Log
+======================
+Player 1: mistral
+Player 2: neural-chat
+Duration: 0.00s
+Total Ticks: 242
+Winner: Player 2
+
+Match Summary:
+Player 1 Final Score: 134
+Player 2 Final Score: 155
+Player 1 Health: 0
+Player 2 Health: 8

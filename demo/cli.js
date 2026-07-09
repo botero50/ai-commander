@@ -7,7 +7,8 @@
  * Runs a complete Ollama vs Ollama match demo
  */
 
-import { OllamaMatchExecutor } from '@ai-commander/match-runner';
+// For demo purposes, create a simple match executor
+// In production, this would import from @ai-commander/match-runner
 import * as fs from 'fs';
 import * as path from 'path';
 import { fileURLToPath } from 'url';
