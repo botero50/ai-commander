@@ -130,6 +130,9 @@ importers:
       '@ai-commander/adapter':
         specifier: workspace:*
         version: link:../adapter
+      '@ai-commander/brain':
+        specifier: workspace:*
+        version: link:../brain
       '@ai-commander/core':
         specifier: workspace:*
         version: link:../core
@@ -2359,6 +2362,7 @@ snapshots:
   '@ai-commander/agent-runtime@file:packages/agent-runtime':
     dependencies:
       '@ai-commander/adapter': link:packages/adapter
+      '@ai-commander/brain': link:packages/brain
       '@ai-commander/core': link:packages/core
       '@ai-commander/decision': link:packages/decision
       '@ai-commander/domain': link:packages/domain

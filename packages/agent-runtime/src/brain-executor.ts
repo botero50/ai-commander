@@ -89,7 +89,7 @@ export class BrainExecutor {
           {
             tick: observation.tick,
             goal: decision.selectedGoal,
-            commands: decision.commands,
+            commands: Array.from(decision.commands),
             outcome: `Executed ${decision.commands.length} commands`,
           },
         ].slice(-20), // Keep last 20 decisions in memory

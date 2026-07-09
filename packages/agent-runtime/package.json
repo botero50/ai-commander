@@ -23,6 +23,7 @@
   },
   "dependencies": {
     "@ai-commander/adapter": "workspace:*",
+    "@ai-commander/brain": "workspace:*",
     "@ai-commander/core": "workspace:*",
     "@ai-commander/decision": "workspace:*",
     "@ai-commander/domain": "workspace:*",
