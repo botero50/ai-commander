@@ -57,6 +57,8 @@ export { LiveCommentary } from './commentary/live-commentary.js';
 export type { CommentaryEntry, CommentarySubscriber, GameStateSnapshot } from './commentary/live-commentary.js';
 export { GameStateHUD } from './hud/game-state-hud.js';
 export type { HUDState, HUDPlayer } from './hud/game-state-hud.js';
+export { AIStatusService } from './status/ai-status.js';
+export type { AIStatus, AIStatusState } from './status/ai-status.js';
 export { MatchTimeline } from './match/match-timeline.js';
 export type { TimelineSnapshot, TimelineEvent } from './match/match-timeline.js';
 export { MatchObserver, MatchObserverBuilder } from './match/match-observer.js';
