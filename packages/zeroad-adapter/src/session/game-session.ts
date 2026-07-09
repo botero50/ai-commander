@@ -11,6 +11,7 @@ import { AutomaticCameraManager } from '../camera/automatic-camera-manager.js';
 import { CinematicModeManager } from '../camera/cinematic-mode-manager.js';
 import { CINEMATIC_CONFIG } from '../camera/camera-config.js';
 import { EventFeed } from '../match/event-feed.js';
+import { PlaybackController } from './playback-controller.js';
 
 export class ZeroADGameSession implements GameSession {
   readonly sessionId: string;
@@ -25,6 +26,7 @@ export class ZeroADGameSession implements GameSession {
   private paused = false;
   private cameraManager: AutomaticCameraManager | null = null;
   private cinematicCamera: CinematicModeManager | null = null;
+  private playbackController: PlaybackController | null = null;
   private eventFeed: EventFeed;
 
   readonly observationProvider: IObservationProvider;
@@ -65,6 +67,15 @@ export class ZeroADGameSession implements GameSession {
       this.started = true;
       this.logger.info('Game session started', { sessionId: this.sessionId });
 
+      // Initialize playback controller for live observation
+      try {
+        this.playbackController = new PlaybackController(this.eventFeed);
+        this.logger.info('Playback controller initialized');
+      } catch (playbackErr) {
+        this.logger.warn('Failed to initialize playback controller', playbackErr);
+        // Continue without playback controls
+      }
+
       // Initialize camera managers for spectator experience
       try {
         // Automatic camera (follows interesting locations)
@@ -82,8 +93,18 @@ export class ZeroADGameSession implements GameSession {
           this.eventFeed.broadcast(`cinematic:${event}`, data);
         });
 
-        // Connect dramatic moments to cinematic responses
+        // Wire cinematic camera to playback controller
+        if (this.playbackController) {
+          this.playbackController.setCinematicCamera(this.cinematicCamera);
+        }
+
+        // Connect dramatic moments to cinematic responses and playback controller
         this.cameraManager.onDramaticMoment((moment) => {
+          // Register with playback controller for navigation
+          if (this.playbackController) {
+            this.playbackController.registerDramaticMoment(moment);
+          }
+
           // In cinematic mode, respond to dramatic moments
           if (this.cinematicCamera?.getMode() === 'cinematic') {
             this.cinematicCamera
@@ -134,6 +155,9 @@ export class ZeroADGameSession implements GameSession {
     }
 
     try {
+      // Stop playback controller
+      this.playbackController = null;
+
       // Stop camera managers first
       if (this.cameraManager) {
         this.cameraManager.stop();
@@ -193,6 +217,14 @@ export class ZeroADGameSession implements GameSession {
    */
   getCinematicCamera(): CinematicModeManager | null {
     return this.cinematicCamera;
+  }
+
+  /**
+   * Get playback controller (if started)
+   * For pause/resume, speed control, moment navigation
+   */
+  getPlaybackController(): PlaybackController | null {
+    return this.playbackController;
   }
 
   /**
