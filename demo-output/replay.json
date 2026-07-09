@@ -1,3584 +1,3264 @@
 {
   "config": {
     "player1Model": "mistral",
-    "player2Model": "mistral",
+    "player2Model": "neural-chat",
     "maxTicks": 500
   },
   "metrics": {
-    "winner": 2,
-    "totalTicks": 223,
-    "duration": 1,
-    "player1Score": 150,
-    "player2Score": 137
+    "winner": 1,
+    "totalTicks": 203,
+    "duration": 0,
+    "player1Score": 134,
+    "player2Score": 136
   },
   "frames": [
     {
       "tickNumber": 0,
-      "timestamp": 1783628692530,
+      "timestamp": 1783629341450,
       "player1State": {
         "health": 100,
         "score": 50,
-        "units": 29
+        "units": 21
       },
       "player2State": {
         "health": 100,
         "score": 50,
-        "units": 27
+        "units": 26
       },
-      "player1Decision": "build",
-      "player2Decision": "defend"
+      "player1Decision": "defend",
+      "player2Decision": "build"
     },
     {
       "tickNumber": 1,
-      "timestamp": 1783628692630,
+      "timestamp": 1783629341550,
       "player1State": {
-        "health": 100,
+        "health": 99,
         "score": 50,
-        "units": 27
+        "units": 23
       },
       "player2State": {
-        "health": 100,
-        "score": 53,
-        "units": 20
+        "health": 91,
+        "score": 50,
+        "units": 23
       },
-      "player1Decision": "build",
-      "player2Decision": "gather"
+      "player1Decision": "attack",
+      "player2Decision": "attack"
     },
     {
       "tickNumber": 2,
-      "timestamp": 1783628692730,
+      "timestamp": 1783629341650,
       "player1State": {
-        "health": 100,
-        "score": 50,
-        "units": 28
+        "health": 99,
+        "score": 54,
+        "units": 20
       },
       "player2State": {
-        "health": 100,
-        "score": 53,
-        "units": 25
-      },
-      "player1Decision": "build",
-      "player2Decision": "scout"
-    },
-    {
-      "tickNumber": 3,
-      "timestamp": 1783628692830,
-      "player1State": {
-        "health": 100,
+        "health": 91,
         "score": 50,
-        "units": 27
-      },
-      "player2State": {
-        "health": 100,
-        "score": 53,
         "units": 26
       },
       "player1Decision": "gather",
       "player2Decision": "defend"
     },
     {
-      "tickNumber": 4,
-      "timestamp": 1783628692930,
+      "tickNumber": 3,
+      "timestamp": 1783629341750,
       "player1State": {
-        "health": 100,
-        "score": 50,
-        "units": 20
+        "health": 99,
+        "score": 54,
+        "units": 28
       },
       "player2State": {
-        "health": 100,
-        "score": 53,
+        "health": 91,
+        "score": 51,
+        "units": 28
+      },
+      "player1Decision": "scout",
+      "player2Decision": "gather"
+    },
+    {
+      "tickNumber": 4,
+      "timestamp": 1783629341850,
+      "player1State": {
+        "health": 99,
+        "score": 54,
+        "units": 25
+      },
+      "player2State": {
+        "health": 91,
+        "score": 51,
         "units": 27
       },
       "player1Decision": "attack",
-      "player2Decision": "gather"
+      "player2Decision": "build"
     },
     {
       "tickNumber": 5,
-      "timestamp": 1783628693030,
+      "timestamp": 1783629341950,
       "player1State": {
-        "health": 100,
-        "score": 50,
-        "units": 22
+        "health": 99,
+        "score": 54,
+        "units": 23
       },
       "player2State": {
-        "health": 100,
-        "score": 53,
-        "units": 25
+        "health": 91,
+        "score": 51,
+        "units": 20
       },
-      "player1Decision": "attack",
-      "player2Decision": "gather"
+      "player1Decision": "scout",
+      "player2Decision": "defend"
     },
     {
       "tickNumber": 6,
-      "timestamp": 1783628693130,
+      "timestamp": 1783629342050,
       "player1State": {
-        "health": 100,
-        "score": 52,
-        "units": 20
+        "health": 99,
+        "score": 58,
+        "units": 23
       },
       "player2State": {
-        "health": 100,
-        "score": 55,
+        "health": 91,
+        "score": 51,
         "units": 25
       },
       "player1Decision": "gather",
-      "player2Decision": "gather"
+      "player2Decision": "build"
     },
     {
       "tickNumber": 7,
-      "timestamp": 1783628693230,
+      "timestamp": 1783629342150,
       "player1State": {
-        "health": 100,
-        "score": 52,
-        "units": 22
+        "health": 99,
+        "score": 59,
+        "units": 28
       },
       "player2State": {
-        "health": 100,
-        "score": 55,
+        "health": 91,
+        "score": 51,
         "units": 25
       },
-      "player1Decision": "defend",
+      "player1Decision": "gather",
       "player2Decision": "scout"
     },
     {
       "tickNumber": 8,
-      "timestamp": 1783628693330,
+      "timestamp": 1783629342250,
       "player1State": {
-        "health": 100,
-        "score": 52,
-        "units": 24
+        "health": 96,
+        "score": 59,
+        "units": 20
       },
       "player2State": {
-        "health": 100,
-        "score": 55,
-        "units": 23
+        "health": 91,
+        "score": 51,
+        "units": 26
       },
-      "player1Decision": "build",
+      "player1Decision": "scout",
       "player2Decision": "attack"
     },
     {
       "tickNumber": 9,
-      "timestamp": 1783628693430,
+      "timestamp": 1783629342350,
       "player1State": {
-        "health": 100,
-        "score": 52,
-        "units": 21
-      },
-      "player2State": {
-        "health": 100,
-        "score": 55,
-        "units": 26
-      },
-      "player1Decision": "scout",
-      "player2Decision": "build"
-    },
-    {
-      "tickNumber": 10,
-      "timestamp": 1783628693530,
-      "player1State": {
-        "health": 100,
-        "score": 52,
-        "units": 23
-      },
-      "player2State": {
-        "health": 100,
-        "score": 55,
-        "units": 25
-      },
-      "player1Decision": "attack",
-      "player2Decision": "attack"
-    },
-    {
-      "tickNumber": 11,
-      "timestamp": 1783628693631,
-      "player1State": {
-        "health": 100,
-        "score": 52,
-        "units": 27
-      },
-      "player2State": {
-        "health": 100,
-        "score": 55,
-        "units": 20
-      },
-      "player1Decision": "defend",
-      "player2Decision": "gather"
-    },
-    {
-      "tickNumber": 12,
-      "timestamp": 1783628693731,
-      "player1State": {
-        "health": 100,
-        "score": 52,
+        "health": 96,
+        "score": 59,
         "units": 28
       },
       "player2State": {
-        "health": 100,
-        "score": 57,
+        "health": 91,
+        "score": 51,
         "units": 22
-      },
-      "player1Decision": "attack",
-      "player2Decision": "gather"
-    },
-    {
-      "tickNumber": 13,
-      "timestamp": 1783628693831,
-      "player1State": {
-        "health": 100,
-        "score": 52,
-        "units": 26
-      },
-      "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 27
-      },
-      "player1Decision": "scout",
-      "player2Decision": "attack"
-    },
-    {
-      "tickNumber": 14,
-      "timestamp": 1783628693931,
-      "player1State": {
-        "health": 100,
-        "score": 52,
-        "units": 26
-      },
-      "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 21
-      },
-      "player1Decision": "defend",
-      "player2Decision": "scout"
-    },
-    {
-      "tickNumber": 15,
-      "timestamp": 1783628694031,
-      "player1State": {
-        "health": 94,
-        "score": 52,
-        "units": 23
-      },
-      "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 22
-      },
-      "player1Decision": "attack",
-      "player2Decision": "attack"
-    },
-    {
-      "tickNumber": 16,
-      "timestamp": 1783628694131,
-      "player1State": {
-        "health": 94,
-        "score": 52,
-        "units": 21
-      },
-      "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 23
-      },
-      "player1Decision": "scout",
-      "player2Decision": "attack"
-    },
-    {
-      "tickNumber": 17,
-      "timestamp": 1783628694231,
-      "player1State": {
-        "health": 94,
-        "score": 52,
-        "units": 28
-      },
-      "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 22
-      },
-      "player1Decision": "defend",
-      "player2Decision": "build"
-    },
-    {
-      "tickNumber": 18,
-      "timestamp": 1783628694331,
-      "player1State": {
-        "health": 94,
-        "score": 52,
-        "units": 27
-      },
-      "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 27
-      },
-      "player1Decision": "scout",
-      "player2Decision": "gather"
-    },
-    {
-      "tickNumber": 19,
-      "timestamp": 1783628694431,
-      "player1State": {
-        "health": 94,
-        "score": 52,
-        "units": 28
-      },
-      "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 25
       },
       "player1Decision": "attack",
       "player2Decision": "defend"
     },
     {
-      "tickNumber": 20,
-      "timestamp": 1783628694531,
+      "tickNumber": 10,
+      "timestamp": 1783629342450,
       "player1State": {
-        "health": 93,
-        "score": 52,
-        "units": 28
+        "health": 96,
+        "score": 59,
+        "units": 26
       },
       "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 28
+        "health": 91,
+        "score": 51,
+        "units": 25
       },
-      "player1Decision": "build",
-      "player2Decision": "attack"
+      "player1Decision": "attack",
+      "player2Decision": "build"
     },
     {
-      "tickNumber": 21,
-      "timestamp": 1783628694631,
+      "tickNumber": 11,
+      "timestamp": 1783629342550,
       "player1State": {
-        "health": 93,
-        "score": 52,
+        "health": 96,
+        "score": 60,
+        "units": 21
+      },
+      "player2State": {
+        "health": 91,
+        "score": 51,
+        "units": 23
+      },
+      "player1Decision": "gather",
+      "player2Decision": "defend"
+    },
+    {
+      "tickNumber": 12,
+      "timestamp": 1783629342650,
+      "player1State": {
+        "health": 96,
+        "score": 60,
         "units": 28
       },
       "player2State": {
-        "health": 100,
-        "score": 57,
+        "health": 91,
+        "score": 51,
+        "units": 28
+      },
+      "player1Decision": "scout",
+      "player2Decision": "scout"
+    },
+    {
+      "tickNumber": 13,
+      "timestamp": 1783629342750,
+      "player1State": {
+        "health": 96,
+        "score": 61,
+        "units": 20
+      },
+      "player2State": {
+        "health": 91,
+        "score": 51,
+        "units": 20
+      },
+      "player1Decision": "gather",
+      "player2Decision": "defend"
+    },
+    {
+      "tickNumber": 14,
+      "timestamp": 1783629342850,
+      "player1State": {
+        "health": 96,
+        "score": 61,
         "units": 27
+      },
+      "player2State": {
+        "health": 91,
+        "score": 51,
+        "units": 26
       },
       "player1Decision": "scout",
       "player2Decision": "build"
     },
     {
-      "tickNumber": 22,
-      "timestamp": 1783628694731,
+      "tickNumber": 15,
+      "timestamp": 1783629342950,
       "player1State": {
-        "health": 93,
-        "score": 55,
+        "health": 96,
+        "score": 61,
+        "units": 21
+      },
+      "player2State": {
+        "health": 91,
+        "score": 51,
+        "units": 23
+      },
+      "player1Decision": "scout",
+      "player2Decision": "build"
+    },
+    {
+      "tickNumber": 16,
+      "timestamp": 1783629343050,
+      "player1State": {
+        "health": 96,
+        "score": 61,
+        "units": 28
+      },
+      "player2State": {
+        "health": 89,
+        "score": 51,
+        "units": 22
+      },
+      "player1Decision": "attack",
+      "player2Decision": "scout"
+    },
+    {
+      "tickNumber": 17,
+      "timestamp": 1783629343150,
+      "player1State": {
+        "health": 87,
+        "score": 61,
+        "units": 22
+      },
+      "player2State": {
+        "health": 89,
+        "score": 51,
+        "units": 25
+      },
+      "player1Decision": "defend",
+      "player2Decision": "attack"
+    },
+    {
+      "tickNumber": 18,
+      "timestamp": 1783629343250,
+      "player1State": {
+        "health": 87,
+        "score": 61,
         "units": 23
       },
       "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 22
+        "health": 89,
+        "score": 51,
+        "units": 27
+      },
+      "player1Decision": "build",
+      "player2Decision": "build"
+    },
+    {
+      "tickNumber": 19,
+      "timestamp": 1783629343350,
+      "player1State": {
+        "health": 87,
+        "score": 61,
+        "units": 24
+      },
+      "player2State": {
+        "health": 89,
+        "score": 51,
+        "units": 24
       },
       "player1Decision": "gather",
       "player2Decision": "build"
     },
     {
-      "tickNumber": 23,
-      "timestamp": 1783628694831,
+      "tickNumber": 20,
+      "timestamp": 1783629343450,
       "player1State": {
-        "health": 93,
-        "score": 55,
-        "units": 28
+        "health": 87,
+        "score": 61,
+        "units": 24
       },
       "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 22
+        "health": 89,
+        "score": 51,
+        "units": 21
       },
       "player1Decision": "scout",
-      "player2Decision": "build"
-    },
-    {
-      "tickNumber": 24,
-      "timestamp": 1783628694931,
-      "player1State": {
-        "health": 93,
-        "score": 55,
-        "units": 26
-      },
-      "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 28
-      },
-      "player1Decision": "attack",
       "player2Decision": "defend"
     },
     {
-      "tickNumber": 25,
-      "timestamp": 1783628695031,
+      "tickNumber": 21,
+      "timestamp": 1783629343550,
       "player1State": {
-        "health": 93,
-        "score": 55,
-        "units": 27
+        "health": 87,
+        "score": 61,
+        "units": 25
       },
       "player2State": {
-        "health": 100,
-        "score": 57,
+        "health": 89,
+        "score": 51,
         "units": 28
       },
-      "player1Decision": "attack",
+      "player1Decision": "scout",
+      "player2Decision": "scout"
+    },
+    {
+      "tickNumber": 22,
+      "timestamp": 1783629343650,
+      "player1State": {
+        "health": 87,
+        "score": 65,
+        "units": 26
+      },
+      "player2State": {
+        "health": 89,
+        "score": 52,
+        "units": 28
+      },
+      "player1Decision": "gather",
+      "player2Decision": "gather"
+    },
+    {
+      "tickNumber": 23,
+      "timestamp": 1783629343750,
+      "player1State": {
+        "health": 87,
+        "score": 65,
+        "units": 24
+      },
+      "player2State": {
+        "health": 89,
+        "score": 52,
+        "units": 24
+      },
+      "player1Decision": "defend",
+      "player2Decision": "scout"
+    },
+    {
+      "tickNumber": 24,
+      "timestamp": 1783629343850,
+      "player1State": {
+        "health": 87,
+        "score": 65,
+        "units": 29
+      },
+      "player2State": {
+        "health": 89,
+        "score": 53,
+        "units": 27
+      },
+      "player1Decision": "scout",
+      "player2Decision": "gather"
+    },
+    {
+      "tickNumber": 25,
+      "timestamp": 1783629343950,
+      "player1State": {
+        "health": 87,
+        "score": 66,
+        "units": 24
+      },
+      "player2State": {
+        "health": 89,
+        "score": 53,
+        "units": 28
+      },
+      "player1Decision": "gather",
       "player2Decision": "scout"
     },
     {
       "tickNumber": 26,
-      "timestamp": 1783628695131,
+      "timestamp": 1783629344050,
       "player1State": {
-        "health": 93,
-        "score": 55,
-        "units": 25
+        "health": 87,
+        "score": 66,
+        "units": 23
       },
       "player2State": {
-        "health": 100,
-        "score": 57,
+        "health": 89,
+        "score": 53,
+        "units": 27
+      },
+      "player1Decision": "scout",
+      "player2Decision": "defend"
+    },
+    {
+      "tickNumber": 27,
+      "timestamp": 1783629344150,
+      "player1State": {
+        "health": 87,
+        "score": 66,
+        "units": 21
+      },
+      "player2State": {
+        "health": 89,
+        "score": 53,
         "units": 24
       },
       "player1Decision": "scout",
       "player2Decision": "scout"
     },
     {
-      "tickNumber": 27,
-      "timestamp": 1783628695231,
+      "tickNumber": 28,
+      "timestamp": 1783629344250,
       "player1State": {
-        "health": 93,
-        "score": 55,
+        "health": 87,
+        "score": 66,
         "units": 23
       },
       "player2State": {
-        "health": 100,
-        "score": 57,
+        "health": 87,
+        "score": 53,
         "units": 28
       },
-      "player1Decision": "build",
-      "player2Decision": "attack"
-    },
-    {
-      "tickNumber": 28,
-      "timestamp": 1783628695331,
-      "player1State": {
-        "health": 93,
-        "score": 55,
-        "units": 22
-      },
-      "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 29
-      },
-      "player1Decision": "defend",
-      "player2Decision": "attack"
+      "player1Decision": "attack",
+      "player2Decision": "build"
     },
     {
       "tickNumber": 29,
-      "timestamp": 1783628695431,
+      "timestamp": 1783629344350,
       "player1State": {
-        "health": 93,
-        "score": 55,
-        "units": 20
-      },
-      "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 25
-      },
-      "player1Decision": "scout",
-      "player2Decision": "defend"
-    },
-    {
-      "tickNumber": 30,
-      "timestamp": 1783628695531,
-      "player1State": {
-        "health": 93,
-        "score": 55,
-        "units": 26
-      },
-      "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 27
-      },
-      "player1Decision": "scout",
-      "player2Decision": "build"
-    },
-    {
-      "tickNumber": 31,
-      "timestamp": 1783628695631,
-      "player1State": {
-        "health": 93,
-        "score": 55,
+        "health": 87,
+        "score": 66,
         "units": 21
       },
       "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 20
+        "health": 87,
+        "score": 56,
+        "units": 28
       },
-      "player1Decision": "scout",
-      "player2Decision": "build"
+      "player1Decision": "attack",
+      "player2Decision": "gather"
     },
     {
-      "tickNumber": 32,
-      "timestamp": 1783628695731,
+      "tickNumber": 30,
+      "timestamp": 1783629344450,
       "player1State": {
-        "health": 93,
-        "score": 55,
-        "units": 27
+        "health": 87,
+        "score": 66,
+        "units": 20
       },
       "player2State": {
-        "health": 100,
-        "score": 57,
+        "health": 87,
+        "score": 56,
         "units": 26
       },
       "player1Decision": "build",
-      "player2Decision": "scout"
+      "player2Decision": "defend"
+    },
+    {
+      "tickNumber": 31,
+      "timestamp": 1783629344550,
+      "player1State": {
+        "health": 87,
+        "score": 66,
+        "units": 28
+      },
+      "player2State": {
+        "health": 87,
+        "score": 56,
+        "units": 25
+      },
+      "player1Decision": "build",
+      "player2Decision": "defend"
+    },
+    {
+      "tickNumber": 32,
+      "timestamp": 1783629344650,
+      "player1State": {
+        "health": 87,
+        "score": 66,
+        "units": 20
+      },
+      "player2State": {
+        "health": 87,
+        "score": 56,
+        "units": 23
+      },
+      "player1Decision": "gather",
+      "player2Decision": "build"
     },
     {
       "tickNumber": 33,
-      "timestamp": 1783628695831,
+      "timestamp": 1783629344750,
       "player1State": {
-        "health": 93,
-        "score": 56,
-        "units": 29
+        "health": 87,
+        "score": 70,
+        "units": 27
       },
       "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 27
+        "health": 87,
+        "score": 56,
+        "units": 20
       },
       "player1Decision": "gather",
       "player2Decision": "defend"
     },
     {
       "tickNumber": 34,
-      "timestamp": 1783628695931,
+      "timestamp": 1783629344850,
       "player1State": {
-        "health": 93,
-        "score": 58,
-        "units": 28
+        "health": 87,
+        "score": 70,
+        "units": 22
       },
       "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 23
+        "health": 87,
+        "score": 56,
+        "units": 22
       },
-      "player1Decision": "gather",
-      "player2Decision": "build"
-    },
-    {
-      "tickNumber": 35,
-      "timestamp": 1783628696031,
-      "player1State": {
-        "health": 93,
-        "score": 58,
-        "units": 24
-      },
-      "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 27
-      },
-      "player1Decision": "build",
+      "player1Decision": "defend",
       "player2Decision": "defend"
     },
     {
-      "tickNumber": 36,
-      "timestamp": 1783628696131,
+      "tickNumber": 35,
+      "timestamp": 1783629344950,
       "player1State": {
-        "health": 93,
-        "score": 58,
-        "units": 20
+        "health": 87,
+        "score": 74,
+        "units": 27
       },
       "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 26
+        "health": 87,
+        "score": 56,
+        "units": 23
+      },
+      "player1Decision": "gather",
+      "player2Decision": "scout"
+    },
+    {
+      "tickNumber": 36,
+      "timestamp": 1783629345050,
+      "player1State": {
+        "health": 87,
+        "score": 74,
+        "units": 28
+      },
+      "player2State": {
+        "health": 87,
+        "score": 56,
+        "units": 25
       },
       "player1Decision": "defend",
       "player2Decision": "build"
     },
     {
       "tickNumber": 37,
-      "timestamp": 1783628696231,
+      "timestamp": 1783629345150,
       "player1State": {
-        "health": 93,
-        "score": 58,
+        "health": 87,
+        "score": 74,
         "units": 20
       },
       "player2State": {
-        "health": 100,
-        "score": 57,
+        "health": 87,
+        "score": 56,
         "units": 28
       },
-      "player1Decision": "defend",
+      "player1Decision": "attack",
       "player2Decision": "build"
     },
     {
       "tickNumber": 38,
-      "timestamp": 1783628696331,
+      "timestamp": 1783629345250,
       "player1State": {
-        "health": 93,
-        "score": 58,
-        "units": 23
+        "health": 87,
+        "score": 74,
+        "units": 27
       },
       "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 21
+        "health": 87,
+        "score": 56,
+        "units": 25
       },
-      "player1Decision": "gather",
-      "player2Decision": "gather"
+      "player1Decision": "build",
+      "player2Decision": "defend"
     },
     {
       "tickNumber": 39,
-      "timestamp": 1783628696431,
+      "timestamp": 1783629345350,
       "player1State": {
-        "health": 93,
-        "score": 58,
-        "units": 28
+        "health": 87,
+        "score": 74,
+        "units": 29
       },
       "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 22
+        "health": 87,
+        "score": 56,
+        "units": 23
       },
       "player1Decision": "build",
       "player2Decision": "build"
     },
     {
       "tickNumber": 40,
-      "timestamp": 1783628696531,
+      "timestamp": 1783629345450,
       "player1State": {
-        "health": 93,
-        "score": 58,
-        "units": 22
+        "health": 87,
+        "score": 75,
+        "units": 23
       },
       "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 26
+        "health": 87,
+        "score": 56,
+        "units": 25
       },
-      "player1Decision": "defend",
-      "player2Decision": "attack"
+      "player1Decision": "gather",
+      "player2Decision": "build"
     },
     {
       "tickNumber": 41,
-      "timestamp": 1783628696631,
+      "timestamp": 1783629345550,
       "player1State": {
-        "health": 93,
-        "score": 58,
+        "health": 87,
+        "score": 75,
         "units": 29
       },
       "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 24
-      },
-      "player1Decision": "scout",
-      "player2Decision": "defend"
-    },
-    {
-      "tickNumber": 42,
-      "timestamp": 1783628696731,
-      "player1State": {
-        "health": 93,
-        "score": 60,
+        "health": 87,
+        "score": 59,
         "units": 22
       },
-      "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 28
-      },
-      "player1Decision": "gather",
+      "player1Decision": "scout",
       "player2Decision": "gather"
     },
     {
-      "tickNumber": 43,
-      "timestamp": 1783628696831,
+      "tickNumber": 42,
+      "timestamp": 1783629345650,
       "player1State": {
-        "health": 93,
-        "score": 60,
-        "units": 26
+        "health": 87,
+        "score": 75,
+        "units": 28
       },
       "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 27
+        "health": 87,
+        "score": 59,
+        "units": 23
       },
-      "player1Decision": "attack",
-      "player2Decision": "defend"
+      "player1Decision": "build",
+      "player2Decision": "scout"
+    },
+    {
+      "tickNumber": 43,
+      "timestamp": 1783629345750,
+      "player1State": {
+        "health": 87,
+        "score": 75,
+        "units": 22
+      },
+      "player2State": {
+        "health": 87,
+        "score": 59,
+        "units": 20
+      },
+      "player1Decision": "build",
+      "player2Decision": "attack"
     },
     {
       "tickNumber": 44,
-      "timestamp": 1783628696931,
+      "timestamp": 1783629345850,
       "player1State": {
-        "health": 93,
-        "score": 63,
-        "units": 20
+        "health": 82,
+        "score": 77,
+        "units": 25
       },
       "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 23
+        "health": 87,
+        "score": 59,
+        "units": 24
       },
       "player1Decision": "gather",
       "player2Decision": "attack"
     },
     {
       "tickNumber": 45,
-      "timestamp": 1783628697031,
+      "timestamp": 1783629345950,
       "player1State": {
-        "health": 93,
-        "score": 63,
-        "units": 26
-      },
-      "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 24
-      },
-      "player1Decision": "attack",
-      "player2Decision": "scout"
-    },
-    {
-      "tickNumber": 46,
-      "timestamp": 1783628697131,
-      "player1State": {
-        "health": 93,
-        "score": 66,
-        "units": 27
-      },
-      "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 28
-      },
-      "player1Decision": "gather",
-      "player2Decision": "attack"
-    },
-    {
-      "tickNumber": 47,
-      "timestamp": 1783628697231,
-      "player1State": {
-        "health": 93,
-        "score": 66,
-        "units": 26
-      },
-      "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 25
-      },
-      "player1Decision": "defend",
-      "player2Decision": "defend"
-    },
-    {
-      "tickNumber": 48,
-      "timestamp": 1783628697331,
-      "player1State": {
-        "health": 93,
-        "score": 66,
-        "units": 21
-      },
-      "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 20
-      },
-      "player1Decision": "scout",
-      "player2Decision": "build"
-    },
-    {
-      "tickNumber": 49,
-      "timestamp": 1783628697431,
-      "player1State": {
-        "health": 93,
-        "score": 66,
+        "health": 82,
+        "score": 77,
         "units": 22
       },
       "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 28
-      },
-      "player1Decision": "defend",
-      "player2Decision": "defend"
-    },
-    {
-      "tickNumber": 50,
-      "timestamp": 1783628697531,
-      "player1State": {
-        "health": 93,
-        "score": 66,
-        "units": 26
-      },
-      "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 23
+        "health": 87,
+        "score": 59,
+        "units": 21
       },
       "player1Decision": "scout",
       "player2Decision": "attack"
     },
     {
-      "tickNumber": 51,
-      "timestamp": 1783628697631,
+      "tickNumber": 46,
+      "timestamp": 1783629346050,
       "player1State": {
-        "health": 93,
-        "score": 66,
-        "units": 29
+        "health": 82,
+        "score": 77,
+        "units": 22
       },
       "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 21
+        "health": 87,
+        "score": 59,
+        "units": 28
       },
-      "player1Decision": "build",
+      "player1Decision": "scout",
       "player2Decision": "defend"
     },
     {
-      "tickNumber": 52,
-      "timestamp": 1783628697731,
+      "tickNumber": 47,
+      "timestamp": 1783629346150,
       "player1State": {
-        "health": 86,
-        "score": 70,
+        "health": 82,
+        "score": 77,
+        "units": 21
+      },
+      "player2State": {
+        "health": 87,
+        "score": 59,
+        "units": 21
+      },
+      "player1Decision": "defend",
+      "player2Decision": "scout"
+    },
+    {
+      "tickNumber": 48,
+      "timestamp": 1783629346250,
+      "player1State": {
+        "health": 82,
+        "score": 79,
         "units": 28
       },
       "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 24
+        "health": 87,
+        "score": 59,
+        "units": 23
       },
       "player1Decision": "gather",
-      "player2Decision": "attack"
+      "player2Decision": "defend"
     },
     {
-      "tickNumber": 53,
-      "timestamp": 1783628697831,
+      "tickNumber": 49,
+      "timestamp": 1783629346350,
       "player1State": {
-        "health": 86,
-        "score": 70,
-        "units": 20
+        "health": 82,
+        "score": 79,
+        "units": 21
       },
       "player2State": {
-        "health": 100,
-        "score": 57,
+        "health": 87,
+        "score": 61,
+        "units": 23
+      },
+      "player1Decision": "build",
+      "player2Decision": "gather"
+    },
+    {
+      "tickNumber": 50,
+      "timestamp": 1783629346450,
+      "player1State": {
+        "health": 82,
+        "score": 79,
+        "units": 29
+      },
+      "player2State": {
+        "health": 87,
+        "score": 61,
         "units": 25
       },
       "player1Decision": "build",
       "player2Decision": "defend"
     },
     {
-      "tickNumber": 54,
-      "timestamp": 1783628697931,
+      "tickNumber": 51,
+      "timestamp": 1783629346550,
       "player1State": {
-        "health": 86,
-        "score": 74,
-        "units": 26
+        "health": 82,
+        "score": 79,
+        "units": 22
       },
       "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 20
+        "health": 83,
+        "score": 61,
+        "units": 28
       },
-      "player1Decision": "gather",
+      "player1Decision": "attack",
       "player2Decision": "build"
     },
     {
-      "tickNumber": 55,
-      "timestamp": 1783628698031,
+      "tickNumber": 52,
+      "timestamp": 1783629346650,
       "player1State": {
-        "health": 86,
-        "score": 74,
-        "units": 24
+        "health": 82,
+        "score": 79,
+        "units": 26
       },
       "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 26
+        "health": 83,
+        "score": 61,
+        "units": 23
       },
       "player1Decision": "build",
       "player2Decision": "defend"
     },
     {
-      "tickNumber": 56,
-      "timestamp": 1783628698131,
+      "tickNumber": 53,
+      "timestamp": 1783629346750,
       "player1State": {
-        "health": 86,
-        "score": 77,
-        "units": 26
+        "health": 82,
+        "score": 79,
+        "units": 22
       },
       "player2State": {
-        "health": 100,
-        "score": 57,
-        "units": 26
+        "health": 83,
+        "score": 61,
+        "units": 28
       },
-      "player1Decision": "gather",
+      "player1Decision": "build",
       "player2Decision": "build"
     },
     {
-      "tickNumber": 57,
-      "timestamp": 1783628698231,
+      "tickNumber": 54,
+      "timestamp": 1783629346850,
       "player1State": {
-        "health": 86,
-        "score": 77,
-        "units": 21
+        "health": 82,
+        "score": 79,
+        "units": 24
       },
       "player2State": {
-        "health": 96,
-        "score": 58,
+        "health": 83,
+        "score": 61,
         "units": 26
+      },
+      "player1Decision": "scout",
+      "player2Decision": "defend"
+    },
+    {
+      "tickNumber": 55,
+      "timestamp": 1783629346950,
+      "player1State": {
+        "health": 82,
+        "score": 83,
+        "units": 20
+      },
+      "player2State": {
+        "health": 83,
+        "score": 61,
+        "units": 28
+      },
+      "player1Decision": "gather",
+      "player2Decision": "attack"
+    },
+    {
+      "tickNumber": 56,
+      "timestamp": 1783629347050,
+      "player1State": {
+        "health": 82,
+        "score": 83,
+        "units": 23
+      },
+      "player2State": {
+        "health": 75,
+        "score": 63,
+        "units": 21
       },
       "player1Decision": "attack",
       "player2Decision": "gather"
     },
     {
-      "tickNumber": 58,
-      "timestamp": 1783628698331,
+      "tickNumber": 57,
+      "timestamp": 1783629347150,
       "player1State": {
-        "health": 86,
-        "score": 77,
-        "units": 20
+        "health": 82,
+        "score": 83,
+        "units": 23
       },
       "player2State": {
-        "health": 96,
-        "score": 58,
-        "units": 27
+        "health": 75,
+        "score": 63,
+        "units": 21
       },
-      "player1Decision": "build",
-      "player2Decision": "scout"
+      "player1Decision": "scout",
+      "player2Decision": "attack"
+    },
+    {
+      "tickNumber": 58,
+      "timestamp": 1783629347250,
+      "player1State": {
+        "health": 82,
+        "score": 87,
+        "units": 25
+      },
+      "player2State": {
+        "health": 75,
+        "score": 67,
+        "units": 28
+      },
+      "player1Decision": "gather",
+      "player2Decision": "gather"
     },
     {
       "tickNumber": 59,
-      "timestamp": 1783628698431,
+      "timestamp": 1783629347350,
       "player1State": {
-        "health": 86,
-        "score": 77,
+        "health": 82,
+        "score": 87,
+        "units": 25
+      },
+      "player2State": {
+        "health": 69,
+        "score": 67,
+        "units": 22
+      },
+      "player1Decision": "attack",
+      "player2Decision": "build"
+    },
+    {
+      "tickNumber": 60,
+      "timestamp": 1783629347450,
+      "player1State": {
+        "health": 82,
+        "score": 87,
         "units": 28
       },
       "player2State": {
-        "health": 96,
-        "score": 58,
+        "health": 69,
+        "score": 67,
+        "units": 20
+      },
+      "player1Decision": "build",
+      "player2Decision": "attack"
+    },
+    {
+      "tickNumber": 61,
+      "timestamp": 1783629347550,
+      "player1State": {
+        "health": 82,
+        "score": 87,
+        "units": 22
+      },
+      "player2State": {
+        "health": 69,
+        "score": 67,
+        "units": 27
+      },
+      "player1Decision": "build",
+      "player2Decision": "build"
+    },
+    {
+      "tickNumber": 62,
+      "timestamp": 1783629347650,
+      "player1State": {
+        "health": 78,
+        "score": 87,
+        "units": 20
+      },
+      "player2State": {
+        "health": 66,
+        "score": 67,
         "units": 23
       },
       "player1Decision": "attack",
       "player2Decision": "attack"
     },
     {
-      "tickNumber": 60,
-      "timestamp": 1783628698531,
-      "player1State": {
-        "health": 86,
-        "score": 77,
-        "units": 24
-      },
-      "player2State": {
-        "health": 96,
-        "score": 58,
-        "units": 29
-      },
-      "player1Decision": "scout",
-      "player2Decision": "attack"
-    },
-    {
-      "tickNumber": 61,
-      "timestamp": 1783628698631,
-      "player1State": {
-        "health": 86,
-        "score": 77,
-        "units": 23
-      },
-      "player2State": {
-        "health": 96,
-        "score": 58,
-        "units": 26
-      },
-      "player1Decision": "scout",
-      "player2Decision": "build"
-    },
-    {
-      "tickNumber": 62,
-      "timestamp": 1783628698731,
-      "player1State": {
-        "health": 86,
-        "score": 77,
-        "units": 24
-      },
-      "player2State": {
-        "health": 96,
-        "score": 58,
-        "units": 26
-      },
-      "player1Decision": "build",
-      "player2Decision": "build"
-    },
-    {
       "tickNumber": 63,
-      "timestamp": 1783628698831,
+      "timestamp": 1783629347750,
       "player1State": {
-        "health": 86,
-        "score": 77,
-        "units": 21
+        "health": 78,
+        "score": 87,
+        "units": 24
       },
       "player2State": {
-        "health": 96,
-        "score": 62,
-        "units": 22
+        "health": 66,
+        "score": 70,
+        "units": 21
       },
       "player1Decision": "defend",
       "player2Decision": "gather"
     },
     {
       "tickNumber": 64,
-      "timestamp": 1783628698931,
+      "timestamp": 1783629347850,
       "player1State": {
-        "health": 86,
-        "score": 77,
-        "units": 21
+        "health": 78,
+        "score": 87,
+        "units": 29
       },
       "player2State": {
-        "health": 96,
-        "score": 62,
-        "units": 22
+        "health": 66,
+        "score": 71,
+        "units": 27
       },
-      "player1Decision": "scout",
-      "player2Decision": "defend"
+      "player1Decision": "attack",
+      "player2Decision": "gather"
     },
     {
       "tickNumber": 65,
-      "timestamp": 1783628699031,
+      "timestamp": 1783629347950,
       "player1State": {
-        "health": 86,
-        "score": 77,
-        "units": 27
-      },
-      "player2State": {
-        "health": 96,
-        "score": 62,
+        "health": 78,
+        "score": 87,
         "units": 23
       },
+      "player2State": {
+        "health": 66,
+        "score": 71,
+        "units": 29
+      },
       "player1Decision": "defend",
-      "player2Decision": "attack"
+      "player2Decision": "scout"
     },
     {
       "tickNumber": 66,
-      "timestamp": 1783628699131,
+      "timestamp": 1783629348050,
       "player1State": {
-        "health": 86,
-        "score": 77,
-        "units": 28
-      },
-      "player2State": {
-        "health": 96,
-        "score": 62,
+        "health": 78,
+        "score": 87,
         "units": 29
       },
+      "player2State": {
+        "health": 66,
+        "score": 71,
+        "units": 27
+      },
       "player1Decision": "build",
-      "player2Decision": "build"
+      "player2Decision": "defend"
     },
     {
       "tickNumber": 67,
-      "timestamp": 1783628699231,
+      "timestamp": 1783629348150,
       "player1State": {
-        "health": 86,
-        "score": 77,
-        "units": 23
+        "health": 78,
+        "score": 87,
+        "units": 24
       },
       "player2State": {
-        "health": 96,
-        "score": 62,
+        "health": 66,
+        "score": 71,
+        "units": 24
+      },
+      "player1Decision": "gather",
+      "player2Decision": "build"
+    },
+    {
+      "tickNumber": 68,
+      "timestamp": 1783629348250,
+      "player1State": {
+        "health": 78,
+        "score": 87,
+        "units": 29
+      },
+      "player2State": {
+        "health": 66,
+        "score": 71,
+        "units": 24
+      },
+      "player1Decision": "scout",
+      "player2Decision": "scout"
+    },
+    {
+      "tickNumber": 69,
+      "timestamp": 1783629348350,
+      "player1State": {
+        "health": 78,
+        "score": 87,
         "units": 27
+      },
+      "player2State": {
+        "health": 66,
+        "score": 71,
+        "units": 20
+      },
+      "player1Decision": "attack",
+      "player2Decision": "defend"
+    },
+    {
+      "tickNumber": 70,
+      "timestamp": 1783629348450,
+      "player1State": {
+        "health": 78,
+        "score": 87,
+        "units": 22
+      },
+      "player2State": {
+        "health": 66,
+        "score": 71,
+        "units": 21
       },
       "player1Decision": "gather",
       "player2Decision": "scout"
     },
     {
-      "tickNumber": 68,
-      "timestamp": 1783628699331,
-      "player1State": {
-        "health": 86,
-        "score": 77,
-        "units": 23
-      },
-      "player2State": {
-        "health": 96,
-        "score": 62,
-        "units": 23
-      },
-      "player1Decision": "scout",
-      "player2Decision": "gather"
-    },
-    {
-      "tickNumber": 69,
-      "timestamp": 1783628699431,
-      "player1State": {
-        "health": 86,
-        "score": 77,
-        "units": 21
-      },
-      "player2State": {
-        "health": 96,
-        "score": 62,
-        "units": 27
-      },
-      "player1Decision": "build",
-      "player2Decision": "gather"
-    },
-    {
-      "tickNumber": 70,
-      "timestamp": 1783628699531,
-      "player1State": {
-        "health": 86,
-        "score": 77,
-        "units": 29
-      },
-      "player2State": {
-        "health": 96,
-        "score": 62,
-        "units": 21
-      },
-      "player1Decision": "scout",
-      "player2Decision": "build"
-    },
-    {
       "tickNumber": 71,
-      "timestamp": 1783628699631,
+      "timestamp": 1783629348550,
       "player1State": {
         "health": 78,
-        "score": 77,
+        "score": 90,
+        "units": 23
+      },
+      "player2State": {
+        "health": 66,
+        "score": 71,
         "units": 28
-      },
-      "player2State": {
-        "health": 96,
-        "score": 62,
-        "units": 27
-      },
-      "player1Decision": "gather",
-      "player2Decision": "attack"
-    },
-    {
-      "tickNumber": 72,
-      "timestamp": 1783628699731,
-      "player1State": {
-        "health": 78,
-        "score": 81,
-        "units": 24
-      },
-      "player2State": {
-        "health": 96,
-        "score": 62,
-        "units": 27
       },
       "player1Decision": "gather",
       "player2Decision": "defend"
     },
     {
-      "tickNumber": 73,
-      "timestamp": 1783628699831,
+      "tickNumber": 72,
+      "timestamp": 1783629348650,
       "player1State": {
         "health": 78,
-        "score": 81,
+        "score": 90,
         "units": 24
       },
       "player2State": {
-        "health": 96,
-        "score": 64,
-        "units": 22
+        "health": 58,
+        "score": 74,
+        "units": 24
+      },
+      "player1Decision": "attack",
+      "player2Decision": "gather"
+    },
+    {
+      "tickNumber": 73,
+      "timestamp": 1783629348750,
+      "player1State": {
+        "health": 70,
+        "score": 90,
+        "units": 26
+      },
+      "player2State": {
+        "health": 58,
+        "score": 74,
+        "units": 29
       },
       "player1Decision": "scout",
-      "player2Decision": "gather"
+      "player2Decision": "attack"
     },
     {
       "tickNumber": 74,
-      "timestamp": 1783628699931,
+      "timestamp": 1783629348850,
       "player1State": {
-        "health": 78,
-        "score": 81,
-        "units": 23
+        "health": 70,
+        "score": 90,
+        "units": 22
       },
       "player2State": {
-        "health": 96,
-        "score": 64,
-        "units": 29
+        "health": 58,
+        "score": 74,
+        "units": 20
       },
-      "player1Decision": "attack",
-      "player2Decision": "scout"
+      "player1Decision": "defend",
+      "player2Decision": "build"
     },
     {
       "tickNumber": 75,
-      "timestamp": 1783628700031,
+      "timestamp": 1783629348950,
       "player1State": {
-        "health": 78,
-        "score": 81,
-        "units": 27
+        "health": 70,
+        "score": 90,
+        "units": 28
       },
       "player2State": {
-        "health": 96,
-        "score": 68,
-        "units": 21
+        "health": 58,
+        "score": 74,
+        "units": 28
       },
       "player1Decision": "attack",
-      "player2Decision": "gather"
+      "player2Decision": "build"
     },
     {
       "tickNumber": 76,
-      "timestamp": 1783628700131,
+      "timestamp": 1783629349050,
       "player1State": {
-        "health": 78,
-        "score": 81,
-        "units": 20
+        "health": 70,
+        "score": 90,
+        "units": 25
       },
       "player2State": {
-        "health": 96,
-        "score": 68,
-        "units": 29
+        "health": 58,
+        "score": 74,
+        "units": 26
       },
-      "player1Decision": "scout",
-      "player2Decision": "build"
+      "player1Decision": "build",
+      "player2Decision": "defend"
     },
     {
       "tickNumber": 77,
-      "timestamp": 1783628700231,
+      "timestamp": 1783629349150,
       "player1State": {
-        "health": 78,
-        "score": 81,
-        "units": 26
-      },
-      "player2State": {
-        "health": 96,
-        "score": 68,
-        "units": 22
-      },
-      "player1Decision": "build",
-      "player2Decision": "scout"
-    },
-    {
-      "tickNumber": 78,
-      "timestamp": 1783628700331,
-      "player1State": {
-        "health": 78,
-        "score": 82,
-        "units": 25
-      },
-      "player2State": {
-        "health": 96,
-        "score": 68,
-        "units": 28
-      },
-      "player1Decision": "gather",
-      "player2Decision": "build"
-    },
-    {
-      "tickNumber": 79,
-      "timestamp": 1783628700431,
-      "player1State": {
-        "health": 77,
-        "score": 82,
-        "units": 25
-      },
-      "player2State": {
-        "health": 93,
-        "score": 68,
-        "units": 24
-      },
-      "player1Decision": "attack",
-      "player2Decision": "attack"
-    },
-    {
-      "tickNumber": 80,
-      "timestamp": 1783628700531,
-      "player1State": {
-        "health": 77,
-        "score": 82,
-        "units": 25
-      },
-      "player2State": {
-        "health": 93,
-        "score": 68,
-        "units": 23
-      },
-      "player1Decision": "attack",
-      "player2Decision": "build"
-    },
-    {
-      "tickNumber": 81,
-      "timestamp": 1783628700631,
-      "player1State": {
-        "health": 77,
-        "score": 83,
-        "units": 28
-      },
-      "player2State": {
-        "health": 93,
-        "score": 72,
-        "units": 24
-      },
-      "player1Decision": "gather",
-      "player2Decision": "gather"
-    },
-    {
-      "tickNumber": 82,
-      "timestamp": 1783628700731,
-      "player1State": {
-        "health": 77,
-        "score": 87,
-        "units": 26
-      },
-      "player2State": {
-        "health": 93,
-        "score": 76,
-        "units": 28
-      },
-      "player1Decision": "gather",
-      "player2Decision": "gather"
-    },
-    {
-      "tickNumber": 83,
-      "timestamp": 1783628700831,
-      "player1State": {
-        "health": 72,
-        "score": 87,
-        "units": 24
-      },
-      "player2State": {
-        "health": 87,
-        "score": 76,
-        "units": 28
-      },
-      "player1Decision": "attack",
-      "player2Decision": "attack"
-    },
-    {
-      "tickNumber": 84,
-      "timestamp": 1783628700931,
-      "player1State": {
-        "health": 72,
-        "score": 87,
-        "units": 23
-      },
-      "player2State": {
-        "health": 87,
-        "score": 76,
-        "units": 25
-      },
-      "player1Decision": "build",
-      "player2Decision": "build"
-    },
-    {
-      "tickNumber": 85,
-      "timestamp": 1783628701031,
-      "player1State": {
-        "health": 72,
-        "score": 88,
-        "units": 23
-      },
-      "player2State": {
-        "health": 87,
-        "score": 76,
-        "units": 27
-      },
-      "player1Decision": "gather",
-      "player2Decision": "build"
-    },
-    {
-      "tickNumber": 86,
-      "timestamp": 1783628701131,
-      "player1State": {
-        "health": 72,
-        "score": 88,
-        "units": 22
-      },
-      "player2State": {
-        "health": 85,
-        "score": 77,
-        "units": 29
-      },
-      "player1Decision": "attack",
-      "player2Decision": "gather"
-    },
-    {
-      "tickNumber": 87,
-      "timestamp": 1783628701231,
-      "player1State": {
-        "health": 68,
-        "score": 88,
-        "units": 23
-      },
-      "player2State": {
-        "health": 85,
-        "score": 77,
-        "units": 29
-      },
-      "player1Decision": "attack",
-      "player2Decision": "attack"
-    },
-    {
-      "tickNumber": 88,
-      "timestamp": 1783628701331,
-      "player1State": {
-        "health": 68,
-        "score": 88,
-        "units": 27
-      },
-      "player2State": {
-        "health": 85,
-        "score": 77,
-        "units": 22
-      },
-      "player1Decision": "gather",
-      "player2Decision": "attack"
-    },
-    {
-      "tickNumber": 89,
-      "timestamp": 1783628701431,
-      "player1State": {
-        "health": 68,
-        "score": 88,
-        "units": 29
-      },
-      "player2State": {
-        "health": 85,
-        "score": 77,
-        "units": 28
-      },
-      "player1Decision": "defend",
-      "player2Decision": "scout"
-    },
-    {
-      "tickNumber": 90,
-      "timestamp": 1783628701531,
-      "player1State": {
-        "health": 68,
-        "score": 88,
-        "units": 28
-      },
-      "player2State": {
-        "health": 85,
-        "score": 77,
-        "units": 21
-      },
-      "player1Decision": "attack",
-      "player2Decision": "build"
-    },
-    {
-      "tickNumber": 91,
-      "timestamp": 1783628701631,
-      "player1State": {
-        "health": 68,
-        "score": 88,
-        "units": 20
-      },
-      "player2State": {
-        "health": 85,
-        "score": 77,
-        "units": 23
-      },
-      "player1Decision": "build",
-      "player2Decision": "build"
-    },
-    {
-      "tickNumber": 92,
-      "timestamp": 1783628701731,
-      "player1State": {
-        "health": 68,
+        "health": 70,
         "score": 90,
         "units": 29
       },
       "player2State": {
-        "health": 85,
-        "score": 77,
-        "units": 22
+        "health": 58,
+        "score": 74,
+        "units": 24
       },
-      "player1Decision": "gather",
+      "player1Decision": "defend",
       "player2Decision": "build"
     },
     {
-      "tickNumber": 93,
-      "timestamp": 1783628701831,
+      "tickNumber": 78,
+      "timestamp": 1783629349250,
       "player1State": {
-        "health": 68,
+        "health": 70,
+        "score": 90,
+        "units": 26
+      },
+      "player2State": {
+        "health": 58,
+        "score": 74,
+        "units": 22
+      },
+      "player1Decision": "defend",
+      "player2Decision": "build"
+    },
+    {
+      "tickNumber": 79,
+      "timestamp": 1783629349350,
+      "player1State": {
+        "health": 70,
+        "score": 90,
+        "units": 21
+      },
+      "player2State": {
+        "health": 58,
+        "score": 74,
+        "units": 28
+      },
+      "player1Decision": "build",
+      "player2Decision": "build"
+    },
+    {
+      "tickNumber": 80,
+      "timestamp": 1783629349450,
+      "player1State": {
+        "health": 70,
+        "score": 90,
+        "units": 27
+      },
+      "player2State": {
+        "health": 58,
+        "score": 74,
+        "units": 20
+      },
+      "player1Decision": "gather",
+      "player2Decision": "defend"
+    },
+    {
+      "tickNumber": 81,
+      "timestamp": 1783629349550,
+      "player1State": {
+        "health": 70,
+        "score": 90,
+        "units": 21
+      },
+      "player2State": {
+        "health": 58,
+        "score": 78,
+        "units": 23
+      },
+      "player1Decision": "attack",
+      "player2Decision": "gather"
+    },
+    {
+      "tickNumber": 82,
+      "timestamp": 1783629349650,
+      "player1State": {
+        "health": 70,
+        "score": 90,
+        "units": 27
+      },
+      "player2State": {
+        "health": 57,
+        "score": 78,
+        "units": 20
+      },
+      "player1Decision": "attack",
+      "player2Decision": "build"
+    },
+    {
+      "tickNumber": 83,
+      "timestamp": 1783629349750,
+      "player1State": {
+        "health": 70,
+        "score": 90,
+        "units": 20
+      },
+      "player2State": {
+        "health": 57,
+        "score": 78,
+        "units": 21
+      },
+      "player1Decision": "build",
+      "player2Decision": "build"
+    },
+    {
+      "tickNumber": 84,
+      "timestamp": 1783629349850,
+      "player1State": {
+        "health": 70,
+        "score": 90,
+        "units": 26
+      },
+      "player2State": {
+        "health": 57,
+        "score": 78,
+        "units": 27
+      },
+      "player1Decision": "scout",
+      "player2Decision": "defend"
+    },
+    {
+      "tickNumber": 85,
+      "timestamp": 1783629349950,
+      "player1State": {
+        "health": 70,
+        "score": 90,
+        "units": 22
+      },
+      "player2State": {
+        "health": 57,
+        "score": 78,
+        "units": 25
+      },
+      "player1Decision": "scout",
+      "player2Decision": "scout"
+    },
+    {
+      "tickNumber": 86,
+      "timestamp": 1783629350050,
+      "player1State": {
+        "health": 70,
+        "score": 91,
+        "units": 20
+      },
+      "player2State": {
+        "health": 57,
+        "score": 78,
+        "units": 22
+      },
+      "player1Decision": "gather",
+      "player2Decision": "scout"
+    },
+    {
+      "tickNumber": 87,
+      "timestamp": 1783629350150,
+      "player1State": {
+        "health": 70,
+        "score": 91,
+        "units": 27
+      },
+      "player2State": {
+        "health": 57,
+        "score": 78,
+        "units": 29
+      },
+      "player1Decision": "attack",
+      "player2Decision": "scout"
+    },
+    {
+      "tickNumber": 88,
+      "timestamp": 1783629350250,
+      "player1State": {
+        "health": 70,
+        "score": 91,
+        "units": 21
+      },
+      "player2State": {
+        "health": 57,
+        "score": 78,
+        "units": 24
+      },
+      "player1Decision": "build",
+      "player2Decision": "scout"
+    },
+    {
+      "tickNumber": 89,
+      "timestamp": 1783629350350,
+      "player1State": {
+        "health": 70,
+        "score": 91,
+        "units": 25
+      },
+      "player2State": {
+        "health": 57,
+        "score": 78,
+        "units": 21
+      },
+      "player1Decision": "scout",
+      "player2Decision": "gather"
+    },
+    {
+      "tickNumber": 90,
+      "timestamp": 1783629350450,
+      "player1State": {
+        "health": 70,
+        "score": 91,
+        "units": 22
+      },
+      "player2State": {
+        "health": 57,
+        "score": 78,
+        "units": 20
+      },
+      "player1Decision": "scout",
+      "player2Decision": "attack"
+    },
+    {
+      "tickNumber": 91,
+      "timestamp": 1783629350550,
+      "player1State": {
+        "health": 70,
+        "score": 91,
+        "units": 26
+      },
+      "player2State": {
+        "health": 57,
+        "score": 78,
+        "units": 27
+      },
+      "player1Decision": "defend",
+      "player2Decision": "scout"
+    },
+    {
+      "tickNumber": 92,
+      "timestamp": 1783629350650,
+      "player1State": {
+        "health": 70,
+        "score": 91,
+        "units": 29
+      },
+      "player2State": {
+        "health": 50,
+        "score": 78,
+        "units": 21
+      },
+      "player1Decision": "attack",
+      "player2Decision": "defend"
+    },
+    {
+      "tickNumber": 93,
+      "timestamp": 1783629350750,
+      "player1State": {
+        "health": 70,
+        "score": 91,
+        "units": 21
+      },
+      "player2State": {
+        "health": 50,
+        "score": 78,
+        "units": 25
+      },
+      "player1Decision": "build",
+      "player2Decision": "scout"
+    },
+    {
+      "tickNumber": 94,
+      "timestamp": 1783629350850,
+      "player1State": {
+        "health": 70,
+        "score": 93,
+        "units": 24
+      },
+      "player2State": {
+        "health": 50,
+        "score": 82,
+        "units": 21
+      },
+      "player1Decision": "gather",
+      "player2Decision": "gather"
+    },
+    {
+      "tickNumber": 95,
+      "timestamp": 1783629350950,
+      "player1State": {
+        "health": 70,
+        "score": 93,
+        "units": 28
+      },
+      "player2State": {
+        "health": 50,
+        "score": 82,
+        "units": 22
+      },
+      "player1Decision": "defend",
+      "player2Decision": "build"
+    },
+    {
+      "tickNumber": 96,
+      "timestamp": 1783629351050,
+      "player1State": {
+        "health": 70,
         "score": 93,
         "units": 27
       },
       "player2State": {
-        "health": 85,
-        "score": 77,
-        "units": 23
+        "health": 50,
+        "score": 82,
+        "units": 26
       },
-      "player1Decision": "gather",
+      "player1Decision": "scout",
       "player2Decision": "defend"
     },
     {
-      "tickNumber": 94,
-      "timestamp": 1783628701931,
+      "tickNumber": 97,
+      "timestamp": 1783629351150,
       "player1State": {
-        "health": 68,
-        "score": 97,
-        "units": 23
-      },
-      "player2State": {
-        "health": 85,
-        "score": 77,
+        "health": 70,
+        "score": 93,
         "units": 24
       },
-      "player1Decision": "gather",
-      "player2Decision": "build"
-    },
-    {
-      "tickNumber": 95,
-      "timestamp": 1783628702031,
-      "player1State": {
-        "health": 68,
-        "score": 97,
-        "units": 21
-      },
       "player2State": {
-        "health": 85,
-        "score": 77,
+        "health": 50,
+        "score": 82,
         "units": 29
       },
-      "player1Decision": "attack",
-      "player2Decision": "attack"
-    },
-    {
-      "tickNumber": 96,
-      "timestamp": 1783628702131,
-      "player1State": {
-        "health": 68,
-        "score": 97,
-        "units": 20
-      },
-      "player2State": {
-        "health": 85,
-        "score": 80,
-        "units": 26
-      },
-      "player1Decision": "build",
-      "player2Decision": "gather"
-    },
-    {
-      "tickNumber": 97,
-      "timestamp": 1783628702231,
-      "player1State": {
-        "health": 68,
-        "score": 97,
-        "units": 29
-      },
-      "player2State": {
-        "health": 81,
-        "score": 80,
-        "units": 27
-      },
-      "player1Decision": "attack",
+      "player1Decision": "scout",
       "player2Decision": "scout"
     },
     {
       "tickNumber": 98,
-      "timestamp": 1783628702331,
+      "timestamp": 1783629351250,
       "player1State": {
-        "health": 68,
-        "score": 97,
+        "health": 66,
+        "score": 93,
         "units": 29
       },
       "player2State": {
-        "health": 81,
-        "score": 82,
-        "units": 25
-      },
-      "player1Decision": "defend",
-      "player2Decision": "gather"
-    },
-    {
-      "tickNumber": 99,
-      "timestamp": 1783628702431,
-      "player1State": {
-        "health": 68,
-        "score": 99,
-        "units": 23
-      },
-      "player2State": {
-        "health": 81,
-        "score": 82,
-        "units": 29
-      },
-      "player1Decision": "gather",
-      "player2Decision": "build"
-    },
-    {
-      "tickNumber": 100,
-      "timestamp": 1783628702531,
-      "player1State": {
-        "health": 68,
-        "score": 99,
-        "units": 27
-      },
-      "player2State": {
-        "health": 81,
+        "health": 50,
         "score": 82,
         "units": 23
       },
       "player1Decision": "build",
-      "player2Decision": "defend"
+      "player2Decision": "attack"
     },
     {
-      "tickNumber": 101,
-      "timestamp": 1783628702631,
+      "tickNumber": 99,
+      "timestamp": 1783629351350,
       "player1State": {
-        "health": 68,
-        "score": 100,
+        "health": 66,
+        "score": 93,
         "units": 21
       },
       "player2State": {
-        "health": 81,
+        "health": 50,
         "score": 82,
-        "units": 24
+        "units": 27
       },
-      "player1Decision": "gather",
+      "player1Decision": "scout",
+      "player2Decision": "attack"
+    },
+    {
+      "tickNumber": 100,
+      "timestamp": 1783629351450,
+      "player1State": {
+        "health": 66,
+        "score": 93,
+        "units": 21
+      },
+      "player2State": {
+        "health": 50,
+        "score": 82,
+        "units": 29
+      },
+      "player1Decision": "attack",
+      "player2Decision": "build"
+    },
+    {
+      "tickNumber": 101,
+      "timestamp": 1783629351550,
+      "player1State": {
+        "health": 66,
+        "score": 93,
+        "units": 22
+      },
+      "player2State": {
+        "health": 50,
+        "score": 85,
+        "units": 27
+      },
+      "player1Decision": "defend",
       "player2Decision": "gather"
     },
     {
       "tickNumber": 102,
-      "timestamp": 1783628702731,
+      "timestamp": 1783629351650,
       "player1State": {
-        "health": 68,
-        "score": 101,
-        "units": 24
-      },
-      "player2State": {
-        "health": 81,
-        "score": 84,
+        "health": 66,
+        "score": 93,
         "units": 20
       },
-      "player1Decision": "gather",
+      "player2State": {
+        "health": 50,
+        "score": 87,
+        "units": 20
+      },
+      "player1Decision": "scout",
       "player2Decision": "gather"
     },
     {
       "tickNumber": 103,
-      "timestamp": 1783628702831,
+      "timestamp": 1783629351750,
       "player1State": {
-        "health": 68,
-        "score": 101,
-        "units": 23
+        "health": 66,
+        "score": 93,
+        "units": 21
       },
       "player2State": {
-        "health": 81,
-        "score": 84,
-        "units": 22
+        "health": 50,
+        "score": 87,
+        "units": 20
       },
       "player1Decision": "defend",
-      "player2Decision": "build"
+      "player2Decision": "defend"
     },
     {
       "tickNumber": 104,
-      "timestamp": 1783628702931,
+      "timestamp": 1783629351850,
       "player1State": {
         "health": 66,
-        "score": 101,
-        "units": 25
+        "score": 94,
+        "units": 21
       },
       "player2State": {
-        "health": 81,
-        "score": 84,
-        "units": 23
+        "health": 50,
+        "score": 87,
+        "units": 21
       },
-      "player1Decision": "scout",
-      "player2Decision": "attack"
+      "player1Decision": "gather",
+      "player2Decision": "build"
     },
     {
       "tickNumber": 105,
-      "timestamp": 1783628703031,
+      "timestamp": 1783629351950,
       "player1State": {
         "health": 66,
-        "score": 101,
-        "units": 20
-      },
-      "player2State": {
-        "health": 81,
-        "score": 84,
-        "units": 21
-      },
-      "player1Decision": "scout",
-      "player2Decision": "build"
-    },
-    {
-      "tickNumber": 106,
-      "timestamp": 1783628703131,
-      "player1State": {
-        "health": 63,
-        "score": 101,
-        "units": 21
-      },
-      "player2State": {
-        "health": 81,
-        "score": 84,
-        "units": 25
-      },
-      "player1Decision": "defend",
-      "player2Decision": "attack"
-    },
-    {
-      "tickNumber": 107,
-      "timestamp": 1783628703231,
-      "player1State": {
-        "health": 63,
-        "score": 101,
-        "units": 26
-      },
-      "player2State": {
-        "health": 81,
-        "score": 85,
+        "score": 94,
         "units": 24
       },
-      "player1Decision": "attack",
-      "player2Decision": "gather"
-    },
-    {
-      "tickNumber": 108,
-      "timestamp": 1783628703331,
-      "player1State": {
-        "health": 63,
-        "score": 101,
-        "units": 25
-      },
       "player2State": {
-        "health": 81,
-        "score": 85,
-        "units": 28
-      },
-      "player1Decision": "defend",
-      "player2Decision": "gather"
-    },
-    {
-      "tickNumber": 109,
-      "timestamp": 1783628703431,
-      "player1State": {
-        "health": 63,
-        "score": 101,
-        "units": 23
-      },
-      "player2State": {
-        "health": 81,
-        "score": 85,
-        "units": 29
-      },
-      "player1Decision": "build",
-      "player2Decision": "gather"
-    },
-    {
-      "tickNumber": 110,
-      "timestamp": 1783628703531,
-      "player1State": {
-        "health": 59,
-        "score": 101,
-        "units": 23
-      },
-      "player2State": {
-        "health": 81,
-        "score": 85,
-        "units": 28
-      },
-      "player1Decision": "attack",
-      "player2Decision": "attack"
-    },
-    {
-      "tickNumber": 111,
-      "timestamp": 1783628703631,
-      "player1State": {
-        "health": 59,
-        "score": 101,
-        "units": 26
-      },
-      "player2State": {
-        "health": 81,
-        "score": 85,
+        "health": 50,
+        "score": 87,
         "units": 21
-      },
-      "player1Decision": "defend",
-      "player2Decision": "build"
-    },
-    {
-      "tickNumber": 112,
-      "timestamp": 1783628703731,
-      "player1State": {
-        "health": 59,
-        "score": 103,
-        "units": 26
-      },
-      "player2State": {
-        "health": 81,
-        "score": 85,
-        "units": 23
       },
       "player1Decision": "gather",
       "player2Decision": "defend"
     },
     {
-      "tickNumber": 113,
-      "timestamp": 1783628703831,
+      "tickNumber": 106,
+      "timestamp": 1783629352050,
       "player1State": {
-        "health": 59,
-        "score": 103,
-        "units": 29
+        "health": 66,
+        "score": 94,
+        "units": 22
       },
       "player2State": {
-        "health": 81,
-        "score": 85,
-        "units": 24
+        "health": 50,
+        "score": 87,
+        "units": 29
       },
-      "player1Decision": "attack",
+      "player1Decision": "scout",
       "player2Decision": "defend"
     },
     {
-      "tickNumber": 114,
-      "timestamp": 1783628703931,
+      "tickNumber": 107,
+      "timestamp": 1783629352150,
       "player1State": {
-        "health": 59,
-        "score": 103,
+        "health": 58,
+        "score": 94,
         "units": 29
       },
       "player2State": {
-        "health": 81,
-        "score": 85,
+        "health": 47,
+        "score": 87,
         "units": 23
       },
       "player1Decision": "attack",
-      "player2Decision": "build"
+      "player2Decision": "attack"
     },
     {
-      "tickNumber": 115,
-      "timestamp": 1783628704031,
+      "tickNumber": 108,
+      "timestamp": 1783629352250,
       "player1State": {
-        "health": 59,
-        "score": 103,
-        "units": 26
+        "health": 58,
+        "score": 94,
+        "units": 27
       },
       "player2State": {
-        "health": 81,
-        "score": 85,
+        "health": 47,
+        "score": 87,
         "units": 26
       },
       "player1Decision": "gather",
       "player2Decision": "scout"
     },
     {
-      "tickNumber": 116,
-      "timestamp": 1783628704131,
+      "tickNumber": 109,
+      "timestamp": 1783629352350,
       "player1State": {
-        "health": 59,
-        "score": 105,
+        "health": 58,
+        "score": 94,
+        "units": 21
+      },
+      "player2State": {
+        "health": 47,
+        "score": 87,
+        "units": 24
+      },
+      "player1Decision": "defend",
+      "player2Decision": "defend"
+    },
+    {
+      "tickNumber": 110,
+      "timestamp": 1783629352450,
+      "player1State": {
+        "health": 58,
+        "score": 98,
+        "units": 22
+      },
+      "player2State": {
+        "health": 47,
+        "score": 87,
+        "units": 24
+      },
+      "player1Decision": "gather",
+      "player2Decision": "attack"
+    },
+    {
+      "tickNumber": 111,
+      "timestamp": 1783629352550,
+      "player1State": {
+        "health": 58,
+        "score": 98,
+        "units": 27
+      },
+      "player2State": {
+        "health": 47,
+        "score": 87,
+        "units": 20
+      },
+      "player1Decision": "scout",
+      "player2Decision": "build"
+    },
+    {
+      "tickNumber": 112,
+      "timestamp": 1783629352650,
+      "player1State": {
+        "health": 58,
+        "score": 98,
         "units": 20
       },
       "player2State": {
-        "health": 81,
-        "score": 85,
-        "units": 29
+        "health": 47,
+        "score": 87,
+        "units": 28
+      },
+      "player1Decision": "defend",
+      "player2Decision": "defend"
+    },
+    {
+      "tickNumber": 113,
+      "timestamp": 1783629352750,
+      "player1State": {
+        "health": 58,
+        "score": 99,
+        "units": 21
+      },
+      "player2State": {
+        "health": 47,
+        "score": 87,
+        "units": 24
+      },
+      "player1Decision": "gather",
+      "player2Decision": "defend"
+    },
+    {
+      "tickNumber": 114,
+      "timestamp": 1783629352850,
+      "player1State": {
+        "health": 54,
+        "score": 99,
+        "units": 22
+      },
+      "player2State": {
+        "health": 47,
+        "score": 87,
+        "units": 25
+      },
+      "player1Decision": "build",
+      "player2Decision": "attack"
+    },
+    {
+      "tickNumber": 115,
+      "timestamp": 1783629352950,
+      "player1State": {
+        "health": 54,
+        "score": 99,
+        "units": 25
+      },
+      "player2State": {
+        "health": 44,
+        "score": 87,
+        "units": 24
+      },
+      "player1Decision": "attack",
+      "player2Decision": "scout"
+    },
+    {
+      "tickNumber": 116,
+      "timestamp": 1783629353050,
+      "player1State": {
+        "health": 54,
+        "score": 101,
+        "units": 27
+      },
+      "player2State": {
+        "health": 44,
+        "score": 87,
+        "units": 23
       },
       "player1Decision": "gather",
       "player2Decision": "build"
     },
     {
       "tickNumber": 117,
-      "timestamp": 1783628704231,
+      "timestamp": 1783629353150,
       "player1State": {
-        "health": 59,
-        "score": 109,
-        "units": 26
-      },
-      "player2State": {
-        "health": 81,
-        "score": 85,
-        "units": 21
-      },
-      "player1Decision": "gather",
-      "player2Decision": "defend"
-    },
-    {
-      "tickNumber": 118,
-      "timestamp": 1783628704331,
-      "player1State": {
-        "health": 59,
-        "score": 109,
-        "units": 24
-      },
-      "player2State": {
-        "health": 81,
-        "score": 85,
-        "units": 24
-      },
-      "player1Decision": "build",
-      "player2Decision": "defend"
-    },
-    {
-      "tickNumber": 119,
-      "timestamp": 1783628704431,
-      "player1State": {
-        "health": 59,
-        "score": 109,
-        "units": 22
-      },
-      "player2State": {
-        "health": 81,
-        "score": 85,
-        "units": 28
-      },
-      "player1Decision": "defend",
-      "player2Decision": "defend"
-    },
-    {
-      "tickNumber": 120,
-      "timestamp": 1783628704531,
-      "player1State": {
-        "health": 59,
-        "score": 109,
-        "units": 28
-      },
-      "player2State": {
-        "health": 81,
-        "score": 85,
-        "units": 27
-      },
-      "player1Decision": "attack",
-      "player2Decision": "defend"
-    },
-    {
-      "tickNumber": 121,
-      "timestamp": 1783628704631,
-      "player1State": {
-        "health": 59,
-        "score": 110,
-        "units": 28
-      },
-      "player2State": {
-        "health": 81,
-        "score": 85,
-        "units": 26
-      },
-      "player1Decision": "gather",
-      "player2Decision": "scout"
-    },
-    {
-      "tickNumber": 122,
-      "timestamp": 1783628704731,
-      "player1State": {
-        "health": 59,
-        "score": 110,
-        "units": 24
-      },
-      "player2State": {
-        "health": 81,
-        "score": 89,
-        "units": 28
-      },
-      "player1Decision": "scout",
-      "player2Decision": "gather"
-    },
-    {
-      "tickNumber": 123,
-      "timestamp": 1783628704831,
-      "player1State": {
-        "health": 59,
-        "score": 110,
+        "health": 54,
+        "score": 103,
         "units": 23
       },
       "player2State": {
-        "health": 81,
-        "score": 93,
+        "health": 44,
+        "score": 87,
+        "units": 20
+      },
+      "player1Decision": "gather",
+      "player2Decision": "gather"
+    },
+    {
+      "tickNumber": 118,
+      "timestamp": 1783629353250,
+      "player1State": {
+        "health": 54,
+        "score": 103,
         "units": 22
+      },
+      "player2State": {
+        "health": 44,
+        "score": 87,
+        "units": 24
+      },
+      "player1Decision": "build",
+      "player2Decision": "build"
+    },
+    {
+      "tickNumber": 119,
+      "timestamp": 1783629353350,
+      "player1State": {
+        "health": 54,
+        "score": 103,
+        "units": 20
+      },
+      "player2State": {
+        "health": 44,
+        "score": 87,
+        "units": 23
       },
       "player1Decision": "attack",
       "player2Decision": "gather"
     },
     {
-      "tickNumber": 124,
-      "timestamp": 1783628704931,
+      "tickNumber": 120,
+      "timestamp": 1783629353450,
       "player1State": {
-        "health": 59,
-        "score": 114,
-        "units": 26
-      },
-      "player2State": {
-        "health": 81,
-        "score": 96,
+        "health": 54,
+        "score": 103,
         "units": 27
       },
-      "player1Decision": "gather",
-      "player2Decision": "gather"
+      "player2State": {
+        "health": 38,
+        "score": 87,
+        "units": 25
+      },
+      "player1Decision": "attack",
+      "player2Decision": "scout"
     },
     {
-      "tickNumber": 125,
-      "timestamp": 1783628705031,
+      "tickNumber": 121,
+      "timestamp": 1783629353550,
       "player1State": {
-        "health": 59,
-        "score": 114,
-        "units": 24
+        "health": 46,
+        "score": 107,
+        "units": 22
       },
       "player2State": {
-        "health": 81,
-        "score": 96,
-        "units": 29
+        "health": 38,
+        "score": 87,
+        "units": 24
       },
-      "player1Decision": "defend",
-      "player2Decision": "build"
+      "player1Decision": "gather",
+      "player2Decision": "attack"
     },
     {
-      "tickNumber": 126,
-      "timestamp": 1783628705131,
+      "tickNumber": 122,
+      "timestamp": 1783629353650,
       "player1State": {
-        "health": 56,
-        "score": 117,
+        "health": 43,
+        "score": 107,
         "units": 25
       },
       "player2State": {
-        "health": 81,
-        "score": 96,
+        "health": 38,
+        "score": 87,
         "units": 22
       },
-      "player1Decision": "gather",
+      "player1Decision": "defend",
       "player2Decision": "attack"
     },
     {
-      "tickNumber": 127,
-      "timestamp": 1783628705231,
+      "tickNumber": 123,
+      "timestamp": 1783629353750,
       "player1State": {
-        "health": 56,
-        "score": 117,
-        "units": 21
+        "health": 43,
+        "score": 107,
+        "units": 27
       },
       "player2State": {
-        "health": 81,
-        "score": 96,
-        "units": 24
+        "health": 38,
+        "score": 87,
+        "units": 22
       },
-      "player1Decision": "scout",
-      "player2Decision": "attack"
+      "player1Decision": "attack",
+      "player2Decision": "scout"
     },
     {
-      "tickNumber": 128,
-      "timestamp": 1783628705331,
+      "tickNumber": 124,
+      "timestamp": 1783629353850,
       "player1State": {
-        "health": 56,
-        "score": 117,
-        "units": 28
+        "health": 43,
+        "score": 107,
+        "units": 29
       },
       "player2State": {
-        "health": 81,
-        "score": 96,
+        "health": 38,
+        "score": 87,
         "units": 20
       },
       "player1Decision": "defend",
       "player2Decision": "build"
     },
     {
-      "tickNumber": 129,
-      "timestamp": 1783628705431,
+      "tickNumber": 125,
+      "timestamp": 1783629353950,
       "player1State": {
-        "health": 52,
-        "score": 117,
-        "units": 29
-      },
-      "player2State": {
-        "health": 81,
-        "score": 96,
-        "units": 29
-      },
-      "player1Decision": "defend",
-      "player2Decision": "attack"
-    },
-    {
-      "tickNumber": 130,
-      "timestamp": 1783628705531,
-      "player1State": {
-        "health": 52,
-        "score": 117,
+        "health": 43,
+        "score": 107,
         "units": 28
       },
       "player2State": {
-        "health": 81,
-        "score": 96,
-        "units": 29
+        "health": 35,
+        "score": 87,
+        "units": 20
       },
       "player1Decision": "attack",
       "player2Decision": "scout"
     },
     {
-      "tickNumber": 131,
-      "timestamp": 1783628705631,
+      "tickNumber": 126,
+      "timestamp": 1783629354050,
       "player1State": {
-        "health": 52,
-        "score": 117,
-        "units": 22
+        "health": 43,
+        "score": 110,
+        "units": 20
       },
       "player2State": {
-        "health": 77,
-        "score": 97,
-        "units": 24
+        "health": 35,
+        "score": 87,
+        "units": 27
       },
-      "player1Decision": "attack",
-      "player2Decision": "gather"
+      "player1Decision": "gather",
+      "player2Decision": "defend"
     },
     {
-      "tickNumber": 132,
-      "timestamp": 1783628705731,
+      "tickNumber": 127,
+      "timestamp": 1783629354150,
       "player1State": {
-        "health": 52,
-        "score": 117,
+        "health": 43,
+        "score": 110,
         "units": 23
       },
       "player2State": {
-        "health": 77,
-        "score": 97,
-        "units": 25
+        "health": 35,
+        "score": 89,
+        "units": 29
       },
       "player1Decision": "defend",
+      "player2Decision": "gather"
+    },
+    {
+      "tickNumber": 128,
+      "timestamp": 1783629354250,
+      "player1State": {
+        "health": 43,
+        "score": 110,
+        "units": 27
+      },
+      "player2State": {
+        "health": 27,
+        "score": 89,
+        "units": 22
+      },
+      "player1Decision": "attack",
+      "player2Decision": "defend"
+    },
+    {
+      "tickNumber": 129,
+      "timestamp": 1783629354350,
+      "player1State": {
+        "health": 43,
+        "score": 110,
+        "units": 26
+      },
+      "player2State": {
+        "health": 27,
+        "score": 89,
+        "units": 22
+      },
+      "player1Decision": "build",
+      "player2Decision": "scout"
+    },
+    {
+      "tickNumber": 130,
+      "timestamp": 1783629354450,
+      "player1State": {
+        "health": 43,
+        "score": 110,
+        "units": 20
+      },
+      "player2State": {
+        "health": 27,
+        "score": 89,
+        "units": 26
+      },
+      "player1Decision": "gather",
+      "player2Decision": "build"
+    },
+    {
+      "tickNumber": 131,
+      "timestamp": 1783629354550,
+      "player1State": {
+        "health": 43,
+        "score": 110,
+        "units": 28
+      },
+      "player2State": {
+        "health": 27,
+        "score": 89,
+        "units": 21
+      },
+      "player1Decision": "build",
+      "player2Decision": "attack"
+    },
+    {
+      "tickNumber": 132,
+      "timestamp": 1783629354650,
+      "player1State": {
+        "health": 43,
+        "score": 110,
+        "units": 26
+      },
+      "player2State": {
+        "health": 27,
+        "score": 89,
+        "units": 27
+      },
+      "player1Decision": "build",
       "player2Decision": "scout"
     },
     {
       "tickNumber": 133,
-      "timestamp": 1783628705831,
+      "timestamp": 1783629354750,
       "player1State": {
-        "health": 44,
-        "score": 117,
-        "units": 23
+        "health": 43,
+        "score": 110,
+        "units": 25
       },
       "player2State": {
-        "health": 77,
-        "score": 97,
-        "units": 21
+        "health": 27,
+        "score": 89,
+        "units": 27
       },
       "player1Decision": "scout",
-      "player2Decision": "attack"
+      "player2Decision": "scout"
     },
     {
       "tickNumber": 134,
-      "timestamp": 1783628705931,
+      "timestamp": 1783629354850,
       "player1State": {
-        "health": 42,
-        "score": 117,
+        "health": 43,
+        "score": 110,
         "units": 20
       },
       "player2State": {
-        "health": 71,
-        "score": 97,
-        "units": 25
+        "health": 27,
+        "score": 93,
+        "units": 28
       },
-      "player1Decision": "attack",
-      "player2Decision": "attack"
+      "player1Decision": "build",
+      "player2Decision": "gather"
     },
     {
       "tickNumber": 135,
-      "timestamp": 1783628706031,
+      "timestamp": 1783629354950,
       "player1State": {
-        "health": 42,
-        "score": 117,
+        "health": 43,
+        "score": 110,
+        "units": 21
+      },
+      "player2State": {
+        "health": 27,
+        "score": 93,
+        "units": 28
+      },
+      "player1Decision": "scout",
+      "player2Decision": "build"
+    },
+    {
+      "tickNumber": 136,
+      "timestamp": 1783629355050,
+      "player1State": {
+        "health": 43,
+        "score": 112,
+        "units": 22
+      },
+      "player2State": {
+        "health": 27,
+        "score": 93,
+        "units": 27
+      },
+      "player1Decision": "gather",
+      "player2Decision": "defend"
+    },
+    {
+      "tickNumber": 137,
+      "timestamp": 1783629355150,
+      "player1State": {
+        "health": 43,
+        "score": 112,
+        "units": 22
+      },
+      "player2State": {
+        "health": 27,
+        "score": 93,
+        "units": 23
+      },
+      "player1Decision": "scout",
+      "player2Decision": "build"
+    },
+    {
+      "tickNumber": 138,
+      "timestamp": 1783629355250,
+      "player1State": {
+        "health": 43,
+        "score": 112,
         "units": 26
       },
       "player2State": {
-        "health": 71,
-        "score": 97,
+        "health": 27,
+        "score": 93,
+        "units": 22
+      },
+      "player1Decision": "defend",
+      "player2Decision": "gather"
+    },
+    {
+      "tickNumber": 139,
+      "timestamp": 1783629355350,
+      "player1State": {
+        "health": 43,
+        "score": 112,
+        "units": 25
+      },
+      "player2State": {
+        "health": 27,
+        "score": 93,
         "units": 21
       },
       "player1Decision": "defend",
       "player2Decision": "scout"
     },
     {
-      "tickNumber": 136,
-      "timestamp": 1783628706131,
-      "player1State": {
-        "health": 42,
-        "score": 119,
-        "units": 20
-      },
-      "player2State": {
-        "health": 71,
-        "score": 100,
-        "units": 21
-      },
-      "player1Decision": "gather",
-      "player2Decision": "gather"
-    },
-    {
-      "tickNumber": 137,
-      "timestamp": 1783628706231,
-      "player1State": {
-        "health": 42,
-        "score": 119,
-        "units": 24
-      },
-      "player2State": {
-        "health": 71,
-        "score": 100,
-        "units": 26
-      },
-      "player1Decision": "scout",
-      "player2Decision": "scout"
-    },
-    {
-      "tickNumber": 138,
-      "timestamp": 1783628706331,
-      "player1State": {
-        "health": 42,
-        "score": 119,
-        "units": 22
-      },
-      "player2State": {
-        "health": 64,
-        "score": 100,
-        "units": 25
-      },
-      "player1Decision": "attack",
-      "player2Decision": "build"
-    },
-    {
-      "tickNumber": 139,
-      "timestamp": 1783628706431,
-      "player1State": {
-        "health": 42,
-        "score": 119,
-        "units": 20
-      },
-      "player2State": {
-        "health": 64,
-        "score": 103,
-        "units": 21
-      },
-      "player1Decision": "scout",
-      "player2Decision": "gather"
-    },
-    {
       "tickNumber": 140,
-      "timestamp": 1783628706531,
+      "timestamp": 1783629355450,
       "player1State": {
-        "health": 42,
-        "score": 123,
-        "units": 24
+        "health": 43,
+        "score": 112,
+        "units": 28
       },
       "player2State": {
-        "health": 64,
-        "score": 103,
-        "units": 23
+        "health": 27,
+        "score": 96,
+        "units": 28
       },
-      "player1Decision": "gather",
-      "player2Decision": "scout"
+      "player1Decision": "defend",
+      "player2Decision": "gather"
     },
     {
       "tickNumber": 141,
-      "timestamp": 1783628706631,
+      "timestamp": 1783629355550,
       "player1State": {
-        "health": 42,
-        "score": 123,
-        "units": 21
-      },
-      "player2State": {
-        "health": 64,
-        "score": 103,
+        "health": 43,
+        "score": 114,
         "units": 29
       },
-      "player1Decision": "build",
+      "player2State": {
+        "health": 27,
+        "score": 96,
+        "units": 29
+      },
+      "player1Decision": "gather",
       "player2Decision": "scout"
     },
     {
       "tickNumber": 142,
-      "timestamp": 1783628706731,
+      "timestamp": 1783629355650,
       "player1State": {
-        "health": 42,
-        "score": 123,
-        "units": 20
-      },
-      "player2State": {
-        "health": 64,
-        "score": 103,
-        "units": 22
-      },
-      "player1Decision": "scout",
-      "player2Decision": "defend"
-    },
-    {
-      "tickNumber": 143,
-      "timestamp": 1783628706831,
-      "player1State": {
-        "health": 38,
-        "score": 123,
-        "units": 29
-      },
-      "player2State": {
-        "health": 64,
-        "score": 103,
-        "units": 20
-      },
-      "player1Decision": "scout",
-      "player2Decision": "attack"
-    },
-    {
-      "tickNumber": 144,
-      "timestamp": 1783628706931,
-      "player1State": {
-        "health": 38,
-        "score": 123,
+        "health": 43,
+        "score": 114,
         "units": 27
       },
       "player2State": {
-        "health": 64,
-        "score": 103,
-        "units": 23
-      },
-      "player1Decision": "attack",
-      "player2Decision": "scout"
-    },
-    {
-      "tickNumber": 145,
-      "timestamp": 1783628707031,
-      "player1State": {
-        "health": 38,
-        "score": 123,
-        "units": 20
-      },
-      "player2State": {
-        "health": 64,
-        "score": 103,
+        "health": 27,
+        "score": 96,
         "units": 28
       },
-      "player1Decision": "defend",
+      "player1Decision": "scout",
       "player2Decision": "build"
     },
     {
-      "tickNumber": 146,
-      "timestamp": 1783628707131,
+      "tickNumber": 143,
+      "timestamp": 1783629355750,
       "player1State": {
-        "health": 38,
-        "score": 123,
-        "units": 20
+        "health": 43,
+        "score": 114,
+        "units": 25
       },
       "player2State": {
-        "health": 64,
-        "score": 106,
-        "units": 26
+        "health": 27,
+        "score": 96,
+        "units": 27
+      },
+      "player1Decision": "build",
+      "player2Decision": "build"
+    },
+    {
+      "tickNumber": 144,
+      "timestamp": 1783629355850,
+      "player1State": {
+        "health": 43,
+        "score": 114,
+        "units": 24
+      },
+      "player2State": {
+        "health": 27,
+        "score": 96,
+        "units": 21
       },
       "player1Decision": "attack",
+      "player2Decision": "build"
+    },
+    {
+      "tickNumber": 145,
+      "timestamp": 1783629355950,
+      "player1State": {
+        "health": 43,
+        "score": 114,
+        "units": 21
+      },
+      "player2State": {
+        "health": 27,
+        "score": 98,
+        "units": 22
+      },
+      "player1Decision": "build",
+      "player2Decision": "gather"
+    },
+    {
+      "tickNumber": 146,
+      "timestamp": 1783629356050,
+      "player1State": {
+        "health": 43,
+        "score": 114,
+        "units": 28
+      },
+      "player2State": {
+        "health": 27,
+        "score": 100,
+        "units": 28
+      },
+      "player1Decision": "defend",
       "player2Decision": "gather"
     },
     {
       "tickNumber": 147,
-      "timestamp": 1783628707231,
+      "timestamp": 1783629356150,
       "player1State": {
-        "health": 38,
-        "score": 123,
-        "units": 23
+        "health": 43,
+        "score": 114,
+        "units": 26
       },
       "player2State": {
-        "health": 64,
-        "score": 106,
-        "units": 20
+        "health": 27,
+        "score": 103,
+        "units": 29
       },
       "player1Decision": "defend",
       "player2Decision": "gather"
     },
     {
       "tickNumber": 148,
-      "timestamp": 1783628707331,
+      "timestamp": 1783629356250,
       "player1State": {
-        "health": 38,
-        "score": 123,
-        "units": 26
+        "health": 43,
+        "score": 114,
+        "units": 27
       },
       "player2State": {
-        "health": 64,
-        "score": 106,
+        "health": 27,
+        "score": 104,
+        "units": 26
+      },
+      "player1Decision": "defend",
+      "player2Decision": "gather"
+    },
+    {
+      "tickNumber": 149,
+      "timestamp": 1783629356350,
+      "player1State": {
+        "health": 43,
+        "score": 114,
+        "units": 25
+      },
+      "player2State": {
+        "health": 27,
+        "score": 104,
         "units": 24
+      },
+      "player1Decision": "build",
+      "player2Decision": "defend"
+    },
+    {
+      "tickNumber": 150,
+      "timestamp": 1783629356450,
+      "player1State": {
+        "health": 43,
+        "score": 114,
+        "units": 28
+      },
+      "player2State": {
+        "health": 27,
+        "score": 104,
+        "units": 29
       },
       "player1Decision": "build",
       "player2Decision": "build"
     },
     {
-      "tickNumber": 149,
-      "timestamp": 1783628707431,
+      "tickNumber": 151,
+      "timestamp": 1783629356550,
       "player1State": {
-        "health": 38,
-        "score": 123,
-        "units": 22
+        "health": 43,
+        "score": 114,
+        "units": 23
       },
       "player2State": {
-        "health": 64,
-        "score": 107,
-        "units": 29
+        "health": 27,
+        "score": 104,
+        "units": 27
       },
       "player1Decision": "build",
-      "player2Decision": "gather"
-    },
-    {
-      "tickNumber": 150,
-      "timestamp": 1783628707531,
-      "player1State": {
-        "health": 38,
-        "score": 123,
-        "units": 28
-      },
-      "player2State": {
-        "health": 64,
-        "score": 110,
-        "units": 21
-      },
-      "player1Decision": "scout",
-      "player2Decision": "gather"
-    },
-    {
-      "tickNumber": 151,
-      "timestamp": 1783628707631,
-      "player1State": {
-        "health": 38,
-        "score": 123,
-        "units": 20
-      },
-      "player2State": {
-        "health": 64,
-        "score": 110,
-        "units": 21
-      },
-      "player1Decision": "defend",
-      "player2Decision": "attack"
+      "player2Decision": "defend"
     },
     {
       "tickNumber": 152,
-      "timestamp": 1783628707731,
+      "timestamp": 1783629356650,
       "player1State": {
-        "health": 37,
-        "score": 123,
-        "units": 28
+        "health": 43,
+        "score": 114,
+        "units": 22
       },
       "player2State": {
-        "health": 64,
-        "score": 110,
-        "units": 21
+        "health": 27,
+        "score": 104,
+        "units": 26
       },
-      "player1Decision": "scout",
+      "player1Decision": "build",
       "player2Decision": "attack"
     },
     {
       "tickNumber": 153,
-      "timestamp": 1783628707831,
+      "timestamp": 1783629356750,
       "player1State": {
-        "health": 37,
-        "score": 123,
+        "health": 43,
+        "score": 114,
         "units": 24
       },
       "player2State": {
-        "health": 64,
-        "score": 110,
+        "health": 26,
+        "score": 104,
+        "units": 25
+      },
+      "player1Decision": "attack",
+      "player2Decision": "build"
+    },
+    {
+      "tickNumber": 154,
+      "timestamp": 1783629356850,
+      "player1State": {
+        "health": 43,
+        "score": 114,
         "units": 23
+      },
+      "player2State": {
+        "health": 26,
+        "score": 104,
+        "units": 22
       },
       "player1Decision": "build",
       "player2Decision": "build"
     },
     {
-      "tickNumber": 154,
-      "timestamp": 1783628707931,
-      "player1State": {
-        "health": 37,
-        "score": 123,
-        "units": 25
-      },
-      "player2State": {
-        "health": 64,
-        "score": 110,
-        "units": 24
-      },
-      "player1Decision": "build",
-      "player2Decision": "attack"
-    },
-    {
       "tickNumber": 155,
-      "timestamp": 1783628708031,
+      "timestamp": 1783629356950,
       "player1State": {
-        "health": 30,
-        "score": 127,
-        "units": 29
+        "health": 43,
+        "score": 114,
+        "units": 22
       },
       "player2State": {
-        "health": 64,
-        "score": 110,
-        "units": 25
+        "health": 17,
+        "score": 104,
+        "units": 28
       },
-      "player1Decision": "gather",
-      "player2Decision": "attack"
+      "player1Decision": "attack",
+      "player2Decision": "defend"
     },
     {
       "tickNumber": 156,
-      "timestamp": 1783628708131,
+      "timestamp": 1783629357050,
       "player1State": {
-        "health": 30,
-        "score": 127,
+        "health": 43,
+        "score": 114,
         "units": 28
       },
       "player2State": {
-        "health": 64,
-        "score": 110,
-        "units": 24
+        "health": 10,
+        "score": 104,
+        "units": 22
       },
-      "player1Decision": "build",
+      "player1Decision": "attack",
       "player2Decision": "defend"
     },
     {
       "tickNumber": 157,
-      "timestamp": 1783628708231,
+      "timestamp": 1783629357150,
       "player1State": {
-        "health": 30,
-        "score": 127,
-        "units": 21
+        "health": 43,
+        "score": 114,
+        "units": 26
       },
       "player2State": {
-        "health": 56,
-        "score": 110,
-        "units": 24
-      },
-      "player1Decision": "attack",
-      "player2Decision": "build"
-    },
-    {
-      "tickNumber": 158,
-      "timestamp": 1783628708331,
-      "player1State": {
-        "health": 30,
-        "score": 127,
-        "units": 27
-      },
-      "player2State": {
-        "health": 56,
-        "score": 110,
-        "units": 28
+        "health": 10,
+        "score": 104,
+        "units": 29
       },
       "player1Decision": "build",
       "player2Decision": "scout"
     },
     {
-      "tickNumber": 159,
-      "timestamp": 1783628708431,
+      "tickNumber": 158,
+      "timestamp": 1783629357250,
       "player1State": {
-        "health": 30,
-        "score": 127,
-        "units": 27
+        "health": 43,
+        "score": 114,
+        "units": 25
       },
       "player2State": {
-        "health": 56,
-        "score": 111,
-        "units": 22
+        "health": 10,
+        "score": 108,
+        "units": 23
       },
       "player1Decision": "attack",
       "player2Decision": "gather"
     },
     {
-      "tickNumber": 160,
-      "timestamp": 1783628708531,
+      "tickNumber": 159,
+      "timestamp": 1783629357350,
       "player1State": {
-        "health": 30,
-        "score": 127,
-        "units": 24
+        "health": 43,
+        "score": 114,
+        "units": 22
       },
       "player2State": {
-        "health": 56,
-        "score": 111,
-        "units": 26
+        "health": 3,
+        "score": 108,
+        "units": 25
       },
-      "player1Decision": "defend",
+      "player1Decision": "attack",
       "player2Decision": "scout"
     },
     {
-      "tickNumber": 161,
-      "timestamp": 1783628708631,
+      "tickNumber": 160,
+      "timestamp": 1783629357450,
       "player1State": {
-        "health": 30,
-        "score": 127,
-        "units": 24
-      },
-      "player2State": {
-        "health": 56,
-        "score": 111,
-        "units": 24
-      },
-      "player1Decision": "build",
-      "player2Decision": "build"
-    },
-    {
-      "tickNumber": 162,
-      "timestamp": 1783628708731,
-      "player1State": {
-        "health": 30,
-        "score": 127,
-        "units": 22
-      },
-      "player2State": {
-        "health": 56,
-        "score": 111,
+        "health": 43,
+        "score": 114,
         "units": 27
       },
+      "player2State": {
+        "health": 3,
+        "score": 110,
+        "units": 25
+      },
       "player1Decision": "defend",
+      "player2Decision": "gather"
+    },
+    {
+      "tickNumber": 161,
+      "timestamp": 1783629357550,
+      "player1State": {
+        "health": 43,
+        "score": 114,
+        "units": 28
+      },
+      "player2State": {
+        "health": 3,
+        "score": 110,
+        "units": 28
+      },
+      "player1Decision": "scout",
       "player2Decision": "defend"
     },
     {
-      "tickNumber": 163,
-      "timestamp": 1783628708831,
+      "tickNumber": 162,
+      "timestamp": 1783629357650,
       "player1State": {
-        "health": 30,
-        "score": 127,
-        "units": 29
+        "health": 43,
+        "score": 117,
+        "units": 28
       },
       "player2State": {
-        "health": 53,
+        "health": 3,
         "score": 111,
-        "units": 22
+        "units": 24
       },
-      "player1Decision": "attack",
+      "player1Decision": "gather",
+      "player2Decision": "gather"
+    },
+    {
+      "tickNumber": 163,
+      "timestamp": 1783629357750,
+      "player1State": {
+        "health": 43,
+        "score": 120,
+        "units": 26
+      },
+      "player2State": {
+        "health": 3,
+        "score": 111,
+        "units": 21
+      },
+      "player1Decision": "gather",
       "player2Decision": "attack"
     },
     {
       "tickNumber": 164,
-      "timestamp": 1783628708931,
+      "timestamp": 1783629357850,
       "player1State": {
-        "health": 30,
-        "score": 127,
+        "health": 43,
+        "score": 120,
         "units": 24
       },
       "player2State": {
-        "health": 53,
-        "score": 115,
-        "units": 20
+        "health": 3,
+        "score": 111,
+        "units": 23
+      },
+      "player1Decision": "defend",
+      "player2Decision": "defend"
+    },
+    {
+      "tickNumber": 165,
+      "timestamp": 1783629357950,
+      "player1State": {
+        "health": 43,
+        "score": 120,
+        "units": 21
+      },
+      "player2State": {
+        "health": 3,
+        "score": 111,
+        "units": 23
       },
       "player1Decision": "scout",
       "player2Decision": "gather"
     },
     {
-      "tickNumber": 165,
-      "timestamp": 1783628709031,
-      "player1State": {
-        "health": 27,
-        "score": 127,
-        "units": 29
-      },
-      "player2State": {
-        "health": 53,
-        "score": 115,
-        "units": 25
-      },
-      "player1Decision": "defend",
-      "player2Decision": "attack"
-    },
-    {
       "tickNumber": 166,
-      "timestamp": 1783628709131,
+      "timestamp": 1783629358050,
       "player1State": {
-        "health": 27,
-        "score": 127,
-        "units": 28
-      },
-      "player2State": {
-        "health": 52,
-        "score": 115,
-        "units": 25
-      },
-      "player1Decision": "attack",
-      "player2Decision": "attack"
-    },
-    {
-      "tickNumber": 167,
-      "timestamp": 1783628709231,
-      "player1State": {
-        "health": 27,
-        "score": 127,
-        "units": 28
-      },
-      "player2State": {
-        "health": 52,
-        "score": 115,
-        "units": 28
-      },
-      "player1Decision": "scout",
-      "player2Decision": "attack"
-    },
-    {
-      "tickNumber": 168,
-      "timestamp": 1783628709331,
-      "player1State": {
-        "health": 27,
-        "score": 127,
+        "health": 43,
+        "score": 120,
         "units": 21
       },
       "player2State": {
-        "health": 52,
-        "score": 115,
-        "units": 23
+        "health": 3,
+        "score": 111,
+        "units": 26
       },
-      "player1Decision": "defend",
-      "player2Decision": "build"
+      "player1Decision": "scout",
+      "player2Decision": "defend"
     },
     {
-      "tickNumber": 169,
-      "timestamp": 1783628709431,
+      "tickNumber": 167,
+      "timestamp": 1783629358150,
       "player1State": {
-        "health": 27,
-        "score": 127,
+        "health": 43,
+        "score": 120,
+        "units": 23
+      },
+      "player2State": {
+        "health": 3,
+        "score": 111,
+        "units": 22
+      },
+      "player1Decision": "defend",
+      "player2Decision": "defend"
+    },
+    {
+      "tickNumber": 168,
+      "timestamp": 1783629358250,
+      "player1State": {
+        "health": 43,
+        "score": 120,
         "units": 24
       },
       "player2State": {
-        "health": 52,
-        "score": 116,
-        "units": 28
+        "health": 3,
+        "score": 115,
+        "units": 26
       },
       "player1Decision": "attack",
+      "player2Decision": "gather"
+    },
+    {
+      "tickNumber": 169,
+      "timestamp": 1783629358350,
+      "player1State": {
+        "health": 43,
+        "score": 120,
+        "units": 23
+      },
+      "player2State": {
+        "health": 3,
+        "score": 117,
+        "units": 23
+      },
+      "player1Decision": "gather",
       "player2Decision": "gather"
     },
     {
       "tickNumber": 170,
-      "timestamp": 1783628709531,
+      "timestamp": 1783629358450,
       "player1State": {
-        "health": 27,
-        "score": 127,
-        "units": 23
+        "health": 43,
+        "score": 120,
+        "units": 25
       },
       "player2State": {
-        "health": 52,
-        "score": 116,
+        "health": 3,
+        "score": 117,
         "units": 21
       },
-      "player1Decision": "defend",
+      "player1Decision": "build",
       "player2Decision": "scout"
     },
     {
       "tickNumber": 171,
-      "timestamp": 1783628709631,
+      "timestamp": 1783629358550,
       "player1State": {
-        "health": 21,
-        "score": 127,
+        "health": 43,
+        "score": 120,
         "units": 23
       },
       "player2State": {
-        "health": 47,
-        "score": 116,
-        "units": 28
+        "health": 3,
+        "score": 117,
+        "units": 23
       },
-      "player1Decision": "attack",
-      "player2Decision": "attack"
+      "player1Decision": "scout",
+      "player2Decision": "defend"
     },
     {
       "tickNumber": 172,
-      "timestamp": 1783628709731,
+      "timestamp": 1783629358650,
       "player1State": {
-        "health": 21,
-        "score": 129,
-        "units": 20
-      },
-      "player2State": {
-        "health": 47,
-        "score": 116,
-        "units": 25
-      },
-      "player1Decision": "gather",
-      "player2Decision": "build"
-    },
-    {
-      "tickNumber": 173,
-      "timestamp": 1783628709831,
-      "player1State": {
-        "health": 21,
-        "score": 129,
+        "health": 38,
+        "score": 121,
         "units": 28
       },
       "player2State": {
-        "health": 47,
-        "score": 116,
-        "units": 23
+        "health": 3,
+        "score": 117,
+        "units": 26
       },
-      "player1Decision": "attack",
+      "player1Decision": "gather",
       "player2Decision": "attack"
     },
     {
-      "tickNumber": 174,
-      "timestamp": 1783628709931,
+      "tickNumber": 173,
+      "timestamp": 1783629358750,
       "player1State": {
-        "health": 21,
-        "score": 129,
-        "units": 20
+        "health": 38,
+        "score": 121,
+        "units": 21
       },
       "player2State": {
-        "health": 47,
-        "score": 116,
-        "units": 24
+        "health": 3,
+        "score": 121,
+        "units": 20
       },
-      "player1Decision": "build",
+      "player1Decision": "defend",
+      "player2Decision": "gather"
+    },
+    {
+      "tickNumber": 174,
+      "timestamp": 1783629358850,
+      "player1State": {
+        "health": 38,
+        "score": 125,
+        "units": 22
+      },
+      "player2State": {
+        "health": 3,
+        "score": 121,
+        "units": 27
+      },
+      "player1Decision": "gather",
       "player2Decision": "build"
     },
     {
       "tickNumber": 175,
-      "timestamp": 1783628710031,
+      "timestamp": 1783629358950,
       "player1State": {
-        "health": 21,
-        "score": 129,
-        "units": 27
+        "health": 38,
+        "score": 125,
+        "units": 28
       },
       "player2State": {
-        "health": 47,
-        "score": 116,
-        "units": 20
+        "health": 3,
+        "score": 121,
+        "units": 29
       },
-      "player1Decision": "gather",
+      "player1Decision": "attack",
       "player2Decision": "gather"
     },
     {
       "tickNumber": 176,
-      "timestamp": 1783628710131,
+      "timestamp": 1783629359050,
       "player1State": {
-        "health": 20,
-        "score": 129,
-        "units": 29
+        "health": 38,
+        "score": 125,
+        "units": 21
       },
       "player2State": {
-        "health": 47,
-        "score": 116,
-        "units": 28
+        "health": 3,
+        "score": 121,
+        "units": 23
       },
-      "player1Decision": "attack",
-      "player2Decision": "attack"
+      "player1Decision": "build",
+      "player2Decision": "scout"
     },
     {
       "tickNumber": 177,
-      "timestamp": 1783628710231,
+      "timestamp": 1783629359150,
       "player1State": {
-        "health": 20,
-        "score": 129,
+        "health": 38,
+        "score": 125,
         "units": 25
       },
       "player2State": {
-        "health": 47,
-        "score": 120,
-        "units": 22
+        "health": 3,
+        "score": 121,
+        "units": 20
       },
-      "player1Decision": "defend",
-      "player2Decision": "gather"
+      "player1Decision": "attack",
+      "player2Decision": "scout"
     },
     {
       "tickNumber": 178,
-      "timestamp": 1783628710331,
+      "timestamp": 1783629359250,
       "player1State": {
-        "health": 20,
-        "score": 129,
-        "units": 26
+        "health": 38,
+        "score": 125,
+        "units": 27
       },
       "player2State": {
-        "health": 40,
-        "score": 120,
-        "units": 21
+        "health": 3,
+        "score": 121,
+        "units": 22
       },
-      "player1Decision": "attack",
+      "player1Decision": "build",
       "player2Decision": "scout"
     },
     {
       "tickNumber": 179,
-      "timestamp": 1783628710431,
+      "timestamp": 1783629359350,
       "player1State": {
-        "health": 17,
-        "score": 129,
-        "units": 20
+        "health": 38,
+        "score": 125,
+        "units": 22
       },
       "player2State": {
-        "health": 40,
-        "score": 120,
-        "units": 23
+        "health": 3,
+        "score": 121,
+        "units": 21
       },
-      "player1Decision": "scout",
-      "player2Decision": "attack"
+      "player1Decision": "defend",
+      "player2Decision": "build"
     },
     {
       "tickNumber": 180,
-      "timestamp": 1783628710531,
+      "timestamp": 1783629359450,
       "player1State": {
-        "health": 17,
-        "score": 129,
-        "units": 27
-      },
-      "player2State": {
-        "health": 40,
-        "score": 120,
+        "health": 38,
+        "score": 125,
         "units": 21
       },
-      "player1Decision": "gather",
-      "player2Decision": "defend"
+      "player2State": {
+        "health": 3,
+        "score": 121,
+        "units": 29
+      },
+      "player1Decision": "attack",
+      "player2Decision": "scout"
     },
     {
       "tickNumber": 181,
-      "timestamp": 1783628710631,
+      "timestamp": 1783629359550,
       "player1State": {
-        "health": 17,
-        "score": 129,
-        "units": 27
+        "health": 38,
+        "score": 125,
+        "units": 24
       },
       "player2State": {
-        "health": 40,
-        "score": 120,
-        "units": 29
+        "health": 1,
+        "score": 125,
+        "units": 23
       },
-      "player1Decision": "defend",
-      "player2Decision": "defend"
+      "player1Decision": "attack",
+      "player2Decision": "gather"
     },
     {
       "tickNumber": 182,
-      "timestamp": 1783628710731,
+      "timestamp": 1783629359650,
       "player1State": {
-        "health": 15,
-        "score": 129,
+        "health": 38,
+        "score": 128,
+        "units": 20
+      },
+      "player2State": {
+        "health": 1,
+        "score": 127,
+        "units": 28
+      },
+      "player1Decision": "gather",
+      "player2Decision": "gather"
+    },
+    {
+      "tickNumber": 183,
+      "timestamp": 1783629359750,
+      "player1State": {
+        "health": 38,
+        "score": 128,
         "units": 28
       },
       "player2State": {
-        "health": 40,
-        "score": 120,
-        "units": 29
+        "health": 1,
+        "score": 127,
+        "units": 21
+      },
+      "player1Decision": "build",
+      "player2Decision": "build"
+    },
+    {
+      "tickNumber": 184,
+      "timestamp": 1783629359850,
+      "player1State": {
+        "health": 38,
+        "score": 128,
+        "units": 28
+      },
+      "player2State": {
+        "health": 1,
+        "score": 127,
+        "units": 21
       },
       "player1Decision": "build",
       "player2Decision": "attack"
     },
     {
-      "tickNumber": 183,
-      "timestamp": 1783628710831,
+      "tickNumber": 185,
+      "timestamp": 1783629359950,
       "player1State": {
-        "health": 15,
-        "score": 129,
-        "units": 23
-      },
-      "player2State": {
-        "health": 40,
-        "score": 120,
-        "units": 26
-      },
-      "player1Decision": "defend",
-      "player2Decision": "scout"
-    },
-    {
-      "tickNumber": 184,
-      "timestamp": 1783628710931,
-      "player1State": {
-        "health": 15,
-        "score": 129,
+        "health": 38,
+        "score": 130,
         "units": 22
       },
       "player2State": {
-        "health": 40,
-        "score": 122,
-        "units": 24
-      },
-      "player1Decision": "scout",
-      "player2Decision": "gather"
-    },
-    {
-      "tickNumber": 185,
-      "timestamp": 1783628711031,
-      "player1State": {
-        "health": 15,
-        "score": 129,
-        "units": 23
-      },
-      "player2State": {
-        "health": 40,
-        "score": 122,
-        "units": 25
+        "health": 1,
+        "score": 127,
+        "units": 28
       },
       "player1Decision": "gather",
-      "player2Decision": "defend"
+      "player2Decision": "scout"
     },
     {
       "tickNumber": 186,
-      "timestamp": 1783628711131,
+      "timestamp": 1783629360050,
       "player1State": {
-        "health": 7,
-        "score": 129,
-        "units": 21
-      },
-      "player2State": {
-        "health": 40,
-        "score": 122,
+        "health": 38,
+        "score": 130,
         "units": 23
       },
-      "player1Decision": "scout",
+      "player2State": {
+        "health": 1,
+        "score": 127,
+        "units": 20
+      },
+      "player1Decision": "gather",
       "player2Decision": "attack"
     },
     {
       "tickNumber": 187,
-      "timestamp": 1783628711231,
+      "timestamp": 1783629360150,
       "player1State": {
-        "health": 7,
-        "score": 129,
-        "units": 25
+        "health": 38,
+        "score": 130,
+        "units": 23
       },
       "player2State": {
-        "health": 40,
-        "score": 122,
-        "units": 28
+        "health": 1,
+        "score": 127,
+        "units": 26
       },
-      "player1Decision": "build",
-      "player2Decision": "attack"
+      "player1Decision": "defend",
+      "player2Decision": "build"
     },
     {
       "tickNumber": 188,
-      "timestamp": 1783628711331,
+      "timestamp": 1783629360250,
       "player1State": {
-        "health": 7,
-        "score": 129,
-        "units": 21
+        "health": 38,
+        "score": 130,
+        "units": 20
       },
       "player2State": {
-        "health": 35,
-        "score": 122,
-        "units": 26
+        "health": 1,
+        "score": 127,
+        "units": 22
       },
-      "player1Decision": "attack",
+      "player1Decision": "scout",
       "player2Decision": "scout"
     },
     {
       "tickNumber": 189,
-      "timestamp": 1783628711431,
+      "timestamp": 1783629360350,
       "player1State": {
-        "health": 7,
-        "score": 129,
-        "units": 24
-      },
-      "player2State": {
-        "health": 32,
-        "score": 122,
+        "health": 38,
+        "score": 130,
         "units": 28
       },
-      "player1Decision": "attack",
-      "player2Decision": "defend"
+      "player2State": {
+        "health": 1,
+        "score": 127,
+        "units": 26
+      },
+      "player1Decision": "defend",
+      "player2Decision": "build"
     },
     {
       "tickNumber": 190,
-      "timestamp": 1783628711531,
+      "timestamp": 1783629360450,
       "player1State": {
-        "health": 7,
-        "score": 129,
-        "units": 26
+        "health": 38,
+        "score": 130,
+        "units": 29
       },
       "player2State": {
-        "health": 32,
-        "score": 122,
-        "units": 20
+        "health": 1,
+        "score": 127,
+        "units": 29
       },
-      "player1Decision": "build",
-      "player2Decision": "attack"
+      "player1Decision": "defend",
+      "player2Decision": "build"
     },
     {
       "tickNumber": 191,
-      "timestamp": 1783628711631,
+      "timestamp": 1783629360550,
       "player1State": {
-        "health": 7,
-        "score": 133,
+        "health": 38,
+        "score": 130,
         "units": 27
       },
       "player2State": {
-        "health": 32,
-        "score": 122,
-        "units": 23
+        "health": 1,
+        "score": 127,
+        "units": 21
       },
-      "player1Decision": "gather",
+      "player1Decision": "defend",
       "player2Decision": "scout"
     },
     {
       "tickNumber": 192,
-      "timestamp": 1783628711731,
+      "timestamp": 1783629360650,
       "player1State": {
-        "health": 7,
-        "score": 133,
-        "units": 21
+        "health": 38,
+        "score": 130,
+        "units": 27
       },
       "player2State": {
-        "health": 32,
-        "score": 122,
-        "units": 29
+        "health": 1,
+        "score": 130,
+        "units": 23
       },
-      "player1Decision": "attack",
-      "player2Decision": "scout"
+      "player1Decision": "build",
+      "player2Decision": "gather"
     },
     {
       "tickNumber": 193,
-      "timestamp": 1783628711831,
+      "timestamp": 1783629360750,
       "player1State": {
-        "health": 7,
-        "score": 133,
-        "units": 26
-      },
-      "player2State": {
-        "health": 27,
-        "score": 122,
+        "health": 38,
+        "score": 130,
         "units": 23
       },
+      "player2State": {
+        "health": 1,
+        "score": 130,
+        "units": 26
+      },
       "player1Decision": "attack",
-      "player2Decision": "defend"
+      "player2Decision": "scout"
     },
     {
       "tickNumber": 194,
-      "timestamp": 1783628711931,
+      "timestamp": 1783629360850,
       "player1State": {
-        "health": 7,
+        "health": 38,
+        "score": 130,
+        "units": 25
+      },
+      "player2State": {
+        "health": 1,
         "score": 133,
         "units": 28
       },
-      "player2State": {
-        "health": 27,
-        "score": 122,
-        "units": 28
-      },
-      "player1Decision": "scout",
-      "player2Decision": "defend"
+      "player1Decision": "build",
+      "player2Decision": "gather"
     },
     {
       "tickNumber": 195,
-      "timestamp": 1783628712031,
+      "timestamp": 1783629360950,
       "player1State": {
-        "health": 7,
+        "health": 38,
         "score": 133,
         "units": 25
       },
       "player2State": {
-        "health": 27,
-        "score": 122,
-        "units": 22
+        "health": 1,
+        "score": 133,
+        "units": 26
       },
-      "player1Decision": "defend",
-      "player2Decision": "defend"
+      "player1Decision": "gather",
+      "player2Decision": "scout"
     },
     {
       "tickNumber": 196,
-      "timestamp": 1783628712131,
+      "timestamp": 1783629361050,
       "player1State": {
-        "health": 7,
+        "health": 33,
         "score": 133,
-        "units": 27
-      },
-      "player2State": {
-        "health": 21,
-        "score": 122,
-        "units": 27
-      },
-      "player1Decision": "attack",
-      "player2Decision": "defend"
-    },
-    {
-      "tickNumber": 197,
-      "timestamp": 1783628712231,
-      "player1State": {
-        "health": 7,
-        "score": 136,
-        "units": 21
-      },
-      "player2State": {
-        "health": 21,
-        "score": 122,
-        "units": 26
-      },
-      "player1Decision": "gather",
-      "player2Decision": "defend"
-    },
-    {
-      "tickNumber": 198,
-      "timestamp": 1783628712331,
-      "player1State": {
-        "health": 6,
-        "score": 136,
-        "units": 22
-      },
-      "player2State": {
-        "health": 21,
-        "score": 122,
-        "units": 21
-      },
-      "player1Decision": "scout",
-      "player2Decision": "attack"
-    },
-    {
-      "tickNumber": 199,
-      "timestamp": 1783628712431,
-      "player1State": {
-        "health": 6,
-        "score": 136,
-        "units": 21
-      },
-      "player2State": {
-        "health": 21,
-        "score": 126,
-        "units": 25
-      },
-      "player1Decision": "build",
-      "player2Decision": "gather"
-    },
-    {
-      "tickNumber": 200,
-      "timestamp": 1783628712531,
-      "player1State": {
-        "health": 6,
-        "score": 136,
-        "units": 26
-      },
-      "player2State": {
-        "health": 21,
-        "score": 126,
-        "units": 20
-      },
-      "player1Decision": "gather",
-      "player2Decision": "build"
-    },
-    {
-      "tickNumber": 201,
-      "timestamp": 1783628712631,
-      "player1State": {
-        "health": 6,
-        "score": 136,
-        "units": 25
-      },
-      "player2State": {
-        "health": 21,
-        "score": 126,
-        "units": 20
-      },
-      "player1Decision": "build",
-      "player2Decision": "build"
-    },
-    {
-      "tickNumber": 202,
-      "timestamp": 1783628712731,
-      "player1State": {
-        "health": 6,
-        "score": 140,
-        "units": 21
-      },
-      "player2State": {
-        "health": 21,
-        "score": 127,
-        "units": 26
-      },
-      "player1Decision": "gather",
-      "player2Decision": "gather"
-    },
-    {
-      "tickNumber": 203,
-      "timestamp": 1783628712831,
-      "player1State": {
-        "health": 6,
-        "score": 141,
-        "units": 20
-      },
-      "player2State": {
-        "health": 21,
-        "score": 127,
-        "units": 26
-      },
-      "player1Decision": "gather",
-      "player2Decision": "build"
-    },
-    {
-      "tickNumber": 204,
-      "timestamp": 1783628712931,
-      "player1State": {
-        "health": 6,
-        "score": 141,
-        "units": 24
-      },
-      "player2State": {
-        "health": 21,
-        "score": 127,
-        "units": 21
-      },
-      "player1Decision": "defend",
-      "player2Decision": "gather"
-    },
-    {
-      "tickNumber": 205,
-      "timestamp": 1783628713031,
-      "player1State": {
-        "health": 6,
-        "score": 141,
-        "units": 26
-      },
-      "player2State": {
-        "health": 19,
-        "score": 127,
-        "units": 25
-      },
-      "player1Decision": "attack",
-      "player2Decision": "defend"
-    },
-    {
-      "tickNumber": 206,
-      "timestamp": 1783628713131,
-      "player1State": {
-        "health": 6,
-        "score": 141,
-        "units": 29
-      },
-      "player2State": {
-        "health": 19,
-        "score": 127,
-        "units": 24
-      },
-      "player1Decision": "scout",
-      "player2Decision": "defend"
-    },
-    {
-      "tickNumber": 207,
-      "timestamp": 1783628713231,
-      "player1State": {
-        "health": 6,
-        "score": 141,
-        "units": 27
-      },
-      "player2State": {
-        "health": 19,
-        "score": 127,
-        "units": 20
-      },
-      "player1Decision": "attack",
-      "player2Decision": "attack"
-    },
-    {
-      "tickNumber": 208,
-      "timestamp": 1783628713331,
-      "player1State": {
-        "health": 6,
-        "score": 144,
-        "units": 24
-      },
-      "player2State": {
-        "health": 19,
-        "score": 127,
-        "units": 20
-      },
-      "player1Decision": "gather",
-      "player2Decision": "scout"
-    },
-    {
-      "tickNumber": 209,
-      "timestamp": 1783628713431,
-      "player1State": {
-        "health": 6,
-        "score": 144,
-        "units": 20
-      },
-      "player2State": {
-        "health": 19,
-        "score": 127,
-        "units": 22
-      },
-      "player1Decision": "build",
-      "player2Decision": "defend"
-    },
-    {
-      "tickNumber": 210,
-      "timestamp": 1783628713531,
-      "player1State": {
-        "health": 6,
-        "score": 144,
-        "units": 22
-      },
-      "player2State": {
-        "health": 19,
-        "score": 128,
-        "units": 25
-      },
-      "player1Decision": "scout",
-      "player2Decision": "gather"
-    },
-    {
-      "tickNumber": 211,
-      "timestamp": 1783628713631,
-      "player1State": {
-        "health": 6,
-        "score": 148,
-        "units": 24
-      },
-      "player2State": {
-        "health": 19,
-        "score": 132,
-        "units": 29
-      },
-      "player1Decision": "gather",
-      "player2Decision": "gather"
-    },
-    {
-      "tickNumber": 212,
-      "timestamp": 1783628713731,
-      "player1State": {
-        "health": 6,
-        "score": 148,
-        "units": 29
-      },
-      "player2State": {
-        "health": 19,
-        "score": 132,
-        "units": 26
-      },
-      "player1Decision": "scout",
-      "player2Decision": "build"
-    },
-    {
-      "tickNumber": 213,
-      "timestamp": 1783628713831,
-      "player1State": {
-        "health": 6,
-        "score": 148,
-        "units": 24
-      },
-      "player2State": {
-        "health": 19,
-        "score": 132,
-        "units": 29
-      },
-      "player1Decision": "build",
-      "player2Decision": "scout"
-    },
-    {
-      "tickNumber": 214,
-      "timestamp": 1783628713931,
-      "player1State": {
-        "health": 6,
-        "score": 148,
         "units": 28
       },
       "player2State": {
-        "health": 19,
-        "score": 134,
+        "health": 1,
+        "score": 133,
         "units": 21
+      },
+      "player1Decision": "defend",
+      "player2Decision": "attack"
+    },
+    {
+      "tickNumber": 197,
+      "timestamp": 1783629361150,
+      "player1State": {
+        "health": 33,
+        "score": 133,
+        "units": 29
+      },
+      "player2State": {
+        "health": 1,
+        "score": 133,
+        "units": 24
+      },
+      "player1Decision": "defend",
+      "player2Decision": "attack"
+    },
+    {
+      "tickNumber": 198,
+      "timestamp": 1783629361250,
+      "player1State": {
+        "health": 33,
+        "score": 133,
+        "units": 26
+      },
+      "player2State": {
+        "health": 1,
+        "score": 133,
+        "units": 22
+      },
+      "player1Decision": "build",
+      "player2Decision": "defend"
+    },
+    {
+      "tickNumber": 199,
+      "timestamp": 1783629361350,
+      "player1State": {
+        "health": 33,
+        "score": 134,
+        "units": 24
+      },
+      "player2State": {
+        "health": 1,
+        "score": 133,
+        "units": 22
+      },
+      "player1Decision": "gather",
+      "player2Decision": "defend"
+    },
+    {
+      "tickNumber": 200,
+      "timestamp": 1783629361450,
+      "player1State": {
+        "health": 33,
+        "score": 134,
+        "units": 28
+      },
+      "player2State": {
+        "health": 1,
+        "score": 133,
+        "units": 23
+      },
+      "player1Decision": "scout",
+      "player2Decision": "attack"
+    },
+    {
+      "tickNumber": 201,
+      "timestamp": 1783629361550,
+      "player1State": {
+        "health": 33,
+        "score": 134,
+        "units": 23
+      },
+      "player2State": {
+        "health": 1,
+        "score": 136,
+        "units": 28
       },
       "player1Decision": "build",
       "player2Decision": "gather"
     },
     {
-      "tickNumber": 215,
-      "timestamp": 1783628714031,
+      "tickNumber": 202,
+      "timestamp": 1783629361650,
       "player1State": {
-        "health": 6,
-        "score": 148,
-        "units": 25
+        "health": 33,
+        "score": 134,
+        "units": 23
       },
       "player2State": {
-        "health": 19,
-        "score": 135,
-        "units": 27
-      },
-      "player1Decision": "defend",
-      "player2Decision": "gather"
-    },
-    {
-      "tickNumber": 216,
-      "timestamp": 1783628714131,
-      "player1State": {
-        "health": 6,
-        "score": 148,
-        "units": 20
-      },
-      "player2State": {
-        "health": 19,
-        "score": 137,
-        "units": 29
-      },
-      "player1Decision": "scout",
-      "player2Decision": "gather"
-    },
-    {
-      "tickNumber": 217,
-      "timestamp": 1783628714231,
-      "player1State": {
-        "health": 6,
-        "score": 148,
-        "units": 26
-      },
-      "player2State": {
-        "health": 19,
-        "score": 137,
-        "units": 29
-      },
-      "player1Decision": "gather",
-      "player2Decision": "build"
-    },
-    {
-      "tickNumber": 218,
-      "timestamp": 1783628714331,
-      "player1State": {
-        "health": 6,
-        "score": 148,
-        "units": 29
-      },
-      "player2State": {
-        "health": 12,
-        "score": 137,
-        "units": 26
-      },
-      "player1Decision": "attack",
-      "player2Decision": "defend"
-    },
-    {
-      "tickNumber": 219,
-      "timestamp": 1783628714431,
-      "player1State": {
-        "health": 6,
-        "score": 150,
-        "units": 27
-      },
-      "player2State": {
-        "health": 12,
-        "score": 137,
-        "units": 29
-      },
-      "player1Decision": "gather",
-      "player2Decision": "scout"
-    },
-    {
-      "tickNumber": 220,
-      "timestamp": 1783628714531,
-      "player1State": {
-        "health": 6,
-        "score": 150,
-        "units": 26
-      },
-      "player2State": {
-        "health": 12,
-        "score": 137,
-        "units": 27
-      },
-      "player1Decision": "gather",
-      "player2Decision": "scout"
-    },
-    {
-      "tickNumber": 221,
-      "timestamp": 1783628714631,
-      "player1State": {
-        "health": 6,
-        "score": 150,
-        "units": 20
-      },
-      "player2State": {
-        "health": 11,
-        "score": 137,
-        "units": 21
-      },
-      "player1Decision": "attack",
-      "player2Decision": "defend"
-    },
-    {
-      "tickNumber": 222,
-      "timestamp": 1783628714731,
-      "player1State": {
         "health": 0,
-        "score": 150,
-        "units": 26
+        "score": 136,
+        "units": 23
       },
-      "player2State": {
-        "health": 11,
-        "score": 137,
-        "units": 27
-      },
-      "player1Decision": "scout",
-      "player2Decision": "attack"
+      "player1Decision": "attack",
+      "player2Decision": "gather"
     }
   ]
 }
