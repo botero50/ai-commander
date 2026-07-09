@@ -158,6 +158,13 @@ export type {
   BroadcastEvent,
   SpectatorViewUpdate,
 } from './tournament/spectator-coordinator.js';
+export { BroadcastServer } from './tournament/broadcast-server.js';
+export type {
+  ClientConnection,
+  BroadcastMessage,
+  ServerConfig,
+  ConnectionStats,
+} from './tournament/broadcast-server.js';
 export { EloRating } from './tournament/elo-rating.js';
 export type { BrainRating, RatingChange, EloConfig } from './tournament/elo-rating.js';
 export { TournamentDashboard, formatTournamentExport } from './tournament/tournament-dashboard.js';
