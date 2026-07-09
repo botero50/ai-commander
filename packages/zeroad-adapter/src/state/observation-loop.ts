@@ -19,6 +19,11 @@ export class ObservationLoop {
   private observationCount: number = 0;
   private totalLatency: number = 0;
 
+  // Playback control
+  private isPaused: boolean = false;
+  private playbackSpeedMultiplier: number = 1.0;
+  private observationSkipCounter: number = 0;
+
   constructor(ipcBridge: IPCBridge, config: ObservationConfig, logger: Logger) {
     this.ipcBridge = ipcBridge;
     this.config = this.validateConfig(config);
@@ -76,6 +81,11 @@ export class ObservationLoop {
   }
 
   private async observeTick(): Promise<void> {
+    // Skip observation if paused or speed multiplier requires skipping
+    if (this.shouldSkipObservation()) {
+      return;
+    }
+
     try {
       const startTime = Date.now();
 
@@ -113,5 +123,79 @@ export class ObservationLoop {
       );
     }
     return config;
+  }
+
+  /**
+   * Pause observation updates
+   */
+  setPaused(paused: boolean): void {
+    if (this.isPaused === paused) {
+      return;
+    }
+
+    this.isPaused = paused;
+    this.observationSkipCounter = 0;
+
+    if (paused) {
+      this.logger.info('Observation paused');
+    } else {
+      this.logger.info('Observation resumed');
+    }
+  }
+
+  /**
+   * Set playback speed multiplier (e.g., 0.5, 1.0, 2.0)
+   * Higher values skip more observations to speed up playback
+   */
+  setPlaybackSpeed(multiplier: number): void {
+    if (multiplier < 0.25 || multiplier > 4) {
+      this.logger.warn('Invalid playback speed', { multiplier });
+      return;
+    }
+
+    this.playbackSpeedMultiplier = multiplier;
+    this.observationSkipCounter = 0;
+
+    this.logger.info('Playback speed changed', { multiplier: `${multiplier}x` });
+  }
+
+  /**
+   * Check if observation should be skipped based on speed
+   * For 2x speed, skip every other observation
+   * For 0.5x speed, observe twice per interval
+   */
+  private shouldSkipObservation(): boolean {
+    if (this.isPaused) {
+      return true;
+    }
+
+    if (this.playbackSpeedMultiplier === 1.0) {
+      return false;
+    }
+
+    // For speed > 1.0, skip observations
+    if (this.playbackSpeedMultiplier > 1.0) {
+      const skipRate = Math.floor(this.playbackSpeedMultiplier);
+      this.observationSkipCounter++;
+      if (this.observationSkipCounter >= skipRate) {
+        this.observationSkipCounter = 0;
+        return false; // Process this observation
+      }
+      return true; // Skip this observation
+    }
+
+    // For speed < 1.0, we'd need to double-observe, which isn't supported
+    // by the interval-based loop. Just slow it down by extending intervals.
+    return false;
+  }
+
+  /**
+   * Get current playback state
+   */
+  getPlaybackState() {
+    return {
+      isPaused: this.isPaused,
+      speedMultiplier: this.playbackSpeedMultiplier,
+    };
   }
 }

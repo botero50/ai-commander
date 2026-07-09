@@ -70,6 +70,18 @@ export class ZeroADGameSession implements GameSession {
       // Initialize playback controller for live observation
       try {
         this.playbackController = new PlaybackController(this.eventFeed);
+
+        // Subscribe to playback state changes to update observation loop
+        this.eventFeed.subscribe((type, data) => {
+          if (type === 'playback:paused') {
+            (this.observationLoop as any).setPaused(true);
+          } else if (type === 'playback:resumed') {
+            (this.observationLoop as any).setPaused(false);
+          } else if (type === 'playback:speed_changed') {
+            (this.observationLoop as any).setPlaybackSpeed(data.newSpeed);
+          }
+        });
+
         this.logger.info('Playback controller initialized');
       } catch (playbackErr) {
         this.logger.warn('Failed to initialize playback controller', playbackErr);
