@@ -93,6 +93,8 @@ export { LiveCommentaryEngine } from './commentator/live-commentary-engine.js';
 export type { CommentaryLine, CommentaryState } from './commentator/live-commentary-engine.js';
 export { MatchStoryline } from './commentator/match-storyline.js';
 export type { MatchPhase, PhaseEvent, MatchPhaseData, StorylineState } from './commentator/match-storyline.js';
+export { CastingStyleManager } from './commentator/casting-styles.js';
+export type { CastingStyle, StyleConfig, StyledCommentaryLine, StyledStoryline } from './commentator/casting-styles.js';
 export { MatchViewer, MatchViewerManager } from './web/match-viewer.js';
 export type { MatchViewerState, MatchViewerEvent } from './web/match-viewer.js';
 export {
