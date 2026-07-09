@@ -81,6 +81,8 @@ export { MatchTimeline } from './match/match-timeline.js';
 export type { TimelineSnapshot, TimelineEvent } from './match/match-timeline.js';
 export { MatchObserver, MatchObserverBuilder } from './match/match-observer.js';
 export type { ObserverCallback } from './match/match-observer.js';
+export { EventDetector } from './director/event-detector.js';
+export type { DetectedEvent, DetectedEventType } from './director/event-detector.js';
 export { MatchViewer, MatchViewerManager } from './web/match-viewer.js';
 export type { MatchViewerState, MatchViewerEvent } from './web/match-viewer.js';
 export {
