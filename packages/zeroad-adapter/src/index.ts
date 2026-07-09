@@ -55,6 +55,8 @@ export { DecisionOverlay } from './match/decision-overlay.js';
 export type { DecisionEvent, DecisionSubscriber } from './match/decision-overlay.js';
 export { LiveCommentary } from './commentary/live-commentary.js';
 export type { CommentaryEntry, CommentarySubscriber, GameStateSnapshot } from './commentary/live-commentary.js';
+export { GameStateHUD } from './hud/game-state-hud.js';
+export type { HUDState, HUDPlayer } from './hud/game-state-hud.js';
 export { MatchTimeline } from './match/match-timeline.js';
 export type { TimelineSnapshot, TimelineEvent } from './match/match-timeline.js';
 export { MatchObserver, MatchObserverBuilder } from './match/match-observer.js';

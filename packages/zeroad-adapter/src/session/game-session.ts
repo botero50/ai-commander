@@ -16,6 +16,7 @@ import { LiveDecisionTimeline } from '../commentary/live-decision-timeline.js';
 import { DecisionOverlay } from '../match/decision-overlay.js';
 import { LiveCommentary } from '../commentary/live-commentary.js';
 import type { GameStateSnapshot } from '../commentary/live-commentary.js';
+import { GameStateHUD } from '../hud/game-state-hud.js';
 
 export class ZeroADGameSession implements GameSession {
   readonly sessionId: string;
@@ -33,6 +34,7 @@ export class ZeroADGameSession implements GameSession {
   private playbackController: PlaybackController | null = null;
   private decisionTimeline: LiveDecisionTimeline | null = null;
   private commentaryService: LiveCommentary | null = null;
+  private gameStateHUD: GameStateHUD | null = null;
   private decisionOverlay: DecisionOverlay;
   private eventFeed: EventFeed;
 
@@ -137,6 +139,10 @@ export class ZeroADGameSession implements GameSession {
         );
         this.commentaryService.start();
         this.logger.info('Live commentary service initialized');
+
+        // Initialize game state HUD for live broadcast display
+        this.gameStateHUD = new GameStateHUD(this.observationLoop as any);
+        this.logger.info('Game state HUD initialized');
       } catch (playbackErr) {
         this.logger.warn('Failed to initialize playback controller', playbackErr);
         // Continue without playback controls
@@ -233,6 +239,12 @@ export class ZeroADGameSession implements GameSession {
         this.commentaryService = null;
       }
 
+      // Stop game state HUD
+      if (this.gameStateHUD) {
+        this.gameStateHUD.destroy();
+        this.gameStateHUD = null;
+      }
+
       // Stop playback controller
       this.playbackController = null;
 
@@ -327,6 +339,14 @@ export class ZeroADGameSession implements GameSession {
    */
   getCommentaryService(): LiveCommentary | null {
     return this.commentaryService;
+  }
+
+  /**
+   * Get game state HUD service (if started)
+   * For real-time broadcast display of resources, military, population
+   */
+  getGameStateHUD(): GameStateHUD | null {
+    return this.gameStateHUD;
   }
 
   /**
