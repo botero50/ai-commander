@@ -37,22 +37,27 @@ export const DecisionEntry: React.FC<DecisionEntryProps> = ({ entry, onClick }) 
     <div
       onClick={() => onClick?.(entry.tick)}
       style={{
-        padding: '0.5rem 0.75rem',
+        padding: '0.625rem 0.875rem',
         borderBottom: '1px solid #e5e7eb',
         backgroundColor: '#fff',
         cursor: onClick ? 'pointer' : 'default',
-        transition: 'background-color 0.2s',
+        transition: 'background-color 0.15s ease, border-left-color 0.15s ease',
         display: 'flex',
         alignItems: 'center',
-        gap: '0.75rem',
-        minHeight: '3rem',
+        gap: '0.875rem',
+        minHeight: '3.25rem',
+        borderLeft: '3px solid transparent',
         ':hover': onClick ? { backgroundColor: '#f9fafb' } : {},
       }}
       onMouseEnter={(e) => {
-        if (onClick) e.currentTarget.style.backgroundColor = '#f9fafb';
+        if (onClick) {
+          e.currentTarget.style.backgroundColor = '#f3f4f6';
+          e.currentTarget.style.borderLeftColor = '#3b82f6';
+        }
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.backgroundColor = '#fff';
+        e.currentTarget.style.borderLeftColor = 'transparent';
       }}
     >
       {/* Player indicator */}
@@ -69,10 +74,12 @@ export const DecisionEntry: React.FC<DecisionEntryProps> = ({ entry, onClick }) 
       {/* Game time */}
       <div
         style={{
-          minWidth: '3rem',
-          fontWeight: '600',
-          color: '#1f2937',
-          fontSize: '0.875rem',
+          minWidth: '3.25rem',
+          fontWeight: '700',
+          color: '#374151',
+          fontSize: '0.8125rem',
+          letterSpacing: '0.01em',
+          fontVariantNumeric: 'tabular-nums',
         }}
       >
         {formatGameTime(entry.tick)}
@@ -84,7 +91,8 @@ export const DecisionEntry: React.FC<DecisionEntryProps> = ({ entry, onClick }) 
           flex: 1,
           fontWeight: '600',
           color: '#1f2937',
-          fontSize: '0.875rem',
+          fontSize: '0.9375rem',
+          lineHeight: '1.4',
         }}
       >
         {entry.summary}
@@ -93,13 +101,16 @@ export const DecisionEntry: React.FC<DecisionEntryProps> = ({ entry, onClick }) 
       {/* Category badge */}
       <div
         style={{
-          padding: '0.25rem 0.5rem',
-          backgroundColor: categoryColor + '20',
+          padding: '0.375rem 0.625rem',
+          backgroundColor: categoryColor + '15',
           color: categoryColor,
-          borderRadius: '0.25rem',
-          fontSize: '0.75rem',
-          fontWeight: '500',
+          borderRadius: '0.375rem',
+          fontSize: '0.7rem',
+          fontWeight: '600',
           flexShrink: 0,
+          textTransform: 'uppercase',
+          letterSpacing: '0.02em',
+          border: `1px solid ${categoryColor}30`,
         }}
       >
         {entry.category}
@@ -108,11 +119,12 @@ export const DecisionEntry: React.FC<DecisionEntryProps> = ({ entry, onClick }) 
       {/* Confidence percentage */}
       <div
         style={{
-          minWidth: '2.5rem',
+          minWidth: '2.75rem',
           textAlign: 'right',
           color: '#6b7280',
-          fontSize: '0.75rem',
-          opacity: 0.6 + entry.confidence * 0.4,
+          fontSize: '0.8125rem',
+          fontWeight: '500',
+          opacity: 0.7 + entry.confidence * 0.3,
         }}
       >
         {Math.round(entry.confidence * 100)}%

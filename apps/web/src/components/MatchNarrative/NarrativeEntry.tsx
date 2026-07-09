@@ -5,22 +5,22 @@ interface NarrativeEntryProps {
   entry: NarrativeEntry;
 }
 
-const getPhaseColor = (phase: string): { bg: string; border: string } => {
+const getPhaseColor = (phase: string): { bg: string; border: string; text: string } => {
   switch (phase) {
     case 'opening':
-      return { bg: '#eff6ff', border: '#3b82f6' }; // Blue
+      return { bg: '#eff6ff', border: '#3b82f6', text: '#1e40af' }; // Blue
     case 'early':
-      return { bg: '#fef3c7', border: '#f59e0b' }; // Amber
+      return { bg: '#fef3c7', border: '#f59e0b', text: '#92400e' }; // Amber
     case 'mid':
-      return { bg: '#fef08a', border: '#eab308' }; // Yellow
+      return { bg: '#fef08a', border: '#eab308', text: '#713f12' }; // Yellow
     case 'turning_point':
-      return { bg: '#fee2e2', border: '#ef4444' }; // Red
+      return { bg: '#fee2e2', border: '#ef4444', text: '#7f1d1d' }; // Red
     case 'late':
-      return { bg: '#fecaca', border: '#dc2626' }; // Dark red
+      return { bg: '#fecaca', border: '#dc2626', text: '#7f1d1d' }; // Dark red
     case 'conclusion':
-      return { bg: '#dcfce7', border: '#16a34a' }; // Green
+      return { bg: '#dcfce7', border: '#16a34a', text: '#15803d' }; // Green
     default:
-      return { bg: '#f3f4f6', border: '#6b7280' }; // Gray
+      return { bg: '#f3f4f6', border: '#6b7280', text: '#374151' }; // Gray
   }
 };
 
@@ -59,22 +59,31 @@ export const NarrativeEntry: React.FC<NarrativeEntryProps> = ({ entry }) => {
   return (
     <div
       style={{
-        padding: '1rem',
-        marginBottom: '0.75rem',
+        padding: '1.125rem 1rem',
+        marginBottom: '0.875rem',
         backgroundColor: colors.bg,
         borderLeft: `4px solid ${colors.border}`,
-        borderRadius: '0.375rem',
+        borderRadius: '0.5rem',
         display: 'flex',
         gap: '1rem',
         alignItems: 'flex-start',
+        transition: 'transform 0.15s ease, box-shadow 0.15s ease',
+        cursor: 'default',
+      }}
+      onMouseEnter={(e) => {
+        e.currentTarget.style.transform = 'translateX(2px)';
+      }}
+      onMouseLeave={(e) => {
+        e.currentTarget.style.transform = 'translateX(0)';
       }}
     >
       {/* Phase Icon */}
       <div
         style={{
-          fontSize: '1.5rem',
+          fontSize: '1.75rem',
           flexShrink: 0,
-          marginTop: '0.125rem',
+          marginTop: '0.0625rem',
+          lineHeight: '1',
         }}
       >
         {icon}
@@ -85,12 +94,12 @@ export const NarrativeEntry: React.FC<NarrativeEntryProps> = ({ entry }) => {
         {/* Phase Label */}
         <div
           style={{
-            fontSize: '0.75rem',
-            fontWeight: '600',
-            color: colors.border,
+            fontSize: '0.7rem',
+            fontWeight: '700',
+            color: colors.text,
             textTransform: 'uppercase',
-            letterSpacing: '0.05em',
-            marginBottom: '0.25rem',
+            letterSpacing: '0.06em',
+            marginBottom: '0.375rem',
           }}
         >
           {phaseLabel}
@@ -99,10 +108,11 @@ export const NarrativeEntry: React.FC<NarrativeEntryProps> = ({ entry }) => {
         {/* Narrative Text */}
         <div
           style={{
-            fontSize: '0.9375rem',
+            fontSize: '0.96875rem',
             color: '#1f2937',
             lineHeight: '1.5',
-            marginBottom: '0.5rem',
+            marginBottom: '0.625rem',
+            fontWeight: '500',
           }}
         >
           {entry.text}
@@ -112,23 +122,27 @@ export const NarrativeEntry: React.FC<NarrativeEntryProps> = ({ entry }) => {
         <div
           style={{
             display: 'flex',
-            gap: '1rem',
-            fontSize: '0.75rem',
+            gap: '1.25rem',
+            fontSize: '0.8125rem',
             color: '#6b7280',
+            fontWeight: '500',
           }}
         >
           {/* Confidence */}
-          <span>{confidencePercent}% confidence</span>
+          <span title="How certain this narrative segment is">
+            {confidencePercent}% confidence
+          </span>
 
           {/* Key Moment Indicator */}
           {entry.isKeyMoment && (
             <span
               style={{
                 color: colors.border,
-                fontWeight: '600',
+                fontWeight: '700',
+                letterSpacing: '0.02em',
               }}
             >
-              ★ Key Moment
+              ★ KEY MOMENT
             </span>
           )}
 

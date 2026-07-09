@@ -20,11 +20,11 @@ const getTypeColor = (type: 'event' | 'status'): string => {
 const getSourceLabel = (source: string): string => {
   switch (source) {
     case 'dramatic_moment':
-      return '⚔';
+      return '⚔️';
     case 'resource_analysis':
       return '📊';
     case 'military_analysis':
-      return '🛡';
+      return '🛡️';
     case 'status':
       return '📢';
     default:
@@ -43,19 +43,19 @@ export const CommentaryEntry: React.FC<CommentaryEntryProps> = ({
     <div
       onClick={() => onClick?.(entry.tick)}
       style={{
-        padding: '0.5rem 0.75rem',
+        padding: '0.625rem 0.875rem',
         borderBottom: '1px solid #e5e7eb',
         backgroundColor: '#fff',
         cursor: onClick ? 'pointer' : 'default',
-        transition: 'background-color 0.2s',
+        transition: 'background-color 0.15s ease, border-left-color 0.15s ease',
         display: 'flex',
         alignItems: 'center',
-        gap: '0.75rem',
-        minHeight: '3rem',
+        gap: '0.875rem',
+        minHeight: '3.25rem',
         borderLeft: `3px solid ${typeColor}`,
       }}
       onMouseEnter={(e) => {
-        if (onClick) e.currentTarget.style.backgroundColor = '#f9fafb';
+        if (onClick) e.currentTarget.style.backgroundColor = '#f3f4f6';
       }}
       onMouseLeave={(e) => {
         e.currentTarget.style.backgroundColor = '#fff';
@@ -64,9 +64,10 @@ export const CommentaryEntry: React.FC<CommentaryEntryProps> = ({
       {/* Source indicator */}
       <div
         style={{
-          fontSize: '1rem',
+          fontSize: '1.125rem',
           flexShrink: 0,
           opacity: confidenceOpacity,
+          lineHeight: '1',
         }}
       >
         {getSourceLabel(entry.source)}
@@ -75,10 +76,12 @@ export const CommentaryEntry: React.FC<CommentaryEntryProps> = ({
       {/* Game time */}
       <div
         style={{
-          minWidth: '3rem',
-          fontWeight: '600',
-          color: '#1f2937',
-          fontSize: '0.875rem',
+          minWidth: '3.25rem',
+          fontWeight: '700',
+          color: '#374151',
+          fontSize: '0.8125rem',
+          letterSpacing: '0.01em',
+          fontVariantNumeric: 'tabular-nums',
         }}
       >
         {formatGameTime(entry.tick)}
@@ -89,7 +92,8 @@ export const CommentaryEntry: React.FC<CommentaryEntryProps> = ({
         style={{
           flex: 1,
           color: '#1f2937',
-          fontSize: '0.875rem',
+          fontSize: '0.9375rem',
+          lineHeight: '1.4',
           opacity: confidenceOpacity,
         }}
       >
@@ -99,14 +103,16 @@ export const CommentaryEntry: React.FC<CommentaryEntryProps> = ({
       {/* Type badge */}
       <div
         style={{
-          padding: '0.25rem 0.5rem',
-          backgroundColor: typeColor + '20',
+          padding: '0.375rem 0.625rem',
+          backgroundColor: typeColor + '15',
           color: typeColor,
-          borderRadius: '0.25rem',
-          fontSize: '0.65rem',
-          fontWeight: '500',
+          borderRadius: '0.375rem',
+          fontSize: '0.7rem',
+          fontWeight: '600',
           flexShrink: 0,
           textTransform: 'uppercase',
+          letterSpacing: '0.02em',
+          border: `1px solid ${typeColor}30`,
         }}
       >
         {entry.type}
@@ -116,10 +122,10 @@ export const CommentaryEntry: React.FC<CommentaryEntryProps> = ({
       {entry.momentSeverity !== undefined && (
         <div
           style={{
-            minWidth: '2rem',
+            minWidth: '2.25rem',
             textAlign: 'right',
             color: '#6b7280',
-            fontSize: '0.75rem',
+            fontSize: '0.8125rem',
             fontWeight: '600',
           }}
         >
