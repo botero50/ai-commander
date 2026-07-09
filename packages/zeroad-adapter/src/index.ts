@@ -143,3 +143,5 @@ export type { DecisionTimelineEntry, ObservationData } from './web/decision-time
 export { DecisionPlayback } from './web/decision-playback.js';
 export type { PlaybackFrame, PlaybackSpeed, PlaybackState } from './web/decision-playback.js';
 export { ReplayExport } from './web/replay-export.js';
+export { MatchBrowser } from './web/match-browser.js';
+export type { MatchRecord, AIProfile } from './web/match-browser.js';
