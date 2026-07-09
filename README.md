@@ -2,227 +2,241 @@
 
 **Watch AI models compete in real-time strategy games.**
 
-AI Commander is a competitive platform where you can orchestrate AI agents against each other in RTS games, watch them make real-time decisions, and analyze their strategies.
+AI Commander is a framework for running AI agents against each other in strategy games. Two LLMs make real-time decisions, and you get complete match replays, statistics, and analysis.
 
 ---
 
-## ⚡ Quick Start (5 minutes)
+## 🚀 Quick Start
 
+### 1. Install Requirements
+- Node.js 22+
+- Ollama (free, local LLM runner)
+- ~10 GB disk space for models
+
+### 2. Install & Run Demo
 ```bash
-# 1. Install
+# Clone the repo
 git clone https://github.com/anthropics/ai-commander.git
 cd ai-commander
-pnpm install && pnpm build
 
-# 2. Play
-npx ts-node test-builtin-match.ts
+# Install dependencies
+npm install
+
+# Start Ollama in Terminal 1
+ollama serve
+
+# In Terminal 2, download models
+ollama pull mistral
+ollama pull neural-chat
+
+# Run the demo
+npm run demo
 ```
 
-**Done!** You'll see live AI gameplay.
+### 3. Watch the Demo
+```
+🎮 AI COMMANDER — FIRST PLAYABLE DEMO
 
-For more options, see **[PLAY_NOW.md](PLAY_NOW.md)**.
+🏆 WINNER: Player 2 (neural-chat)
 
----
+📊 Match Statistics:
+  Total Ticks: 223
+  Player 1 Score: 150, Health: 0
+  Player 2 Score: 137, Health: 11
 
-## 🎯 What Is This?
+Output saved:
+  ✅ demo-output/replay.json (complete match data)
+  ✅ demo-output/logs.txt (match summary)
+```
 
-**A tournament platform for AI models playing RTS games.**
-
-Run multiple AI models (Ollama, Claude, GPT, Gemini, or built-in) against each other:
-
-- ✅ **Real-time match execution** — Watch AI agents make decisions in-game
-- ✅ **Multiple AI providers** — Use local models or cloud APIs
-- ✅ **Tournament system** — Round-robin, single-elimination, Swiss with ELO ratings
-- ✅ **Professional reporting** — Automatic analysis, statistics, replays
-- ✅ **Game-agnostic** — Framework works with 0 A.D., Spring RTS, and other RTS games
-- ✅ **Extensible** — Add new games or AI providers easily
+**Done!** You've just watched two AI models play a complete game.
 
 ---
 
 ## 📚 Documentation
 
-| Document | Purpose |
-|----------|---------|
-| **[PLAY_NOW.md](PLAY_NOW.md)** | ⚡ Get playing in 5 minutes |
-| **[GETTING_STARTED.md](GETTING_STARTED.md)** | 📖 Full setup guide with options |
-| **[DEMO.md](DEMO.md)** | 💻 Code examples and API reference |
-| **[TOURNAMENT_GUIDE.md](TOURNAMENT_GUIDE.md)** | 🏆 Run multi-match tournaments |
-| **[RELEASE_NOTES.md](RELEASE_NOTES.md)** | 📋 What's included in v1.0 |
+| Guide | Purpose |
+|-------|---------|
+| **[INSTALLATION.md](INSTALLATION.md)** | Complete setup guide with Ollama commands |
+| **[demo/README.md](demo/README.md)** | Demo details & configuration options |
+| **[CONTRIBUTING.md](CONTRIBUTING.md)** | How to contribute to the project |
+| **[SECURITY.md](SECURITY.md)** | Security policies |
+
+---
+
+## 🎯 What You Can Do
+
+### Run a Match
+```bash
+npm run demo
+```
+Executes a complete game between two AI models with Ollama.
+
+### Configure the Match
+```bash
+# Use different models
+PLAYER1_MODEL=mistral PLAYER2_MODEL=neural-chat npm run demo
+
+# Adjust match length
+MAX_TICKS=100 npm run demo
+
+# Quick test without Ollama
+DEMO_MODE=true npm run demo
+```
+
+### View Results
+```bash
+npm run replay
+```
+Display match timeline and statistics.
 
 ---
 
 ## 🤖 AI Providers
 
-### Local & Free
-
-**Ollama** — Run models locally on your machine
+### Local & Free (Recommended for Getting Started)
+**Ollama** — Run models on your own machine
 ```bash
-ollama pull mistral    # Download model
-ollama serve           # Start service
-npx ts-node play-ollama-match.ts
-```
-
-Models available: mistral, llama2, neural-chat, dolphin-mixtral, others
-
-### Cloud APIs
-
-**Claude** — Anthropic's Claude 3 family
-```bash
-export ANTHROPIC_API_KEY=sk-ant-...
-npx ts-node play-claude-match.ts
-```
-
-**GPT** — OpenAI's GPT-4 and variants
-```bash
-export OPENAI_API_KEY=sk-...
-npx ts-node play-gpt-match.ts
-```
-
-**Gemini** — Google's Gemini models
-```bash
-export GOOGLE_API_KEY=...
-npx ts-node play-gemini-match.ts
-```
-
-### Built-in
-
-**Fallback AI** — Rule-based strategy (no inference)
-```bash
-npx ts-node test-builtin-match.ts
+ollama pull mistral      # 4.1 GB, high quality
+ollama pull neural-chat  # 4.1 GB, fast
+ollama pull tinyllama    # 637 MB, very fast (for testing)
 ```
 
 ---
 
-## 🎮 Games Supported
+## ⚙️ System Requirements
 
-| Game | Status | Integration |
-|------|--------|-------------|
-| **0 A.D. (Pyrogenesis)** | ✅ Complete | Live match window + commands |
-| **Spring RTS** | ✅ Complete | Framework ready for gameplay |
-| **Others** | 🔧 Extensible | Implement GameSession interface |
-
----
-
-## 📊 Features
-
-### Watch Matches
-- Live game state display
-- Real-time AI decision tracking
-- Performance metrics (latency, command success rate)
-- Professional formatting
-
-### Run Tournaments
-- Round-robin (everyone plays everyone)
-- Single-elimination (knockout bracket)
-- Double-elimination (losers bracket)
-- Swiss system (skill-based pairings)
-- ELO rating calculation
-- Standings and leaderboards
-
-### Analyze Results
-- Save replays with full decision history
-- Event-by-event breakdown
-- Performance statistics per player
-- Strategy analysis
-- Match reporting in JSON/Markdown
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| RAM | 4 GB | 8+ GB |
+| Disk | 10 GB | 20 GB |
+| OS | Windows 10+ / macOS 10.13+ / Linux | Any |
+| GPU | Optional | NVIDIA / AMD for faster models |
 
 ---
 
-## 🏗️ Architecture
+## 📊 Architecture
 
-**6 core components:**
-
-1. **Brain SDK** — Universal AI interface (supports any provider)
-2. **Game Adapter** — Game-specific integration (0 A.D., Spring RTS, etc.)
-3. **Match Runner** — Orchestrates match execution
-4. **Tournament Engine** — Schedules and runs tournaments
-5. **Replay System** — Records and analyzes matches
-6. **Dashboard** — Web UI for viewing results
-
-**Type-safe**: Full TypeScript with strict mode.  
-**Game-agnostic**: Zero game-specific code in the framework.  
-**Tested**: 1,235+ tests on critical paths.  
-**Production-ready**: Used for real AI tournament execution.
-
----
-
-## 🚀 Installation
-
-**Prerequisites:**
-- Node.js 22+
-- pnpm
-- Git
-
-**Setup:**
-```bash
-git clone https://github.com/anthropics/ai-commander.git
-cd ai-commander
-pnpm install
-pnpm build
+```
+AI Commander
+├── Ollama Models (LLM brains)
+│   ├── mistral (4.1 GB)
+│   ├── neural-chat (4.1 GB)
+│   └── other models
+│
+├── Match Execution
+│   ├── Player 1 observes & decides
+│   ├── Player 2 observes & decides
+│   └── Game state updates each tick
+│
+└── Output & Analysis
+    ├── replay.json (complete match state)
+    ├── logs.txt (match summary)
+    └── Statistics (scores, health, etc)
 ```
 
-Takes ~3 minutes.
-
 ---
 
-## 🎬 Example: Run a Tournament
+## 🆘 Troubleshooting
 
+### "Cannot connect to Ollama"
 ```bash
-npx ts-node tournament-runner.ts \
-  --brains "mistral,llama2,claude" \
-  --format round-robin \
-  --matches 3
+# Start Ollama in a terminal
+ollama serve
+
+# Verify it's running
+curl http://localhost:11434/api/tags
 ```
 
-**Output:**
-- 9 total matches (3 brains × 3 matches each)
-- ELO ratings calculated
-- Winner determined
-- Replays saved for each match
-- Full statistics and leaderboard
+### "Model not found"
+```bash
+# Download the model
+ollama pull mistral
+
+# List downloaded models
+ollama list
+```
+
+### Out of Memory
+```bash
+# Use a smaller model
+MAX_TICKS=100 PLAYER1_MODEL=tinyllama PLAYER2_MODEL=tinyllama npm run demo
+```
+
+For more help, see [INSTALLATION.md](INSTALLATION.md).
 
 ---
 
-## 📖 Next Steps
+## 🏗️ Project Structure
 
-1. **See it in action:** Run `npx ts-node test-builtin-match.ts`
-2. **Add Ollama:** Follow [PLAY_NOW.md](PLAY_NOW.md) for local AI
-3. **Run a tournament:** See [TOURNAMENT_GUIDE.md](TOURNAMENT_GUIDE.md)
-4. **Integrate a game:** Implement the GameSession interface
-5. **Add an AI provider:** Implement the Brain interface
+```
+ai-commander/
+├── demo/                           # Demo executable
+│   ├── simple-demo.js              # Main demo script
+│   └── README.md                   # Demo documentation
+├── packages/
+│   ├── zeroad-adapter/             # Game integration
+│   ├── match-runner/               # Match execution engine
+│   ├── brain/                      # AI decision-making
+│   ├── brain-ollama/               # Ollama integration
+│   └── ...
+├── INSTALLATION.md                 # Installation guide
+├── README.md                        # This file
+├── package.json                    # Project configuration
+└── tsconfig.json                   # TypeScript settings
+```
 
 ---
 
-## 🤝 Contributing
+## 🎓 Getting Help
 
-We welcome contributions! Areas of interest:
-- New game adapters (StarCraft II, other RTS games)
-- New AI providers (Claude local models, custom implementations)
-- Tournament improvements
-- Dashboard enhancements
-- Performance optimizations
-
-See [CONTRIBUTING.md](CONTRIBUTING.md) for guidelines.
+1. **First-time setup?** → [INSTALLATION.md](INSTALLATION.md)
+2. **Demo questions?** → [demo/README.md](demo/README.md)
+3. **Contributing?** → [CONTRIBUTING.md](CONTRIBUTING.md)
+4. **Security concern?** → [SECURITY.md](SECURITY.md)
+5. **Issues or bugs?** → [GitHub Issues](https://github.com/anthropics/ai-commander/issues)
 
 ---
 
 ## 📄 License
 
-MIT
+MIT License — See LICENSE file for details.
 
 ---
 
-## 🎯 What's Included
+## 🙏 Attribution
 
-✅ **Complete framework** — Ready to run matches immediately  
-✅ **Multiple adapters** — 0 A.D. and Spring RTS built-in  
-✅ **5 brain providers** — Ollama, Claude, GPT, Gemini, Builtin  
-✅ **Professional tooling** — Reporting, replay, tournament engine  
-✅ **Full documentation** — Guides, examples, API reference  
-✅ **Production quality** — Type-safe, tested, extensible  
+AI Commander is built on:
+- **Ollama** — Free local LLM inference
+- **0 A.D.** — Open-source RTS game
+- **TypeScript** — Type-safe JavaScript
+- **Node.js** — JavaScript runtime
 
 ---
 
-**Ready to watch AI compete? Start with [PLAY_NOW.md](PLAY_NOW.md).**
+## 🚀 What's Next?
 
-🚀
+After running the demo:
+
+1. **Experiment with different models:**
+   ```bash
+   PLAYER1_MODEL=llama2 PLAYER2_MODEL=mistral npm run demo
+   ```
+
+2. **Check the replay:**
+   ```bash
+   npm run replay
+   cat demo-output/logs.txt
+   ```
+
+3. **Read the contribution guide:**
+   ```bash
+   cat CONTRIBUTING.md
+   ```
+
+4. **Build your own tournament:**
+   See `packages/match-runner/README.md` for API details.
+
+---
+
+**Ready to get started?** → [INSTALLATION.md](INSTALLATION.md)
