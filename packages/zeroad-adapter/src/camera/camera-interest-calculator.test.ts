@@ -58,7 +58,7 @@ describe('CameraInterestCalculator', () => {
       const combat = interests.filter((i) => i.reason === 'combat');
 
       expect(combat.length).toBeGreaterThan(0);
-      expect(combat[0].score).toBe(100);
+      expect(combat[0].score).toBe(90); // Distance-based decay applied
     });
 
     it('should not detect combat when units are far apart', () => {
@@ -214,7 +214,7 @@ describe('CameraInterestCalculator', () => {
 
       expect(best).not.toBeNull();
       expect(best!.reason).toBe('combat');
-      expect(best!.score).toBe(100);
+      expect(best!.score).toBe(90); // Distance-based decay applied
     });
 
     it('should return null when no units', () => {
