@@ -178,3 +178,11 @@ export type {
   StatisticsSnapshot,
   MatchStatistics,
 } from './analytics/statistics-analyzer.js';
+export { MetaGamingTrendsAnalyzer } from './analytics/meta-gaming-trends.js';
+export type {
+  StrategyPattern,
+  UnitComposition,
+  TechProgression,
+  MetaSnapshot,
+  MetaTrend,
+} from './analytics/meta-gaming-trends.js';
