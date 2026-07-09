@@ -1,0 +1,50 @@
+AI COMMANDER — OFFICIAL DEMONSTRATION SUMMARY
+==================================================
+
+Generated: 7/9/2026, 3:38:37 PM
+Version: 1.0.0
+
+MATCH CONFIGURATION
+──────────────────
+Player 1 Model: mistral
+Player 2 Model: neural-chat
+Max Ticks: 500
+
+MATCH RESULTS
+─────────────
+Winner: Player 1
+Total Ticks: 198
+Duration: 0.13s
+Ticks/Second: 1477.6
+
+PLAYER 1 (mistral)
+Final Score: 124
+Final Health: undefined
+
+PLAYER 2 (neural-chat)
+Final Score: 125
+Final Health: undefined
+
+ARTIFACTS
+─────────
+✅ replay.json — Complete match data
+✅ DEMO-GUIDE.md — Professional explanation
+✅ metadata.json — Execution metadata
+✅ summary.txt — This file
+
+VIEW THE DEMO
+─────────────
+Run: npm run replay
+
+TRY AGAIN
+─────────
+Run: npm run launch-demo
+
+NEXT STEPS
+──────────
+1. Share this demo with others
+2. Try different model combinations
+3. Experiment with different match lengths
+4. Review the technical guide for contributors
+
+Questions? See INSTALLATION.md or demo/LAUNCH-DEMO.md

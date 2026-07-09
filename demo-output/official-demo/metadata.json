@@ -1,0 +1,24 @@
+{
+  "timestamp": "2026-07-09T20:38:37.781Z",
+  "version": "1.0.0",
+  "hostname": "salchi",
+  "platform": "win32",
+  "nodeVersion": "v24.18.0",
+  "match": {
+    "player1": "mistral",
+    "player2": "neural-chat",
+    "winner": 1,
+    "totalTicks": 198,
+    "duration": 134,
+    "scores": {
+      "player1": 124,
+      "player2": 125
+    }
+  },
+  "artifacts": {
+    "replay": "replay.json",
+    "guide": "DEMO-GUIDE.md",
+    "metadata": "metadata.json",
+    "summary": "summary.txt"
+  }
+}

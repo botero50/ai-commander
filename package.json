@@ -41,6 +41,7 @@
     "test:watch": "vitest watch",
     "doctor": "npm run typecheck && npm run lint && npm run format:check && npm run test",
     "launch-demo": "node demo/launch-demo.js",
+    "official-demo": "npm run build && node demo/run-official-demo.js",
     "demo": "npm run build && node demo/simple-demo.js",
     "replay": "node demo/replay-demo.ts"
   },
