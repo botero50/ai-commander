@@ -1,88 +1,59 @@
-import { useState, useCallback, useMemo } from 'react';
-import type { DecisionEvent } from '@/types';
-
-export interface TimelineStats {
-  totalDecisions: number;
-  averageDuration: number;
-  totalCommands: number;
-  averageCommandsPerDecision: number;
-  player1Decisions: number;
-  player2Decisions: number;
-}
-
-export interface DecisionFilter {
-  player?: 'player1' | 'player2';
-  brain?: string;
-  searchText?: string;
-}
+import { useState, useEffect, useMemo } from 'react';
+import type { TimelineEntry } from '@ai-commander/zeroad-adapter';
+import type { GameSession } from '@/types';
 
 /**
- * Hook for managing decision timeline data and filtering
+ * Hook for real-time decision timeline with player filtering
  */
-export function useDecisionTimeline(decisions: readonly DecisionEvent[] = []) {
-  const [filter, setFilter] = useState<DecisionFilter>({});
-  const [searchText, setSearchText] = useState('');
+export function useDecisionTimeline(gameSession: GameSession | null) {
+  const [entries, setEntries] = useState<TimelineEntry[]>([]);
+  const [filter, setFilter] = useState<{ player?: 'player1' | 'player2' }>({});
+  const [isLoading, setIsLoading] = useState(true);
 
-  // Filter decisions based on current filter
-  const filteredDecisions = useMemo(() => {
-    return decisions.filter((decision) => {
-      // Player filter
-      if (filter.player && decision.player !== filter.player) {
-        return false;
+  // Subscribe to live timeline
+  useEffect(() => {
+    if (!gameSession) {
+      setIsLoading(false);
+      return;
+    }
+
+    try {
+      const timeline = gameSession.getDecisionTimeline?.();
+      if (!timeline) {
+        setIsLoading(false);
+        return;
       }
 
-      // Brain filter
-      if (filter.brain && decision.brainName !== filter.brain) {
-        return false;
-      }
+      setIsLoading(false);
+      const unsubscribe = timeline.subscribe(setEntries);
+      return unsubscribe;
+    } catch (err) {
+      console.error('Failed to subscribe to timeline:', err);
+      setIsLoading(false);
+    }
+  }, [gameSession]);
 
-      // Search filter
-      if (searchText && !decision.reasoning?.toLowerCase().includes(searchText.toLowerCase())) {
-        return false;
-      }
+  // Filter by player
+  const filteredEntries = useMemo(() => {
+    if (!filter.player) return entries;
+    return entries.filter((e) => e.player === filter.player);
+  }, [entries, filter]);
 
-      return true;
-    });
-  }, [decisions, filter, searchText]);
-
-  // Calculate statistics
-  const stats = useMemo<TimelineStats>(() => {
-    const totalDecisions = decisions.length;
-    const totalDuration = decisions.reduce((sum, d) => sum + d.durationMs, 0);
-    const totalCommands = decisions.reduce((sum, d) => sum + d.commandCount, 0);
-
+  // Count entries per player
+  const counts = useMemo(() => {
     return {
-      totalDecisions,
-      averageDuration: totalDecisions > 0 ? Math.round(totalDuration / totalDecisions) : 0,
-      totalCommands,
-      averageCommandsPerDecision: totalDecisions > 0 ? Math.round(totalCommands / totalDecisions * 100) / 100 : 0,
-      player1Decisions: decisions.filter((d) => d.player === 'player1').length,
-      player2Decisions: decisions.filter((d) => d.player === 'player2').length,
+      all: entries.length,
+      player1: entries.filter((e) => e.player === 'player1').length,
+      player2: entries.filter((e) => e.player === 'player2').length,
     };
-  }, [decisions]);
-
-  // Get unique brains
-  const brains = useMemo(() => {
-    return Array.from(new Set(decisions.map((d) => d.brainName)));
-  }, [decisions]);
-
-  const updateFilter = useCallback((newFilter: Partial<DecisionFilter>) => {
-    setFilter((prev) => ({ ...prev, ...newFilter }));
-  }, []);
-
-  const clearFilter = useCallback(() => {
-    setFilter({});
-    setSearchText('');
-  }, []);
+  }, [entries]);
 
   return {
-    filteredDecisions,
-    stats,
-    brains,
+    entries,
+    filteredEntries,
     filter,
-    searchText,
-    setSearchText,
-    updateFilter,
-    clearFilter,
+    setPlayerFilter: (player?: 'player1' | 'player2') => setFilter({ player }),
+    isLoading,
+    counts,
   };
 }
