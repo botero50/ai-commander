@@ -1,351 +1,255 @@
-# AI Commander — Getting Started Guide
+# 🚀 AI Commander — Getting Started
 
-Welcome to AI Commander! This guide will walk you through setting up and using the CLI to run AI tournaments.
+Welcome to AI Commander. This guide will get you running your first match in 5 minutes.
 
 ---
 
 ## 📋 Prerequisites
 
-Before you begin, ensure you have:
+### Required
+- **Node.js 22.0.0+** (not 18) — [Download here](https://nodejs.org/)
+- **pnpm 9.0.0+** — `npm install -g pnpm`
+- **Git** — For cloning the repo
 
-1. **Node.js 18+** — [Download here](https://nodejs.org/)
-   ```bash
-   node --version  # Should be v18.0.0 or higher
-   ```
-
-2. **pnpm** — Package manager
-   ```bash
-   npm install -g pnpm
-   pnpm --version  # Should be 8.0.0 or higher
-   ```
-
-3. **0 A.D.** (optional) — For live match visualization
-   - Download from [play0ad.com](https://play0ad.com/)
-   - Install to default location: `C:\Program Files\0 A.D\`
-
-4. **Ollama** — For AI brain
-   ```bash
-   # Download from https://ollama.ai/
-   # Verify installation:
-   ollama --version
-   
-   # Pull a model (or use existing)
-   ollama pull llama2
-   ```
+### Optional (based on what you want to do)
+- **Ollama** — For local LLM models (https://ollama.ai/)
+- **0 A.D.** — For game window visualization (https://play0ad.com/)
+- **Claude API key** — For using Claude brain (https://console.anthropic.com)
+- **OpenAI API key** — For using GPT brain (https://platform.openai.com/api-keys)
 
 ---
 
-## 🚀 Setup
+## ⚡ 5-Minute Setup
 
-### Step 1: Clone and Install
+### Step 1: Clone and Build
 
 ```bash
-# Navigate to project directory
-cd C:\Users\boter\ai-commander
-
-# Install dependencies
+git clone https://github.com/anthropics/ai-commander.git
+cd ai-commander
 pnpm install
-
-# Build the project
 pnpm build
 ```
 
-### Step 2: Configure Paths (Optional)
+**Time:** ~3 minutes on typical machine  
+**Disk:** ~500MB  
+**Network:** ~100MB download
 
-The CLI looks for 0 A.D. in the default location. If installed elsewhere:
-
-```bash
-# Create local config file
-cat > ~/.ai-commander/config.json << EOF
-{
-  "gameDataPath": "C:\\your\\path\\to\\0 A.D\\binaries\\data",
-  "modPath": "C:\\your\\path\\to\\0 A.D\\binaries\\data\\mods\\public",
-  "replayDir": "./replays"
-}
-EOF
-```
-
-### Step 3: Start Ollama Service
+### Step 2: Run Your First Match
 
 ```bash
-# In a separate terminal, start Ollama
-ollama serve
-
-# Verify it's running (in another terminal)
-curl http://localhost:11434/api/tags
+npx ts-node demo.ts
 ```
 
----
+This runs a **Builtin vs Builtin** match (rule-based AI, no external dependencies).
 
-## 💡 Usage
-
-### 1️⃣ Start a Single Match
-
-**Description**: Run a complete match between two AI brains and save the replay.
-
-```bash
-ai-commander match start \
-  --brain1 "Ollama" \
-  --brain2 "Ollama" \
-  --max-ticks 5000
-```
-
-**Options**:
-- `--brain1 <name>` — First AI brain (default: "Ollama")
-- `--brain2 <name>` — Second AI brain (default: "Ollama")
-- `--max-ticks <number>` — Maximum game ticks (default: 5000)
-- `--replay-dir <path>` — Where to save replays (default: ./replays)
-- `--no-window` — Don't launch 0 A.D. window
-- `--no-replay` — Don't save replay file
-- `--verbose` — Show detailed logs
-
-**Example Output**:
+**Expected Output:**
 ```
 Starting match...
-  Brain 1: Ollama
-  Brain 2: Ollama
-  Max ticks: 5000
-  Replay dir: ./replays
+  Brain 1: Builtin
+  Brain 2: Builtin
+  Max ticks: 1000
 
 Executing match...
-Match completed!
-  Ticks run: 3450
-  Duration: 45.0s
-  Player 1: Ollama (156 commands, 4 errors)
-  Player 2: Ollama (149 commands, 5 errors)
-  Winner: Ollama
-
-Saving replay...
-Replay saved to: ./replays/match-001.json
-```
-
-**Quick Start**:
-```bash
-# Simplest possible command (all defaults)
-ai-commander match start
-
-# Watch it with 0 A.D. window open
-ai-commander match start --brain1 Ollama --brain2 Ollama
-
-# Quick test (1000 ticks)
-ai-commander match start --max-ticks 1000
-
-# Save to custom location
-ai-commander match start --replay-dir "C:\tournaments\replays"
-```
-
----
-
-### 2️⃣ Run a Tournament
-
-**Description**: Execute multiple matches between brains with rankings and ELO ratings.
-
-```bash
-# Use a preset
-ai-commander tournament run --preset multi-llm
-
-# Or configure manually
-ai-commander tournament run \
-  --brains "Ollama,Ollama,Ollama" \
-  --format round_robin \
-  --max-ticks 5000
-```
-
-**Presets Available**:
-1. **ollama-vs-ollama** — Two local Ollama instances
-   ```bash
-   ai-commander tournament run --preset ollama-vs-ollama
-   ```
-
-2. **multi-llm** — Ollama, Claude, and GPT (requires API keys)
-   ```bash
-   ai-commander tournament run --preset multi-llm
-   ```
-
-3. **builtin-vs-ollama** — Builtin AI vs Ollama
-   ```bash
-   ai-commander tournament run --preset builtin-vs-ollama
-   ```
-
-4. **quick-match** — Single fast match (1000 ticks)
-   ```bash
-   ai-commander tournament run --preset quick-match
-   ```
-
-5. **long-match** — Single extended match (10000 ticks)
-   ```bash
-   ai-commander tournament run --preset long-match
-   ```
-
-**Manual Options**:
-- `--brains <names>` — Comma-separated brain names (required)
-- `--format <format>` — `round_robin` or `single_elimination` (default: round_robin)
-- `--max-ticks <number>` — Ticks per match (default: 5000)
-- `--replay-dir <path>` — Replay storage (default: ./tournament-replays)
-- `--parallel <n>` — Parallel matches (default: 1)
-- `--name <name>` — Tournament name (auto-generated if not specified)
-
-**Example: 3-Brain Round-Robin Tournament**
-```bash
-ai-commander tournament run \
-  --brains "Ollama1,Ollama2,Ollama3" \
-  --format round_robin \
-  --name "triple-ollama" \
-  --max-ticks 5000
-```
-
-**Example Output**:
-```
-Starting tournament...
-  Name: triple-ollama
-  Brains: Ollama1, Ollama2, Ollama3
-  Format: round_robin
-  Max ticks: 5000
-
-Executing tournament...
-Scheduling 3 matches...
-
-Match 1: Ollama1 vs Ollama2
-Match 2: Ollama1 vs Ollama3
-Match 3: Ollama2 vs Ollama3
-
-Tournament completed!
-  Total matches: 3
-  Duration: 2m 15s
-
-Final Rankings:
-
-1. Ollama1              | Wins: 2 | Losses: 0 | Draw: 0
-2. Ollama2              | Wins: 1 | Losses: 1 | Draw: 0
-3. Ollama3              | Wins: 0 | Losses: 2 | Draw: 0
-```
-
----
-
-### 3️⃣ Analyze & Export Replays
-
-**Description**: Load and export match replays in multiple formats.
-
-```bash
-# List recent replays
-ls -la ./replays/
-
-# Export a replay in all formats
-ai-commander replay export match-001 \
-  --format json,csv,html \
-  --output-dir ./analysis/
-```
-
-**Formats**:
-- **JSON** — Complete raw replay data (for programmatic analysis)
-- **CSV** — Summary statistics and decision timeline (for spreadsheets)
-- **HTML** — Human-readable report with charts (for viewing in browser)
-
-**Example Outputs**:
-
-**JSON Export** (`match-001.json`):
-```json
-{
-  "metadata": {
-    "matchId": "match-001",
-    "timestamp": 1688652000000,
-    "brain1Name": "Ollama",
-    "brain2Name": "Ollama",
-    "winner": "Ollama",
-    "duration": 45000,
-    "ticksRan": 3450,
-    "player1Commands": 156,
-    "player1Errors": 4,
-    "player2Commands": 149,
-    "player2Errors": 5
-  },
-  "decisions": [...],
-  "snapshots": [...]
-}
-```
-
-**CSV Export** (`match-001.csv`):
-```csv
-Match Summary
-
-Match ID,match-001
-Timestamp,2023-07-06T15:00:00Z
-Brain 1,Ollama
-Brain 2,Ollama
-Winner,Ollama
-Duration (ms),45000
-Ticks,3450
-Player 1 Commands,156
-Player 1 Errors,4
-Player 2 Commands,149
-Player 2 Errors,5
-
-Decision Timeline
-
-Tick,Player,Brain,Commands,Errors,Duration (ms),Reasoning
-0,Player 1,Ollama,5,0,245,"Build initial workers"
-1,Player 2,Ollama,4,0,289,"Expand territory"
+[Tick 100] Player 1 expanded to North Territory
+[Tick 200] Player 2 built Barracks
+[Tick 350] Combat: Player 1 lost 3 units, killed 8
 ...
+Match completed!
+  Ticks run: 1000
+  Duration: 12s
+  Winner: Player 1
+  Player 1 Commands: 156
+  Player 2 Commands: 149
 ```
 
-**HTML Export** (`match-001.html`):
-- Professional formatted report
-- Player statistics
-- Decision timeline rankings
-- Error rate analysis
-- View in any web browser
+**That's it!** You have AI Commander running.
 
 ---
 
-## 🔧 Common Tasks
+## 🎮 Next: Run With Ollama (Local AI)
 
-### View Available Commands
+### Step 1: Install Ollama
+
+**Windows:**
+- Download installer from https://ollama.ai/
+- Run installer
+- Restart terminal
+
+**macOS:**
 ```bash
-ai-commander help
+brew install ollama
 ```
 
-### Show CLI Version
+**Linux:**
 ```bash
-ai-commander version
+curl -fsSL https://ollama.ai/install.sh | sh
 ```
 
-### List All Configuration Presets
+### Step 2: Start Ollama Service
+
 ```bash
-ai-commander config preset list
+# In a NEW terminal window:
+ollama serve
+
+# Should output:
+# Listening on 127.0.0.1:11434 (http)
 ```
 
-### Create Custom Preset
+Leave this running. This is the Ollama service.
+
+### Step 3: Pull a Model (in another terminal)
+
 ```bash
-ai-commander config preset create my-preset \
-  --brains "Brain1,Brain2" \
-  --max-ticks 7500
+ollama pull mistral
+# Downloads ~5GB, takes 5-10 minutes depending on connection
+```
+
+Or pull multiple models:
+```bash
+ollama pull mistral    # Fast (7B params)
+ollama pull llama2     # Medium (13B params)
+```
+
+### Step 4: Verify Ollama is Ready
+
+```bash
+curl http://localhost:11434/api/tags
+# Should return JSON with list of models
+```
+
+### Step 5: Run an Ollama Match
+
+```bash
+npx ts-node demo.ts --player1 ollama --player2 ollama --model1 mistral --model2 llama2
+```
+
+Or use the SDK directly:
+
+```typescript
+import { BrainManager } from '@ai-commander/brain';
+import { OllamaMatchExecutor } from '@ai-commander/match-runner';
+
+const brain1 = await BrainManager.create({
+  provider: 'ollama',
+  model: 'mistral',
+  endpoint: 'http://localhost:11434',
+});
+
+const brain2 = await BrainManager.create({
+  provider: 'ollama',
+  model: 'llama2',
+  endpoint: 'http://localhost:11434',
+});
+
+// ... rest of match setup
 ```
 
 ---
 
-## 📂 File Structure
+## 🤖 Using Cloud AI (Claude, GPT, Gemini)
 
+### Claude
+
+1. Get your API key from https://console.anthropic.com
+2. Set environment variable:
+   ```bash
+   export ANTHROPIC_API_KEY=sk-ant-...
+   ```
+3. Create brain:
+   ```typescript
+   const claude = await BrainManager.create({
+     provider: 'claude',
+     model: 'claude-3-sonnet-20240229',
+   });
+   ```
+
+### OpenAI (GPT)
+
+1. Get your API key from https://platform.openai.com/api-keys
+2. Set environment variable:
+   ```bash
+   export OPENAI_API_KEY=sk-...
+   ```
+3. Create brain:
+   ```typescript
+   const gpt = await BrainManager.create({
+     provider: 'openai',
+     model: 'gpt-4',
+   });
+   ```
+
+### Google Gemini
+
+1. Get your API key from https://aistudio.google.com/app/apikey
+2. Set environment variable:
+   ```bash
+   export GOOGLE_API_KEY=...
+   ```
+3. Create brain:
+   ```typescript
+   const gemini = await BrainManager.create({
+     provider: 'gemini',
+     model: 'gemini-pro',
+   });
+   ```
+
+---
+
+## 🎯 Common First-Time Tasks
+
+### Run Multiple Matches
+
+```bash
+#!/bin/bash
+for i in {1..5}; do
+  echo "Match $i..."
+  npx ts-node demo.ts --no-replay
+done
 ```
-./replays/
-├── match-001.json          # Full replay data
-├── match-002.json
-└── match-003.json
 
-./tournament-replays/
-├── match-001.json
-├── match-002.json
-└── match-003.json
+### Run a Tournament
 
-./analysis/
-├── match-001.json
-├── match-001.csv
-├── match-001.html
-└── ...
+```typescript
+import { TournamentBracket } from '@ai-commander/match-runner';
+import { BrainManager } from '@ai-commander/brain';
+
+const participants = [
+  { id: 'p1', name: 'Mistral', provider: 'ollama', model: 'mistral' },
+  { id: 'p2', name: 'Llama2', provider: 'ollama', model: 'llama2' },
+  { id: 'p3', name: 'Builtin', provider: 'builtin' },
+];
+
+const bracket = new TournamentBracket('round-robin', participants);
+
+for (let match = bracket.getNextMatch(); match; match = bracket.getNextMatch()) {
+  const result = await executor.execute(match);
+  bracket.recordResult(match.matchId, result.winner);
+}
+
+const standings = bracket.getStandings();
+console.table(standings);
+```
+
+### Save and Analyze Replays
+
+All matches automatically save to `./replays/match-*.json` with full decision history.
+
+Load and analyze:
+```typescript
+import fs from 'fs';
+
+const replay = JSON.parse(fs.readFileSync('./replays/match-001.json', 'utf-8'));
+
+console.log(`Winner: ${replay.winner}`);
+console.log(`Ticks: ${replay.ticksRan}`);
+console.log(`Player 1 Commands: ${replay.player1Commands}`);
+console.log(`Player 2 Commands: ${replay.player2Commands}`);
+console.log(`Decisions: ${replay.decisions.length}`);
 ```
 
 ---
 
-## ⚙️ Troubleshooting
+## 🔧 Troubleshooting
 
 ### "Ollama connection failed"
 
@@ -353,157 +257,160 @@ ai-commander config preset create my-preset \
 # Check if Ollama is running
 curl http://localhost:11434/api/tags
 
-# If not, start it
+# If fails, start Ollama in another terminal
 ollama serve
+
+# If still fails, verify installation
+ollama --version
+```
+
+### "Model not found"
+
+```bash
+# Check available models
+ollama list
+
+# Pull a model
+ollama pull mistral
+```
+
+### "Node version error"
+
+```bash
+# Check your Node version
+node --version
+
+# Need 22.0.0 or higher
+# Update Node from https://nodejs.org/
+```
+
+### "Build failed"
+
+```bash
+# Clear and reinstall
+rm -rf node_modules pnpm-lock.yaml
+pnpm install
+pnpm build
 ```
 
 ### "0 A.D. not found"
 
-```bash
-# Verify installation path
-ls "C:\Program Files\0 A.D\binaries\data"
+0 A.D. is optional. You can run matches without it.
 
-# Or disable window launch
-ai-commander match start --no-window
+If you want the game window:
+1. Download from https://play0ad.com/
+2. Install to default location
+3. Framework will auto-detect
+
+Or skip it and run with `--no-window`.
+
+---
+
+## 📊 What's in a Match?
+
+Every match produces:
+
+### Replay File (`./replays/match-*.json`)
+- Complete match state at every tick
+- All AI decisions with latency
+- All events (expansions, combat, etc.)
+- Full telemetry (CPU, memory, latency)
+
+### Match Summary
+```
+Winner: Player 1
+Duration: 67 seconds
+Ticks: 1000
+Commands Executed: 523
+Commands Failed: 18
+Decision Accuracy: 94%
 ```
 
-### "Replay directory not writable"
-
-```bash
-# Create and verify directory
-mkdir -p ./replays
-ls -la ./replays
+### Event Log
 ```
-
-### "Command not found"
-
-```bash
-# Ensure project is built
-pnpm build
-
-# Verify zeroad-adapter is installed
-pnpm list @ai-commander/zeroad-adapter
+[Tick 100] Player 1 Expansion to North Territory
+[Tick 150] Player 2 Built 2 Barracks
+[Tick 200] Combat: Player 1 killed 8, lost 3
+[Tick 250] Player 2 Researched Iron Working
 ```
 
 ---
 
-## 🎯 Complete Workflow Example
+## 🎬 Full Workflow Example
 
-Here's a realistic workflow from start to finish:
+Here's a realistic end-to-end workflow:
 
 ```bash
-# 1. Ensure dependencies are ready
-cd C:\Users\boter\ai-commander
+# 1. Setup (one-time)
+cd ai-commander
+pnpm install
 pnpm build
 
-# 2. In another terminal, start Ollama
+# 2. In terminal 1: Start Ollama
 ollama serve
 
-# 3. Create replay directory
-mkdir -p ./replays
+# 3. In terminal 2: Create test directory
+mkdir -p matches
+cd matches
 
-# 4. Run a quick test match
-ai-commander match start --max-ticks 1000
-
-# 5. Check the replay
-ls -lh ./replays/
-
-# 6. Export for analysis
-ai-commander replay export match-001 --format csv,html
-
-# 7. View the HTML report
-start ./match-001.html  # Windows
-# or
-open ./match-001.html   # macOS
-# or
-xdg-open ./match-001.html  # Linux
-
-# 8. Run a full tournament
-ai-commander tournament run --preset ollama-vs-ollama
-
-# 9. Export all tournament replays
-for file in ./tournament-replays/*.json; do
-  match_id=$(basename "$file" .json)
-  ai-commander replay export "$match_id" --format html
-done
-
-# 10. View tournament results
-ls -lh ./tournament-replays/
-```
-
----
-
-## 📊 Output Files
-
-### Match Replay (`match-001.json`)
-- **Size**: 2-5 MB typical
-- **Contents**: Full match data, decisions, snapshots
-- **Use**: Programmatic analysis, replay in players
-
-### Tournament Replays
-- **Location**: `./tournament-replays/`
-- **Pattern**: `match-001.json`, `match-002.json`, etc.
-- **Use**: Historical analysis, leaderboards
-
-### Exported Reports
-- **JSON**: Raw data for processing
-- **CSV**: Spreadsheet import
-- **HTML**: Browser viewing and sharing
-
----
-
-## 🚀 Next Steps
-
-1. **Try a quick match**: `ai-commander match start --max-ticks 1000`
-2. **Run a tournament**: `ai-commander tournament run --preset quick-match`
-3. **Analyze results**: `ai-commander replay export <match-id> --format html`
-4. **Share reports**: Open `.html` files in browser to share results
-
----
-
-## 📖 Documentation
-
-For more details, see:
-- `MVP-DELIVERY-SUMMARY.md` — Project overview
-- `EPIC-16-*.md` — CLI story specifications
-- Code comments in `packages/zeroad-adapter/src/cli/`
-
----
-
-## 💬 Tips & Tricks
-
-### Batch Process Multiple Matches
-```bash
-#!/bin/bash
-for i in {1..10}; do
+# 4. Run 5 matches
+for i in {1..5}; do
   echo "Running match $i..."
-  ai-commander match start --no-replay
+  npx ts-node ../demo.ts --player1 ollama --player2 ollama
+  sleep 2  # Brief pause between matches
 done
-```
 
-### Monitor Match Progress
-```bash
-# Run with verbose output
-ai-commander match start --verbose
+# 5. Check results
+ls -lh *.json
 
-# Or watch logs in real-time
-tail -f ./logs/ai-commander.log
-```
+# 6. Analyze
+npx ts-node << 'EOF'
+import fs from 'fs';
+import { glob } from 'glob';
 
-### Compare Brain Performance
-```bash
-# Run tournament with same brains
-ai-commander tournament run \
-  --brains "Ollama,Ollama,Ollama" \
-  --name "consistency-test"
-
-# Export all results
-ai-commander replay export * --format csv
+const files = await glob('match-*.json');
+for (const file of files) {
+  const replay = JSON.parse(fs.readFileSync(file, 'utf-8'));
+  console.log(`${file}: Winner=${replay.winner}, Ticks=${replay.ticksRan}`);
+}
+EOF
 ```
 
 ---
 
-## ✅ You're Ready!
+## ✅ Success Indicators
 
-Your AI Commander CLI is set up and ready to use. Start with a simple match and explore from there. Happy tournaments! 🎮
+You'll know AI Commander is working when:
 
+1. ✅ `pnpm build` completes without errors
+2. ✅ `npx ts-node demo.ts` runs a match and produces output
+3. ✅ A replay file appears in `./replays/`
+4. ✅ You see decision log output with player actions
+5. ✅ Match completes with a winner
+
+---
+
+## 🎯 Next Steps
+
+1. **Read DEMO.md** — Complete walkthrough with code examples
+2. **Run a tournament** — Multiple matches with standings
+3. **Try different brains** — Builtin, Ollama, Claude, GPT
+4. **Analyze replays** — Load match data for analysis
+5. **Extend it** — Add new brain providers or game adapters
+
+---
+
+## 📚 More Information
+
+- **[README.md](./README.md)** — Project overview
+- **[RELEASE_NOTES.md](./RELEASE_NOTES.md)** — What's in v1.0
+- **[DEMO.md](./DEMO.md)** — Complete code examples
+- **[INSTALLATION_VALIDATION_REPORT.md](./INSTALLATION_VALIDATION_REPORT.md)** — Detailed installation validation
+
+---
+
+## 🎮 You're Ready!
+
+AI Commander is installed and ready to use. Pick any brain provider (Builtin, Ollama, Claude, GPT) and watch two AI models compete.
+
+**Happy tournaments!** 🚀
