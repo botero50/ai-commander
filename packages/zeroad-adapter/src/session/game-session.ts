@@ -20,6 +20,7 @@ import { GameStateHUD } from '../hud/game-state-hud.js';
 import { MinimapService } from '../hud/minimap.js';
 import { AIStatusService } from '../status/ai-status.js';
 import { ObjectiveTracker } from '../status/objective-tracker.js';
+import { EventAnnotations } from '../match/event-annotations.js';
 
 export class ZeroADGameSession implements GameSession {
   readonly sessionId: string;
@@ -41,6 +42,7 @@ export class ZeroADGameSession implements GameSession {
   private aiStatusService: AIStatusService | null = null;
   private minimapService: MinimapService | null = null;
   private objectiveTracker: ObjectiveTracker | null = null;
+  private eventAnnotations: EventAnnotations | null = null;
   private decisionOverlay: DecisionOverlay;
   private eventFeed: EventFeed;
 
@@ -167,6 +169,10 @@ export class ZeroADGameSession implements GameSession {
         // Initialize objective tracker for tracking AI strategy changes
         this.objectiveTracker = new ObjectiveTracker();
         this.logger.info('Objective tracker initialized');
+
+        // Initialize event annotations for broadcast event tracking
+        this.eventAnnotations = new EventAnnotations();
+        this.logger.info('Event annotations initialized');
       } catch (playbackErr) {
         this.logger.warn('Failed to initialize playback controller', playbackErr);
         // Continue without playback controls
@@ -285,6 +291,12 @@ export class ZeroADGameSession implements GameSession {
       if (this.objectiveTracker) {
         this.objectiveTracker.destroy();
         this.objectiveTracker = null;
+      }
+
+      // Stop event annotations
+      if (this.eventAnnotations) {
+        this.eventAnnotations.destroy();
+        this.eventAnnotations = null;
       }
 
       // Stop playback controller
@@ -413,6 +425,14 @@ export class ZeroADGameSession implements GameSession {
    */
   getObjectiveTracker(): ObjectiveTracker | null {
     return this.objectiveTracker;
+  }
+
+  /**
+   * Get event annotations (if started)
+   * For tracking and displaying major gameplay events
+   */
+  getEventAnnotations(): EventAnnotations | null {
+    return this.eventAnnotations;
   }
 
   /**

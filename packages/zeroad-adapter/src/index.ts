@@ -53,6 +53,8 @@ export { runLiveMatch } from './match/live-match-runner.js';
 export type { LiveMatchConfig, LiveMatchResult } from './match/live-match-runner.js';
 export { DecisionOverlay } from './match/decision-overlay.js';
 export type { DecisionEvent, DecisionSubscriber } from './match/decision-overlay.js';
+export { EventAnnotations } from './match/event-annotations.js';
+export type { AnnotationState, GameEvent, EventType } from './match/event-annotations.js';
 export { LiveCommentary } from './commentary/live-commentary.js';
 export type { CommentaryEntry, CommentarySubscriber, GameStateSnapshot } from './commentary/live-commentary.js';
 export { GameStateHUD } from './hud/game-state-hud.js';
