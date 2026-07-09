@@ -11,6 +11,7 @@
 import { CameraInterestCalculator } from './camera-interest-calculator.js';
 import { SmoothCameraController } from './smooth-camera-controller.js';
 import { createSetTargetCommand } from './camera-commands.js';
+import { DramaticMomentDetector, type DramaticMoment } from './dramatic-moment-detector.js';
 
 interface Unit {
   readonly id: string;
@@ -46,14 +47,23 @@ interface EventFeed {
   broadcast(type: string, data: any): void;
 }
 
+export interface CinematicMomentCallback {
+  (moment: DramaticMoment): void;
+}
+
 export class AutomaticCameraManager {
   private calculator: CameraInterestCalculator;
   private controller: SmoothCameraController;
+  private dramaticDetector: DramaticMomentDetector;
   private unsubscribe: (() => void) | null = null;
   private isStarted = false;
   private previousState: GameState | null = null;
   private targetUpdateInterval = 500; // Update target every 500ms
   private lastTargetUpdate = 0;
+  private dramaticMomentCallbacks: CinematicMomentCallback[] = [];
+  private lastDramaticMoment: DramaticMoment | null = null;
+  private dramaticMomentCooldown = 2000; // Min ms between dramatic moment responses
+  private lastDramaticMomentTime = 0;
 
   constructor(
     private commandInjector: CommandInjector,
@@ -62,6 +72,7 @@ export class AutomaticCameraManager {
   ) {
     this.calculator = new CameraInterestCalculator();
     this.controller = new SmoothCameraController();
+    this.dramaticDetector = new DramaticMomentDetector();
   }
 
   /**
@@ -111,8 +122,41 @@ export class AutomaticCameraManager {
       });
     }
 
-    // Update camera target at regular intervals (to avoid thrashing)
+    // Detect dramatic moments
     const now = Date.now();
+    if (previousState && now - this.lastDramaticMomentTime > this.dramaticMomentCooldown) {
+      const dramaticMoments = this.dramaticDetector.detectDramaticMoments(state, previousState);
+
+      // Process the most severe moment
+      if (dramaticMoments.length > 0) {
+        const moment = dramaticMoments.reduce((max, curr) =>
+          curr.severity > max.severity ? curr : max
+        );
+
+        this.lastDramaticMoment = moment;
+        this.lastDramaticMomentTime = now;
+
+        // Notify subscribers
+        for (const callback of this.dramaticMomentCallbacks) {
+          try {
+            callback(moment);
+          } catch (err) {
+            console.error(`Error in dramatic moment callback: ${err}`);
+          }
+        }
+
+        // Broadcast event
+        this.eventFeed.broadcast('camera:dramatic_moment', {
+          type: moment.type,
+          position: moment.position,
+          severity: moment.severity,
+          description: moment.description,
+          players: moment.players,
+        });
+      }
+    }
+
+    // Update camera target at regular intervals (to avoid thrashing)
     if (now - this.lastTargetUpdate > this.targetUpdateInterval) {
       this.updateCameraTarget(state, previousState);
       this.lastTargetUpdate = now;
@@ -196,6 +240,35 @@ export class AutomaticCameraManager {
       z: centerZ,
       unitCount: state.units.length,
     });
+  }
+
+  /**
+   * Subscribe to dramatic moment events
+   */
+  onDramaticMoment(callback: CinematicMomentCallback): () => void {
+    this.dramaticMomentCallbacks.push(callback);
+
+    // Return unsubscribe function
+    return () => {
+      const index = this.dramaticMomentCallbacks.indexOf(callback);
+      if (index > -1) {
+        this.dramaticMomentCallbacks.splice(index, 1);
+      }
+    };
+  }
+
+  /**
+   * Get last detected dramatic moment
+   */
+  getLastDramaticMoment(): DramaticMoment | null {
+    return this.lastDramaticMoment;
+  }
+
+  /**
+   * Set cooldown between dramatic moment responses
+   */
+  setDramaticMomentCooldown(cooldownMs: number): void {
+    this.dramaticMomentCooldown = cooldownMs;
   }
 
   /**

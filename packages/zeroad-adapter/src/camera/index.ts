@@ -53,6 +53,10 @@ export type { CameraMode, CinematicState } from './cinematic-mode-manager.js';
 
 export { CinematicModeManager } from './cinematic-mode-manager.js';
 
+export type { DramaticMomentType, DramaticMoment } from './dramatic-moment-detector.js';
+
+export { DramaticMomentDetector } from './dramatic-moment-detector.js';
+
 export type { CameraConfig } from './camera-config.js';
 
 export {
