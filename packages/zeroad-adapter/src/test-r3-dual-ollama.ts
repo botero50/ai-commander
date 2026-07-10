@@ -1,14 +1,15 @@
 #!/usr/bin/env node
 
 /**
- * Story R3.1 — Ollama vs Petra AI Tournament (2-Player)
+ * Story R3.1 — Dual Ollama Tournament (3-Player Map Workaround)
  *
  * Key insight: RL Interface can only control ONE player (the human slot)
- *              Player 2 needs Petra AI to be active
+ *              We use a 3-player map and ignore Player 3
  *
  * Setup:
  * - Player 1 (Athenians): OllamaAIBrain controlled via RL Interface (human slot)
- * - Player 2 (Gaul): Petra AI (opponent)
+ * - Player 2 (Gaul): OllamaAIBrain (also via RL Interface, batched commands)
+ * - Player 3 (Kushite): Petra AI (dummy opponent, ignored)
  *
  * Execution:
  * npm run build
@@ -40,8 +41,8 @@ interface TournamentTick {
 
 async function main() {
   console.log('╔════════════════════════════════════════════════════════════╗');
-  console.log('║      STORY R3.1 — OLLAMA vs PETRA AI TOURNAMENT          ║');
-  console.log('║    Player 1 (Ollama) vs Player 2 (Petra)                  ║');
+  console.log('║      STORY R3.1 — DUAL OLLAMA TOURNAMENT                 ║');
+  console.log('║    Player 1 & 2 (Ollama) vs Player 3 (Petra AI dummy)    ║');
   console.log('╚════════════════════════════════════════════════════════════╝\n');
 
   const logger = new Logger('info');
@@ -49,6 +50,7 @@ async function main() {
   const worldStateMapper = new WorldStateMapper(logger);
 
   // Create two Ollama brains - one for each player
+  // Both target the human slot via RL Interface with batched commands
   console.log('[INIT] Initializing two Ollama brains...');
   const brain1 = new OllamaAIBrain(logger, {
     modelName: OLLAMA_MODEL,
@@ -58,7 +60,7 @@ async function main() {
     topK: 40,
     numPredict: 256,
     timeout: 30000,
-    playerID: 1, // Controls Player 1 (Athenians)
+    playerID: 1, // Controls Player 1 (Athenians) via RL Interface
   });
 
   const brain2 = new OllamaAIBrain(logger, {
@@ -69,7 +71,7 @@ async function main() {
     topK: 40,
     numPredict: 256,
     timeout: 30000,
-    playerID: 2, // Controls Player 2 (Gaul)
+    playerID: 2, // Controls Player 2 (Gaul) via RL Interface (batched)
   });
 
   try {
@@ -87,8 +89,10 @@ async function main() {
     const entities = Object.values(gameState.entities || {}) as any[];
     const p1Units = entities.filter(e => e.owner === 1 && (e.template || '').includes('unit'));
     const p2Units = entities.filter(e => e.owner === 2 && (e.template || '').includes('unit'));
+    const p3Units = entities.filter(e => e.owner === 3 && (e.template || '').includes('unit'));
     console.log(`       Player 1 (Athenians/Ollama): ${p1Units.length} units`);
-    console.log(`       Player 2 (Gaul/Petra): ${p2Units.length} units\n`);
+    console.log(`       Player 2 (Gaul/Ollama): ${p2Units.length} units`);
+    console.log(`       Player 3 (Kushite/Petra): ${p3Units.length} units (ignored)\n`);
 
     // Tournament loop
     console.log(`[GAME] Running tournament for ${MAX_TICKS} ticks...\n`);
@@ -138,6 +142,9 @@ async function main() {
       const p2Units = worldState.agents.filter(
         a => (a.customData as any)?.type === 'unit' && a.controlledByPlayerId?.toString() === '2'
       ).length;
+      const p3Units = worldState.agents.filter(
+        a => (a.customData as any)?.type === 'unit' && a.controlledByPlayerId?.toString() === '3'
+      ).length;
 
       tickHistory.push({
         tick: worldState.time.currentTick.number,
@@ -157,17 +164,19 @@ async function main() {
           tick: ticksCompleted,
           p1Units,
           p2Units,
+          p3Units,
           p1Cmds: decision1.commands.length,
           p2Cmds: decision2.commands.length,
         });
       }
 
-      // Check for early termination (any player eliminated)
+      // Check for early termination (any Ollama player eliminated)
       if (p1Units === 0 || p2Units === 0) {
-        logger.info('Match ended - player eliminated', {
+        logger.info('Match ended - Ollama player eliminated', {
           tick: ticksCompleted,
           p1Units,
           p2Units,
+          p3Units,
         });
         break;
       }
@@ -195,20 +204,21 @@ async function main() {
     console.log(`  Avg commands/tick: ${(tickHistory.reduce((s, t) => s + t.player1Commands, 0) / ticksCompleted).toFixed(1)}`);
     console.log('');
 
-    console.log('Player 2 (Gaul/Petra):');
+    console.log('Player 2 (Gaul/Ollama):');
     console.log(`  Start: ${firstTick.player2Units} units`);
     console.log(`  End: ${lastTick.player2Units} units`);
     console.log(`  Change: ${lastTick.player2Units - firstTick.player2Units} units`);
+    console.log(`  Avg commands/tick: ${(tickHistory.reduce((s, t) => s + t.player2Commands, 0) / ticksCompleted).toFixed(1)}`);
     console.log('');
 
     // Winner
     console.log('[WINNER]\n');
     if (lastTick.player1Units > 0 && lastTick.player2Units === 0) {
-      console.log('🏆 ATHENIANS (OLLAMA) WINS - Defeated Gaul (Petra)!');
+      console.log('🏆 ATHENIANS (OLLAMA #1) WINS!');
     } else if (lastTick.player2Units > 0 && lastTick.player1Units === 0) {
-      console.log('🏆 GAUL (PETRA) WINS - Defeated Athenians (Ollama)!');
+      console.log('🏆 GAUL (OLLAMA #2) WINS!');
     } else if (lastTick.player1Units === 0 && lastTick.player2Units === 0) {
-      console.log('⚠ DRAW - Both players eliminated');
+      console.log('⚠ DRAW - Both Ollama players eliminated');
     } else {
       if (lastTick.player1Units > lastTick.player2Units) {
         console.log(`ATHENIANS LEAD - ${lastTick.player1Units} vs ${lastTick.player2Units} units`);
@@ -226,15 +236,16 @@ async function main() {
       JSON.stringify(
         {
           timestamp: new Date().toISOString(),
-          story: 'R3.1 - Ollama vs Petra AI Tournament',
+          story: 'R3.1 - Dual Ollama Tournament (3-Player Map Workaround)',
           configuration: {
             maxTicks: MAX_TICKS,
             model: OLLAMA_MODEL,
-            map: 'acropolis_bay_2p',
-            player1: { id: 1, civ: 'Athenians', brain: 'Ollama', controlledVia: 'RL Interface (human slot)' },
-            player2: { id: 2, civ: 'Gaul', brain: 'Petra AI', controlledVia: 'Game AI' },
-            strategy: 'Ollama controls Player 1 (human), Petra AI controls Player 2',
-            rlInterfaceRequirement: 'Can only control one player (the human slot)',
+            map: 'alpine_mountains_3p',
+            player1: { id: 1, civ: 'Athenians', brain: 'Ollama #1', controlledVia: 'RL Interface (human slot)' },
+            player2: { id: 2, civ: 'Gaul', brain: 'Ollama #2', controlledVia: 'RL Interface (batched with P1)' },
+            player3: { id: 3, civ: 'Kushite', brain: 'Petra AI', controlledVia: 'Game AI (dummy, ignored)' },
+            strategy: 'Both Ollama brains send decisions together via RL Interface, P3 is just a placeholder',
+            rlInterfaceRequirement: 'Only controls human slot (P1), but we batch P2 commands with P1',
           },
           duration: { totalMs: duration, totalSeconds: (duration / 1000).toFixed(1) },
           ticksCompleted,
@@ -256,8 +267,8 @@ async function main() {
     await brain2.shutdown();
 
     console.log('\n╔════════════════════════════════════════════════════════════╗');
-    console.log('║  ✓ OLLAMA vs PETRA AI TOURNAMENT: COMPLETE              ║');
-    console.log('║  Story R3.1: Single Ollama Brain Competing               ║');
+    console.log('║  ✓ DUAL OLLAMA TOURNAMENT: COMPLETE                     ║');
+    console.log('║  Story R3.1: Two Independent Ollama Brains Competing     ║');
     console.log('╚════════════════════════════════════════════════════════════╝\n');
 
     process.exit(0);
