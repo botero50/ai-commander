@@ -7,6 +7,7 @@ const DEFAULT_CONFIG: Partial<ZeroADConfiguration> = {
   launchTimeout: 30000,
   shutdownTimeout: 10000,
   logLevel: 'info',
+  gameExecutablePath: 'C:\\Program Files (x86)\\0 A.D. Empires Ascendant\\binaries\\system\\pyrogenesis.exe',
 };
 
 export class ConfigurationLoader {
@@ -24,22 +25,39 @@ export class ConfigurationLoader {
 
   private static loadFromEnvironment(): Partial<ZeroADConfiguration> {
     const env = process.env;
-    return {
-      gameExecutablePath: env.ZEROAD_EXECUTABLE || env.ZEROAD_PATH,
-      gameDataPath: env.ZEROAD_DATA_PATH,
-      ipcPort: env.ZEROAD_IPC_PORT ? parseInt(env.ZEROAD_IPC_PORT, 10) : undefined,
-      ipcHost: env.ZEROAD_IPC_HOST,
-      launchTimeout: env.ZEROAD_LAUNCH_TIMEOUT ? parseInt(env.ZEROAD_LAUNCH_TIMEOUT, 10) : undefined,
-      shutdownTimeout: env.ZEROAD_SHUTDOWN_TIMEOUT ? parseInt(env.ZEROAD_SHUTDOWN_TIMEOUT, 10) : undefined,
-      logLevel: (env.ZEROAD_LOG_LEVEL as 'debug' | 'info' | 'warn' | 'error') || undefined,
-    };
+    const result: Partial<ZeroADConfiguration> = {};
+
+    // Only set values if they exist in environment, otherwise let defaults apply
+    if (env.ZEROAD_EXECUTABLE || env.ZEROAD_PATH) {
+      result.gameExecutablePath = env.ZEROAD_EXECUTABLE || env.ZEROAD_PATH;
+    }
+    if (env.ZEROAD_DATA_PATH) {
+      result.gameDataPath = env.ZEROAD_DATA_PATH;
+    }
+    if (env.ZEROAD_IPC_PORT) {
+      result.ipcPort = parseInt(env.ZEROAD_IPC_PORT, 10);
+    }
+    if (env.ZEROAD_IPC_HOST) {
+      result.ipcHost = env.ZEROAD_IPC_HOST;
+    }
+    if (env.ZEROAD_LAUNCH_TIMEOUT) {
+      result.launchTimeout = parseInt(env.ZEROAD_LAUNCH_TIMEOUT, 10);
+    }
+    if (env.ZEROAD_SHUTDOWN_TIMEOUT) {
+      result.shutdownTimeout = parseInt(env.ZEROAD_SHUTDOWN_TIMEOUT, 10);
+    }
+    if (env.ZEROAD_LOG_LEVEL) {
+      result.logLevel = env.ZEROAD_LOG_LEVEL as 'debug' | 'info' | 'warn' | 'error';
+    }
+
+    return result;
   }
 
   private static validate(config: ZeroADConfiguration): void {
     if (!config.gameExecutablePath) {
       throw new ZeroADAdapterError(
         ZeroADAdapterErrorCode.INVALID_CONFIG,
-        'gameExecutablePath is required (set via ZEROAD_EXECUTABLE or ZEROAD_PATH environment variable)'
+        'gameExecutablePath is required (set via ZEROAD_EXECUTABLE or ZEROAD_PATH environment variable or it will use the default Windows installation path)'
       );
     }
 
