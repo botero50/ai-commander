@@ -183,7 +183,8 @@ async function configureGame(): Promise<void> {
     // Set camera zoom to maximum (zoomed out) and use native screen resolution
     const settingsList = [
       ['zoom.max = 300.0', /zoom\.max\s*=\s*[\d.]+/],
-      ['zoom.default = 80.0', /zoom\.default\s*=\s*[\d.]+/],
+      ['zoom.default = 150.0', /zoom\.default\s*=\s*[\d.]+/],  // Start more zoomed out (150/300 = half max zoom)
+      ['zoom.min = 0.0', /zoom\.min\s*=\s*[\d.]+/],            // Allow full zoom out
       [`graphics.xres = ${screenWidth}`, /graphics\.xres\s*=\s*\d+/],
       [`graphics.yres = ${screenHeight}`, /graphics\.yres\s*=\s*\d+/],
       ['graphics.windowed = false', /graphics\.windowed\s*=\s*(true|false)/],
