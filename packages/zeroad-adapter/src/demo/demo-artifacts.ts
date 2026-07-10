@@ -9,7 +9,7 @@ import { Logger } from '../config/logger.js';
 import type { SessionPackage } from '../session/session-recorder.js';
 import { SessionRecorder } from '../session/session-recorder.js';
 
-export interface DemoArtifacts {
+export interface DemoArtifactsData {
   matchId: string;
   timestamp: string;
   replay: {
@@ -47,10 +47,10 @@ export class DemoArtifacts {
   /**
    * Generate artifacts from session package
    */
-  generateArtifacts(sessionPkg: SessionPackage): DemoArtifacts {
+  generateArtifacts(sessionPkg: SessionPackage): DemoArtifactsData {
     const metadata = SessionRecorder.extractMetadata(sessionPkg);
 
-    const artifacts: DemoArtifacts = {
+    const artifacts: DemoArtifactsData = {
       matchId: metadata.matchId,
       timestamp: metadata.recordedAt,
       replay: {
@@ -162,7 +162,7 @@ export class DemoArtifacts {
   /**
    * Export artifacts as readable report
    */
-  exportReport(artifacts: DemoArtifacts): string {
+  exportReport(artifacts: DemoArtifactsData): string {
     const lines = [
       '=== DEMO MATCH ARTIFACTS ===',
       '',

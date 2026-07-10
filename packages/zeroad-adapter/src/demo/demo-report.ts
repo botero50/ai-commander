@@ -6,7 +6,7 @@
  */
 
 import { Logger } from '../config/logger.js';
-import type { DemoArtifacts } from './demo-artifacts.js';
+import type { DemoArtifactsData } from './demo-artifacts.js';
 
 export interface MatchAnalysis {
   matchId: string;
@@ -52,7 +52,7 @@ export class DemoReport {
   /**
    * Generate report from demo artifacts
    */
-  generateReport(artifacts: DemoArtifacts, matchDetails?: Record<string, any>): DemoReportData {
+  generateReport(artifacts: DemoArtifactsData, matchDetails?: Record<string, any>): DemoReportData {
     const eventDensity = artifacts.telemetry.duration > 0
       ? artifacts.telemetry.totalEvents / artifacts.telemetry.duration
       : 0;
