@@ -29,7 +29,7 @@ const execAsync = promisify(exec);
 
 const RL_HOST = '127.0.0.1';
 const RL_PORT = 6000;
-const GAME_STARTUP_WAIT = 8000; // Wait 8 seconds for game to start
+const GAME_STARTUP_WAIT = process.env.STARTUP_WAIT ? parseInt(process.env.STARTUP_WAIT, 10) : 5000; // Wait 5 seconds for game to start (override with STARTUP_WAIT env var)
 const RL_CONNECT_TIMEOUT = 30000; // Try to connect for 30 seconds
 
 // Model options (from fastest to most capable):
