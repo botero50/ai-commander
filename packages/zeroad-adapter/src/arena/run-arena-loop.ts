@@ -330,33 +330,14 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
 
     logger.info(`🎮 Match started - Initial game tick: ${gameState.tick || 0}`);
 
-    // Schedule test camera movements for debugging
-    const testCameraMovements = async () => {
-      const testPositions = [
-        { time: 5000, x: 100, z: 100, label: '5s - Northwest corner' },
-        { time: 10000, x: 256, z: 256, label: '10s - Center' },
-        { time: 15000, x: 400, z: 100, label: '15s - Northeast' },
-        { time: 30000, x: 200, z: 400, label: '30s - South' },
-      ];
-
-      for (const test of testPositions) {
-        setTimeout(async () => {
-          try {
-            const code = `
-              let cam = Engine.GetCameraData();
-              Engine.SetCameraData(${test.x}, ${test.z}, cam.zoom, cam.rotX, cam.rotY, cam.zoom);
-            `;
-            await client.evaluate(code);
-            logger.info(`🎥 TEST: ${test.label} (${test.x}, ${test.z})`);
-            eventFeed.broadcast('camera:test-movement', { label: test.label, x: test.x, z: test.z });
-          } catch (error) {
-            logger.warn(`🎥 TEST FAILED: ${test.label}`, { error });
-          }
-        }, test.time);
-      }
-    };
-
-    testCameraMovements();
+    // Define test camera movements (time in milliseconds since match start)
+    const testPositions = [
+      { time: 5000, x: 100, z: 100, label: '5s - Northwest corner' },
+      { time: 10000, x: 256, z: 256, label: '10s - Center' },
+      { time: 15000, x: 400, z: 100, label: '15s - Northeast' },
+      { time: 30000, x: 200, z: 400, label: '30s - South' },
+    ];
+    let nextTestIndex = 0;
 
     // Set camera zoom to maximum (300) via JavaScript evaluation
     try {
@@ -426,6 +407,26 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
           cameraStateUpdateCallback(gameStateForCamera, previousCameraState);
         }
         previousCameraState = gameStateForCamera;
+
+        // Execute test camera movements at scheduled times
+        const elapsedMs = Date.now() - matchStartTime;
+        while (nextTestIndex < testPositions.length && elapsedMs >= testPositions[nextTestIndex].time) {
+          const test = testPositions[nextTestIndex];
+          try {
+            const code = `
+              let cam = Engine.GetCameraData();
+              Engine.SetCameraData(${test.x}, ${test.z}, cam.zoom, cam.rotX, cam.rotY, cam.zoom);
+            `;
+            await client.evaluate(code);
+            logger.info(`🎥 TEST MOVEMENT: ${test.label} (x=${test.x}, z=${test.z})`);
+            eventFeed.broadcast('camera:test-movement', { label: test.label, x: test.x, z: test.z });
+          } catch (error) {
+            logger.warn(`🎥 TEST MOVEMENT FAILED: ${test.label}`, {
+              error: error instanceof Error ? error.message : String(error),
+            });
+          }
+          nextTestIndex++;
+        }
 
         // Check win conditions
         if (playerUnits === 0) {
