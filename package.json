@@ -46,7 +46,8 @@
     "official-demo": "npm run build && node demo/run-official-demo.js",
     "validate-demo": "node demo/validate-demo.js",
     "demo": "npm run build && node demo/simple-demo.js",
-    "replay": "node demo/replay-demo.ts"
+    "replay": "node demo/replay-demo.ts",
+    "stream:launch": "npm run build && node stream.js"
   },
   "devDependencies": {
     "@eslint/js": "^10.0.1",
