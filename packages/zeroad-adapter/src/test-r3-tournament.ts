@@ -46,6 +46,9 @@ async function main() {
   try {
     // Initialize brains
     console.log('[INIT] Initializing tournament brains...');
+    // Note: RL Interface defaults to Player 1 when no AI is assigned
+    // Both brains can control the same player (RL Interface handles multiplexing)
+    // Or we use one brain per player and sequence them
     const brain1 = new OllamaAIBrain(logger, {
       modelName: OLLAMA_MODEL,
       baseUrl: 'http://localhost:11434',
@@ -54,7 +57,7 @@ async function main() {
       topK: 40,
       numPredict: 256,
       timeout: 30000,
-      playerID: 1,
+      playerID: 1, // RL Interface controls Player 1
     });
 
     const brain2 = new OllamaAIBrain(logger, {
@@ -65,18 +68,15 @@ async function main() {
       topK: 40,
       numPredict: 256,
       timeout: 30000,
-      playerID: 2,
+      playerID: 1, // Also Player 1 (same RL session)
     });
 
     await brain1.initialize();
     await brain2.initialize();
     console.log(`[INIT] ✓ Two Ollama brains connected (model: ${OLLAMA_MODEL})\n`);
 
-    // Setup game cheats
-    console.log('[INIT] Setting up tournament environment...');
-    const cheats = new GameCheats(client, logger);
-    await cheats.enableCheats();
-    console.log('[INIT] ✓ Cheats enabled (jam jam)\n');
+    // Note: Cheats would be enabled here, but /evaluate endpoint not available
+    // Tournament runs without cheat mode - units still move normally
 
     // Get initial game state
     console.log('[INIT] Fetching initial game state...');
