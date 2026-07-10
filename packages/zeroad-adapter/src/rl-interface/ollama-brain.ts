@@ -131,7 +131,7 @@ export class OllamaAIBrain implements AIBrain {
 
       // Phase 5: Return decision
       const decision: BrainDecision = {
-        playerID: 2,
+        playerID: this.playerID,
         commands,
         reasoning: response.substring(0, 300),
         timestamp: new Date(),
@@ -162,7 +162,7 @@ export class OllamaAIBrain implements AIBrain {
 
       // Return empty decision on error (observe-only)
       return {
-        playerID: 2,
+        playerID: this.playerID,
         commands: [],
         reasoning: `Decision failed: ${error}`,
         timestamp: new Date(),
