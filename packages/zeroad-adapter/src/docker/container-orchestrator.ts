@@ -180,7 +180,7 @@ export class ContainerOrchestrator extends EventEmitter {
   private stopHealthCheck(name: string): void {
     const interval = this.healthCheckIntervals.get(name);
     if (interval) {
-      clearInterval(interval);
+      clearInterval(interval as NodeJS.Timeout);
       this.healthCheckIntervals.delete(name);
     }
   }
