@@ -32,7 +32,7 @@ import * as fs from 'fs';
 
 const RL_HOST = '127.0.0.1';
 const RL_PORT = 6000;
-const LOOP_TICKS = 10;
+const LOOP_TICKS = process.argv[2] ? parseInt(process.argv[2], 10) : 300; // Default 300 ticks = 15 seconds at 20 FPS
 
 /**
  * Simple observing brain - just watches without executing
