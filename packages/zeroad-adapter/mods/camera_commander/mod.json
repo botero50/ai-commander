@@ -1,0 +1,7 @@
+{
+  "name": "camera_commander",
+  "version": "1.0.0",
+  "label": "Camera Commander",
+  "description": "Remote camera control for AI Commander broadcasting. Listen for camera commands and execute movements in real-time.",
+  "dependencies": ["0ad>=0.0.26"]
+}

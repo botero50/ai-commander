@@ -24,6 +24,7 @@ import { RLHTTPClient } from '../rl-interface/http-client.js';
 import { WorldStateMapper } from '../rl-interface/world-state-mapper.js';
 import { OllamaAIBrain } from '../rl-interface/ollama-brain.js';
 import { AutomaticCameraManager } from '../camera/automatic-camera-manager.js';
+import { CameraModController } from '../camera/camera-mod-controller.js';
 import { EventFeed } from '../match/event-feed.js';
 import { Logger } from '../config/logger.js';
 
@@ -121,6 +122,7 @@ async function startGame(): Promise<ChildProcess> {
   const gameProcess = spawn(pyrogenesis, [
     `--rl-interface=${RL_HOST}:${RL_PORT}`,
     '--mod=public',
+    '--mod=camera_commander',  // Load camera control mod
     '-autostart=skirmishes/acropolis_bay_2p',
     '-autostart-ai=1:petra',
     '-autostart-ai=2:petra',
@@ -258,6 +260,10 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
     // Initialize event feed for camera and broadcast events
     const eventFeed = new EventFeed();
 
+    // Initialize camera controller (communicates with camera_commander mod)
+    const cameraController = new CameraModController(logger);
+    await cameraController.connect();
+
     // Initialize Ollama brain
     const brain = new OllamaAIBrain(logger, {
       modelName: OLLAMA_MODEL,
@@ -280,12 +286,12 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
     const cameraManager = new AutomaticCameraManager(
       {
         injectCommand: async (command: any) => {
-          // Log camera commands instead of trying to execute them
-          // (The /evaluate endpoint has port issues, so we'll debug this separately)
-          logger.info('📸 Camera command (not executing due to port issues)', {
-            actionType: command.actionType,
-            parameters: command.parameters,
-          });
+          // Execute camera commands through the mod controller
+          if (command.actionType === 'camera:set-target') {
+            const { x, z, duration } = command.parameters;
+            await cameraController.panTo(x, z, duration || 1000);
+            logger.info('🎥 Camera pan', { x, z, duration });
+          }
           return null;
         },
       },
@@ -399,11 +405,12 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
         }
         previousCameraState = gameStateForCamera;
 
-        // Execute test camera movements at scheduled times (logging only)
+        // Execute test camera movements at scheduled times
         const elapsedMs = Date.now() - matchStartTime;
         while (nextTestIndex < testPositions.length && elapsedMs >= testPositions[nextTestIndex].time) {
           const test = testPositions[nextTestIndex];
-          logger.info(`🎥 TEST MOVEMENT TRIGGERED: ${test.label} (x=${test.x}, z=${test.z})`);
+          await cameraController.panTo(test.x, test.z, 2000);
+          logger.info(`🎥 TEST MOVEMENT: ${test.label} (x=${test.x}, z=${test.z})`);
           eventFeed.broadcast('camera:test-movement', { label: test.label, x: test.x, z: test.z });
           nextTestIndex++;
         }
@@ -464,8 +471,9 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
       }
     }
 
-    // Stop camera manager
+    // Stop camera manager and controller
     cameraManager.stop();
+    cameraController.disconnect();
 
     if (matchWinner) {
       stats.matchesCompleted++;
