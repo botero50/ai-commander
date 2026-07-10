@@ -1,123 +1,121 @@
 /**
- * Camera Commander Component
+ * Camera Commander Script
  *
- * Enables remote camera control via HTTP API.
- * Listens on a TCP socket for camera commands from AI Commander.
- *
- * Commands format:
- * {
- *   "action": "pan",
- *   "x": 128,
- *   "z": 128,
- *   "duration": 1000
- * }
+ * Enables remote camera control via simple function calls.
+ * Called by AI Commander to move camera during matches.
  */
 
-Engine.RegisterComponentType(IID_Camera, "Camera", {
-  Schema() {
-    return {
-      "data": {
-        "x": 128,
-        "z": 128,
-        "distance": 80,
-        "rotation": 0,
-        "tilt": 0.5
-      }
-    };
+var CameraControl = {
+  // Current camera position
+  position: {
+    x: 128,
+    z: 128,
+    distance: 80,
+    rotation: 0,
+    tilt: 0.5
   },
 
-  Init() {
-    this.data = {
-      x: 128,
-      z: 128,
-      distance: 80,
-      rotation: 0,
-      tilt: 0.5
-    };
+  // Animation state
+  isMoving: false,
+  moveStartTime: 0,
+  moveDuration: 0,
+  targetX: 128,
+  targetZ: 128,
 
-    this.isMoving = false;
-    this.moveStartTime = 0;
-    this.moveDuration = 0;
-    this.targetX = this.data.x;
-    this.targetZ = this.data.z;
-
-    // Log that component initialized
-    print("[CameraCommander] Camera component initialized");
-  },
-
-  OnTurnStart() {
-    // Check if we're in the middle of a camera movement
-    if (this.isMoving) {
-      const elapsedTime = Engine.QueryInterface(SYSTEM_ENTITY, IID_Timer).GetTime() - this.moveStartTime;
-      const progress = Math.min(1.0, elapsedTime / this.moveDuration);
-
-      if (progress >= 1.0) {
-        // Movement complete
-        this.data.x = this.targetX;
-        this.data.z = this.targetZ;
-        this.isMoving = false;
-      } else {
-        // Smooth interpolation (ease-in-out)
-        const easeProgress = this.easeInOutCubic(progress);
-        this.data.x = this.data.x + (this.targetX - this.data.x) * easeProgress;
-        this.data.z = this.data.z + (this.targetZ - this.data.z) * easeProgress;
-      }
-    }
+  /**
+   * Initialize camera control
+   */
+  Init: function() {
+    print("[CameraCommander] Camera control initialized");
   },
 
   /**
-   * Pan camera to position
+   * Pan camera to position smoothly
    */
-  PanTo(x, z, duration = 1000) {
+  PanTo: function(x, z, duration) {
+    duration = duration || 1000;
     print("[CameraCommander] Panning to (" + x + ", " + z + ") over " + duration + "ms");
 
     this.targetX = x;
     this.targetZ = z;
     this.moveDuration = duration;
-    this.moveStartTime = Engine.QueryInterface(SYSTEM_ENTITY, IID_Timer).GetTime();
+    this.moveStartTime = new Date().getTime();
     this.isMoving = true;
   },
 
   /**
    * Set camera position instantly
    */
-  SetPosition(x, z) {
+  SetPosition: function(x, z) {
     print("[CameraCommander] Setting camera to (" + x + ", " + z + ")");
-    this.data.x = x;
-    this.data.z = z;
+    this.position.x = x;
+    this.position.z = z;
     this.isMoving = false;
   },
 
   /**
    * Get current camera position
    */
-  GetPosition() {
+  GetPosition: function() {
     return {
-      x: this.data.x,
-      z: this.data.z,
-      distance: this.data.distance,
-      rotation: this.data.rotation,
-      tilt: this.data.tilt
+      x: this.position.x,
+      z: this.position.z,
+      distance: this.position.distance,
+      rotation: this.position.rotation,
+      tilt: this.position.tilt
     };
   },
 
   /**
    * Set camera distance (zoom)
    */
-  SetDistance(distance) {
+  SetDistance: function(distance) {
     print("[CameraCommander] Setting distance to " + distance);
-    this.data.distance = Math.max(10, Math.min(300, distance));
+    this.position.distance = Math.max(10, Math.min(300, distance));
+  },
+
+  /**
+   * Update camera position (called each turn)
+   */
+  Update: function() {
+    if (!this.isMoving) {
+      return;
+    }
+
+    var now = new Date().getTime();
+    var elapsed = now - this.moveStartTime;
+    var progress = Math.min(1.0, elapsed / this.moveDuration);
+
+    if (progress >= 1.0) {
+      // Movement complete
+      this.position.x = this.targetX;
+      this.position.z = this.targetZ;
+      this.isMoving = false;
+    } else {
+      // Smooth interpolation (ease-in-out cubic)
+      var easeProgress = this.easeInOutCubic(progress);
+      var startX = this.position.x;
+      var startZ = this.position.z;
+
+      this.position.x = startX + (this.targetX - startX) * easeProgress;
+      this.position.z = startZ + (this.targetZ - startZ) * easeProgress;
+    }
   },
 
   /**
    * Ease-in-out cubic interpolation
    */
-  easeInOutCubic(t) {
+  easeInOutCubic: function(t) {
     if (t < 0.5) {
       return 4 * t * t * t;
     } else {
-      const f = 2 * t - 2;
+      var f = 2 * t - 2;
       return 0.5 * f * f * f + 1;
     }
   }
-});
+};
+
+// Export camera control globally
+Engine.RegisterGlobal("CameraControl", CameraControl);
+
+print("[CameraCommander] Camera control registered globally");
