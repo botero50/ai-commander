@@ -437,21 +437,32 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
 
         // Update automatic camera to follow interesting actions
         // Convert world state to format camera manager expects
+        const units = worldState.agents
+          .filter(a => (a.customData as any)?.type === 'unit')
+          .map(a => {
+            const customData = a.customData as any;
+            // Position can be in positionRaw or directly in agent
+            const positionRaw = customData?.positionRaw || { x: 0, z: 0 };
+            return {
+              id: customData?.entityId?.toString() || '',
+              owner: a.controlledByPlayerId?.toString() || '',
+              position: { x: positionRaw.x || 0, z: positionRaw.z || 0 },
+              health: customData?.health,
+            };
+          });
+
+        // Log sample unit positions every 1000 ticks
+        if (tick % 1000 === 0 && units.length > 0) {
+          logger.info('📍 Sample unit positions:', {
+            sampleUnit: units[0],
+            totalUnits: units.length,
+            allHaveZeroPos: units.every(u => u.position.x === 0 && u.position.z === 0),
+          });
+        }
+
         const gameStateForCamera = {
           tick: worldState.time.currentTick.number,
-          units: worldState.agents
-            .filter(a => (a.customData as any)?.type === 'unit')
-            .map(a => {
-              const customData = a.customData as any;
-              // Position can be in positionRaw or directly in agent
-              const positionRaw = customData?.positionRaw || { x: 0, z: 0 };
-              return {
-                id: customData?.entityId?.toString() || '',
-                owner: a.controlledByPlayerId?.toString() || '',
-                position: { x: positionRaw.x || 0, z: positionRaw.z || 0 },
-                health: customData?.health,
-              };
-            }),
+          units,
           buildings: worldState.agents
             .filter(a => (a.customData as any)?.type === 'building')
             .map(a => {

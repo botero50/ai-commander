@@ -54,6 +54,16 @@ export class CameraInterestCalculator {
   ): CameraInterest[] {
     const interests: Map<string, CameraInterest> = new Map();
 
+    // Debug: log what units we're getting
+    if (currentState.units.length > 0) {
+      const firstUnit = currentState.units[0];
+      console.log('[CameraInterest] Sample unit:', JSON.stringify({
+        id: firstUnit.id,
+        owner: firstUnit.owner,
+        position: firstUnit.position,
+      }));
+    }
+
     // Detect combat zones
     this.detectCombat(currentState).forEach((interest) => {
       interests.set(this.positionKey(interest.x, interest.z), interest);
