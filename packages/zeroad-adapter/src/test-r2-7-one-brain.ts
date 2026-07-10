@@ -159,7 +159,25 @@ async function main() {
     // Get initial game state
     console.log('[INIT] Fetching initial game state...');
     const initialState = await client.step([]);
-    console.log(`[INIT] ✓ Game state at tick ${initialState.tick}\n`);
+    console.log(`[INIT] ✓ Game state at tick ${initialState.tick}`);
+
+    // Wait for game to be playable (player has units)
+    console.log('[INIT] Waiting for game to be playable (player units created)...');
+    let playableState = initialState;
+    let attempts = 0;
+    while (attempts < 100) {
+      const entities = Object.values(playableState.entities || {}) as any[];
+      const player1Units = entities.filter(e => e.owner === 1 && (e.template || '').includes('infantry'));
+      if (player1Units.length > 0) {
+        console.log(`[INIT] ✓ Game playable - Player 1 has ${player1Units.length} units\n`);
+        break;
+      }
+      playableState = await client.step([]);
+      attempts++;
+    }
+    if (attempts >= 100) {
+      console.log('[WARN] Game may not be playable yet (no units detected after 100 ticks)');
+    }
 
     // Run the AI loop
     console.log(`[GAME] Running match for up to ${MAX_TICKS} ticks...\n`);

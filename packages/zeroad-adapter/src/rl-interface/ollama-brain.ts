@@ -204,25 +204,33 @@ OBJECTIVE: Expand your civilization, gather resources, and eliminate enemy force
 
   /**
    * Build prompt for Ollama inference
+   *
+   * IMPORTANT: Prompt must elicit responses with keywords the parser can extract.
+   * Parser looks for: "move", "expand", "gather", "resource", "attack", "enemy"
    */
   private buildPrompt(gameDescription: string): string {
-    return `You are an AI commander in Age of Empires 2. Analyze the current game state and decide on strategic actions.
+    return `You are an AI commander in Age of Empires 2. Your job is to order military and economic actions.
 
 ${gameDescription}
 
-AVAILABLE COMMANDS:
-1. Move units to a location
-2. Attack enemy units
-3. Gather resources
-4. Research technologies
-5. Build structures
+IMMEDIATE ACTIONS YOU CAN TAKE RIGHT NOW:
+- MOVE your units to gather resources or explore
+- EXPAND by building new structures
+- GATHER resources from nearby locations
+- ATTACK enemy units if you see them
+- RESEARCH technologies to improve your civilization
 
-Based on the game state above, what are the top 3-5 strategic decisions you should make RIGHT NOW?
+Based on the game state above, output 2-3 IMMEDIATE ACTIONS to take RIGHT NOW. Be very specific and direct.
 
-Be concise. Start with "Decision 1:", "Decision 2:", etc.
-Focus on: early expansion, resource gathering, and protecting your base.
+For each action, start with one of these keywords: MOVE, EXPAND, GATHER, ATTACK, or RESEARCH
+Then explain what to do.
 
-DECISIONS:`;
+Example format:
+MOVE - Scout the unexplored areas to find resources and enemy positions
+GATHER - Collect wood and stone from nearby resource nodes
+EXPAND - Build a second settlement in the eastern part of the map
+
+Now output your immediate actions:`;
   }
 
   /**
@@ -270,44 +278,57 @@ DECISIONS:`;
   /**
    * Parse Ollama response into GameCommand array
    *
-   * Strategy: Extract action descriptions from LLM response,
-   * map to available game commands, validate against world state.
+   * Strategy: Look for action keywords (MOVE, GATHER, ATTACK, EXPAND)
+   * For each keyword found, generate a corresponding command.
    */
   private parseCommands(response: string, worldState: WorldState): GameCommand[] {
     const commands: GameCommand[] = [];
 
-    // Parse response line by line looking for action keywords
+    // Look for explicit action keywords at line start
     const lines = response.split('\n');
 
     for (const line of lines) {
-      const lowerLine = line.toLowerCase();
+      const trimmed = line.trim().toUpperCase();
 
-      // Detect "move" actions
-      if (lowerLine.includes('move') || lowerLine.includes('expand')) {
+      // MOVE action
+      if (trimmed.startsWith('MOVE')) {
         const moveCmd = this.createMoveCommand(worldState);
-        if (moveCmd) commands.push(moveCmd);
+        if (moveCmd) {
+          commands.push(moveCmd);
+          this.logger.debug('Parsed MOVE command from Ollama response');
+        }
       }
 
-      // Detect "gather" actions
-      if (lowerLine.includes('gather') || lowerLine.includes('resource')) {
+      // EXPAND or BUILD action
+      if (trimmed.startsWith('EXPAND') || trimmed.startsWith('BUILD')) {
+        const buildCmd = this.createBuildCommand(worldState);
+        if (buildCmd) {
+          commands.push(buildCmd);
+          this.logger.debug('Parsed EXPAND/BUILD command from Ollama response');
+        }
+      }
+
+      // GATHER action
+      if (trimmed.startsWith('GATHER')) {
         const gatherCmd = this.createGatherCommand(worldState);
-        if (gatherCmd) commands.push(gatherCmd);
+        if (gatherCmd) {
+          commands.push(gatherCmd);
+          this.logger.debug('Parsed GATHER command from Ollama response');
+        }
       }
 
-      // Detect "attack" actions
-      if (lowerLine.includes('attack') || lowerLine.includes('enemy')) {
+      // ATTACK action
+      if (trimmed.startsWith('ATTACK')) {
         const attackCmd = this.createAttackCommand(worldState);
-        if (attackCmd) commands.push(attackCmd);
+        if (attackCmd) {
+          commands.push(attackCmd);
+          this.logger.debug('Parsed ATTACK command from Ollama response');
+        }
       }
 
-      // Limit to reasonable number of commands per tick
-      if (commands.length >= 3) break;
+      // Limit to 2 commands per tick (reasonable for RTS AI)
+      if (commands.length >= 2) break;
     }
-
-    this.logger.debug('Commands parsed from LLM response', {
-      responseLength: response.length,
-      commandsGenerated: commands.length,
-    });
 
     return commands;
   }
@@ -371,6 +392,39 @@ DECISIONS:`;
         type: 'Gather',
         entities: unitIds,
         target: resourceId,
+        queued: false,
+      },
+    };
+  }
+
+  /**
+   * Create a Build command for new structures
+   */
+  private createBuildCommand(worldState: WorldState): GameCommand | null {
+    const builders = worldState.agents
+      .filter(a => (a.customData as any)?.type === 'unit')
+      .filter(a => a.controlledByPlayerId?.toString() === '1')
+      .filter(a => (a.customData as any)?.template?.includes('civilian'))
+      .slice(0, 1);
+
+    if (builders.length === 0) return null;
+
+    const builderId = (builders[0].customData as any)?.entityId;
+    if (!builderId) return null;
+
+    // Simple heuristic: place building near the map center
+    const x = (worldState.map?.width || 256) / 2 + Math.random() * 50;
+    const z = (worldState.map?.height || 256) / 2 + Math.random() * 50;
+
+    return {
+      playerID: 1,
+      json_cmd: {
+        type: 'Build',
+        entities: [builderId],
+        template: 'structures/athen/storehouse',
+        x: Math.round(x),
+        z: Math.round(z),
+        angle: 0,
         queued: false,
       },
     };

@@ -1,0 +1,1527 @@
+{
+  "timestamp": "2026-07-10T04:09:10.114Z",
+  "story": "R2.7.1 - One Brain, One Player",
+  "configuration": {
+    "maxTicks": 50,
+    "model": "neural-chat:latest",
+    "host": "127.0.0.1",
+    "port": 6000,
+    "player1": "OllamaAIBrain",
+    "player2": "Built-in 0 A.D. AI (Petra)"
+  },
+  "duration": {
+    "totalMs": 59235,
+    "totalSeconds": "59.2"
+  },
+  "summary": {
+    "ticksCompleted": 50,
+    "decisionsCount": 50,
+    "validDecisions": 50,
+    "avgOllamaLatencyMs": 1121.22,
+    "avgGameLatencyMs": 1184.58
+  },
+  "decisions": [
+    {
+      "tick": 2856000,
+      "timestamp": "2026-07-10T04:08:12.746Z",
+      "observationSummary": {
+        "tick": 2856000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Assign scouts to explore different directions, gathering information about the map layout, resources, and enemy forces.\nGATHER - Prioritize the harvesting of wood from visible resource nodes, ",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 1834,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 2872000,
+      "timestamp": "2026-07-10T04:08:13.828Z",
+      "observationSummary": {
+        "tick": 2872000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Send scouts to nearby areas to gather intelligence on enemy movements and discover additional resources\nMOVE - Dispatch troops to protect and secure gathered resources while exploring the map\n",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 1020,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 2888000,
+      "timestamp": "2026-07-10T04:08:15.302Z",
+      "observationSummary": {
+        "tick": 2888000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Deploy scouts to locate more resource deposits, and assess enemy forces' positioning.\nEXPAND - Begin constructing an additional Town Center near resources for further growth and efficiency.\nGA",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 1409,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 2904000,
+      "timestamp": "2026-07-10T04:08:16.208Z",
+      "observationSummary": {
+        "tick": 2904000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Send your units to gather resources while scouting the surroundings for potential threats.\nRESEARCH - Prioritize researching technologies that improve military strength and resource gathering ",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 829,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 2920000,
+      "timestamp": "2026-07-10T04:08:16.956Z",
+      "observationSummary": {
+        "tick": 2920000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Send your units to gather resources while exploring nearby areas\nGATHER - Construct a Marketplace near available resources to increase your capacity for gathering them\nRESEARCH - Focus on Tech",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 689,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 2936000,
+      "timestamp": "2026-07-10T04:08:18.088Z",
+      "observationSummary": {
+        "tick": 2936000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Send a few scout units towards enemy bases and resource locations to gain intel on their position and resources.\nGATHER - Dispatch villagers to collect nearby resources, such as food, wood, st",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 1067,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 2952000,
+      "timestamp": "2026-07-10T04:08:19.053Z",
+      "observationSummary": {
+        "tick": 2952000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Send scouting units to locate more resources, enemy forces, and potential expansion locations.\n\nEXPAND - Construct a Market near the resource-rich area to support the economy and improve trade",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 905,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 2968000,
+      "timestamp": "2026-07-10T04:08:20.294Z",
+      "observationSummary": {
+        "tick": 2968000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Deploy scouts towards enemy bases to gather intel on their strengths and weaknesses\nEXPAND - Construct additional outposts in strategic locations for better resource management and troop deplo",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 1177,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 2984000,
+      "timestamp": "2026-07-10T04:08:21.278Z",
+      "observationSummary": {
+        "tick": 2984000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Dispatch scouts to explore the nearby lands and gather intelligence on enemy movements and resources.\nGATHER - Relocate your units near resource nodes (wood, food, stone) to collect and effici",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 917,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3000000,
+      "timestamp": "2026-07-10T04:08:23.279Z",
+      "observationSummary": {
+        "tick": 3000000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Send some scouting units to explore the surrounding areas for potential expansion opportunities and any hidden resources.\n\nGATHER - Assign your available villagers to collect wood, stone, and ",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 1941,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3016000,
+      "timestamp": "2026-07-10T04:08:24.251Z",
+      "observationSummary": {
+        "tick": 3016000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Send some scouts towards enemy units to gather intel on their numbers, locations, and strategies.\nRESEARCH - Prioritize researching new technology such as Archery or Squires for better militar",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 906,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3032000,
+      "timestamp": "2026-07-10T04:08:25.971Z",
+      "observationSummary": {
+        "tick": 3032000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " ATTACK - Deploy your units against the weaker enemies, prioritizing those near your resources. Focus on protecting and securing your gathering spots.\nMOVE - Assign some units to explore nearby areas ",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 1651,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3048000,
+      "timestamp": "2026-07-10T04:08:27.316Z",
+      "observationSummary": {
+        "tick": 3048000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Send your scouts to explore the surrounding areas, focusing on locations with higher visibility to spot potential threats or resources.\nGATHER - If possible, relocate some units closer to reso",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 1273,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3064000,
+      "timestamp": "2026-07-10T04:08:28.693Z",
+      "observationSummary": {
+        "tick": 3064000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Send some units to gather resources while others explore further into the map for possible enemy presence.\nEXPAND - Construct a Town Center at a strategically advantageous location nearby to s",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 1313,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3080000,
+      "timestamp": "2026-07-10T04:08:29.735Z",
+      "observationSummary": {
+        "tick": 3080000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Position some units near resource nodes, keeping an eye on the enemy's movements.\nEXPAND - Construct a new town center to grow your economy and access more resources.\nGATHER - Send gathered un",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 981,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3096000,
+      "timestamp": "2026-07-10T04:08:30.863Z",
+      "observationSummary": {
+        "tick": 3096000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Deploy recon units to scout the surrounding terrain, focusing on locating enemy movements and potential resources.\nGATHER - Send worker units to gather resources from nearby nodes, maximizing ",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 1073,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3112000,
+      "timestamp": "2026-07-10T04:08:31.692Z",
+      "observationSummary": {
+        "tick": 3112000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Send your scouts to gather information about enemy movements and nearby resources\nEXPAND - Construct a new town center near a strategic location with plenty of room for future expansions\nGATHE",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 755,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3128000,
+      "timestamp": "2026-07-10T04:08:32.556Z",
+      "observationSummary": {
+        "tick": 3128000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Send scouts to explore and gather information about enemy movements and nearby resource locations\nGATHER - Station your remaining units to collect resources efficiently from available nodes\nRE",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 790,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3144000,
+      "timestamp": "2026-07-10T04:08:33.843Z",
+      "observationSummary": {
+        "tick": 3144000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Send your units to scavenge for nearby food so they can regain health while exploring for resources and potential threats.\nGATHER - Dispatch workers to gather as many gold, wood, and stone res",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 1217,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3160000,
+      "timestamp": "2026-07-10T04:08:35.423Z",
+      "observationSummary": {
+        "tick": 3160000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Send some units to secure and explore newly discovered locations while gathering nearby resources. This will help you gain more information on enemy positions and potential resource nodes.\nGAT",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 1526,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3176000,
+      "timestamp": "2026-07-10T04:08:36.520Z",
+      "observationSummary": {
+        "tick": 3176000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Send some of your units to explore potential resource-rich locations for gathering and expansion opportunities\nGATHER - Dispatch remaining units to focus on collecting nearby resources efficie",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 1029,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3192000,
+      "timestamp": "2026-07-10T04:08:38.575Z",
+      "observationSummary": {
+        "tick": 3192000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Send some units to gather food near your base while keeping one unit on guard. Make sure to secure your existing resources by building a defensive wall around them if possible.\nEXPAND - Resear",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 1996,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3208000,
+      "timestamp": "2026-07-10T04:08:39.590Z",
+      "observationSummary": {
+        "tick": 3208000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Send scouts to locate additional resource spots and potential threats\nEXPAND - Construct an outpost near one of your resource locations to help secure it\nGATHER - Order nearby villagers to gat",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 944,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3224000,
+      "timestamp": "2026-07-10T04:08:41.152Z",
+      "observationSummary": {
+        "tick": 3224000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Send scouts to explore further into the map and gather information about potential threats or hidden resources.\nGATHER - Prioritize gathering wood, food, and gold from nearby locations to stre",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 1497,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3240000,
+      "timestamp": "2026-07-10T04:08:42.469Z",
+      "observationSummary": {
+        "tick": 3240000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Send scouting units towards the northwest corner to gather information about potential threats and resources.\nEXPAND - Construct a Market next to your current Town Center to increase the numbe",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 1254,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3256000,
+      "timestamp": "2026-07-10T04:08:43.596Z",
+      "observationSummary": {
+        "tick": 3256000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Deploy scouts to gather intelligence on the enemies and potential new locations for expansion\nEXPAND - Construct a second town center near a rich resource area to maximize production\nGATHER - ",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 1073,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3272000,
+      "timestamp": "2026-07-10T04:08:44.558Z",
+      "observationSummary": {
+        "tick": 3272000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " GATHER - Send one unit each to gather food, gold, and stone from nearby resource nodes\nMOVE - Scout the unexplored areas using a scout unit, focusing on identifying enemy positions and uncovered reso",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 889,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3288000,
+      "timestamp": "2026-07-10T04:08:45.482Z",
+      "observationSummary": {
+        "tick": 3288000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " GATHER - Send some units to gather the closest food, gold, and resources to build up economy.\nMOVE - Assign a few scouts to explore areas far from the base and check for new resources or potential th",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 865,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3304000,
+      "timestamp": "2026-07-10T04:08:46.380Z",
+      "observationSummary": {
+        "tick": 3304000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Deploy some units to gather resources while exploring new territories\nGATHER - Send workers to collect more wood, food, and gold at nearby locations\nATTACK (Optional if you see enemy forces) -",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 834,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3320000,
+      "timestamp": "2026-07-10T04:08:47.686Z",
+      "observationSummary": {
+        "tick": 3320000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Send some of your units to secure nearby resources, while others explore the map for potential threats and expansion opportunities.\nGATHER - Continue gathering resources from visible resource ",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 1245,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3336000,
+      "timestamp": "2026-07-10T04:08:48.403Z",
+      "observationSummary": {
+        "tick": 3336000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " GATHER - Send units to gather resources near the town center\nMOVE - Scout with remaining units to find nearby enemies and potential expansion areas\nRESEARCH - Prioritize technology research on milita",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 661,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3352000,
+      "timestamp": "2026-07-10T04:08:50.073Z",
+      "observationSummary": {
+        "tick": 3352000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Send some units to gather food near the visible farms while scouting for potential enemies or resources around the map.\nGATHER - Assign units to collect resources from visible resources nodes,",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 1592,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3368000,
+      "timestamp": "2026-07-10T04:08:51.025Z",
+      "observationSummary": {
+        "tick": 3368000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Send your units to secure nearby resource points and protect them\nRESEARCH - Prioritize researching economic, gathering, and military technologies to boost your economy and combat strength\nEXP",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 893,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3384000,
+      "timestamp": "2026-07-10T04:08:52.006Z",
+      "observationSummary": {
+        "tick": 3384000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Send a small group of scouts to explore the map and locate nearby resources, as well as any enemy units\nGATHER - Have your villagers collect wood from nearby trees and gather stone from quarri",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 924,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3400000,
+      "timestamp": "2026-07-10T04:08:53.167Z",
+      "observationSummary": {
+        "tick": 3400000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Send some units to scout potential expansion spots and look for hidden enemies\nEXPAND - Build a new resource-rich outpost near an open area close to your main base\nGATHER - Assign one of your ",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 1106,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3416000,
+      "timestamp": "2026-07-10T04:08:54.156Z",
+      "observationSummary": {
+        "tick": 3416000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 24,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Send scouts to explore the surroundings for potential threats or hidden resources\nGATHER - Have your villagers collect resources (wood, food, gold) from nearby locations while managing populat",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 921,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3432000,
+      "timestamp": "2026-07-10T04:08:55.181Z",
+      "observationSummary": {
+        "tick": 3432000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 26,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Deploy recon units to gather intel on enemy locations and resource distribution\nEXPAND - Establish a new outpost near an abundant resource patch to expand territory\nGATHER - Dispatch gatherers",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 964,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3448000,
+      "timestamp": "2026-07-10T04:08:56.560Z",
+      "observationSummary": {
+        "tick": 3448000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 26,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Deploy your scouts to gather information about enemy movements and locate potential resources.\nGATHER - Send your villagers to collect wood, stone, food, and gold from available resource nodes",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 1315,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3464000,
+      "timestamp": "2026-07-10T04:08:58.365Z",
+      "observationSummary": {
+        "tick": 3464000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 26,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Send some scouts or military units to gather intelligence on nearby enemies, resources, and strategic locations.\nGATHER - Prioritize gathering resources from the nearest resource nodes. This w",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 1737,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3480000,
+      "timestamp": "2026-07-10T04:08:59.196Z",
+      "observationSummary": {
+        "tick": 3480000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 26,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Send some scouts to explore unknown territories and gather information on the enemies and resources\nATTACK - Focus on eliminating enemy units near your base for better resource protection\nEXPA",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 776,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3496000,
+      "timestamp": "2026-07-10T04:09:00.203Z",
+      "observationSummary": {
+        "tick": 3496000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 26,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Deploy scouts to explore unknown regions, gathering information on nearby resources and enemy movements.\nGATHER - Dispatch villagers to collect resources from visible areas, prioritizing close",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 942,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3512000,
+      "timestamp": "2026-07-10T04:09:01.214Z",
+      "observationSummary": {
+        "tick": 3512000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 26,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Dispatch a group of scouts to explore new territories, looking for undiscovered resources and possible enemy outposts\nGATHER - Assign workers to collect nearby wood and stone while protecting ",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 943,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3528000,
+      "timestamp": "2026-07-10T04:09:02.344Z",
+      "observationSummary": {
+        "tick": 3528000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 26,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Deploy scouts towards the northwest corner, looking for resources and potential threats\nMOVE - Send one unit to gather food and gather intel on enemy movements near the southeast corner\nATTACK",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 1070,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3544000,
+      "timestamp": "2026-07-10T04:09:03.801Z",
+      "observationSummary": {
+        "tick": 3544000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 26,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " ATTACK - Send your units to engage the enemy forces that you can see on the map. This will help reduce their numbers, weakening them and potentially disrupting their plans.\nMOVE - Station some units ",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 1388,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3560000,
+      "timestamp": "2026-07-10T04:09:04.730Z",
+      "observationSummary": {
+        "tick": 3560000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 26,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Dispatch scouts to explore the map and gather information about enemy movements and resource locations.\nEXPAND - Build an additional town center near the nearest visible resources, allowing fo",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 869,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3576000,
+      "timestamp": "2026-07-10T04:09:05.490Z",
+      "observationSummary": {
+        "tick": 3576000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 26,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Send 3 scouts to locate the nearest resources and potential threats\nMOVE - Relocate your villagers to harvest gold from newly discovered locations\nGATHER - Construct a Market to facilitate fas",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 697,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3592000,
+      "timestamp": "2026-07-10T04:09:06.648Z",
+      "observationSummary": {
+        "tick": 3592000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 26,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " ATTACK - Send a group of your strongest units to engage with their weakest forces.\nMOVE - Deploy a small scouting party to explore and locate undiscovered resources, potential expansion sites, and en",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 1095,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3608000,
+      "timestamp": "2026-07-10T04:09:07.581Z",
+      "observationSummary": {
+        "tick": 3608000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 26,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " ATTACK - Deploy your units near enemy-controlled buildings, targeting their military forces first.\nMOVE - Scout the unexplored areas to find resources and enemy positions, ensuring your safety while ",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 874,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3624000,
+      "timestamp": "2026-07-10T04:09:09.086Z",
+      "observationSummary": {
+        "tick": 3624000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 26,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Assign your scouts to explore the unknown territory around you, gathering intel on resource locations and enemy movements.\nGATHER - Focus on securing nearby resources by sending gatherers clos",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 1454,
+      "executionLatencyMs": 0
+    },
+    {
+      "tick": 3640000,
+      "timestamp": "2026-07-10T04:09:10.088Z",
+      "observationSummary": {
+        "tick": 3640000,
+        "friendlyUnits": 9,
+        "friendlyBuildings": 5,
+        "enemyUnits": 26,
+        "enemyBuildings": 12
+      },
+      "promptSize": 0,
+      "modelResponse": " MOVE - Deploy scouts to explore unknown territories, gather intel on enemy movements, and locate new resources.\nGATHER - Send workers to collect nearby wood, stone, food, and gold to support growth a",
+      "commandsParsed": 2,
+      "commandsExecuted": 2,
+      "commandsFailed": 0,
+      "ollamaLatencyMs": 941,
+      "executionLatencyMs": 0
+    }
+  ],
+  "metrics": [
+    {
+      "tick": 1,
+      "timestamp": "2026-07-10T04:08:10.881Z",
+      "observationTime": 26,
+      "mappingTime": 3,
+      "brainTime": 1834,
+      "executionTime": 31,
+      "totalTime": 1896,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 2,
+      "timestamp": "2026-07-10T04:08:12.777Z",
+      "observationTime": 28,
+      "mappingTime": 1,
+      "brainTime": 1020,
+      "executionTime": 32,
+      "totalTime": 1083,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 3,
+      "timestamp": "2026-07-10T04:08:13.860Z",
+      "observationTime": 31,
+      "mappingTime": 2,
+      "brainTime": 1409,
+      "executionTime": 40,
+      "totalTime": 1482,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 4,
+      "timestamp": "2026-07-10T04:08:15.342Z",
+      "observationTime": 33,
+      "mappingTime": 3,
+      "brainTime": 829,
+      "executionTime": 29,
+      "totalTime": 895,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 5,
+      "timestamp": "2026-07-10T04:08:16.237Z",
+      "observationTime": 28,
+      "mappingTime": 1,
+      "brainTime": 689,
+      "executionTime": 23,
+      "totalTime": 742,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 6,
+      "timestamp": "2026-07-10T04:08:16.980Z",
+      "observationTime": 38,
+      "mappingTime": 2,
+      "brainTime": 1067,
+      "executionTime": 26,
+      "totalTime": 1134,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 7,
+      "timestamp": "2026-07-10T04:08:18.114Z",
+      "observationTime": 30,
+      "mappingTime": 3,
+      "brainTime": 906,
+      "executionTime": 31,
+      "totalTime": 970,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 8,
+      "timestamp": "2026-07-10T04:08:19.084Z",
+      "observationTime": 31,
+      "mappingTime": 2,
+      "brainTime": 1177,
+      "executionTime": 35,
+      "totalTime": 1245,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 9,
+      "timestamp": "2026-07-10T04:08:20.329Z",
+      "observationTime": 30,
+      "mappingTime": 2,
+      "brainTime": 917,
+      "executionTime": 29,
+      "totalTime": 978,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 10,
+      "timestamp": "2026-07-10T04:08:21.307Z",
+      "observationTime": 29,
+      "mappingTime": 2,
+      "brainTime": 1941,
+      "executionTime": 36,
+      "totalTime": 2008,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 11,
+      "timestamp": "2026-07-10T04:08:23.315Z",
+      "observationTime": 29,
+      "mappingTime": 1,
+      "brainTime": 907,
+      "executionTime": 38,
+      "totalTime": 975,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 12,
+      "timestamp": "2026-07-10T04:08:24.290Z",
+      "observationTime": 27,
+      "mappingTime": 2,
+      "brainTime": 1651,
+      "executionTime": 39,
+      "totalTime": 1720,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 13,
+      "timestamp": "2026-07-10T04:08:26.010Z",
+      "observationTime": 30,
+      "mappingTime": 2,
+      "brainTime": 1274,
+      "executionTime": 36,
+      "totalTime": 1342,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 14,
+      "timestamp": "2026-07-10T04:08:27.352Z",
+      "observationTime": 27,
+      "mappingTime": 1,
+      "brainTime": 1313,
+      "executionTime": 31,
+      "totalTime": 1372,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 15,
+      "timestamp": "2026-07-10T04:08:28.724Z",
+      "observationTime": 28,
+      "mappingTime": 2,
+      "brainTime": 981,
+      "executionTime": 25,
+      "totalTime": 1036,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 16,
+      "timestamp": "2026-07-10T04:08:29.760Z",
+      "observationTime": 29,
+      "mappingTime": 1,
+      "brainTime": 1073,
+      "executionTime": 40,
+      "totalTime": 1143,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 17,
+      "timestamp": "2026-07-10T04:08:30.903Z",
+      "observationTime": 31,
+      "mappingTime": 2,
+      "brainTime": 756,
+      "executionTime": 40,
+      "totalTime": 829,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 18,
+      "timestamp": "2026-07-10T04:08:31.732Z",
+      "observationTime": 29,
+      "mappingTime": 4,
+      "brainTime": 791,
+      "executionTime": 38,
+      "totalTime": 862,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 19,
+      "timestamp": "2026-07-10T04:08:32.594Z",
+      "observationTime": 29,
+      "mappingTime": 3,
+      "brainTime": 1217,
+      "executionTime": 23,
+      "totalTime": 1272,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 20,
+      "timestamp": "2026-07-10T04:08:33.866Z",
+      "observationTime": 28,
+      "mappingTime": 2,
+      "brainTime": 1526,
+      "executionTime": 34,
+      "totalTime": 1591,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 21,
+      "timestamp": "2026-07-10T04:08:35.457Z",
+      "observationTime": 32,
+      "mappingTime": 1,
+      "brainTime": 1030,
+      "executionTime": 29,
+      "totalTime": 1092,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 22,
+      "timestamp": "2026-07-10T04:08:36.549Z",
+      "observationTime": 29,
+      "mappingTime": 1,
+      "brainTime": 1996,
+      "executionTime": 32,
+      "totalTime": 2058,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 23,
+      "timestamp": "2026-07-10T04:08:38.607Z",
+      "observationTime": 37,
+      "mappingTime": 2,
+      "brainTime": 944,
+      "executionTime": 32,
+      "totalTime": 1015,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 24,
+      "timestamp": "2026-07-10T04:08:39.622Z",
+      "observationTime": 31,
+      "mappingTime": 2,
+      "brainTime": 1497,
+      "executionTime": 28,
+      "totalTime": 1558,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 25,
+      "timestamp": "2026-07-10T04:08:41.180Z",
+      "observationTime": 32,
+      "mappingTime": 2,
+      "brainTime": 1255,
+      "executionTime": 24,
+      "totalTime": 1313,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 26,
+      "timestamp": "2026-07-10T04:08:42.493Z",
+      "observationTime": 27,
+      "mappingTime": 2,
+      "brainTime": 1074,
+      "executionTime": 35,
+      "totalTime": 1138,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 27,
+      "timestamp": "2026-07-10T04:08:43.631Z",
+      "observationTime": 35,
+      "mappingTime": 3,
+      "brainTime": 889,
+      "executionTime": 28,
+      "totalTime": 955,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 28,
+      "timestamp": "2026-07-10T04:08:44.587Z",
+      "observationTime": 29,
+      "mappingTime": 1,
+      "brainTime": 865,
+      "executionTime": 31,
+      "totalTime": 926,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 29,
+      "timestamp": "2026-07-10T04:08:45.513Z",
+      "observationTime": 30,
+      "mappingTime": 2,
+      "brainTime": 835,
+      "executionTime": 28,
+      "totalTime": 895,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 30,
+      "timestamp": "2026-07-10T04:08:46.408Z",
+      "observationTime": 31,
+      "mappingTime": 2,
+      "brainTime": 1245,
+      "executionTime": 25,
+      "totalTime": 1303,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 31,
+      "timestamp": "2026-07-10T04:08:47.711Z",
+      "observationTime": 29,
+      "mappingTime": 2,
+      "brainTime": 661,
+      "executionTime": 45,
+      "totalTime": 738,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 32,
+      "timestamp": "2026-07-10T04:08:48.449Z",
+      "observationTime": 30,
+      "mappingTime": 1,
+      "brainTime": 1593,
+      "executionTime": 29,
+      "totalTime": 1653,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 33,
+      "timestamp": "2026-07-10T04:08:50.102Z",
+      "observationTime": 28,
+      "mappingTime": 1,
+      "brainTime": 893,
+      "executionTime": 27,
+      "totalTime": 950,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 34,
+      "timestamp": "2026-07-10T04:08:51.052Z",
+      "observationTime": 29,
+      "mappingTime": 1,
+      "brainTime": 924,
+      "executionTime": 25,
+      "totalTime": 979,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 35,
+      "timestamp": "2026-07-10T04:08:52.031Z",
+      "observationTime": 28,
+      "mappingTime": 2,
+      "brainTime": 1106,
+      "executionTime": 38,
+      "totalTime": 1174,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 36,
+      "timestamp": "2026-07-10T04:08:53.205Z",
+      "observationTime": 29,
+      "mappingTime": 1,
+      "brainTime": 921,
+      "executionTime": 32,
+      "totalTime": 983,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 37,
+      "timestamp": "2026-07-10T04:08:54.188Z",
+      "observationTime": 28,
+      "mappingTime": 1,
+      "brainTime": 964,
+      "executionTime": 33,
+      "totalTime": 1026,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 38,
+      "timestamp": "2026-07-10T04:08:55.214Z",
+      "observationTime": 28,
+      "mappingTime": 2,
+      "brainTime": 1316,
+      "executionTime": 38,
+      "totalTime": 1384,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 39,
+      "timestamp": "2026-07-10T04:08:56.598Z",
+      "observationTime": 28,
+      "mappingTime": 2,
+      "brainTime": 1737,
+      "executionTime": 24,
+      "totalTime": 1791,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 40,
+      "timestamp": "2026-07-10T04:08:58.389Z",
+      "observationTime": 28,
+      "mappingTime": 2,
+      "brainTime": 777,
+      "executionTime": 36,
+      "totalTime": 843,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 41,
+      "timestamp": "2026-07-10T04:08:59.232Z",
+      "observationTime": 27,
+      "mappingTime": 1,
+      "brainTime": 943,
+      "executionTime": 35,
+      "totalTime": 1006,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 42,
+      "timestamp": "2026-07-10T04:09:00.238Z",
+      "observationTime": 30,
+      "mappingTime": 2,
+      "brainTime": 944,
+      "executionTime": 28,
+      "totalTime": 1004,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 43,
+      "timestamp": "2026-07-10T04:09:01.242Z",
+      "observationTime": 31,
+      "mappingTime": 1,
+      "brainTime": 1070,
+      "executionTime": 33,
+      "totalTime": 1135,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 44,
+      "timestamp": "2026-07-10T04:09:02.377Z",
+      "observationTime": 33,
+      "mappingTime": 2,
+      "brainTime": 1389,
+      "executionTime": 33,
+      "totalTime": 1457,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 45,
+      "timestamp": "2026-07-10T04:09:03.834Z",
+      "observationTime": 26,
+      "mappingTime": 1,
+      "brainTime": 869,
+      "executionTime": 26,
+      "totalTime": 922,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 46,
+      "timestamp": "2026-07-10T04:09:04.757Z",
+      "observationTime": 33,
+      "mappingTime": 1,
+      "brainTime": 698,
+      "executionTime": 33,
+      "totalTime": 766,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 47,
+      "timestamp": "2026-07-10T04:09:05.523Z",
+      "observationTime": 28,
+      "mappingTime": 1,
+      "brainTime": 1095,
+      "executionTime": 30,
+      "totalTime": 1155,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 48,
+      "timestamp": "2026-07-10T04:09:06.678Z",
+      "observationTime": 28,
+      "mappingTime": 1,
+      "brainTime": 874,
+      "executionTime": 20,
+      "totalTime": 923,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 49,
+      "timestamp": "2026-07-10T04:09:07.601Z",
+      "observationTime": 29,
+      "mappingTime": 1,
+      "brainTime": 1455,
+      "executionTime": 32,
+      "totalTime": 1517,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    },
+    {
+      "tick": 50,
+      "timestamp": "2026-07-10T04:09:09.118Z",
+      "observationTime": 28,
+      "mappingTime": 1,
+      "brainTime": 941,
+      "executionTime": 25,
+      "totalTime": 995,
+      "observationValid": true,
+      "commandsExecuted": 2,
+      "commandsSuccessful": 2
+    }
+  ]
+}

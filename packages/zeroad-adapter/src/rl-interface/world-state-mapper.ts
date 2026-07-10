@@ -153,18 +153,26 @@ export class WorldStateMapper {
 
   /**
    * Map agents (units and buildings) from raw entities
+   *
+   * Note: entities comes as an object map { id: entity }, not an array.
+   * This was fixed in http-client.ts parseGameState()
    */
   private mapAgents(
     rawState: RawGameState,
     players: readonly Player[]
   ): readonly AgentSnapshot[] {
-    if (!rawState.entities || rawState.entities.length === 0) {
+    if (!rawState.entities || (Array.isArray(rawState.entities) && rawState.entities.length === 0)) {
       this.logger.warn('No entities in raw state');
       return [];
     }
 
-    return rawState.entities
-      .map((rawEntity) => {
+    // Convert to array if needed (should already be array from http-client.ts)
+    const entitiesArray = Array.isArray(rawState.entities)
+      ? rawState.entities
+      : Object.values(rawState.entities);
+
+    return entitiesArray
+      .map((rawEntity: any) => {
         try {
           return this.mapEntity(rawEntity, players);
         } catch (error) {
@@ -202,6 +210,9 @@ export class WorldStateMapper {
       max: entity.max_hitpoints || 100,
     };
 
+    // Infer entity type from template name if type is not set
+    const inferredType = entity.type || this.inferTypeFromTemplate(entity.template || '');
+
     return createAgentSnapshot(
       agentId,
       controlledByPlayerId,
@@ -209,7 +220,7 @@ export class WorldStateMapper {
       createEmptyResourcePool([]), // 0 A.D. doesn't track per-unit resources
       {
         entityId: entity.id,
-        type: entity.type,
+        type: inferredType,
         template: entity.template,
         owner: entity.owner,
         health,
@@ -224,6 +235,22 @@ export class WorldStateMapper {
         amount: entity.amount,
       }
     );
+  }
+
+  /**
+   * Infer entity type from template name
+   */
+  private inferTypeFromTemplate(template: string): string {
+    if (template.includes('structures/') || template.includes('civil_centre') || template.includes('barracks')) {
+      return 'building';
+    }
+    if (template.includes('units/') || template.includes('infantry') || template.includes('cavalry')) {
+      return 'unit';
+    }
+    if (template.includes('gaia/') || template.includes('flora') || template.includes('fauna')) {
+      return 'resource';
+    }
+    return 'unknown';
   }
 
   /**
