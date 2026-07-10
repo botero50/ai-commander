@@ -124,7 +124,7 @@ export class OllamaAIBrain implements AIBrain {
 
       // Phase 5: Return decision
       const decision: BrainDecision = {
-        playerID: 1,
+        playerID: 2,
         commands,
         reasoning: response.substring(0, 300),
         timestamp: new Date(),
@@ -145,7 +145,7 @@ export class OllamaAIBrain implements AIBrain {
 
       // Return empty decision on error (observe-only)
       return {
-        playerID: 1,
+        playerID: 2,
         commands: [],
         reasoning: `Decision failed: ${error}`,
         timestamp: new Date(),
@@ -173,11 +173,11 @@ export class OllamaAIBrain implements AIBrain {
     const buildings = agents.filter(a => (a.customData as any)?.type === 'building');
     const resources = agents.filter(a => (a.customData as any)?.type === 'resource');
 
-    const friendlyUnits = units.filter(u => u.controlledByPlayerId?.toString() === '1').length;
-    const enemyUnits = units.filter(u => u.controlledByPlayerId?.toString() !== '1').length;
+    const friendlyUnits = units.filter(u => u.controlledByPlayerId?.toString() === '2').length;
+    const enemyUnits = units.filter(u => u.controlledByPlayerId?.toString() !== '2').length;
 
-    const friendlyBuildings = buildings.filter(b => b.controlledByPlayerId?.toString() === '1').length;
-    const enemyBuildings = buildings.filter(b => b.controlledByPlayerId?.toString() !== '1').length;
+    const friendlyBuildings = buildings.filter(b => b.controlledByPlayerId?.toString() === '2').length;
+    const enemyBuildings = buildings.filter(b => b.controlledByPlayerId?.toString() !== '2').length;
 
     return `
 GAME STATE AT TICK ${worldState.time.currentTick.number}
@@ -331,7 +331,7 @@ Now output your immediate MOVE orders (be very specific):`;
     // Get all units first
     const allUnits = worldState.agents
       .filter(a => (a.customData as any)?.type === 'unit')
-      .filter(a => a.controlledByPlayerId?.toString() === '1');
+      .filter(a => a.controlledByPlayerId?.toString() === '2');
 
     // Debug log what we found
     const templateSummary = allUnits.map(u => {
@@ -371,7 +371,7 @@ Now output your immediate MOVE orders (be very specific):`;
     const targetZ = Math.random() * ((worldState.map?.height || 256) * 0.8) + 50;
 
     return {
-      playerID: 1,
+      playerID: 2,
       json_cmd: {
         type: 'move',
         entities: unitIds,
@@ -388,7 +388,7 @@ Now output your immediate MOVE orders (be very specific):`;
   private createGatherCommand(worldState: WorldState): GameCommand | null {
     const gatherUnits = worldState.agents
       .filter(a => (a.customData as any)?.type === 'unit')
-      .filter(a => a.controlledByPlayerId?.toString() === '1')
+      .filter(a => a.controlledByPlayerId?.toString() === '2')
       // Skip Gaia fauna - only use actual player-controlled units
       .filter(u => {
         const template = (u.customData as any)?.template || '';
@@ -408,7 +408,7 @@ Now output your immediate MOVE orders (be very specific):`;
     if (unitIds.length === 0 || !resourceId) return null;
 
     return {
-      playerID: 1,
+      playerID: 2,
       json_cmd: {
         type: 'gather',
         entities: unitIds,
@@ -436,7 +436,7 @@ Now output your immediate MOVE orders (be very specific):`;
   private createAttackCommand(worldState: WorldState): GameCommand | null {
     const attackUnits = worldState.agents
       .filter(a => (a.customData as any)?.type === 'unit')
-      .filter(a => a.controlledByPlayerId?.toString() === '1')
+      .filter(a => a.controlledByPlayerId?.toString() === '2')
       // Skip Gaia fauna - only use actual player-controlled units
       .filter(u => {
         const template = (u.customData as any)?.template || '';
@@ -457,7 +457,7 @@ Now output your immediate MOVE orders (be very specific):`;
     if (unitIds.length === 0 || !targetId) return null;
 
     return {
-      playerID: 1,
+      playerID: 2,
       json_cmd: {
         type: 'attack',
         entities: unitIds,
