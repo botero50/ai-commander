@@ -21,16 +21,18 @@ export class RLHTTPClient {
     /**
      * Initialize game with scenario config (POST /reset)
      *
-     * Official protocol: Scenario config sent as JSON in POST body
+     * Official protocol: Scenario config sent as plain text (not JSON) in POST body
+     * Sends config in format: key=value\nkey=value\n...
      */
     async reset(scenarioConfig) {
         this.logger.info('Calling /reset endpoint', { url: `${this.baseUrl}/reset` });
         try {
-            const body = JSON.stringify(scenarioConfig);
+            // Convert scenario config to plain text format
+            const body = this.serializeScenarioConfig(scenarioConfig);
             const response = await fetch(`${this.baseUrl}/reset`, {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json',
+                    'Content-Type': 'text/plain',
                 },
                 body,
                 signal: AbortSignal.timeout(this.timeout),
@@ -48,6 +50,36 @@ export class RLHTTPClient {
             this.logger.error('Failed to reset game', { error: String(error) });
             throw error;
         }
+    }
+    /**
+     * Serialize scenario config to plain text format expected by RL Interface
+     */
+    serializeScenarioConfig(config) {
+        const lines = [];
+        // Settings section
+        if (config.settings) {
+            const settings = config.settings;
+            // Map name
+            if (settings.Map) {
+                lines.push(`Map=${settings.Map}`);
+            }
+            // Player data (civilization list)
+            if (settings.PlayerData && Array.isArray(settings.PlayerData)) {
+                for (let i = 0; i < settings.PlayerData.length; i++) {
+                    const playerData = settings.PlayerData[i];
+                    if (playerData.Civ) {
+                        lines.push(`PlayerData[${i}].Civ=${playerData.Civ}`);
+                    }
+                }
+            }
+            // Other settings
+            for (const [key, value] of Object.entries(settings)) {
+                if (key !== 'Map' && key !== 'PlayerData' && typeof value === 'string') {
+                    lines.push(`${key}=${value}`);
+                }
+            }
+        }
+        return lines.join('\n') + (lines.length > 0 ? '\n' : '');
     }
     /**
      * Execute commands and advance game by one tick (POST /step)

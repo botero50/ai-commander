@@ -13,6 +13,7 @@
 
 import { Logger } from '../config/logger.js';
 import { RawGameState } from './types.js';
+import * as http from 'http';
 
 export interface ScenarioConfig {
   settings: {
@@ -43,17 +44,20 @@ export class RLHTTPClient {
   /**
    * Initialize game with scenario config (POST /reset)
    *
-   * Official protocol: Scenario config sent as JSON in POST body
+   * Official protocol: Scenario config sent as plain text (not JSON) in POST body
+   * Sends config in format: key=value\nkey=value\n...
    */
   async reset(scenarioConfig: ScenarioConfig): Promise<RawGameState> {
     this.logger.info('Calling /reset endpoint', { url: `${this.baseUrl}/reset` });
 
     try {
-      const body = JSON.stringify(scenarioConfig);
+      // Convert scenario config to plain text format
+      const body = this.serializeScenarioConfig(scenarioConfig);
+
       const response = await fetch(`${this.baseUrl}/reset`, {
         method: 'POST',
         headers: {
-          'Content-Type': 'application/json',
+          'Content-Type': 'text/plain',
         },
         body,
         signal: AbortSignal.timeout(this.timeout),
@@ -76,6 +80,42 @@ export class RLHTTPClient {
   }
 
   /**
+   * Serialize scenario config to plain text format expected by RL Interface
+   */
+  private serializeScenarioConfig(config: ScenarioConfig): string {
+    const lines: string[] = [];
+
+    // Settings section
+    if (config.settings) {
+      const settings = config.settings;
+
+      // Map name
+      if (settings.Map) {
+        lines.push(`Map=${settings.Map}`);
+      }
+
+      // Player data (civilization list)
+      if (settings.PlayerData && Array.isArray(settings.PlayerData)) {
+        for (let i = 0; i < settings.PlayerData.length; i++) {
+          const playerData = settings.PlayerData[i];
+          if (playerData.Civ) {
+            lines.push(`PlayerData[${i}].Civ=${playerData.Civ}`);
+          }
+        }
+      }
+
+      // Other settings
+      for (const [key, value] of Object.entries(settings)) {
+        if (key !== 'Map' && key !== 'PlayerData' && typeof value === 'string') {
+          lines.push(`${key}=${value}`);
+        }
+      }
+    }
+
+    return lines.join('\n') + (lines.length > 0 ? '\n' : '');
+  }
+
+  /**
    * Execute commands and advance game by one tick (POST /step)
    *
    * Official protocol: Commands as newline-delimited entries
@@ -93,22 +133,41 @@ export class RLHTTPClient {
         bodyLength: body.length,
       });
 
-      const response = await fetch(`${this.baseUrl}/step`, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'text/plain',
-        },
-        body,
-        signal: AbortSignal.timeout(this.timeout),
+      return new Promise((resolve, reject) => {
+        const postData = Buffer.from(body);
+        const options = {
+          hostname: this.host,
+          port: this.port,
+          path: '/step',
+          method: 'POST',
+          headers: {
+            'Content-Type': 'text/plain',
+            'Content-Length': postData.length,
+          },
+          timeout: this.timeout,
+        };
+
+        const req = http.request(options, (res) => {
+          let data = '';
+          res.on('data', (chunk) => {
+            data += chunk;
+          });
+          res.on('end', () => {
+            if (res.statusCode && res.statusCode < 300) {
+              resolve(this.parseGameState(data));
+            } else {
+              reject(new Error(`HTTP ${res.statusCode}: ${data}`));
+            }
+          });
+        });
+
+        req.on('error', (error) => {
+          reject(error);
+        });
+
+        req.write(postData);
+        req.end();
       });
-
-      if (!response.ok) {
-        const errorText = await response.text();
-        throw new Error(`HTTP ${response.status}: ${errorText}`);
-      }
-
-      const responseText = await response.text();
-      return this.parseGameState(responseText);
     } catch (error) {
       this.logger.error('Failed to execute step', {
         error: String(error),
@@ -190,15 +249,29 @@ export class RLHTTPClient {
    */
   async isReachable(): Promise<boolean> {
     try {
-      // Try a simple GET request to /templates (doesn't require a running game)
-      const response = await fetch(`${this.baseUrl}/templates`, {
-        method: 'GET',
-        signal: AbortSignal.timeout(this.timeout),
+      // Try a POST to /step with empty commands (known working endpoint)
+      // Use a longer timeout for connectivity check (20 seconds)
+      const response = await fetch(`${this.baseUrl}/step`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'text/plain',
+        },
+        body: '',
+        signal: AbortSignal.timeout(20000),
+      });
+
+      this.logger.debug('isReachable check successful', {
+        url: `${this.baseUrl}/step`,
+        status: response.status,
       });
 
       // Any response (404, 400, etc) means server is reachable
-      return true;
-    } catch {
+      return response.ok || response.status >= 400;
+    } catch (error) {
+      this.logger.debug('isReachable check failed', {
+        url: `${this.baseUrl}/step`,
+        error: String(error),
+      });
       return false;
     }
   }
@@ -206,18 +279,47 @@ export class RLHTTPClient {
   /**
    * Parse game state from RL Interface response
    *
-   * Response is plain text (not JSON). Need to determine actual format
-   * from running 0 A.D. instance.
+   * 0 A.D. returns JSON with:
+   * - timeElapsed (in seconds)
+   * - entities: map of ID -> entity object (not an array)
+   * - players: array
+   * - various game state fields
+   *
+   * We need to normalize this to RawGameState format:
+   * - Calculate tick from timeElapsed (20 FPS = 50ms per tick)
+   * - Convert entities object to array
    */
   private parseGameState(responseText: string): RawGameState {
-    // TODO: Determine actual response format from 0 A.D.
-    // For now, assume it might be JSON on a single line
     try {
-      return JSON.parse(responseText) as RawGameState;
-    } catch {
+      const raw = JSON.parse(responseText) as any;
+
+      // Calculate tick from timeElapsed (game runs at 20 FPS)
+      const tick = Math.floor((raw.timeElapsed || 0) * 20);
+
+      // Convert entities from map { id: entity } to array
+      const entitiesArray = raw.entities
+        ? Object.values(raw.entities).map((entity: any, id: number) => ({
+            ...entity,
+            id: entity.id || id,
+          }))
+        : [];
+
+      return {
+        tick,
+        time_elapsed: raw.timeElapsed || 0,
+        players: raw.players || [],
+        entities: entitiesArray,
+        mapSize: raw.mapSize,
+        mapName: raw.mapName,
+      } as RawGameState;
+    } catch (error) {
+      this.logger.error('Failed to parse game state', { error: String(error) });
       // If not JSON, return raw text as single field
       return {
         tick: 0,
+        time_elapsed: 0,
+        players: [],
+        entities: [],
         raw: responseText,
       } as unknown as RawGameState;
     }

@@ -9,25 +9,25 @@
  * For 10 continuous ticks.
  *
  * Prerequisites:
- * - 0 A.D. running with: pyrogenesis.exe --rl-interface=127.0.0.1:6000 --mod=public
+ * - 0 A.D. running with: pyrogenesis.exe --rl-interface=127.0.0.1:6000 --mod=public -autostart="skirmishes/acropolis_bay_2p"
  *
  * Run with:
- * npx tsc test-r2-5-complete-ai-loop.ts --module esnext --target es2020 --skipLibCheck true
- * node test-r2-5-complete-ai-loop.js
+ * npm run build
+ * node packages/zeroad-adapter/dist/test-r2-5-complete-ai-loop.js
  */
 
-import { RLHTTPClient, ScenarioConfig } from './packages/zeroad-adapter/dist/rl-interface/http-client.js';
-import { ObservationReceiver } from './packages/zeroad-adapter/dist/rl-interface/observation-receiver.js';
-import { CommandExecutor } from './packages/zeroad-adapter/dist/rl-interface/command-executor.js';
-import { WorldStateMapper } from './packages/zeroad-adapter/dist/rl-interface/world-state-mapper.js';
+import { RLHTTPClient, ScenarioConfig } from './rl-interface/http-client.js';
+import { ObservationReceiver } from './rl-interface/observation-receiver.js';
+import { CommandExecutor } from './rl-interface/command-executor.js';
+import { WorldStateMapper } from './rl-interface/world-state-mapper.js';
 import {
   AILoopOrchestrator,
   DummyBrain,
   type BrainDecision,
-} from './packages/zeroad-adapter/dist/rl-interface/ai-loop-orchestrator.js';
-import type { AIBrain } from './packages/zeroad-adapter/dist/rl-interface/ai-loop-orchestrator.js';
-import type { WorldState } from './packages/domain/dist/index.js';
-import { Logger } from './packages/zeroad-adapter/dist/config/logger.js';
+} from './rl-interface/ai-loop-orchestrator.js';
+import type { AIBrain } from './rl-interface/ai-loop-orchestrator.js';
+import type { WorldState } from '../../domain/dist/index.js';
+import { Logger } from './config/logger.js';
 import * as fs from 'fs';
 
 const RL_HOST = '127.0.0.1';
@@ -61,25 +61,24 @@ async function main() {
   console.log('║  Observe → WorldState → Brain → Execute Loop  ║');
   console.log('╚════════════════════════════════════════════════╝\n');
 
-  const logger = new Logger();
+  const logger = new Logger('debug');
+  console.log(`[DEBUG] Creating client: host=${RL_HOST}, port=${RL_PORT}, timeout=10000`);
   const client = new RLHTTPClient(RL_HOST, RL_PORT, 10000, logger);
+  console.log(`[DEBUG] Client created, baseUrl=${(client as any).baseUrl}`);
   const observationReceiver = new ObservationReceiver(logger);
   const commandExecutor = new CommandExecutor(client, logger);
   const worldStateMapper = new WorldStateMapper(logger);
   const brain = new ObservingBrain(logger);
 
   try {
-    // Step 1: Skip connectivity check (will fail on first step command anyway)
-    console.log('[STEP 1] Attempting to reach RL Interface...');
-
-    // Step 2: Get initial game state (game already running via -autostart)
-    console.log('[STEP 2] Fetching initial game state...');
+    // Step 1: Get initial game state (game already running via -autostart)
+    console.log('[STEP 1] Fetching initial game state...');
     const initialState = await client.step([]);
     console.log(`✓ Game state fetched at tick ${initialState.tick}\n`);
 
-    // Step 3: Run the AI loop
+    // Step 2: Run the AI loop
     console.log(
-      `[STEP 3] Running complete AI loop for ${LOOP_TICKS} ticks...\n`
+      `[STEP 2] Running complete AI loop for ${LOOP_TICKS} ticks...\n`
     );
 
     const orchestrator = new AILoopOrchestrator(
@@ -95,7 +94,7 @@ async function main() {
     const finalState = await orchestrator.runLoop(LOOP_TICKS);
     const duration = Date.now() - startTime;
 
-    // Step 4: Print results
+    // Step 3: Print results
     console.log('\n[RESULTS]\n');
     console.log(orchestrator.generateReport());
 

@@ -1,0 +1,141 @@
+{
+  "timestamp": "2026-07-10T01:47:50.133Z",
+  "story": "R2.5 - First Complete AI Loop",
+  "configuration": {
+    "ticks": 10,
+    "host": "127.0.0.1",
+    "port": 6000
+  },
+  "duration": {
+    "totalMs": 225,
+    "totalSeconds": "0.2"
+  },
+  "summary": {
+    "ticksCompleted": 10,
+    "avgLatencyMs": 22.4,
+    "totalCommandsExecuted": 0,
+    "totalCommandsSuccessful": 0
+  },
+  "metrics": [
+    {
+      "tick": 1,
+      "timestamp": "2026-07-10T01:47:49.908Z",
+      "observationTime": 19,
+      "mappingTime": 2,
+      "brainTime": 0,
+      "executionTime": 0,
+      "totalTime": 22,
+      "observationValid": true,
+      "commandsExecuted": 0,
+      "commandsSuccessful": 0
+    },
+    {
+      "tick": 2,
+      "timestamp": "2026-07-10T01:47:49.930Z",
+      "observationTime": 16,
+      "mappingTime": 1,
+      "brainTime": 0,
+      "executionTime": 0,
+      "totalTime": 18,
+      "observationValid": true,
+      "commandsExecuted": 0,
+      "commandsSuccessful": 0
+    },
+    {
+      "tick": 3,
+      "timestamp": "2026-07-10T01:47:49.948Z",
+      "observationTime": 18,
+      "mappingTime": 1,
+      "brainTime": 0,
+      "executionTime": 0,
+      "totalTime": 19,
+      "observationValid": true,
+      "commandsExecuted": 0,
+      "commandsSuccessful": 0
+    },
+    {
+      "tick": 4,
+      "timestamp": "2026-07-10T01:47:49.967Z",
+      "observationTime": 21,
+      "mappingTime": 1,
+      "brainTime": 0,
+      "executionTime": 0,
+      "totalTime": 22,
+      "observationValid": true,
+      "commandsExecuted": 0,
+      "commandsSuccessful": 0
+    },
+    {
+      "tick": 5,
+      "timestamp": "2026-07-10T01:47:49.989Z",
+      "observationTime": 18,
+      "mappingTime": 1,
+      "brainTime": 0,
+      "executionTime": 0,
+      "totalTime": 19,
+      "observationValid": true,
+      "commandsExecuted": 0,
+      "commandsSuccessful": 0
+    },
+    {
+      "tick": 6,
+      "timestamp": "2026-07-10T01:47:50.008Z",
+      "observationTime": 20,
+      "mappingTime": 0,
+      "brainTime": 0,
+      "executionTime": 0,
+      "totalTime": 21,
+      "observationValid": true,
+      "commandsExecuted": 0,
+      "commandsSuccessful": 0
+    },
+    {
+      "tick": 7,
+      "timestamp": "2026-07-10T01:47:50.030Z",
+      "observationTime": 20,
+      "mappingTime": 1,
+      "brainTime": 0,
+      "executionTime": 0,
+      "totalTime": 21,
+      "observationValid": true,
+      "commandsExecuted": 0,
+      "commandsSuccessful": 0
+    },
+    {
+      "tick": 8,
+      "timestamp": "2026-07-10T01:47:50.051Z",
+      "observationTime": 26,
+      "mappingTime": 1,
+      "brainTime": 0,
+      "executionTime": 0,
+      "totalTime": 27,
+      "observationValid": true,
+      "commandsExecuted": 0,
+      "commandsSuccessful": 0
+    },
+    {
+      "tick": 9,
+      "timestamp": "2026-07-10T01:47:50.078Z",
+      "observationTime": 29,
+      "mappingTime": 2,
+      "brainTime": 0,
+      "executionTime": 0,
+      "totalTime": 31,
+      "observationValid": true,
+      "commandsExecuted": 0,
+      "commandsSuccessful": 0
+    },
+    {
+      "tick": 10,
+      "timestamp": "2026-07-10T01:47:50.109Z",
+      "observationTime": 22,
+      "mappingTime": 2,
+      "brainTime": 0,
+      "executionTime": 0,
+      "totalTime": 24,
+      "observationValid": true,
+      "commandsExecuted": 0,
+      "commandsSuccessful": 0
+    }
+  ]
+}
