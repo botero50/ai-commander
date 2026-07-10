@@ -170,10 +170,8 @@ async function killGame(): Promise<void> {
 async function startGame(): Promise<ChildProcess> {
   logger.info('Starting game initialization...');
 
-  // Sync camera mod to game directory
-  logger.info('About to sync camera mod...');
-  await syncCameraModToGame();
-  logger.info('Camera mod sync complete');
+  // TODO: Sync camera mod when it's working properly
+  // await syncCameraModToGame();
 
   // Configure game before starting
   logger.info('Configuring game...');
@@ -189,7 +187,7 @@ async function startGame(): Promise<ChildProcess> {
   const gameProcess = spawn(pyrogenesis, [
     `--rl-interface=${RL_HOST}:${RL_PORT}`,
     '--mod=public',
-    '--mod=camera_commander',  // Load camera control mod
+    // '--mod=camera_commander',  // TODO: Camera mod not working yet
     '-autostart=skirmishes/acropolis_bay_2p',
     '-autostart-ai=1:petra',
     '-autostart-ai=2:petra',
