@@ -280,21 +280,12 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
     const cameraManager = new AutomaticCameraManager(
       {
         injectCommand: async (command: any) => {
-          // Send camera commands via evaluate endpoint
-          if (command.actionType === 'camera:set-target') {
-            const { x, z, duration } = command.parameters;
-            const code = `
-              let cam = Engine.GetCameraData();
-              // Simple pan to position (0 A.D. will handle smooth movement)
-              Engine.SetCameraData(${x}, ${z}, cam.zoom, cam.rotX, cam.rotY, cam.zoom);
-            `;
-            try {
-              await client.evaluate(code);
-              logger.debug('Camera command executed', { x, z, duration });
-            } catch (error) {
-              logger.warn('Camera command failed', { error });
-            }
-          }
+          // Log camera commands instead of trying to execute them
+          // (The /evaluate endpoint has port issues, so we'll debug this separately)
+          logger.info('📸 Camera command (not executing due to port issues)', {
+            actionType: command.actionType,
+            parameters: command.parameters,
+          });
           return null;
         },
       },
@@ -408,23 +399,12 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
         }
         previousCameraState = gameStateForCamera;
 
-        // Execute test camera movements at scheduled times
+        // Execute test camera movements at scheduled times (logging only)
         const elapsedMs = Date.now() - matchStartTime;
         while (nextTestIndex < testPositions.length && elapsedMs >= testPositions[nextTestIndex].time) {
           const test = testPositions[nextTestIndex];
-          try {
-            const code = `
-              let cam = Engine.GetCameraData();
-              Engine.SetCameraData(${test.x}, ${test.z}, cam.zoom, cam.rotX, cam.rotY, cam.zoom);
-            `;
-            await client.evaluate(code);
-            logger.info(`🎥 TEST MOVEMENT: ${test.label} (x=${test.x}, z=${test.z})`);
-            eventFeed.broadcast('camera:test-movement', { label: test.label, x: test.x, z: test.z });
-          } catch (error) {
-            logger.warn(`🎥 TEST MOVEMENT FAILED: ${test.label}`, {
-              error: error instanceof Error ? error.message : String(error),
-            });
-          }
+          logger.info(`🎥 TEST MOVEMENT TRIGGERED: ${test.label} (x=${test.x}, z=${test.z})`);
+          eventFeed.broadcast('camera:test-movement', { label: test.label, x: test.x, z: test.z });
           nextTestIndex++;
         }
 
