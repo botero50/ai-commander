@@ -205,32 +205,29 @@ OBJECTIVE: Expand your civilization, gather resources, and eliminate enemy force
   /**
    * Build prompt for Ollama inference
    *
-   * IMPORTANT: Prompt must elicit responses with keywords the parser can extract.
-   * Parser looks for: "move", "expand", "gather", "resource", "attack", "enemy"
+   * Focus on MOVE commands only (other command types have format issues).
+   * MOVE is proven to work with 0 A.D. RL Interface.
    */
   private buildPrompt(gameDescription: string): string {
-    return `You are an AI commander in Age of Empires 2. Your job is to order military and economic actions.
+    return `You are an AI commander in Age of Empires 2. Your primary job is to move units strategically.
 
 ${gameDescription}
 
-IMMEDIATE ACTIONS YOU CAN TAKE RIGHT NOW:
-- MOVE your units to gather resources or explore
-- EXPAND by building new structures
-- GATHER resources from nearby locations
-- ATTACK enemy units if you see them
-- RESEARCH technologies to improve your civilization
+IMMEDIATE ACTIONS YOU SHOULD TAKE:
+- MOVE your units to good positions for gathering resources
+- MOVE to explore the map and find enemy positions
+- MOVE to defend your base from threats
 
-Based on the game state above, output 2-3 IMMEDIATE ACTIONS to take RIGHT NOW. Be very specific and direct.
+Based on the game state above, output 2-3 MOVE orders for your units RIGHT NOW.
 
-For each action, start with one of these keywords: MOVE, EXPAND, GATHER, ATTACK, or RESEARCH
-Then explain what to do.
+For each action, start with: MOVE - [description of where to move and why]
 
 Example format:
-MOVE - Scout the unexplored areas to find resources and enemy positions
-GATHER - Collect wood and stone from nearby resource nodes
-EXPAND - Build a second settlement in the eastern part of the map
+MOVE - Send scouts north to find resource locations and enemy positions
+MOVE - Position defenders near the town center to protect against attacks
+MOVE - Move workers to nearby wood and stone resources
 
-Now output your immediate actions:`;
+Now output your immediate MOVE orders (be very specific):`;
   }
 
   /**
@@ -299,32 +296,23 @@ Now output your immediate actions:`;
         }
       }
 
-      // EXPAND or BUILD action
-      if (trimmed.startsWith('EXPAND') || trimmed.startsWith('BUILD')) {
-        const buildCmd = this.createBuildCommand(worldState);
-        if (buildCmd) {
-          commands.push(buildCmd);
-          this.logger.debug('Parsed EXPAND/BUILD command from Ollama response');
-        }
-      }
+      // EXPAND or BUILD action (disabled - format issues with 0 A.D.)
+      // if (trimmed.startsWith('EXPAND') || trimmed.startsWith('BUILD')) {
+      //   const buildCmd = this.createBuildCommand(worldState);
+      //   if (buildCmd) commands.push(buildCmd);
+      // }
 
-      // GATHER action
-      if (trimmed.startsWith('GATHER')) {
-        const gatherCmd = this.createGatherCommand(worldState);
-        if (gatherCmd) {
-          commands.push(gatherCmd);
-          this.logger.debug('Parsed GATHER command from Ollama response');
-        }
-      }
+      // GATHER action (disabled - format issues)
+      // if (trimmed.startsWith('GATHER')) {
+      //   const gatherCmd = this.createGatherCommand(worldState);
+      //   if (gatherCmd) commands.push(gatherCmd);
+      // }
 
-      // ATTACK action
-      if (trimmed.startsWith('ATTACK')) {
-        const attackCmd = this.createAttackCommand(worldState);
-        if (attackCmd) {
-          commands.push(attackCmd);
-          this.logger.debug('Parsed ATTACK command from Ollama response');
-        }
-      }
+      // ATTACK action (disabled - format issues)
+      // if (trimmed.startsWith('ATTACK')) {
+      //   const attackCmd = this.createAttackCommand(worldState);
+      //   if (attackCmd) commands.push(attackCmd);
+      // }
 
       // Limit to 2 commands per tick (reasonable for RTS AI)
       if (commands.length >= 2) break;
@@ -399,35 +387,14 @@ Now output your immediate actions:`;
 
   /**
    * Create a Build command for new structures
+   *
+   * Note: Build is complex - requires builder unit to execute.
+   * For now, focus on Move commands which are proven to work.
    */
   private createBuildCommand(worldState: WorldState): GameCommand | null {
-    const builders = worldState.agents
-      .filter(a => (a.customData as any)?.type === 'unit')
-      .filter(a => a.controlledByPlayerId?.toString() === '1')
-      .filter(a => (a.customData as any)?.template?.includes('civilian'))
-      .slice(0, 1);
-
-    if (builders.length === 0) return null;
-
-    const builderId = (builders[0].customData as any)?.entityId;
-    if (!builderId) return null;
-
-    // Simple heuristic: place building near the map center
-    const x = (worldState.map?.width || 256) / 2 + Math.random() * 50;
-    const z = (worldState.map?.height || 256) / 2 + Math.random() * 50;
-
-    return {
-      playerID: 1,
-      json_cmd: {
-        type: 'Build',
-        entities: [builderId],
-        template: 'structures/athen/storehouse',
-        x: Math.round(x),
-        z: Math.round(z),
-        angle: 0,
-        queued: false,
-      },
-    };
+    // Disabled for now - Build commands have format issues
+    // Return null to skip build attempts
+    return null;
   }
 
   /**
