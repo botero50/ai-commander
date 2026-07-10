@@ -18,15 +18,17 @@
 
 import { fileURLToPath } from 'url';
 import { dirname, join } from 'path';
+import { pathToFileURL } from 'url';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 // Dynamically import the stream launcher
 const streamPath = join(__dirname, 'packages/zeroad-adapter/dist/stream/stream-launch.js');
+const streamUrl = pathToFileURL(streamPath).href;
 
 try {
-  const { streamLaunch } = await import(streamPath);
+  const { streamLaunch } = await import(streamUrl);
 
   console.log('\n╔════════════════════════════════════════════╗');
   console.log('║   🎬 AI COMMANDER PUBLIC STREAM LAUNCH     ║');
@@ -35,7 +37,7 @@ try {
   // Launch the stream
   await streamLaunch();
 } catch (error) {
-  console.error('❌ Failed to launch stream:', error);
+  console.error('❌ Failed to launch stream:', error.message);
   console.error('\nTroubleshooting:');
   console.error('1. Run from project root: cd C:\\Users\\boter\\ai-commander');
   console.error('2. Build first: npm run build');
