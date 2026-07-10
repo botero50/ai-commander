@@ -172,39 +172,32 @@ async function main() {
     console.log('\n[DECISION QUALITY]\n');
     console.log(brain.getReport());
 
-    // Final state analysis
+    // Final state from last decision
     console.log('\n[FINAL STATE]\n');
-    const finalEntities = Object.values(finalState.entities || {}) as any[];
-    const finalP1Units = finalEntities.filter(e => e.owner === 1).length;
-    const finalP2Units = finalEntities.filter(e => e.owner === 2).length;
-    const finalP1Buildings = finalEntities.filter(
-      e => e.owner === 1 && (e.template || '').includes('structures')
-    ).length;
-    const finalP2Buildings = finalEntities.filter(
-      e => e.owner === 2 && (e.template || '').includes('structures')
-    ).length;
+    const lastDecision = brain.decisions[brain.decisions.length - 1];
+    if (lastDecision) {
+      console.log(`Final Tick: ${lastDecision.tick}`);
+      console.log(`Player 1 (Ollama/Gaul): ${lastDecision.player1Units} units`);
+      console.log(`Player 2 (Petra AI/Athenians): ${lastDecision.player2Units} units`);
 
-    console.log(`Game Time: ${(duration / 1000).toFixed(1)}s (${brain.decisions.length} decisions)`);
-    console.log(`Player 1 (Ollama/Gaul): ${finalP1Units} units, ${finalP1Buildings} buildings`);
-    console.log(`Player 2 (Petra AI/Athenians): ${finalP2Units} units, ${finalP2Buildings} buildings`);
-
-    // Winner
-    console.log('\n[WINNER]\n');
-    if (finalP1Units > 0 && finalP2Units === 0) {
-      console.log('🏆 PLAYER 1 (OLLAMA) WINS - Eliminated opponent!');
-    } else if (finalP2Units > 0 && finalP1Units === 0) {
-      console.log('🏆 PLAYER 2 (PETRA AI) WINS - Eliminated opponent!');
-    } else if (finalP1Units === 0 && finalP2Units === 0) {
-      console.log('⚠ DRAW - Both players eliminated');
-    } else {
-      const p1Score = finalP1Units + finalP1Buildings * 2;
-      const p2Score = finalP2Units + finalP2Buildings * 2;
-      if (p1Score > p2Score) {
-        console.log(`🏆 PLAYER 1 (OLLAMA) WINS - Higher score (${p1Score} vs ${p2Score})`);
-      } else if (p2Score > p1Score) {
-        console.log(`🏆 PLAYER 2 (PETRA AI) WINS - Higher score (${p2Score} vs ${p1Score})`);
+      // Winner
+      console.log('\n[WINNER]\n');
+      if (lastDecision.player1Units > 0 && lastDecision.player2Units === 0) {
+        console.log('🏆 PLAYER 1 (OLLAMA) WINS - Eliminated opponent!');
+      } else if (lastDecision.player2Units > 0 && lastDecision.player1Units === 0) {
+        console.log('🏆 PLAYER 2 (PETRA AI) WINS - Eliminated opponent!');
+      } else if (lastDecision.player1Units === 0 && lastDecision.player2Units === 0) {
+        console.log('⚠ DRAW - Both players eliminated');
       } else {
-        console.log(`⚠ DRAW - Tied score (${p1Score} each)`);
+        const p1Score = lastDecision.player1Units * 2;
+        const p2Score = lastDecision.player2Units * 2;
+        if (p1Score > p2Score) {
+          console.log(`🏆 PLAYER 1 (OLLAMA) LEADS - More units (${lastDecision.player1Units} vs ${lastDecision.player2Units})`);
+        } else if (p2Score > p1Score) {
+          console.log(`🏆 PLAYER 2 (PETRA AI) LEADS - More units (${lastDecision.player2Units} vs ${lastDecision.player1Units})`);
+        } else {
+          console.log(`⚠ TIED - Same unit count (${lastDecision.player1Units} each)`);
+        }
       }
     }
 
@@ -225,9 +218,9 @@ async function main() {
           duration: { totalMs: duration, totalSeconds: (duration / 1000).toFixed(1) },
           ticksCompleted: brain.decisions.length,
           finalState: {
-            tick: finalState.tick,
-            player1: { units: finalP1Units, buildings: finalP1Buildings },
-            player2: { units: finalP2Units, buildings: finalP2Buildings },
+            tick: finalState.currentTick,
+            player1: { units: lastDecision?.player1Units || 0 },
+            player2: { units: lastDecision?.player2Units || 0 },
           },
           decisions: brain.decisions,
         },
