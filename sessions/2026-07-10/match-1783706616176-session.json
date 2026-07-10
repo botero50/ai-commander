@@ -1,0 +1,90 @@
+{
+  "metadata": {
+    "matchId": "match-1783706616176",
+    "map": "alpine_mountains_3p",
+    "players": 2,
+    "status": "stopped",
+    "duration": "0h 0m 0s",
+    "ticks": 1000,
+    "createdAt": "2026-07-10T18:03:36.176Z",
+    "recordedAt": "2026-07-10T18:03:36.178Z"
+  },
+  "statistics": {
+    "totalEvents": 1,
+    "eventCounts": {
+      "match:started": 1
+    },
+    "timelineEntries": 1,
+    "totalDurationSeconds": 0
+  },
+  "config": {
+    "matchId": "match-1783706616176",
+    "map": "alpine_mountains_3p",
+    "players": [
+      {
+        "id": 1,
+        "name": "NeuralRTS",
+        "civilization": "Athens",
+        "aiModel": "ollama:neural-rts",
+        "aiPrompt": "aggressive-v1.0.0"
+      },
+      {
+        "id": 2,
+        "name": "Claude",
+        "civilization": "Rome",
+        "aiModel": "claude-opus-4-8",
+        "aiPrompt": "balanced-v1.0.0"
+      }
+    ]
+  },
+  "timeline": {
+    "entries": [
+      {
+        "timestamp": "2026-07-10T18:03:36.177Z",
+        "elapsedSeconds": 0,
+        "event": "match:started",
+        "data": {
+          "matchId": "match-1783706616176"
+        }
+      }
+    ],
+    "startTime": "2026-07-10T18:03:36.177Z"
+  },
+  "events": {
+    "entries": [
+      {
+        "event": "match:started",
+        "data": {
+          "matchId": "match-1783706616176",
+          "map": "alpine_mountains_3p",
+          "players": [
+            {
+              "id": 1,
+              "name": "P1",
+              "civilization": "Athens"
+            }
+          ],
+          "timestamp": "2026-07-10T18:03:36.177Z"
+        },
+        "timestamp": "2026-07-10T18:03:36.177Z"
+      }
+    ],
+    "statistics": {
+      "totalEvents": 1,
+      "eventCounts": {
+        "match:started": 1
+      },
+      "matches": 1,
+      "errors": 0,
+      "lastEvent": "match:started"
+    }
+  },
+  "summary": {
+    "matchId": "match-1783706616176",
+    "map": "alpine_mountains_3p",
+    "players": 2,
+    "status": "stopped",
+    "duration": "0h 0m 0s",
+    "ticks": 1000
+  }
+}

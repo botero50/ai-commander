@@ -1,0 +1,550 @@
+{
+  "metadata": {
+    "matchId": "match-1783706623195",
+    "map": "alpine_mountains_3p",
+    "players": 2,
+    "status": "stopped",
+    "duration": "0h 0m 0s",
+    "ticks": 5000,
+    "createdAt": "2026-07-10T18:03:43.195Z",
+    "recordedAt": "2026-07-10T18:03:43.196Z"
+  },
+  "statistics": {
+    "totalEvents": 17,
+    "eventCounts": {
+      "match:started": 1,
+      "observation:received": 5,
+      "decision:completed": 5,
+      "command:executed": 5,
+      "match:ended": 1
+    },
+    "timelineEntries": 17,
+    "totalDurationSeconds": 0.001
+  },
+  "config": {
+    "matchId": "match-1783706623195",
+    "map": "alpine_mountains_3p",
+    "players": [
+      {
+        "id": 1,
+        "name": "NeuralRTS",
+        "civilization": "Athens",
+        "aiModel": "ollama:neural-rts",
+        "aiPrompt": "aggressive-v1.0.0"
+      },
+      {
+        "id": 2,
+        "name": "Claude",
+        "civilization": "Rome",
+        "aiModel": "claude-opus-4-8",
+        "aiPrompt": "balanced-v1.0.0"
+      }
+    ]
+  },
+  "timeline": {
+    "entries": [
+      {
+        "timestamp": "2026-07-10T18:03:43.195Z",
+        "elapsedSeconds": 0,
+        "event": "match:started",
+        "data": {
+          "matchId": "match-1783706623195"
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:03:43.195Z",
+        "elapsedSeconds": 0,
+        "event": "observation:received",
+        "data": {
+          "tick": 0,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:03:43.195Z",
+        "elapsedSeconds": 0,
+        "event": "decision:completed",
+        "data": {
+          "tick": 0,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:03:43.196Z",
+        "elapsedSeconds": 0.001,
+        "event": "command:executed",
+        "data": {
+          "tick": 0,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:03:43.196Z",
+        "elapsedSeconds": 0.001,
+        "event": "observation:received",
+        "data": {
+          "tick": 25,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:03:43.196Z",
+        "elapsedSeconds": 0.001,
+        "event": "decision:completed",
+        "data": {
+          "tick": 25,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:03:43.196Z",
+        "elapsedSeconds": 0.001,
+        "event": "command:executed",
+        "data": {
+          "tick": 25,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:03:43.196Z",
+        "elapsedSeconds": 0.001,
+        "event": "observation:received",
+        "data": {
+          "tick": 50,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:03:43.196Z",
+        "elapsedSeconds": 0.001,
+        "event": "decision:completed",
+        "data": {
+          "tick": 50,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:03:43.196Z",
+        "elapsedSeconds": 0.001,
+        "event": "command:executed",
+        "data": {
+          "tick": 50,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:03:43.196Z",
+        "elapsedSeconds": 0.001,
+        "event": "observation:received",
+        "data": {
+          "tick": 75,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:03:43.196Z",
+        "elapsedSeconds": 0.001,
+        "event": "decision:completed",
+        "data": {
+          "tick": 75,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:03:43.196Z",
+        "elapsedSeconds": 0.001,
+        "event": "command:executed",
+        "data": {
+          "tick": 75,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:03:43.196Z",
+        "elapsedSeconds": 0.001,
+        "event": "observation:received",
+        "data": {
+          "tick": 100,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:03:43.196Z",
+        "elapsedSeconds": 0.001,
+        "event": "decision:completed",
+        "data": {
+          "tick": 100,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:03:43.196Z",
+        "elapsedSeconds": 0.001,
+        "event": "command:executed",
+        "data": {
+          "tick": 100,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:03:43.196Z",
+        "elapsedSeconds": 0.001,
+        "event": "match:ended",
+        "data": {
+          "matchId": "match-1783706623195",
+          "winner": 1
+        }
+      }
+    ],
+    "startTime": "2026-07-10T18:03:43.195Z"
+  },
+  "events": {
+    "entries": [
+      {
+        "event": "match:started",
+        "data": {
+          "matchId": "match-1783706623195",
+          "map": "alpine_mountains_3p",
+          "players": [
+            {
+              "id": 1,
+              "name": "NeuralRTS",
+              "civilization": "Athens"
+            },
+            {
+              "id": 2,
+              "name": "Claude",
+              "civilization": "Rome"
+            }
+          ],
+          "timestamp": "2026-07-10T18:03:43.195Z"
+        },
+        "timestamp": "2026-07-10T18:03:43.195Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783706623195",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 0,
+          "observation": {
+            "gameTime": 0,
+            "resources": {
+              "wood": 500,
+              "stone": 300
+            },
+            "units": 10
+          },
+          "timestamp": "2026-07-10T18:03:43.195Z"
+        },
+        "timestamp": "2026-07-10T18:03:43.195Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783706623195",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 0,
+          "model": "ollama:neural-rts",
+          "prompt": "aggressive-v1.0.0",
+          "decision": {
+            "objective": "Action at tick 0",
+            "confidence": 0.85,
+            "reasoning": "Strategic"
+          },
+          "latency": 1000,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:03:43.195Z"
+        },
+        "timestamp": "2026-07-10T18:03:43.195Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783706623195",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 0,
+          "command": {
+            "action": "build",
+            "target": "unit-1"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:03:43.195Z"
+        },
+        "timestamp": "2026-07-10T18:03:43.196Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783706623195",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 25,
+          "observation": {
+            "gameTime": 25,
+            "resources": {
+              "wood": 525,
+              "stone": 325
+            },
+            "units": 10
+          },
+          "timestamp": "2026-07-10T18:03:43.196Z"
+        },
+        "timestamp": "2026-07-10T18:03:43.196Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783706623195",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 25,
+          "model": "ollama:neural-rts",
+          "prompt": "aggressive-v1.0.0",
+          "decision": {
+            "objective": "Action at tick 25",
+            "confidence": 0.85,
+            "reasoning": "Strategic"
+          },
+          "latency": 1000,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:03:43.196Z"
+        },
+        "timestamp": "2026-07-10T18:03:43.196Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783706623195",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 25,
+          "command": {
+            "action": "build",
+            "target": "unit-1"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:03:43.196Z"
+        },
+        "timestamp": "2026-07-10T18:03:43.196Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783706623195",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 50,
+          "observation": {
+            "gameTime": 50,
+            "resources": {
+              "wood": 550,
+              "stone": 350
+            },
+            "units": 10
+          },
+          "timestamp": "2026-07-10T18:03:43.196Z"
+        },
+        "timestamp": "2026-07-10T18:03:43.196Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783706623195",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 50,
+          "model": "ollama:neural-rts",
+          "prompt": "aggressive-v1.0.0",
+          "decision": {
+            "objective": "Action at tick 50",
+            "confidence": 0.85,
+            "reasoning": "Strategic"
+          },
+          "latency": 1000,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:03:43.196Z"
+        },
+        "timestamp": "2026-07-10T18:03:43.196Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783706623195",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 50,
+          "command": {
+            "action": "build",
+            "target": "unit-1"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:03:43.196Z"
+        },
+        "timestamp": "2026-07-10T18:03:43.196Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783706623195",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 75,
+          "observation": {
+            "gameTime": 75,
+            "resources": {
+              "wood": 575,
+              "stone": 375
+            },
+            "units": 10
+          },
+          "timestamp": "2026-07-10T18:03:43.196Z"
+        },
+        "timestamp": "2026-07-10T18:03:43.196Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783706623195",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 75,
+          "model": "ollama:neural-rts",
+          "prompt": "aggressive-v1.0.0",
+          "decision": {
+            "objective": "Action at tick 75",
+            "confidence": 0.85,
+            "reasoning": "Strategic"
+          },
+          "latency": 1000,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:03:43.196Z"
+        },
+        "timestamp": "2026-07-10T18:03:43.196Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783706623195",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 75,
+          "command": {
+            "action": "build",
+            "target": "unit-1"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:03:43.196Z"
+        },
+        "timestamp": "2026-07-10T18:03:43.196Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783706623195",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 100,
+          "observation": {
+            "gameTime": 100,
+            "resources": {
+              "wood": 600,
+              "stone": 400
+            },
+            "units": 10
+          },
+          "timestamp": "2026-07-10T18:03:43.196Z"
+        },
+        "timestamp": "2026-07-10T18:03:43.196Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783706623195",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 100,
+          "model": "ollama:neural-rts",
+          "prompt": "aggressive-v1.0.0",
+          "decision": {
+            "objective": "Action at tick 100",
+            "confidence": 0.85,
+            "reasoning": "Strategic"
+          },
+          "latency": 1000,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:03:43.196Z"
+        },
+        "timestamp": "2026-07-10T18:03:43.196Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783706623195",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 100,
+          "command": {
+            "action": "build",
+            "target": "unit-1"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:03:43.196Z"
+        },
+        "timestamp": "2026-07-10T18:03:43.196Z"
+      },
+      {
+        "event": "match:ended",
+        "data": {
+          "matchId": "match-1783706623195",
+          "winner": {
+            "id": 1,
+            "name": "NeuralRTS"
+          },
+          "runners": [
+            {
+              "id": 2,
+              "name": "Claude"
+            }
+          ],
+          "duration": {
+            "ticks": 5000,
+            "seconds": 120
+          },
+          "statistics": {
+            "totalCommands": 450,
+            "avgLatency": 1200,
+            "totalCost": 0.05,
+            "commandSuccessRate": 0.95
+          },
+          "timestamp": "2026-07-10T18:03:43.196Z"
+        },
+        "timestamp": "2026-07-10T18:03:43.196Z"
+      }
+    ],
+    "statistics": {
+      "totalEvents": 17,
+      "eventCounts": {
+        "match:started": 1,
+        "observation:received": 5,
+        "decision:completed": 5,
+        "command:executed": 5,
+        "match:ended": 1
+      },
+      "matches": 1,
+      "errors": 0,
+      "lastEvent": "match:ended"
+    }
+  },
+  "summary": {
+    "matchId": "match-1783706623195",
+    "map": "alpine_mountains_3p",
+    "players": 2,
+    "status": "stopped",
+    "duration": "0h 0m 0s",
+    "ticks": 5000
+  }
+}
