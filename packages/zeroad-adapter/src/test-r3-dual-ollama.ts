@@ -1,15 +1,14 @@
 #!/usr/bin/env node
 
 /**
- * Story R3.1 — Ollama Tournament (3-Player Batched Commands)
+ * Story R3.1 — Dual Ollama Tournament (2-Player Pure AI)
  *
- * Key insight: Batch both decisions into one /step call
+ * Key insight: Both players controlled by Ollama, no human player needed
  *
  * Setup:
- * - Player 1 (Athenians): OllamaAIBrain controlled via RL Interface
- * - Player 2 (Gaul): Petra AI (opponent)
- * - Player 3 (Kushite): Petra AI (opponent)
- * - One RL Interface connection, batched commands
+ * - Player 1 (Athenians): OllamaAIBrain instance 1
+ * - Player 2 (Gaul): OllamaAIBrain instance 2
+ * - One RL Interface connection, batched commands from both brains
  *
  * Execution:
  * npm run build
@@ -34,7 +33,6 @@ interface TournamentTick {
   timestamp: string;
   player1Units: number;
   player2Units: number;
-  player3Units: number;
   player1Commands: number;
   player2Commands: number;
   totalCommands: number;
@@ -42,18 +40,16 @@ interface TournamentTick {
 
 async function main() {
   console.log('╔════════════════════════════════════════════════════════════╗');
-  console.log('║      STORY R3.1 — OLLAMA TOURNAMENT                      ║');
-  console.log('║    Ollama vs Petra AI (batched commands)                   ║');
+  console.log('║      STORY R3.1 — DUAL OLLAMA TOURNAMENT                 ║');
+  console.log('║    Two Ollama players competing (no human, no Petra)       ║');
   console.log('╚════════════════════════════════════════════════════════════╝\n');
 
   const logger = new Logger('info');
   const client = new RLHTTPClient(RL_HOST, RL_PORT, 10000, logger);
   const worldStateMapper = new WorldStateMapper(logger);
 
-  // Create two Ollama brains
+  // Create two Ollama brains - one for each player
   console.log('[INIT] Initializing two Ollama brains...');
-  // RL Interface ALWAYS controls Player 1 (the human slot)
-  // Player 2 (Petra AI) is the opponent
   const brain1 = new OllamaAIBrain(logger, {
     modelName: OLLAMA_MODEL,
     baseUrl: 'http://localhost:11434',
@@ -62,10 +58,9 @@ async function main() {
     topK: 40,
     numPredict: 256,
     timeout: 30000,
-    playerID: 1, // RL Interface controls Player 1
+    playerID: 1, // Controls Player 1 (Athenians)
   });
 
-  // Secondary brain (for future dual-brain setup - currently unused)
   const brain2 = new OllamaAIBrain(logger, {
     modelName: OLLAMA_MODEL,
     baseUrl: 'http://localhost:11434',
@@ -74,7 +69,7 @@ async function main() {
     topK: 40,
     numPredict: 256,
     timeout: 30000,
-    playerID: 1, // Also targets Player 1 (batched together)
+    playerID: 2, // Controls Player 2 (Gaul)
   });
 
   try {
@@ -92,10 +87,8 @@ async function main() {
     const entities = Object.values(gameState.entities || {}) as any[];
     const p1Units = entities.filter(e => e.owner === 1 && (e.template || '').includes('unit'));
     const p2Units = entities.filter(e => e.owner === 2 && (e.template || '').includes('unit'));
-    const p3Units = entities.filter(e => e.owner === 3 && (e.template || '').includes('unit'));
     console.log(`       Player 1 (Athenians/Ollama): ${p1Units.length} units`);
-    console.log(`       Player 2 (Gaul/Petra): ${p2Units.length} units`);
-    console.log(`       Player 3 (Kushite/Petra): ${p3Units.length} units\n`);
+    console.log(`       Player 2 (Gaul/Ollama): ${p2Units.length} units\n`);
 
     // Tournament loop
     console.log(`[GAME] Running tournament for ${MAX_TICKS} ticks...\n`);
@@ -145,16 +138,12 @@ async function main() {
       const p2Units = worldState.agents.filter(
         a => (a.customData as any)?.type === 'unit' && a.controlledByPlayerId?.toString() === '2'
       ).length;
-      const p3Units = worldState.agents.filter(
-        a => (a.customData as any)?.type === 'unit' && a.controlledByPlayerId?.toString() === '3'
-      ).length;
 
       tickHistory.push({
         tick: worldState.time.currentTick.number,
         timestamp: new Date().toISOString(),
         player1Units: p1Units,
         player2Units: p2Units,
-        player3Units: p3Units,
         player1Commands: decision1.commands.length,
         player2Commands: decision2.commands.length,
         totalCommands: combinedCommands.length,
@@ -168,20 +157,17 @@ async function main() {
           tick: ticksCompleted,
           p1Units,
           p2Units,
-          p3Units,
           p1Cmds: decision1.commands.length,
           p2Cmds: decision2.commands.length,
         });
       }
 
       // Check for early termination (any player eliminated)
-      const playersAlive = (p1Units > 0 ? 1 : 0) + (p2Units > 0 ? 1 : 0) + (p3Units > 0 ? 1 : 0);
-      if (playersAlive <= 1) {
-        logger.info('Match ended - only one player remains', {
+      if (p1Units === 0 || p2Units === 0) {
+        logger.info('Match ended - player eliminated', {
           tick: ticksCompleted,
           p1Units,
           p2Units,
-          p3Units,
         });
         break;
       }
@@ -209,31 +195,26 @@ async function main() {
     console.log(`  Avg commands/tick: ${(tickHistory.reduce((s, t) => s + t.player1Commands, 0) / ticksCompleted).toFixed(1)}`);
     console.log('');
 
-    console.log('Player 2 (Gaul/Petra):');
+    console.log('Player 2 (Gaul/Ollama):');
     console.log(`  Start: ${firstTick.player2Units} units`);
     console.log(`  End: ${lastTick.player2Units} units`);
     console.log(`  Change: ${lastTick.player2Units - firstTick.player2Units} units`);
-    console.log('');
-
-    console.log('Player 3 (Kushite/Petra):');
-    console.log(`  Start: ${firstTick.player3Units} units`);
-    console.log(`  End: ${lastTick.player3Units} units`);
-    console.log(`  Change: ${lastTick.player3Units - firstTick.player3Units} units`);
+    console.log(`  Avg commands/tick: ${(tickHistory.reduce((s, t) => s + t.player2Commands, 0) / ticksCompleted).toFixed(1)}`);
     console.log('');
 
     // Winner
     console.log('[WINNER]\n');
     if (lastTick.player1Units > 0 && lastTick.player2Units === 0) {
-      console.log('🏆 PLAYER 1 (OLLAMA) WINS - Eliminated opponent!');
+      console.log('🏆 ATHENIANS (OLLAMA #1) WINS - Defeated Gaul!');
     } else if (lastTick.player2Units > 0 && lastTick.player1Units === 0) {
-      console.log('🏆 PLAYER 2 (OLLAMA) WINS - Eliminated opponent!');
+      console.log('🏆 GAUL (OLLAMA #2) WINS - Defeated Athenians!');
     } else if (lastTick.player1Units === 0 && lastTick.player2Units === 0) {
       console.log('⚠ DRAW - Both players eliminated');
     } else {
       if (lastTick.player1Units > lastTick.player2Units) {
-        console.log(`PLAYER 1 LEADS - ${lastTick.player1Units} vs ${lastTick.player2Units} units`);
+        console.log(`ATHENIANS LEAD - ${lastTick.player1Units} vs ${lastTick.player2Units} units`);
       } else if (lastTick.player2Units > lastTick.player1Units) {
-        console.log(`PLAYER 2 LEADS - ${lastTick.player2Units} vs ${lastTick.player1Units} units`);
+        console.log(`GAUL LEADS - ${lastTick.player2Units} vs ${lastTick.player1Units} units`);
       } else {
         console.log(`TIED - Both have ${lastTick.player1Units} units`);
       }
@@ -246,13 +227,16 @@ async function main() {
       JSON.stringify(
         {
           timestamp: new Date().toISOString(),
-          story: 'R3.1 - Dual Ollama Tournament (Batched Commands)',
+          story: 'R3.1 - Dual Ollama Tournament (Pure AI, No Human)',
           configuration: {
             maxTicks: MAX_TICKS,
             model: OLLAMA_MODEL,
-            player1: { id: 1, brain: 'Ollama' },
-            player2: { id: 2, brain: 'Ollama' },
-            strategy: 'Batched commands (both brains decide, execute together)',
+            map: 'acropolis_bay_2p',
+            player1: { id: 1, civ: 'Athenians', brain: 'Ollama #1' },
+            player2: { id: 2, civ: 'Gaul', brain: 'Ollama #2' },
+            strategy: 'Batched commands (both brains decide independently, execute together)',
+            noHumanPlayer: true,
+            noPetraAI: true,
           },
           duration: { totalMs: duration, totalSeconds: (duration / 1000).toFixed(1) },
           ticksCompleted,
@@ -274,8 +258,8 @@ async function main() {
     await brain2.shutdown();
 
     console.log('\n╔════════════════════════════════════════════════════════════╗');
-    console.log('║  ✓ OLLAMA TOURNAMENT: COMPLETE                          ║');
-    console.log('║  Story R3.1 Definition of Done: SATISFIED                 ║');
+    console.log('║  ✓ DUAL OLLAMA TOURNAMENT: COMPLETE                     ║');
+    console.log('║  Story R3.1: Pure AI Competition - No Human Player       ║');
     console.log('╚════════════════════════════════════════════════════════════╝\n');
 
     process.exit(0);
