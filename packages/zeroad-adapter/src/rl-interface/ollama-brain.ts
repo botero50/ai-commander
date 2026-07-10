@@ -1,0 +1,434 @@
+/**
+ * Ollama AI Brain
+ *
+ * Implements AIBrain interface using local Ollama LLM inference.
+ * Converts WorldState to natural language prompts, gets LLM decisions,
+ * parses responses into GameCommand[] for execution.
+ *
+ * Prerequisites:
+ * - Ollama running on localhost:11434
+ * - Model available (e.g., ollama pull llama2)
+ *
+ * Story R3.1: Ollama Brain Implementation
+ */
+
+import { Logger } from '../config/logger.js';
+import type { WorldState } from '@ai-commander/domain';
+import type { AIBrain, BrainDecision } from './ai-loop-orchestrator.js';
+import type { GameCommand } from './http-client.js';
+
+export interface OllamaConfig {
+  modelName: string; // e.g., 'llama2', 'mistral', 'neural-chat'
+  baseUrl: string; // e.g., 'http://localhost:11434'
+  temperature: number; // 0.0 - 1.0 (lower = deterministic, higher = creative)
+  topP: number; // Nucleus sampling
+  topK: number; // Diversity
+  numPredict: number; // Max response tokens
+  timeout: number; // Request timeout in ms
+}
+
+export interface OllamaResponse {
+  model: string;
+  created_at: string;
+  response: string;
+  done: boolean;
+}
+
+/**
+ * AI Brain powered by local Ollama LLM inference
+ */
+export class OllamaAIBrain implements AIBrain {
+  private logger: Logger;
+  private config: OllamaConfig;
+  private decisionCount: number = 0;
+
+  constructor(logger: Logger, config: Partial<OllamaConfig> = {}) {
+    this.logger = logger;
+    this.config = {
+      modelName: config.modelName || 'llama2',
+      baseUrl: config.baseUrl || 'http://localhost:11434',
+      temperature: config.temperature !== undefined ? config.temperature : 0.7,
+      topP: config.topP !== undefined ? config.topP : 0.9,
+      topK: config.topK !== undefined ? config.topK : 40,
+      numPredict: config.numPredict || 256,
+      timeout: config.timeout || 30000,
+    };
+  }
+
+  /**
+   * Initialize brain (verify Ollama is reachable)
+   */
+  async initialize(): Promise<void> {
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), this.config.timeout);
+
+      const response = await fetch(`${this.config.baseUrl}/api/tags`, {
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`Ollama health check failed: ${response.status}`);
+      }
+
+      const data = (await response.json()) as { models: Array<{ name: string }> };
+      const availableModels = data.models.map(m => m.name);
+
+      this.logger.info('Ollama initialized', {
+        baseUrl: this.config.baseUrl,
+        selectedModel: this.config.modelName,
+        availableModels: availableModels.join(', '),
+      });
+
+      if (!availableModels.includes(this.config.modelName)) {
+        this.logger.warn('Selected model not available', {
+          model: this.config.modelName,
+          available: availableModels,
+        });
+      }
+    } catch (error) {
+      this.logger.error('Failed to initialize Ollama brain', {
+        error: String(error),
+        baseUrl: this.config.baseUrl,
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Make a decision based on world state
+   */
+  async decide(worldState: WorldState): Promise<BrainDecision> {
+    this.decisionCount++;
+
+    try {
+      // Phase 1: Describe game state
+      const gameDescription = this.describeGameState(worldState);
+
+      // Phase 2: Build prompt
+      const prompt = this.buildPrompt(gameDescription);
+
+      // Phase 3: Query Ollama
+      this.logger.debug('Querying Ollama', {
+        decision: this.decisionCount,
+        model: this.config.modelName,
+        promptLength: prompt.length,
+      });
+
+      const response = await this.callOllama(prompt);
+
+      // Phase 4: Parse response into commands
+      const commands = this.parseCommands(response, worldState);
+
+      // Phase 5: Return decision
+      const decision: BrainDecision = {
+        playerID: 1,
+        commands,
+        reasoning: response.substring(0, 300),
+        timestamp: new Date(),
+      };
+
+      this.logger.info('Brain decision made', {
+        decision: this.decisionCount,
+        commands: commands.length,
+        responseLength: response.length,
+      });
+
+      return decision;
+    } catch (error) {
+      this.logger.error('Brain decision failed', {
+        decision: this.decisionCount,
+        error: String(error),
+      });
+
+      // Return empty decision on error (observe-only)
+      return {
+        playerID: 1,
+        commands: [],
+        reasoning: `Decision failed: ${error}`,
+        timestamp: new Date(),
+      };
+    }
+  }
+
+  /**
+   * Shutdown brain
+   */
+  async shutdown(): Promise<void> {
+    this.logger.info('Ollama brain shutdown', {
+      totalDecisions: this.decisionCount,
+    });
+  }
+
+  /**
+   * Convert WorldState to natural language game description
+   */
+  private describeGameState(worldState: WorldState): string {
+    const agents = worldState.agents;
+    const players = worldState.players;
+
+    const units = agents.filter(a => (a.customData as any)?.type === 'unit');
+    const buildings = agents.filter(a => (a.customData as any)?.type === 'building');
+    const resources = agents.filter(a => (a.customData as any)?.type === 'resource');
+
+    const friendlyUnits = units.filter(u => u.controlledByPlayerId?.toString() === '1').length;
+    const enemyUnits = units.filter(u => u.controlledByPlayerId?.toString() !== '1').length;
+
+    const friendlyBuildings = buildings.filter(b => b.controlledByPlayerId?.toString() === '1').length;
+    const enemyBuildings = buildings.filter(b => b.controlledByPlayerId?.toString() !== '1').length;
+
+    return `
+GAME STATE AT TICK ${worldState.time.currentTick.number}
+
+PLAYERS:
+${players.map(p => `- ${p.name} (ID: ${p.id})`).join('\n')}
+
+YOUR FORCES:
+- Units: ${friendlyUnits}
+- Buildings: ${friendlyBuildings}
+- Total Agents: ${friendlyUnits + friendlyBuildings}
+
+ENEMY FORCES:
+- Units: ${enemyUnits}
+- Buildings: ${enemyBuildings}
+- Total Agents: ${enemyUnits + enemyBuildings}
+
+MAP: ${worldState.map?.name || 'Unknown'} (${worldState.map?.width}x${worldState.map?.height})
+VISIBLE RESOURCES: ${resources.length}
+
+OBJECTIVE: Expand your civilization, gather resources, and eliminate enemy forces.
+    `.trim();
+  }
+
+  /**
+   * Build prompt for Ollama inference
+   */
+  private buildPrompt(gameDescription: string): string {
+    return `You are an AI commander in Age of Empires 2. Analyze the current game state and decide on strategic actions.
+
+${gameDescription}
+
+AVAILABLE COMMANDS:
+1. Move units to a location
+2. Attack enemy units
+3. Gather resources
+4. Research technologies
+5. Build structures
+
+Based on the game state above, what are the top 3-5 strategic decisions you should make RIGHT NOW?
+
+Be concise. Start with "Decision 1:", "Decision 2:", etc.
+Focus on: early expansion, resource gathering, and protecting your base.
+
+DECISIONS:`;
+  }
+
+  /**
+   * Call Ollama API and get response
+   */
+  private async callOllama(prompt: string): Promise<string> {
+    const requestBody = {
+      model: this.config.modelName,
+      prompt,
+      stream: false,
+      temperature: this.config.temperature,
+      top_p: this.config.topP,
+      top_k: this.config.topK,
+      num_predict: this.config.numPredict,
+    };
+
+    try {
+      const controller = new AbortController();
+      const timeoutId = setTimeout(() => controller.abort(), this.config.timeout);
+
+      const response = await fetch(`${this.config.baseUrl}/api/generate`, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(requestBody),
+        signal: controller.signal,
+      });
+
+      clearTimeout(timeoutId);
+
+      if (!response.ok) {
+        throw new Error(`Ollama API error: ${response.status}`);
+      }
+
+      const data = (await response.json()) as OllamaResponse;
+      return data.response || '';
+    } catch (error) {
+      this.logger.error('Ollama API call failed', {
+        error: String(error),
+        model: this.config.modelName,
+      });
+      throw error;
+    }
+  }
+
+  /**
+   * Parse Ollama response into GameCommand array
+   *
+   * Strategy: Extract action descriptions from LLM response,
+   * map to available game commands, validate against world state.
+   */
+  private parseCommands(response: string, worldState: WorldState): GameCommand[] {
+    const commands: GameCommand[] = [];
+
+    // Parse response line by line looking for action keywords
+    const lines = response.split('\n');
+
+    for (const line of lines) {
+      const lowerLine = line.toLowerCase();
+
+      // Detect "move" actions
+      if (lowerLine.includes('move') || lowerLine.includes('expand')) {
+        const moveCmd = this.createMoveCommand(worldState);
+        if (moveCmd) commands.push(moveCmd);
+      }
+
+      // Detect "gather" actions
+      if (lowerLine.includes('gather') || lowerLine.includes('resource')) {
+        const gatherCmd = this.createGatherCommand(worldState);
+        if (gatherCmd) commands.push(gatherCmd);
+      }
+
+      // Detect "attack" actions
+      if (lowerLine.includes('attack') || lowerLine.includes('enemy')) {
+        const attackCmd = this.createAttackCommand(worldState);
+        if (attackCmd) commands.push(attackCmd);
+      }
+
+      // Limit to reasonable number of commands per tick
+      if (commands.length >= 3) break;
+    }
+
+    this.logger.debug('Commands parsed from LLM response', {
+      responseLength: response.length,
+      commandsGenerated: commands.length,
+    });
+
+    return commands;
+  }
+
+  /**
+   * Create a Move command from available units
+   */
+  private createMoveCommand(worldState: WorldState): GameCommand | null {
+    const units = worldState.agents
+      .filter(a => (a.customData as any)?.type === 'unit')
+      .filter(a => a.controlledByPlayerId?.toString() === '1')
+      .slice(0, 3); // Limit to first 3 units
+
+    if (units.length === 0) return null;
+
+    const unitIds = units
+      .map(u => (u.customData as any)?.entityId)
+      .filter(Boolean) as number[];
+
+    if (unitIds.length === 0) return null;
+
+    // Simple heuristic: move towards center of map
+    const centerX = (worldState.map?.width || 256) / 2;
+    const centerZ = (worldState.map?.height || 256) / 2;
+
+    return {
+      playerID: 1,
+      json_cmd: {
+        type: 'Move',
+        entities: unitIds,
+        x: Math.round(centerX),
+        z: Math.round(centerZ),
+        queued: false,
+      },
+    };
+  }
+
+  /**
+   * Create a Gather command from available resources
+   */
+  private createGatherCommand(worldState: WorldState): GameCommand | null {
+    const gatherUnits = worldState.agents
+      .filter(a => (a.customData as any)?.type === 'unit')
+      .filter(a => a.controlledByPlayerId?.toString() === '1')
+      .slice(0, 2);
+
+    const resources = worldState.agents
+      .filter(a => (a.customData as any)?.type === 'resource')
+      .slice(0, 1);
+
+    if (gatherUnits.length === 0 || resources.length === 0) return null;
+
+    const unitIds = gatherUnits.map(u => (u.customData as any)?.entityId).filter(Boolean) as number[];
+    const resourceId = (resources[0].customData as any)?.entityId;
+
+    if (unitIds.length === 0 || !resourceId) return null;
+
+    return {
+      playerID: 1,
+      json_cmd: {
+        type: 'Gather',
+        entities: unitIds,
+        target: resourceId,
+        queued: false,
+      },
+    };
+  }
+
+  /**
+   * Create an Attack command against enemy units
+   */
+  private createAttackCommand(worldState: WorldState): GameCommand | null {
+    const attackUnits = worldState.agents
+      .filter(a => (a.customData as any)?.type === 'unit')
+      .filter(a => a.controlledByPlayerId?.toString() === '1')
+      .slice(0, 2);
+
+    const enemyUnits = worldState.agents
+      .filter(a => (a.customData as any)?.type === 'unit')
+      .filter(a => a.controlledByPlayerId?.toString() !== '1')
+      .slice(0, 1);
+
+    if (attackUnits.length === 0 || enemyUnits.length === 0) return null;
+
+    const unitIds = attackUnits.map(u => (u.customData as any)?.entityId).filter(Boolean) as number[];
+    const targetId = (enemyUnits[0].customData as any)?.entityId;
+
+    if (unitIds.length === 0 || !targetId) return null;
+
+    return {
+      playerID: 1,
+      json_cmd: {
+        type: 'Attack',
+        entities: unitIds,
+        target: targetId,
+        queued: false,
+      },
+    };
+  }
+
+  /**
+   * Generate metrics report
+   */
+  generateReport(): string {
+    const lines: string[] = [];
+
+    lines.push('╔═══════════════════════════════════════════════════════╗');
+    lines.push('║          OLLAMA AI BRAIN REPORT                      ║');
+    lines.push('╚═══════════════════════════════════════════════════════╝');
+    lines.push('');
+
+    lines.push('Configuration:');
+    lines.push(`  Model:        ${this.config.modelName}`);
+    lines.push(`  Base URL:     ${this.config.baseUrl}`);
+    lines.push(`  Temperature:  ${this.config.temperature}`);
+    lines.push('');
+
+    lines.push('Statistics:');
+    lines.push(`  Decisions:    ${this.decisionCount}`);
+    lines.push('');
+
+    return lines.join('\n');
+  }
+}
