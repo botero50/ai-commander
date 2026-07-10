@@ -65,11 +65,22 @@ const logger = new Logger('info', 'ArenaLoop');
  */
 async function syncCameraModToGame(): Promise<void> {
   try {
-    const sourceModPath = path.join(__dirname, '../mods/camera_commander');
+    // Find mod path relative to current working directory
+    // When running: npx tsx packages/zeroad-adapter/src/arena/run-arena-loop.ts
+    // cwd = project root, so mod is at: packages/zeroad-adapter/mods/camera_commander
+    const sourceModPath = path.join(process.cwd(), 'packages/zeroad-adapter/mods/camera_commander');
     const destModDir = `${process.env.USERPROFILE}\\AppData\\Local\\0 A.D. Empires Ascendant\\binaries\\data\\mods`;
     const destModPath = path.join(destModDir, 'camera_commander');
 
     logger.info('⚙️  Syncing camera_commander mod...');
+    logger.debug('Source: ' + sourceModPath);
+    logger.debug('Dest: ' + destModPath);
+
+    // Check if source mod exists
+    if (!fs.existsSync(sourceModPath)) {
+      logger.warn('Source mod not found at: ' + sourceModPath);
+      return;
+    }
 
     // Remove old mod if it exists
     if (fs.existsSync(destModPath)) {
