@@ -323,11 +323,19 @@ Now output your immediate MOVE orders (be very specific):`;
 
   /**
    * Create a Move command from available units
+   *
+   * IMPORTANT: Filter for military/support units only, not Gaia creatures
+   * Gaia fauna (sheep, deer) have owner=0 and will not respond to commands
    */
   private createMoveCommand(worldState: WorldState): GameCommand | null {
     const units = worldState.agents
       .filter(a => (a.customData as any)?.type === 'unit')
       .filter(a => a.controlledByPlayerId?.toString() === '1')
+      // Skip Gaia fauna - only command actual player-controlled units
+      .filter(u => {
+        const template = (u.customData as any)?.template || '';
+        return !template.includes('fauna') && !template.includes('flora');
+      })
       .slice(0, 3); // Limit to first 3 units
 
     if (units.length === 0) return null;
@@ -338,17 +346,17 @@ Now output your immediate MOVE orders (be very specific):`;
 
     if (unitIds.length === 0) return null;
 
-    // Simple heuristic: move towards center of map
-    const centerX = (worldState.map?.width || 256) / 2;
-    const centerZ = (worldState.map?.height || 256) / 2;
+    // Move to a strategic location (not center, but towards resources)
+    const targetX = Math.random() * ((worldState.map?.width || 256) * 0.8) + 50;
+    const targetZ = Math.random() * ((worldState.map?.height || 256) * 0.8) + 50;
 
     return {
       playerID: 1,
       json_cmd: {
         type: 'Move',
         entities: unitIds,
-        x: Math.round(centerX),
-        z: Math.round(centerZ),
+        x: Math.round(targetX),
+        z: Math.round(targetZ),
         queued: false,
       },
     };
@@ -361,6 +369,11 @@ Now output your immediate MOVE orders (be very specific):`;
     const gatherUnits = worldState.agents
       .filter(a => (a.customData as any)?.type === 'unit')
       .filter(a => a.controlledByPlayerId?.toString() === '1')
+      // Skip Gaia fauna - only use actual player-controlled units
+      .filter(u => {
+        const template = (u.customData as any)?.template || '';
+        return !template.includes('fauna') && !template.includes('flora');
+      })
       .slice(0, 2);
 
     const resources = worldState.agents
@@ -404,6 +417,11 @@ Now output your immediate MOVE orders (be very specific):`;
     const attackUnits = worldState.agents
       .filter(a => (a.customData as any)?.type === 'unit')
       .filter(a => a.controlledByPlayerId?.toString() === '1')
+      // Skip Gaia fauna - only use actual player-controlled units
+      .filter(u => {
+        const template = (u.customData as any)?.template || '';
+        return !template.includes('fauna') && !template.includes('flora');
+      })
       .slice(0, 2);
 
     const enemyUnits = worldState.agents
