@@ -23,6 +23,7 @@ import { ObservationReceiver } from './rl-interface/observation-receiver.js';
 import { WorldStateMapper } from './rl-interface/world-state-mapper.js';
 import { TournamentOrchestrator } from './rl-interface/tournament-orchestrator.js';
 import { OllamaAIBrain } from './rl-interface/ollama-brain.js';
+import { GameCheats } from './rl-interface/game-cheats.js';
 import { Logger } from './config/logger.js';
 import * as fs from 'fs';
 
@@ -70,6 +71,12 @@ async function main() {
     await brain1.initialize();
     await brain2.initialize();
     console.log(`[INIT] ✓ Two Ollama brains connected (model: ${OLLAMA_MODEL})\n`);
+
+    // Setup game cheats
+    console.log('[INIT] Setting up tournament environment...');
+    const cheats = new GameCheats(client, logger);
+    await cheats.enableCheats();
+    console.log('[INIT] ✓ Cheats enabled (jam jam)\n');
 
     // Get initial game state
     console.log('[INIT] Fetching initial game state...');
