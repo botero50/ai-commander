@@ -16,6 +16,7 @@ import { Logger } from '../config/logger.js';
 import type { WorldState } from '@ai-commander/domain';
 import type { AIBrain, BrainDecision } from './ai-loop-orchestrator.js';
 import type { GameCommand } from './http-client.js';
+import { DecisionLogger } from './decision-logger.js';
 
 export interface OllamaConfig {
   modelName: string; // e.g., 'llama2', 'mistral', 'neural-chat'
@@ -41,9 +42,11 @@ export class OllamaAIBrain implements AIBrain {
   private logger: Logger;
   private config: OllamaConfig;
   private decisionCount: number = 0;
+  private decisionLogger: DecisionLogger;
 
   constructor(logger: Logger, config: Partial<OllamaConfig> = {}) {
     this.logger = logger;
+    this.decisionLogger = new DecisionLogger(logger);
     this.config = {
       modelName: config.modelName || 'llama2',
       baseUrl: config.baseUrl || 'http://localhost:11434',
@@ -130,6 +133,16 @@ export class OllamaAIBrain implements AIBrain {
         timestamp: new Date(),
       };
 
+      // Log decision for quality analysis
+      this.decisionLogger.logDecision(
+        worldState,
+        prompt,
+        response,
+        Date.now() - (decision.timestamp.getTime() - 1000), // Rough latency estimate
+        commands,
+        true
+      );
+
       this.logger.info('Brain decision made', {
         decision: this.decisionCount,
         commands: commands.length,
@@ -160,6 +173,20 @@ export class OllamaAIBrain implements AIBrain {
     this.logger.info('Ollama brain shutdown', {
       totalDecisions: this.decisionCount,
     });
+  }
+
+  /**
+   * Get decision quality report
+   */
+  getDecisionReport(): string {
+    return this.decisionLogger.generateReport();
+  }
+
+  /**
+   * Export decision log
+   */
+  exportDecisions(): string {
+    return this.decisionLogger.exportToJSON();
   }
 
   /**

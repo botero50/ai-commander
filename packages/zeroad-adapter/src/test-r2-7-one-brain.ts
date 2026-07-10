@@ -89,16 +89,16 @@ class OllamaBrain implements AIBrain {
       // Record decision
       const agents = worldState.agents;
       const friendlyUnits = agents.filter(
-        a => (a.customData as any)?.type === 'unit' && a.controlledByPlayerId?.toString() === '1'
+        a => (a.customData as any)?.type === 'unit' && a.controlledByPlayerId?.toString() === '2'
       ).length;
       const friendlyBuildings = agents.filter(
-        a => (a.customData as any)?.type === 'building' && a.controlledByPlayerId?.toString() === '1'
+        a => (a.customData as any)?.type === 'building' && a.controlledByPlayerId?.toString() === '2'
       ).length;
       const enemyUnits = agents.filter(
-        a => (a.customData as any)?.type === 'unit' && a.controlledByPlayerId?.toString() !== '1'
+        a => (a.customData as any)?.type === 'unit' && a.controlledByPlayerId?.toString() !== '2'
       ).length;
       const enemyBuildings = agents.filter(
-        a => (a.customData as any)?.type === 'building' && a.controlledByPlayerId?.toString() !== '1'
+        a => (a.customData as any)?.type === 'building' && a.controlledByPlayerId?.toString() !== '2'
       ).length;
 
       this.decisions.push({
@@ -124,7 +124,7 @@ class OllamaBrain implements AIBrain {
     } catch (error) {
       this.logger.error('OllamaBrain decision failed', { error: String(error), tick });
       return {
-        playerID: 1,
+        playerID: 2,
         commands: [],
         reasoning: `Decision failed: ${error}`,
         timestamp: new Date(),
@@ -134,6 +134,14 @@ class OllamaBrain implements AIBrain {
 
   async shutdown(): Promise<void> {
     await this.ollama.shutdown();
+  }
+
+  getDecisionReport(): string {
+    return this.ollama.getDecisionReport();
+  }
+
+  exportDecisions(): string {
+    return this.ollama.exportDecisions();
   }
 }
 
@@ -213,6 +221,16 @@ async function main() {
     console.log(`Avg commands per decision: ${(
       decisions.reduce((a: number, b: any) => a + b.commandsParsed, 0) / decisions.length
     ).toFixed(1)}`);
+
+    // Print detailed quality report
+    console.log('\n[DECISION QUALITY REPORT]\n');
+    const qualityReport = (brain as any).getDecisionReport();
+    console.log(qualityReport);
+
+    // Export decision log
+    const decisionLog = (brain as any).exportDecisions();
+    fs.writeFileSync('decision-log.json', decisionLog);
+    console.log('\nDetailed decision log exported to decision-log.json');
 
     // Save detailed metrics
     const metricsPath = 'test-r2-7-metrics.json';
