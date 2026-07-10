@@ -51,8 +51,8 @@ async function main() {
 
   // Create two Ollama brains
   console.log('[INIT] Initializing two Ollama brains...');
-  // RL Interface controls Player 1 (human slot)
-  // Player 2 (Petra AI) is the opponent
+  // RL Interface controls Player 2 (Gaul - human slot)
+  // Player 1 (Athenians - Petra AI) is the opponent
   const brain1 = new OllamaAIBrain(logger, {
     modelName: OLLAMA_MODEL,
     baseUrl: 'http://localhost:11434',
@@ -61,7 +61,7 @@ async function main() {
     topK: 40,
     numPredict: 256,
     timeout: 30000,
-    playerID: 1, // RL Interface controls Player 1
+    playerID: 2, // RL Interface controls Player 2 (Gaul)
   });
 
   // Secondary brain (for future dual-brain setup - currently unused)
@@ -73,7 +73,7 @@ async function main() {
     topK: 40,
     numPredict: 256,
     timeout: 30000,
-    playerID: 1, // Also targets Player 1 (batched together)
+    playerID: 2, // Also targets Player 2 (batched together)
   });
 
   try {
