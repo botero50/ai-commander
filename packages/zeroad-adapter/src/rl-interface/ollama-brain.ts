@@ -26,6 +26,7 @@ export interface OllamaConfig {
   topK: number; // Diversity
   numPredict: number; // Max response tokens
   timeout: number; // Request timeout in ms
+  playerID?: number; // Player to control (1 or 2). Default: 2
 }
 
 export interface OllamaResponse {
@@ -43,10 +44,12 @@ export class OllamaAIBrain implements AIBrain {
   private config: OllamaConfig;
   private decisionCount: number = 0;
   private decisionLogger: DecisionLogger;
+  private playerID: number;
 
   constructor(logger: Logger, config: Partial<OllamaConfig> = {}) {
     this.logger = logger;
     this.decisionLogger = new DecisionLogger(logger);
+    this.playerID = config.playerID || 2;
     this.config = {
       modelName: config.modelName || 'llama2',
       baseUrl: config.baseUrl || 'http://localhost:11434',
@@ -55,6 +58,7 @@ export class OllamaAIBrain implements AIBrain {
       topK: config.topK !== undefined ? config.topK : 40,
       numPredict: config.numPredict || 256,
       timeout: config.timeout || 30000,
+      playerID: config.playerID || 2,
     };
   }
 
@@ -200,11 +204,11 @@ export class OllamaAIBrain implements AIBrain {
     const buildings = agents.filter(a => (a.customData as any)?.type === 'building');
     const resources = agents.filter(a => (a.customData as any)?.type === 'resource');
 
-    const friendlyUnits = units.filter(u => u.controlledByPlayerId?.toString() === '2').length;
-    const enemyUnits = units.filter(u => u.controlledByPlayerId?.toString() !== '2').length;
+    const friendlyUnits = units.filter(u => u.controlledByPlayerId?.toString() === this.playerID.toString()).length;
+    const enemyUnits = units.filter(u => u.controlledByPlayerId?.toString() !== this.playerID.toString()).length;
 
-    const friendlyBuildings = buildings.filter(b => b.controlledByPlayerId?.toString() === '2').length;
-    const enemyBuildings = buildings.filter(b => b.controlledByPlayerId?.toString() !== '2').length;
+    const friendlyBuildings = buildings.filter(b => b.controlledByPlayerId?.toString() === this.playerID.toString()).length;
+    const enemyBuildings = buildings.filter(b => b.controlledByPlayerId?.toString() !== this.playerID.toString()).length;
 
     return `
 GAME STATE AT TICK ${worldState.time.currentTick.number}
@@ -358,7 +362,7 @@ Now output your immediate MOVE orders (be very specific):`;
     // Get all units first
     const allUnits = worldState.agents
       .filter(a => (a.customData as any)?.type === 'unit')
-      .filter(a => a.controlledByPlayerId?.toString() === '2');
+      .filter(a => a.controlledByPlayerId?.toString() === this.playerID.toString());
 
     // Debug log what we found
     const templateSummary = allUnits.map(u => {
@@ -398,7 +402,7 @@ Now output your immediate MOVE orders (be very specific):`;
     const targetZ = Math.random() * ((worldState.map?.height || 256) * 0.8) + 50;
 
     return {
-      playerID: 2,
+      playerID: this.playerID,
       json_cmd: {
         type: 'move',
         entities: unitIds,
@@ -415,7 +419,7 @@ Now output your immediate MOVE orders (be very specific):`;
   private createGatherCommand(worldState: WorldState): GameCommand | null {
     const gatherUnits = worldState.agents
       .filter(a => (a.customData as any)?.type === 'unit')
-      .filter(a => a.controlledByPlayerId?.toString() === '2')
+      .filter(a => a.controlledByPlayerId?.toString() === this.playerID.toString())
       // Skip Gaia fauna - only use actual player-controlled units
       .filter(u => {
         const template = (u.customData as any)?.template || '';
@@ -435,7 +439,7 @@ Now output your immediate MOVE orders (be very specific):`;
     if (unitIds.length === 0 || !resourceId) return null;
 
     return {
-      playerID: 2,
+      playerID: this.playerID,
       json_cmd: {
         type: 'gather',
         entities: unitIds,
@@ -463,7 +467,7 @@ Now output your immediate MOVE orders (be very specific):`;
   private createAttackCommand(worldState: WorldState): GameCommand | null {
     const attackUnits = worldState.agents
       .filter(a => (a.customData as any)?.type === 'unit')
-      .filter(a => a.controlledByPlayerId?.toString() === '2')
+      .filter(a => a.controlledByPlayerId?.toString() === this.playerID.toString())
       // Skip Gaia fauna - only use actual player-controlled units
       .filter(u => {
         const template = (u.customData as any)?.template || '';
@@ -484,7 +488,7 @@ Now output your immediate MOVE orders (be very specific):`;
     if (unitIds.length === 0 || !targetId) return null;
 
     return {
-      playerID: 2,
+      playerID: this.playerID,
       json_cmd: {
         type: 'attack',
         entities: unitIds,
