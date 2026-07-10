@@ -82,7 +82,7 @@ export class TournamentOrchestrator {
           break;
         }
 
-        // Step 2: Get decisions from both brains simultaneously (actually sequential but same game state)
+        // Step 2: Get decisions from both brains (same game state for fairness)
         const decision1Start = Date.now();
         let decision1: BrainDecision;
         try {
@@ -104,9 +104,11 @@ export class TournamentOrchestrator {
         const decision2Latency = Date.now() - decision2Start;
 
         // Step 3: Prepare combined command set
+        // NOTE: RL Interface only controls one player, so we can only execute commands for that player
+        // Both brains decide, but only the RL-controlled player's commands execute
         const combinedCommands: GameCommand[] = [
-          ...decision1.commands,
-          ...decision2.commands,
+          ...decision1.commands.filter(cmd => cmd.playerID === 1), // Only Player 1 commands
+          ...decision2.commands.filter(cmd => cmd.playerID === 2), // Only Player 2 commands
         ];
 
         // Step 4: Execute all commands in one game tick

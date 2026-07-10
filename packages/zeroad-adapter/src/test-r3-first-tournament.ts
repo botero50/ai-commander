@@ -172,31 +172,43 @@ async function main() {
     console.log('\n[DECISION QUALITY]\n');
     console.log(brain.getReport());
 
-    // Final state from last decision
-    console.log('\n[FINAL STATE]\n');
+    // Final state analysis
+    console.log('\n[FINAL STATE ANALYSIS]\n');
+
+    // Get last decision to see final units
     const lastDecision = brain.decisions[brain.decisions.length - 1];
-    if (lastDecision) {
-      console.log(`Final Tick: ${lastDecision.tick}`);
-      console.log(`Player 1 (Petra AI/Athenians): ${lastDecision.player1Units} units`);
-      console.log(`Player 2 (Ollama/Gaul): ${lastDecision.player2Units} units`);
+    const initialDecision = brain.decisions[0];
+
+    if (lastDecision && initialDecision) {
+      console.log(`Match Duration: ${lastDecision.tick - initialDecision.tick} ticks`);
+      console.log('');
+      console.log(`Player 1 (Petra AI - Athenians):`);
+      console.log(`  Start: ${initialDecision.player1Units} units`);
+      console.log(`  End: ${lastDecision.player1Units} units`);
+      console.log(`  Change: ${lastDecision.player1Units - initialDecision.player1Units} units`);
+      console.log('');
+      console.log(`Player 2 (Ollama - Gaul):`);
+      console.log(`  Start: ${initialDecision.player2Units} units`);
+      console.log(`  End: ${lastDecision.player2Units} units`);
+      console.log(`  Change: ${lastDecision.player2Units - initialDecision.player2Units} units`);
 
       // Winner
-      console.log('\n[WINNER]\n');
+      console.log('\n[OUTCOME]\n');
       if (lastDecision.player1Units > 0 && lastDecision.player2Units === 0) {
-        console.log('🏆 PLAYER 1 (OLLAMA) WINS - Eliminated opponent!');
+        console.log('🏆 PLAYER 1 (PETRA AI) WINS - Eliminated opponent!');
       } else if (lastDecision.player2Units > 0 && lastDecision.player1Units === 0) {
-        console.log('🏆 PLAYER 2 (PETRA AI) WINS - Eliminated opponent!');
+        console.log('🏆 PLAYER 2 (OLLAMA) WINS - Eliminated opponent!');
       } else if (lastDecision.player1Units === 0 && lastDecision.player2Units === 0) {
         console.log('⚠ DRAW - Both players eliminated');
       } else {
-        const p1Score = lastDecision.player1Units * 2;
-        const p2Score = lastDecision.player2Units * 2;
+        const p1Score = lastDecision.player1Units;
+        const p2Score = lastDecision.player2Units;
         if (p1Score > p2Score) {
-          console.log(`🏆 PLAYER 1 (OLLAMA) LEADS - More units (${lastDecision.player1Units} vs ${lastDecision.player2Units})`);
+          console.log(`PLAYER 1 (PETRA AI) LEADS - ${lastDecision.player1Units} vs ${lastDecision.player2Units} units`);
         } else if (p2Score > p1Score) {
-          console.log(`🏆 PLAYER 2 (PETRA AI) LEADS - More units (${lastDecision.player2Units} vs ${lastDecision.player1Units})`);
+          console.log(`PLAYER 2 (OLLAMA) LEADS - ${lastDecision.player2Units} vs ${lastDecision.player1Units} units`);
         } else {
-          console.log(`⚠ TIED - Same unit count (${lastDecision.player1Units} each)`);
+          console.log(`TIED - Both have ${lastDecision.player1Units} units`);
         }
       }
     }
