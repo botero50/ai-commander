@@ -328,15 +328,35 @@ Now output your immediate MOVE orders (be very specific):`;
    * Gaia fauna (sheep, deer) have owner=0 and will not respond to commands
    */
   private createMoveCommand(worldState: WorldState): GameCommand | null {
-    const units = worldState.agents
+    // Get all units first
+    const allUnits = worldState.agents
       .filter(a => (a.customData as any)?.type === 'unit')
-      .filter(a => a.controlledByPlayerId?.toString() === '1')
-      // Skip Gaia fauna - only command actual player-controlled units
+      .filter(a => a.controlledByPlayerId?.toString() === '1');
+
+    // Debug log what we found
+    const templateSummary = allUnits.map(u => {
+      const template = (u.customData as any)?.template || 'unknown';
+      const isFauna = template.includes('fauna') || template.includes('flora');
+      return `${(u.customData as any)?.entityId}:${template}(fauna=${isFauna})`;
+    }).join(' | ');
+
+    this.logger.debug('Unit selection for Move command', {
+      allUnitsCount: allUnits.length,
+      unitSummary: templateSummary,
+    });
+
+    // Filter out fauna
+    const units = allUnits
       .filter(u => {
         const template = (u.customData as any)?.template || '';
         return !template.includes('fauna') && !template.includes('flora');
       })
       .slice(0, 3); // Limit to first 3 units
+
+    this.logger.debug('After fauna filter', {
+      selectedCount: units.length,
+      selectedIds: units.map(u => (u.customData as any)?.entityId).join(','),
+    });
 
     if (units.length === 0) return null;
 
@@ -353,7 +373,7 @@ Now output your immediate MOVE orders (be very specific):`;
     return {
       playerID: 1,
       json_cmd: {
-        type: 'Move',
+        type: 'move',
         entities: unitIds,
         x: Math.round(targetX),
         z: Math.round(targetZ),
@@ -390,7 +410,7 @@ Now output your immediate MOVE orders (be very specific):`;
     return {
       playerID: 1,
       json_cmd: {
-        type: 'Gather',
+        type: 'gather',
         entities: unitIds,
         target: resourceId,
         queued: false,
@@ -439,7 +459,7 @@ Now output your immediate MOVE orders (be very specific):`;
     return {
       playerID: 1,
       json_cmd: {
-        type: 'Attack',
+        type: 'attack',
         entities: unitIds,
         target: targetId,
         queued: false,
