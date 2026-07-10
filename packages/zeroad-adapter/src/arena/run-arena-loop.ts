@@ -105,6 +105,9 @@ async function killGame(): Promise<void> {
  * Start a fresh 0 A.D. instance with RL Interface
  */
 async function startGame(): Promise<ChildProcess> {
+  // Configure game before starting
+  await configureGame();
+
   logger.info('🟢 Starting fresh 0 A.D. instance...');
 
   const pyrogenesis =
@@ -117,6 +120,13 @@ async function startGame(): Promise<ChildProcess> {
     '-autostart=skirmishes/acropolis_bay_2p',
     '-autostart-ai=1:petra',
     '-autostart-ai=2:petra',
+    // Display options
+    '-fullscreen',           // Start in fullscreen/maximized
+    '-xres=1920',           // Resolution width (adjust if needed)
+    '-yres=1080',           // Resolution height (adjust if needed)
+    // Camera/zoom options for maximum overview
+    '-forcemultiplay',      // Skip splash screen
+    '-nointro',             // Skip intro video
   ]);
 
   gameProcess.on('error', error => {
@@ -132,6 +142,57 @@ async function startGame(): Promise<ChildProcess> {
   await sleep(GAME_STARTUP_WAIT);
 
   return gameProcess;
+}
+
+/**
+ * Configure 0 A.D. for maximum visibility (zoom out + camera settings)
+ */
+async function configureGame(): Promise<void> {
+  const fs = await import('fs').then(m => m.promises);
+  const path = require('path');
+
+  try {
+    logger.info('⚙️  Configuring 0 A.D. camera settings...');
+
+    const userDir = `${process.env.USERPROFILE}\\AppData\\Local\\0 A.D. Empires Ascendant`;
+    const configDir = path.join(userDir, 'config');
+    const configPath = path.join(configDir, 'user.cfg');
+
+    // Create config directory if it doesn't exist
+    try {
+      await fs.mkdir(configDir, { recursive: true });
+    } catch {
+      // Directory exists
+    }
+
+    // Read existing config or create new
+    let config = '';
+    try {
+      config = await fs.readFile(configPath, 'utf8');
+    } catch {
+      // File doesn't exist yet
+    }
+
+    // Set camera zoom to maximum (zoomed out)
+    // camera.distance controls zoom: higher = zoomed out
+    const zoomDistance = 'camera.distance = 300';
+
+    if (config.includes('camera.distance')) {
+      // Replace existing camera distance
+      config = config.replace(/camera\.distance\s*=\s*[\d.]+/g, zoomDistance);
+    } else {
+      // Add new camera distance setting
+      config += `\n${zoomDistance}\n`;
+    }
+
+    // Write back config
+    await fs.writeFile(configPath, config, 'utf8');
+    logger.info('✓ Camera configured for maximum zoom out');
+  } catch (error) {
+    logger.warn('Could not auto-configure camera settings', {
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
 }
 
 /**
