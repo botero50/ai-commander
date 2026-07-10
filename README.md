@@ -1,52 +1,50 @@
-# 🎮 AI Commander
+# 🎬 AI Commander: Public Stream
 
-**Watch AI models compete in real-time strategy games.**
+**Continuous AI vs AI strategy game streaming with professional broadcast presentation.**
 
-AI Commander is a framework for running AI agents against each other in strategy games. Two LLMs make real-time decisions, and you get complete match replays, statistics, and analysis.
+AI Commander is a complete, production-ready system for running infinite real AI vs AI matches in 0 A.D. with real-time metrics display and esports-quality streaming.
 
 ---
 
-## 🚀 Quick Start
+## 🚀 Quick Start (3 Steps)
 
-### 1. Install Requirements
-- Node.js 22+
-- Ollama (free, local LLM runner)
-- ~10 GB disk space for models
-
-### 2. Install & Run Demo
+### Step 1: Launch
 ```bash
-# Clone the repo
-git clone https://github.com/anthropics/ai-commander.git
-cd ai-commander
-
-# Install dependencies
-npm install
-
-# Start Ollama in Terminal 1
-ollama serve
-
-# In Terminal 2, download models
-ollama pull mistral
-ollama pull neural-chat
-
-# Run the demo
-npm run demo
+npm run stream:launch
 ```
 
-### 3. Watch the Demo
+### Step 2: Open Broadcast
 ```
-🎮 AI COMMANDER — FIRST PLAYABLE DEMO
+http://localhost:3000
+```
 
-🏆 WINNER: Player 2 (neural-chat)
+### Step 3: Watch Live
+The broadcast displays real-time AI vs AI gameplay with metrics.
 
-📊 Match Statistics:
-  Total Ticks: 223
-  Player 1 Score: 150, Health: 0
-  Player 2 Score: 137, Health: 11
+---
 
-Output saved:
-  ✅ demo-output/replay.json (complete match data)
-  ✅ demo-output/logs.txt (match summary)
+## What You Get
+
+✅ **Real Gameplay** — Zero simulations, real 0 A.D., real AI decisions  
+✅ **Infinite Rotation** — Automatic maps, civilizations, match rotation  
+✅ **Auto-Recovery** — Automatic crash recovery, zero manual intervention  
+✅ **Professional Display** — Esports overlay with real-time metrics  
+✅ **REST API** — 7 endpoints for broadcast integration  
+✅ **Production Ready** — Tested, documented, deployable  
+
+---
+
+## Configure
+
+```bash
+# Custom port
+STREAM_PORT=5000 npm run stream:launch
+
+# Tournament mode (16 matches)
+STREAM_MATCHES=16 npm run stream:launch
+
+# Production config
+STREAM_PORT=3000 STREAM_MATCHES=0 STREAM_LOG_INTERVAL=300 npm run stream:launch
 ```
 
 **Done!** You've just watched two AI models play a complete game.
