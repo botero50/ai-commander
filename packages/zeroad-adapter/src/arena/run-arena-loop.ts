@@ -66,6 +66,23 @@ const stats: ArenaStats = {
   wins: {},
 };
 
+// Track pending AI requests to avoid AbortError on shutdown
+let pendingAIRequests = 0;
+const MAX_WAIT_FOR_PENDING = 5000; // Wait max 5 seconds for pending requests
+
+/**
+ * Wait for pending AI requests to complete
+ */
+async function waitForPendingRequests(): Promise<void> {
+  const startTime = Date.now();
+  while (pendingAIRequests > 0 && Date.now() - startTime < MAX_WAIT_FOR_PENDING) {
+    await sleep(100);
+  }
+  if (pendingAIRequests > 0) {
+    logger.warn(`⏳ Shutdown timeout - ${pendingAIRequests} AI requests still pending`);
+  }
+}
+
 /**
  * Kill all running pyrogenesis processes
  */
@@ -221,6 +238,7 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
         // Get decision from brain only every N ticks (for speed)
         // Fire-and-forget: Send commands as soon as AI responds, don't wait
         if (tick % decisionFrequency === 0) {
+          pendingAIRequests++;
           brain.decide(worldState)
             .then(decision => {
               if (decision.commands && decision.commands.length > 0) {
@@ -237,6 +255,9 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
                 tick,
                 error: err instanceof Error ? err.message : String(err),
               });
+            })
+            .finally(() => {
+              pendingAIRequests--;
             });
         }
 
@@ -312,6 +333,12 @@ async function main() {
       // Run the match
       const success = await runMatch(gameProcess, matchNumber);
 
+      // Wait for pending AI requests before killing game
+      if (pendingAIRequests > 0) {
+        logger.info(`⏳ Waiting for ${pendingAIRequests} pending AI requests...`);
+        await waitForPendingRequests();
+      }
+
       // Kill the game after match
       await killGame();
 
@@ -345,12 +372,14 @@ async function main() {
 // Graceful shutdown
 process.on('SIGINT', async () => {
   logger.info('\n⏹️  Shutdown requested - cleaning up and stopping...');
+  await waitForPendingRequests();
   await killGame();
   process.exit(0);
 });
 
 process.on('SIGTERM', async () => {
   logger.info('\n⏹️  Termination requested - cleaning up and stopping...');
+  await waitForPendingRequests();
   await killGame();
   process.exit(0);
 });
