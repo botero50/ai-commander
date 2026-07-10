@@ -107,11 +107,13 @@ async function syncCameraModToGame(): Promise<void> {
     };
 
     copyDir(sourceModPath, destModPath);
-    logger.info('✓ camera_commander mod synced');
+    logger.info('✓ camera_commander mod synced successfully');
   } catch (error) {
-    logger.warn('Could not sync camera mod', {
+    logger.error('❌ Failed to sync camera mod', {
       error: error instanceof Error ? error.message : String(error),
+      stack: error instanceof Error ? error.stack : undefined,
     });
+    throw error;
   }
 }
 
@@ -166,10 +168,15 @@ async function killGame(): Promise<void> {
  * Start a fresh 0 A.D. instance with RL Interface
  */
 async function startGame(): Promise<ChildProcess> {
+  logger.info('Starting game initialization...');
+
   // Sync camera mod to game directory
+  logger.info('About to sync camera mod...');
   await syncCameraModToGame();
+  logger.info('Camera mod sync complete');
 
   // Configure game before starting
+  logger.info('Configuring game...');
   await configureGame();
   await sleep(500); // Let config file flush to disk
 
