@@ -21,6 +21,7 @@
 import { spawn, exec, type ChildProcess } from 'child_process';
 import { promisify } from 'util';
 import { RLHTTPClient } from '../rl-interface/http-client.js';
+import { WorldStateMapper } from '../rl-interface/world-state-mapper.js';
 import { OllamaAIBrain } from '../rl-interface/ollama-brain.js';
 import { Logger } from '../config/logger.js';
 
@@ -150,6 +151,7 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
     }
 
     const client = new RLHTTPClient(RL_HOST, RL_PORT, 10000, logger);
+    const worldStateMapper = new WorldStateMapper(logger);
 
     // Initialize Ollama brain
     const brain = new OllamaAIBrain(logger, {
@@ -177,10 +179,22 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
     // Main match loop
     while (tick < maxTicks && !matchWinner) {
       try {
-        // Get entities
-        const entities = Object.values(gameState.entities || {}) as any[];
-        const playerUnits = entities.filter((e: any) => e.owner === 1).length;
-        const enemyUnits = entities.filter((e: any) => e.owner === 2).length;
+        // Map raw game state to world state using the same mapper as test-r3-dual-ollama
+        gameState = await client.step([]);
+        const worldState = worldStateMapper.mapObservationToWorldState(gameState);
+
+        if (!worldState) {
+          logger.error('Failed to map world state');
+          break;
+        }
+
+        // Get unit counts
+        const playerUnits = worldState.agents.filter(
+          a => (a.customData as any)?.type === 'unit' && a.controlledByPlayerId?.toString() === '1'
+        ).length;
+        const enemyUnits = worldState.agents.filter(
+          a => (a.customData as any)?.type === 'unit' && a.controlledByPlayerId?.toString() === '2'
+        ).length;
 
         // Check win conditions
         if (playerUnits === 0) {
@@ -195,19 +209,13 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
           break;
         }
 
-        // Get decision from brain - convert RawGameState to WorldState format
-        const worldStateForBrain = {
-          tick: gameState.tick || 0,
-          timestamp: Date.now(),
-          missionId: 'arena-match',
-          agent: { playerId: 1, position: { x: 0, y: 0 }, health: 100, resources: 0 },
-          units: entities.filter((e: any) => e.owner === 1),
-          resources: [],
-          structures: [],
-          visibility: { visibleEnemyCount: enemyUnits, visibleResourceCount: 0 },
-        } as any;
-
-        const decision = await brain.decide(worldStateForBrain);
+        // Get decision from brain
+        const decision = await brain.decide(worldState).catch(err => ({
+          playerID: 1,
+          commands: [],
+          reasoning: `Error: ${err}`,
+          timestamp: new Date(),
+        }));
 
         // Send commands
         if (decision.commands && decision.commands.length > 0) {
