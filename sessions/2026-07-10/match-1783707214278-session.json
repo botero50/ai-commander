@@ -1,0 +1,1907 @@
+{
+  "metadata": {
+    "matchId": "match-1783707214278",
+    "map": "alpine_mountains_3p",
+    "players": 2,
+    "status": "stopped",
+    "duration": "0h 0m 0s",
+    "ticks": 100,
+    "createdAt": "2026-07-10T18:13:34.278Z",
+    "recordedAt": "2026-07-10T18:13:34.279Z"
+  },
+  "statistics": {
+    "totalEvents": 65,
+    "eventCounts": {
+      "match:started": 1,
+      "observation:received": 21,
+      "decision:completed": 21,
+      "command:executed": 21,
+      "match:ended": 1
+    },
+    "timelineEntries": 65,
+    "totalDurationSeconds": 0
+  },
+  "config": {
+    "matchId": "match-1783707214278",
+    "map": "alpine_mountains_3p",
+    "players": [
+      {
+        "id": 1,
+        "name": "Player1",
+        "civilization": "Athens",
+        "aiModel": "model-a",
+        "aiPrompt": "prompt-a"
+      },
+      {
+        "id": 2,
+        "name": "Player2",
+        "civilization": "Rome",
+        "aiModel": "model-b",
+        "aiPrompt": "prompt-b"
+      }
+    ]
+  },
+  "timeline": {
+    "entries": [
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "match:started",
+        "data": {
+          "matchId": "match-1783707214278",
+          "map": "alpine_mountains_3p",
+          "players": 2
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "observation:received",
+        "data": {
+          "tick": 0,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "decision:completed",
+        "data": {
+          "tick": 0,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "command:executed",
+        "data": {
+          "tick": 0,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "observation:received",
+        "data": {
+          "tick": 5,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "decision:completed",
+        "data": {
+          "tick": 5,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "command:executed",
+        "data": {
+          "tick": 5,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "observation:received",
+        "data": {
+          "tick": 10,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "decision:completed",
+        "data": {
+          "tick": 10,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "command:executed",
+        "data": {
+          "tick": 10,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "observation:received",
+        "data": {
+          "tick": 15,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "decision:completed",
+        "data": {
+          "tick": 15,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "command:executed",
+        "data": {
+          "tick": 15,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "observation:received",
+        "data": {
+          "tick": 20,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "decision:completed",
+        "data": {
+          "tick": 20,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "command:executed",
+        "data": {
+          "tick": 20,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "observation:received",
+        "data": {
+          "tick": 25,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "decision:completed",
+        "data": {
+          "tick": 25,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "command:executed",
+        "data": {
+          "tick": 25,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "observation:received",
+        "data": {
+          "tick": 30,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "decision:completed",
+        "data": {
+          "tick": 30,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "command:executed",
+        "data": {
+          "tick": 30,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "observation:received",
+        "data": {
+          "tick": 35,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "decision:completed",
+        "data": {
+          "tick": 35,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "command:executed",
+        "data": {
+          "tick": 35,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "observation:received",
+        "data": {
+          "tick": 40,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "decision:completed",
+        "data": {
+          "tick": 40,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "command:executed",
+        "data": {
+          "tick": 40,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "observation:received",
+        "data": {
+          "tick": 45,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "decision:completed",
+        "data": {
+          "tick": 45,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "command:executed",
+        "data": {
+          "tick": 45,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "observation:received",
+        "data": {
+          "tick": 50,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "decision:completed",
+        "data": {
+          "tick": 50,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "command:executed",
+        "data": {
+          "tick": 50,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "observation:received",
+        "data": {
+          "tick": 55,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "decision:completed",
+        "data": {
+          "tick": 55,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "command:executed",
+        "data": {
+          "tick": 55,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "observation:received",
+        "data": {
+          "tick": 60,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "decision:completed",
+        "data": {
+          "tick": 60,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "command:executed",
+        "data": {
+          "tick": 60,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "observation:received",
+        "data": {
+          "tick": 65,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "decision:completed",
+        "data": {
+          "tick": 65,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "command:executed",
+        "data": {
+          "tick": 65,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "observation:received",
+        "data": {
+          "tick": 70,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "decision:completed",
+        "data": {
+          "tick": 70,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "command:executed",
+        "data": {
+          "tick": 70,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "observation:received",
+        "data": {
+          "tick": 75,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "decision:completed",
+        "data": {
+          "tick": 75,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "command:executed",
+        "data": {
+          "tick": 75,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "observation:received",
+        "data": {
+          "tick": 80,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "decision:completed",
+        "data": {
+          "tick": 80,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "command:executed",
+        "data": {
+          "tick": 80,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "observation:received",
+        "data": {
+          "tick": 85,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "decision:completed",
+        "data": {
+          "tick": 85,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "command:executed",
+        "data": {
+          "tick": 85,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "observation:received",
+        "data": {
+          "tick": 90,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "decision:completed",
+        "data": {
+          "tick": 90,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "command:executed",
+        "data": {
+          "tick": 90,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "observation:received",
+        "data": {
+          "tick": 95,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "decision:completed",
+        "data": {
+          "tick": 95,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "command:executed",
+        "data": {
+          "tick": 95,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "observation:received",
+        "data": {
+          "tick": 100,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "decision:completed",
+        "data": {
+          "tick": 100,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "command:executed",
+        "data": {
+          "tick": 100,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:13:34.278Z",
+        "elapsedSeconds": 0,
+        "event": "match:ended",
+        "data": {
+          "matchId": "match-1783707214278",
+          "winner": 1,
+          "ticks": 100
+        }
+      }
+    ],
+    "startTime": "2026-07-10T18:13:34.278Z"
+  },
+  "events": {
+    "entries": [
+      {
+        "event": "match:started",
+        "data": {
+          "matchId": "match-1783707214278",
+          "map": "alpine_mountains_3p",
+          "players": [
+            {
+              "id": 1,
+              "name": "Player1",
+              "civilization": "Athens"
+            },
+            {
+              "id": 2,
+              "name": "Player2",
+              "civilization": "Rome"
+            }
+          ],
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 0,
+          "observation": {
+            "gameTime": 0,
+            "resources": {
+              "wood": 738.7598470212613,
+              "stone": 570.4160529739409,
+              "food": 590.9651615252335
+            },
+            "units": 34,
+            "buildings": 13
+          },
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 0,
+          "model": "model-a",
+          "prompt": "prompt-a",
+          "decision": {
+            "objective": "Build initial economy",
+            "confidence": 0.8350548362799678,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 950.0408626598277,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 0,
+          "command": {
+            "action": "build",
+            "target": "unit-4"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 5,
+          "observation": {
+            "gameTime": 0.5,
+            "resources": {
+              "wood": 969.1404466180816,
+              "stone": 424.65639950422434,
+              "food": 562.4767860007062
+            },
+            "units": 32,
+            "buildings": 8
+          },
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 5,
+          "model": "model-a",
+          "prompt": "prompt-a",
+          "decision": {
+            "objective": "Build initial economy",
+            "confidence": 0.9769304941004033,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 971.2013646979728,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 5,
+          "command": {
+            "action": "train",
+            "target": "unit-89"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 10,
+          "observation": {
+            "gameTime": 1,
+            "resources": {
+              "wood": 836.2192597583066,
+              "stone": 388.2301572005803,
+              "food": 483.43929179384725
+            },
+            "units": 28,
+            "buildings": 13
+          },
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 10,
+          "model": "model-a",
+          "prompt": "prompt-a",
+          "decision": {
+            "objective": "Build initial economy",
+            "confidence": 0.9641718482957615,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 957.2523780857796,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 10,
+          "command": {
+            "action": "train",
+            "target": "unit-70"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 15,
+          "observation": {
+            "gameTime": 1.5,
+            "resources": {
+              "wood": 664.0509075552184,
+              "stone": 503.01473000574686,
+              "food": 526.6188231126966
+            },
+            "units": 44,
+            "buildings": 6
+          },
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 15,
+          "model": "model-a",
+          "prompt": "prompt-a",
+          "decision": {
+            "objective": "Build initial economy",
+            "confidence": 0.934463341692976,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 808.8262028411355,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 15,
+          "command": {
+            "action": "train",
+            "target": "unit-10"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 20,
+          "observation": {
+            "gameTime": 2,
+            "resources": {
+              "wood": 729.1631946869729,
+              "stone": 392.71120281535013,
+              "food": 491.640026776243
+            },
+            "units": 46,
+            "buildings": 6
+          },
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 20,
+          "model": "model-a",
+          "prompt": "prompt-a",
+          "decision": {
+            "objective": "Build initial economy",
+            "confidence": 0.9520425756949866,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 969.9284813057081,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 20,
+          "command": {
+            "action": "train",
+            "target": "unit-42"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 25,
+          "observation": {
+            "gameTime": 2.5,
+            "resources": {
+              "wood": 866.0753209974873,
+              "stone": 482.98907141369887,
+              "food": 472.7695340689572
+            },
+            "units": 32,
+            "buildings": 5
+          },
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 25,
+          "model": "model-a",
+          "prompt": "prompt-a",
+          "decision": {
+            "objective": "Establish military presence",
+            "confidence": 0.8154838362325457,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 1002.3261518470161,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 25,
+          "command": {
+            "action": "train",
+            "target": "unit-95"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 30,
+          "observation": {
+            "gameTime": 3,
+            "resources": {
+              "wood": 758.410175861482,
+              "stone": 522.1111699285887,
+              "food": 469.8631138228283
+            },
+            "units": 42,
+            "buildings": 9
+          },
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 30,
+          "model": "model-a",
+          "prompt": "prompt-a",
+          "decision": {
+            "objective": "Establish military presence",
+            "confidence": 0.9378318449351992,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 1057.543231191785,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 30,
+          "command": {
+            "action": "train",
+            "target": "unit-13"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 35,
+          "observation": {
+            "gameTime": 3.5,
+            "resources": {
+              "wood": 974.3927995415714,
+              "stone": 382.1237892466329,
+              "food": 582.9616873317989
+            },
+            "units": 29,
+            "buildings": 6
+          },
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 35,
+          "model": "model-a",
+          "prompt": "prompt-a",
+          "decision": {
+            "objective": "Establish military presence",
+            "confidence": 0.8084577369114616,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 862.374414696497,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 35,
+          "command": {
+            "action": "train",
+            "target": "unit-23"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 40,
+          "observation": {
+            "gameTime": 4,
+            "resources": {
+              "wood": 832.5459773294272,
+              "stone": 540.6649002450308,
+              "food": 576.0916358300128
+            },
+            "units": 42,
+            "buildings": 9
+          },
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 40,
+          "model": "model-a",
+          "prompt": "prompt-a",
+          "decision": {
+            "objective": "Establish military presence",
+            "confidence": 0.7752496219877745,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 873.3223916436898,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 40,
+          "command": {
+            "action": "train",
+            "target": "unit-88"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 45,
+          "observation": {
+            "gameTime": 4.5,
+            "resources": {
+              "wood": 801.4076552743236,
+              "stone": 322.42750244601655,
+              "food": 517.8099900232965
+            },
+            "units": 49,
+            "buildings": 7
+          },
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 45,
+          "model": "model-a",
+          "prompt": "prompt-a",
+          "decision": {
+            "objective": "Establish military presence",
+            "confidence": 0.8221345601884914,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 1066.8609866344975,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 45,
+          "command": {
+            "action": "train",
+            "target": "unit-10"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 50,
+          "observation": {
+            "gameTime": 5,
+            "resources": {
+              "wood": 830.2548587756564,
+              "stone": 425.22164050213775,
+              "food": 510.61313882015736
+            },
+            "units": 20,
+            "buildings": 11
+          },
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 50,
+          "model": "model-a",
+          "prompt": "prompt-a",
+          "decision": {
+            "objective": "Expand territory",
+            "confidence": 0.8129297895720444,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 915.2508988265364,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 50,
+          "command": {
+            "action": "train",
+            "target": "unit-97"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 55,
+          "observation": {
+            "gameTime": 5.5,
+            "resources": {
+              "wood": 978.8921639068336,
+              "stone": 478.1244133319459,
+              "food": 418.48074099159487
+            },
+            "units": 41,
+            "buildings": 12
+          },
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 55,
+          "model": "model-a",
+          "prompt": "prompt-a",
+          "decision": {
+            "objective": "Expand territory",
+            "confidence": 0.899071537045575,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 1149.5716475891109,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 55,
+          "command": {
+            "action": "train",
+            "target": "unit-48"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 60,
+          "observation": {
+            "gameTime": 6,
+            "resources": {
+              "wood": 501.04466922678097,
+              "stone": 348.7029190332981,
+              "food": 493.17994995603533
+            },
+            "units": 31,
+            "buildings": 10
+          },
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 60,
+          "model": "model-a",
+          "prompt": "prompt-a",
+          "decision": {
+            "objective": "Expand territory",
+            "confidence": 0.8441294541757158,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 1103.4073459347042,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 60,
+          "command": {
+            "action": "train",
+            "target": "unit-8"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 65,
+          "observation": {
+            "gameTime": 6.5,
+            "resources": {
+              "wood": 679.2764990981141,
+              "stone": 426.64390094794123,
+              "food": 573.3197191739541
+            },
+            "units": 27,
+            "buildings": 9
+          },
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 65,
+          "model": "model-a",
+          "prompt": "prompt-a",
+          "decision": {
+            "objective": "Expand territory",
+            "confidence": 0.7765895497362021,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 1099.0115419145113,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 65,
+          "command": {
+            "action": "train",
+            "target": "unit-8"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 70,
+          "observation": {
+            "gameTime": 7,
+            "resources": {
+              "wood": 504.0223541298428,
+              "stone": 478.1874136549196,
+              "food": 473.0994172001133
+            },
+            "units": 25,
+            "buildings": 7
+          },
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 70,
+          "model": "model-a",
+          "prompt": "prompt-a",
+          "decision": {
+            "objective": "Expand territory",
+            "confidence": 0.8172504111681924,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 950.8911754737718,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 70,
+          "command": {
+            "action": "train",
+            "target": "unit-19"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 75,
+          "observation": {
+            "gameTime": 7.5,
+            "resources": {
+              "wood": 750.0523821498623,
+              "stone": 471.0280586483524,
+              "food": 418.12014642889494
+            },
+            "units": 47,
+            "buildings": 8
+          },
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 75,
+          "model": "model-a",
+          "prompt": "prompt-a",
+          "decision": {
+            "objective": "Prepare for endgame",
+            "confidence": 0.8031696648158624,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 915.1011137706103,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 75,
+          "command": {
+            "action": "train",
+            "target": "unit-26"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 80,
+          "observation": {
+            "gameTime": 8,
+            "resources": {
+              "wood": 927.7957566600537,
+              "stone": 431.92716515703216,
+              "food": 558.726987306766
+            },
+            "units": 30,
+            "buildings": 5
+          },
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 80,
+          "model": "model-a",
+          "prompt": "prompt-a",
+          "decision": {
+            "objective": "Prepare for endgame",
+            "confidence": 0.7303013194268249,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 1153.7527543308054,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 80,
+          "command": {
+            "action": "train",
+            "target": "unit-10"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 85,
+          "observation": {
+            "gameTime": 8.5,
+            "resources": {
+              "wood": 790.1161567510828,
+              "stone": 543.868960330265,
+              "food": 527.5211788400723
+            },
+            "units": 43,
+            "buildings": 9
+          },
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 85,
+          "model": "model-a",
+          "prompt": "prompt-a",
+          "decision": {
+            "objective": "Prepare for endgame",
+            "confidence": 0.8854961101213041,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 1121.086176346691,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 85,
+          "command": {
+            "action": "train",
+            "target": "unit-75"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 90,
+          "observation": {
+            "gameTime": 9,
+            "resources": {
+              "wood": 625.4188003420222,
+              "stone": 538.1507740608414,
+              "food": 414.86150250262386
+            },
+            "units": 29,
+            "buildings": 14
+          },
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 90,
+          "model": "model-a",
+          "prompt": "prompt-a",
+          "decision": {
+            "objective": "Prepare for endgame",
+            "confidence": 0.9669084909444875,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 923.7087888461461,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 90,
+          "command": {
+            "action": "train",
+            "target": "unit-77"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 95,
+          "observation": {
+            "gameTime": 9.5,
+            "resources": {
+              "wood": 745.7662196977184,
+              "stone": 503.0861409063673,
+              "food": 401.5880780824773
+            },
+            "units": 36,
+            "buildings": 10
+          },
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 95,
+          "model": "model-a",
+          "prompt": "prompt-a",
+          "decision": {
+            "objective": "Prepare for endgame",
+            "confidence": 0.7767868264488005,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 1155.041082075942,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 95,
+          "command": {
+            "action": "train",
+            "target": "unit-80"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 100,
+          "observation": {
+            "gameTime": 10,
+            "resources": {
+              "wood": 633.3964116999216,
+              "stone": 576.8373155919738,
+              "food": 407.9686077558838
+            },
+            "units": 24,
+            "buildings": 5
+          },
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 100,
+          "model": "model-a",
+          "prompt": "prompt-a",
+          "decision": {
+            "objective": "Prepare for endgame",
+            "confidence": 0.8580403204113016,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 1104.8709058778977,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707214278",
+          "playerId": 1,
+          "playerName": "Player1",
+          "tick": 100,
+          "command": {
+            "action": "build",
+            "target": "unit-81"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      },
+      {
+        "event": "match:ended",
+        "data": {
+          "matchId": "match-1783707214278",
+          "winner": {
+            "id": 1,
+            "name": "Player1"
+          },
+          "runners": [
+            {
+              "id": 2,
+              "name": "Player2"
+            }
+          ],
+          "duration": {
+            "ticks": 100,
+            "seconds": 10
+          },
+          "statistics": {
+            "totalCommands": 145,
+            "avgLatency": 1279,
+            "totalCost": 0.07062513597798567,
+            "commandSuccessRate": 0.902231934590169
+          },
+          "timestamp": "2026-07-10T18:13:34.278Z"
+        },
+        "timestamp": "2026-07-10T18:13:34.278Z"
+      }
+    ],
+    "statistics": {
+      "totalEvents": 65,
+      "eventCounts": {
+        "match:started": 1,
+        "observation:received": 21,
+        "decision:completed": 21,
+        "command:executed": 21,
+        "match:ended": 1
+      },
+      "matches": 1,
+      "errors": 0,
+      "lastEvent": "match:ended"
+    }
+  },
+  "summary": {
+    "matchId": "match-1783707214278",
+    "map": "alpine_mountains_3p",
+    "players": 2,
+    "status": "stopped",
+    "duration": "0h 0m 0s",
+    "ticks": 100
+  }
+}

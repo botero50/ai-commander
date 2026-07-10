@@ -1,0 +1,1907 @@
+{
+  "metadata": {
+    "matchId": "match-1783707174839",
+    "map": "alpine_mountains_3p",
+    "players": 2,
+    "status": "stopped",
+    "duration": "0h 0m 0s",
+    "ticks": 100,
+    "createdAt": "2026-07-10T18:12:54.839Z",
+    "recordedAt": "2026-07-10T18:12:54.842Z"
+  },
+  "statistics": {
+    "totalEvents": 65,
+    "eventCounts": {
+      "match:started": 1,
+      "observation:received": 21,
+      "decision:completed": 21,
+      "command:executed": 21,
+      "match:ended": 1
+    },
+    "timelineEntries": 65,
+    "totalDurationSeconds": 0
+  },
+  "config": {
+    "matchId": "match-1783707174839",
+    "map": "alpine_mountains_3p",
+    "players": [
+      {
+        "id": 1,
+        "name": "NeuralRTS",
+        "civilization": "Athens",
+        "aiModel": "ollama:neural-rts",
+        "aiPrompt": "aggressive-v1.0.0"
+      },
+      {
+        "id": 2,
+        "name": "Claude",
+        "civilization": "Rome",
+        "aiModel": "claude-opus-4-8",
+        "aiPrompt": "balanced-v1.0.0"
+      }
+    ]
+  },
+  "timeline": {
+    "entries": [
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "match:started",
+        "data": {
+          "matchId": "match-1783707174839",
+          "map": "alpine_mountains_3p",
+          "players": 2
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "observation:received",
+        "data": {
+          "tick": 0,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "decision:completed",
+        "data": {
+          "tick": 0,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "command:executed",
+        "data": {
+          "tick": 0,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "observation:received",
+        "data": {
+          "tick": 5,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "decision:completed",
+        "data": {
+          "tick": 5,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "command:executed",
+        "data": {
+          "tick": 5,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "observation:received",
+        "data": {
+          "tick": 10,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "decision:completed",
+        "data": {
+          "tick": 10,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "command:executed",
+        "data": {
+          "tick": 10,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "observation:received",
+        "data": {
+          "tick": 15,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "decision:completed",
+        "data": {
+          "tick": 15,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "command:executed",
+        "data": {
+          "tick": 15,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "observation:received",
+        "data": {
+          "tick": 20,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "decision:completed",
+        "data": {
+          "tick": 20,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "command:executed",
+        "data": {
+          "tick": 20,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "observation:received",
+        "data": {
+          "tick": 25,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "decision:completed",
+        "data": {
+          "tick": 25,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "command:executed",
+        "data": {
+          "tick": 25,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "observation:received",
+        "data": {
+          "tick": 30,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "decision:completed",
+        "data": {
+          "tick": 30,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "command:executed",
+        "data": {
+          "tick": 30,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "observation:received",
+        "data": {
+          "tick": 35,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "decision:completed",
+        "data": {
+          "tick": 35,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "command:executed",
+        "data": {
+          "tick": 35,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "observation:received",
+        "data": {
+          "tick": 40,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "decision:completed",
+        "data": {
+          "tick": 40,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "command:executed",
+        "data": {
+          "tick": 40,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "observation:received",
+        "data": {
+          "tick": 45,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "decision:completed",
+        "data": {
+          "tick": 45,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "command:executed",
+        "data": {
+          "tick": 45,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "observation:received",
+        "data": {
+          "tick": 50,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "decision:completed",
+        "data": {
+          "tick": 50,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "command:executed",
+        "data": {
+          "tick": 50,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "observation:received",
+        "data": {
+          "tick": 55,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "decision:completed",
+        "data": {
+          "tick": 55,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "command:executed",
+        "data": {
+          "tick": 55,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "observation:received",
+        "data": {
+          "tick": 60,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "decision:completed",
+        "data": {
+          "tick": 60,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "command:executed",
+        "data": {
+          "tick": 60,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "observation:received",
+        "data": {
+          "tick": 65,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "decision:completed",
+        "data": {
+          "tick": 65,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "command:executed",
+        "data": {
+          "tick": 65,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "observation:received",
+        "data": {
+          "tick": 70,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "decision:completed",
+        "data": {
+          "tick": 70,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "command:executed",
+        "data": {
+          "tick": 70,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "observation:received",
+        "data": {
+          "tick": 75,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "decision:completed",
+        "data": {
+          "tick": 75,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "command:executed",
+        "data": {
+          "tick": 75,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "observation:received",
+        "data": {
+          "tick": 80,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "decision:completed",
+        "data": {
+          "tick": 80,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "command:executed",
+        "data": {
+          "tick": 80,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "observation:received",
+        "data": {
+          "tick": 85,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "decision:completed",
+        "data": {
+          "tick": 85,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "command:executed",
+        "data": {
+          "tick": 85,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "observation:received",
+        "data": {
+          "tick": 90,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "decision:completed",
+        "data": {
+          "tick": 90,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "command:executed",
+        "data": {
+          "tick": 90,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "observation:received",
+        "data": {
+          "tick": 95,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "decision:completed",
+        "data": {
+          "tick": 95,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "command:executed",
+        "data": {
+          "tick": 95,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "observation:received",
+        "data": {
+          "tick": 100,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "decision:completed",
+        "data": {
+          "tick": 100,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "command:executed",
+        "data": {
+          "tick": 100,
+          "playerId": 1
+        }
+      },
+      {
+        "timestamp": "2026-07-10T18:12:54.841Z",
+        "elapsedSeconds": 0.001,
+        "event": "match:ended",
+        "data": {
+          "matchId": "match-1783707174839",
+          "winner": 1,
+          "ticks": 100
+        }
+      }
+    ],
+    "startTime": "2026-07-10T18:12:54.840Z"
+  },
+  "events": {
+    "entries": [
+      {
+        "event": "match:started",
+        "data": {
+          "matchId": "match-1783707174839",
+          "map": "alpine_mountains_3p",
+          "players": [
+            {
+              "id": 1,
+              "name": "NeuralRTS",
+              "civilization": "Athens"
+            },
+            {
+              "id": 2,
+              "name": "Claude",
+              "civilization": "Rome"
+            }
+          ],
+          "timestamp": "2026-07-10T18:12:54.840Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.840Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 0,
+          "observation": {
+            "gameTime": 0,
+            "resources": {
+              "wood": 893.8678383350145,
+              "stone": 474.1844015469195,
+              "food": 443.464384475516
+            },
+            "units": 36,
+            "buildings": 11
+          },
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 0,
+          "model": "ollama:neural-rts",
+          "prompt": "aggressive-v1.0.0",
+          "decision": {
+            "objective": "Build initial economy",
+            "confidence": 0.7498859948059073,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 863.0534450904029,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 0,
+          "command": {
+            "action": "build",
+            "target": "unit-27"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 5,
+          "observation": {
+            "gameTime": 0.5,
+            "resources": {
+              "wood": 835.0214823797758,
+              "stone": 387.8257385813969,
+              "food": 526.4192879808872
+            },
+            "units": 25,
+            "buildings": 6
+          },
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 5,
+          "model": "ollama:neural-rts",
+          "prompt": "aggressive-v1.0.0",
+          "decision": {
+            "objective": "Build initial economy",
+            "confidence": 0.8896745091009797,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 1092.8778753227384,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 5,
+          "command": {
+            "action": "train",
+            "target": "unit-78"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 10,
+          "observation": {
+            "gameTime": 1,
+            "resources": {
+              "wood": 651.7297771071144,
+              "stone": 581.6107199170101,
+              "food": 581.2955936358392
+            },
+            "units": 49,
+            "buildings": 10
+          },
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 10,
+          "model": "ollama:neural-rts",
+          "prompt": "aggressive-v1.0.0",
+          "decision": {
+            "objective": "Build initial economy",
+            "confidence": 0.8256954319346315,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 1139.3096507213213,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 10,
+          "command": {
+            "action": "train",
+            "target": "unit-81"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 15,
+          "observation": {
+            "gameTime": 1.5,
+            "resources": {
+              "wood": 542.8536007674388,
+              "stone": 582.9144433441049,
+              "food": 451.76536206617106
+            },
+            "units": 47,
+            "buildings": 11
+          },
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 15,
+          "model": "ollama:neural-rts",
+          "prompt": "aggressive-v1.0.0",
+          "decision": {
+            "objective": "Build initial economy",
+            "confidence": 0.9028036093273794,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 1097.7745884056844,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 15,
+          "command": {
+            "action": "train",
+            "target": "unit-69"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 20,
+          "observation": {
+            "gameTime": 2,
+            "resources": {
+              "wood": 608.124507677132,
+              "stone": 349.41768677464825,
+              "food": 598.5907766288994
+            },
+            "units": 26,
+            "buildings": 5
+          },
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 20,
+          "model": "ollama:neural-rts",
+          "prompt": "aggressive-v1.0.0",
+          "decision": {
+            "objective": "Build initial economy",
+            "confidence": 0.8612437751110065,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 1164.2807687627346,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 20,
+          "command": {
+            "action": "train",
+            "target": "unit-89"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 25,
+          "observation": {
+            "gameTime": 2.5,
+            "resources": {
+              "wood": 864.1795940404031,
+              "stone": 309.63586597203516,
+              "food": 444.56685886496234
+            },
+            "units": 42,
+            "buildings": 14
+          },
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 25,
+          "model": "ollama:neural-rts",
+          "prompt": "aggressive-v1.0.0",
+          "decision": {
+            "objective": "Establish military presence",
+            "confidence": 0.7060316179482291,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 864.1773144614884,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 25,
+          "command": {
+            "action": "train",
+            "target": "unit-24"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 30,
+          "observation": {
+            "gameTime": 3,
+            "resources": {
+              "wood": 590.3465285008532,
+              "stone": 301.848688216135,
+              "food": 460.71520768055547
+            },
+            "units": 48,
+            "buildings": 13
+          },
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 30,
+          "model": "ollama:neural-rts",
+          "prompt": "aggressive-v1.0.0",
+          "decision": {
+            "objective": "Establish military presence",
+            "confidence": 0.859119101150918,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 1182.1176333578287,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 30,
+          "command": {
+            "action": "train",
+            "target": "unit-97"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 35,
+          "observation": {
+            "gameTime": 3.5,
+            "resources": {
+              "wood": 883.3897579918843,
+              "stone": 411.1367720759066,
+              "food": 561.289580625647
+            },
+            "units": 41,
+            "buildings": 6
+          },
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 35,
+          "model": "ollama:neural-rts",
+          "prompt": "aggressive-v1.0.0",
+          "decision": {
+            "objective": "Establish military presence",
+            "confidence": 0.9741009251550421,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 920.714739919269,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 35,
+          "command": {
+            "action": "train",
+            "target": "unit-59"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 40,
+          "observation": {
+            "gameTime": 4,
+            "resources": {
+              "wood": 815.6411922312814,
+              "stone": 456.88479206663624,
+              "food": 463.47609658421817
+            },
+            "units": 39,
+            "buildings": 7
+          },
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 40,
+          "model": "ollama:neural-rts",
+          "prompt": "aggressive-v1.0.0",
+          "decision": {
+            "objective": "Establish military presence",
+            "confidence": 0.9224736048485638,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 1193.1590408159436,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 40,
+          "command": {
+            "action": "train",
+            "target": "unit-34"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 45,
+          "observation": {
+            "gameTime": 4.5,
+            "resources": {
+              "wood": 606.8627586913206,
+              "stone": 407.6525763603237,
+              "food": 436.8288101917662
+            },
+            "units": 41,
+            "buildings": 13
+          },
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 45,
+          "model": "ollama:neural-rts",
+          "prompt": "aggressive-v1.0.0",
+          "decision": {
+            "objective": "Establish military presence",
+            "confidence": 0.9933835151627748,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 1049.6220361898975,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 45,
+          "command": {
+            "action": "train",
+            "target": "unit-36"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 50,
+          "observation": {
+            "gameTime": 5,
+            "resources": {
+              "wood": 547.1972736440721,
+              "stone": 556.5721258442688,
+              "food": 497.5901780828461
+            },
+            "units": 45,
+            "buildings": 7
+          },
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 50,
+          "model": "ollama:neural-rts",
+          "prompt": "aggressive-v1.0.0",
+          "decision": {
+            "objective": "Expand territory",
+            "confidence": 0.9696487112867528,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 1096.612268566271,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 50,
+          "command": {
+            "action": "train",
+            "target": "unit-15"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 55,
+          "observation": {
+            "gameTime": 5.5,
+            "resources": {
+              "wood": 621.086159443671,
+              "stone": 382.97479271439954,
+              "food": 405.4606078005101
+            },
+            "units": 23,
+            "buildings": 13
+          },
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 55,
+          "model": "ollama:neural-rts",
+          "prompt": "aggressive-v1.0.0",
+          "decision": {
+            "objective": "Expand territory",
+            "confidence": 0.8410480645302174,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 859.1395723744021,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 55,
+          "command": {
+            "action": "train",
+            "target": "unit-24"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 60,
+          "observation": {
+            "gameTime": 6,
+            "resources": {
+              "wood": 919.8706034920508,
+              "stone": 521.892154316904,
+              "food": 537.5327076453025
+            },
+            "units": 46,
+            "buildings": 9
+          },
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 60,
+          "model": "ollama:neural-rts",
+          "prompt": "aggressive-v1.0.0",
+          "decision": {
+            "objective": "Expand territory",
+            "confidence": 0.7659211396862171,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 1153.8999873154119,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 60,
+          "command": {
+            "action": "train",
+            "target": "unit-92"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 65,
+          "observation": {
+            "gameTime": 6.5,
+            "resources": {
+              "wood": 942.5370649412239,
+              "stone": 302.61333176711145,
+              "food": 424.3027686800423
+            },
+            "units": 39,
+            "buildings": 10
+          },
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 65,
+          "model": "ollama:neural-rts",
+          "prompt": "aggressive-v1.0.0",
+          "decision": {
+            "objective": "Expand territory",
+            "confidence": 0.9095526798245295,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 1074.4719313685582,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 65,
+          "command": {
+            "action": "train",
+            "target": "unit-41"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 70,
+          "observation": {
+            "gameTime": 7,
+            "resources": {
+              "wood": 530.3590771332698,
+              "stone": 349.62588454799186,
+              "food": 419.4263991952533
+            },
+            "units": 45,
+            "buildings": 13
+          },
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 70,
+          "model": "ollama:neural-rts",
+          "prompt": "aggressive-v1.0.0",
+          "decision": {
+            "objective": "Expand territory",
+            "confidence": 0.7585883584768034,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 822.7673969150643,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 70,
+          "command": {
+            "action": "train",
+            "target": "unit-7"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 75,
+          "observation": {
+            "gameTime": 7.5,
+            "resources": {
+              "wood": 665.694551861669,
+              "stone": 452.2901692740676,
+              "food": 553.1501070748867
+            },
+            "units": 47,
+            "buildings": 6
+          },
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 75,
+          "model": "ollama:neural-rts",
+          "prompt": "aggressive-v1.0.0",
+          "decision": {
+            "objective": "Prepare for endgame",
+            "confidence": 0.8549517616504214,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 1156.2943585876496,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 75,
+          "command": {
+            "action": "train",
+            "target": "unit-3"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 80,
+          "observation": {
+            "gameTime": 8,
+            "resources": {
+              "wood": 978.6431846127598,
+              "stone": 399.0638730335937,
+              "food": 520.382123771898
+            },
+            "units": 26,
+            "buildings": 10
+          },
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 80,
+          "model": "ollama:neural-rts",
+          "prompt": "aggressive-v1.0.0",
+          "decision": {
+            "objective": "Prepare for endgame",
+            "confidence": 0.8331672226714145,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 808.3947999553812,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 80,
+          "command": {
+            "action": "train",
+            "target": "unit-85"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 85,
+          "observation": {
+            "gameTime": 8.5,
+            "resources": {
+              "wood": 755.8470588202545,
+              "stone": 542.917784930022,
+              "food": 545.2338446231104
+            },
+            "units": 42,
+            "buildings": 7
+          },
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 85,
+          "model": "ollama:neural-rts",
+          "prompt": "aggressive-v1.0.0",
+          "decision": {
+            "objective": "Prepare for endgame",
+            "confidence": 0.9422622398090397,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 948.0017499533479,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 85,
+          "command": {
+            "action": "train",
+            "target": "unit-40"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 90,
+          "observation": {
+            "gameTime": 9,
+            "resources": {
+              "wood": 651.8354091889228,
+              "stone": 479.6407234590374,
+              "food": 475.1897980255659
+            },
+            "units": 47,
+            "buildings": 10
+          },
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 90,
+          "model": "ollama:neural-rts",
+          "prompt": "aggressive-v1.0.0",
+          "decision": {
+            "objective": "Prepare for endgame",
+            "confidence": 0.8300640732427502,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 899.7120267125126,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 90,
+          "command": {
+            "action": "train",
+            "target": "unit-41"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 95,
+          "observation": {
+            "gameTime": 9.5,
+            "resources": {
+              "wood": 655.3158226998534,
+              "stone": 404.1143590610931,
+              "food": 565.5592624766782
+            },
+            "units": 25,
+            "buildings": 10
+          },
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 95,
+          "model": "ollama:neural-rts",
+          "prompt": "aggressive-v1.0.0",
+          "decision": {
+            "objective": "Prepare for endgame",
+            "confidence": 0.7372313367989715,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 1085.5648108145222,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 95,
+          "command": {
+            "action": "train",
+            "target": "unit-47"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "observation:received",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 100,
+          "observation": {
+            "gameTime": 10,
+            "resources": {
+              "wood": 900.3033643403762,
+              "stone": 505.04773032091475,
+              "food": 434.6778942674938
+            },
+            "units": 36,
+            "buildings": 8
+          },
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "decision:completed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 100,
+          "model": "ollama:neural-rts",
+          "prompt": "aggressive-v1.0.0",
+          "decision": {
+            "objective": "Prepare for endgame",
+            "confidence": 0.9538883958688307,
+            "reasoning": "Strategic decision based on game state"
+          },
+          "latency": 910.2499398753874,
+          "cost": 0.0001,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "command:executed",
+        "data": {
+          "matchId": "match-1783707174839",
+          "playerId": 1,
+          "playerName": "NeuralRTS",
+          "tick": 100,
+          "command": {
+            "action": "build",
+            "target": "unit-63"
+          },
+          "isValid": true,
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      },
+      {
+        "event": "match:ended",
+        "data": {
+          "matchId": "match-1783707174839",
+          "winner": {
+            "id": 1,
+            "name": "NeuralRTS"
+          },
+          "runners": [
+            {
+              "id": 2,
+              "name": "Claude"
+            }
+          ],
+          "duration": {
+            "ticks": 100,
+            "seconds": 10
+          },
+          "statistics": {
+            "totalCommands": 144,
+            "avgLatency": 1356,
+            "totalCost": 0.03082186037009567,
+            "commandSuccessRate": 0.9873981494355261
+          },
+          "timestamp": "2026-07-10T18:12:54.841Z"
+        },
+        "timestamp": "2026-07-10T18:12:54.841Z"
+      }
+    ],
+    "statistics": {
+      "totalEvents": 65,
+      "eventCounts": {
+        "match:started": 1,
+        "observation:received": 21,
+        "decision:completed": 21,
+        "command:executed": 21,
+        "match:ended": 1
+      },
+      "matches": 1,
+      "errors": 0,
+      "lastEvent": "match:ended"
+    }
+  },
+  "summary": {
+    "matchId": "match-1783707174839",
+    "map": "alpine_mountains_3p",
+    "players": 2,
+    "status": "stopped",
+    "duration": "0h 0m 0s",
+    "ticks": 100
+  }
+}
