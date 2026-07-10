@@ -5,6 +5,8 @@
  * Called by AI Commander to move camera during matches.
  */
 
+print("[CameraCommander] Loading camera control mod...");
+
 var CameraControl = {
   // Current camera position
   position: {
@@ -21,12 +23,13 @@ var CameraControl = {
   moveDuration: 0,
   targetX: 128,
   targetZ: 128,
+  callCount: 0,
 
   /**
    * Initialize camera control
    */
   Init: function() {
-    print("[CameraCommander] Camera control initialized");
+    print("[CameraCommander] ✓ Camera control initialized");
   },
 
   /**
@@ -34,7 +37,8 @@ var CameraControl = {
    */
   PanTo: function(x, z, duration) {
     duration = duration || 1000;
-    print("[CameraCommander] Panning to (" + x + ", " + z + ") over " + duration + "ms");
+    this.callCount++;
+    print("[CameraCommander] PanTo called (#" + this.callCount + "): (" + x + ", " + z + ") over " + duration + "ms");
 
     this.targetX = x;
     this.targetZ = z;
@@ -118,4 +122,6 @@ var CameraControl = {
 // Export camera control globally
 Engine.RegisterGlobal("CameraControl", CameraControl);
 
-print("[CameraCommander] Camera control registered globally");
+print("[CameraCommander] ✓ Camera control registered globally");
+print("[CameraCommander] CameraControl.PanTo = " + typeof CameraControl.PanTo);
+print("[CameraCommander] Ready to receive camera commands");
