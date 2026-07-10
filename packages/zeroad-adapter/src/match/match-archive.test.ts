@@ -204,17 +204,15 @@ describe('MatchArchive', () => {
     };
 
     // Archive 3 matches
-    const ids = [
-      archive.archive(matchData),
-      archive.archive(matchData),
-      archive.archive(matchData),
-    ];
+    archive.archive(matchData);
+    archive.archive(matchData);
+    archive.archive(matchData);
 
     const matches = archive.listMatches();
 
     expect(matches.length).toBe(3);
     expect(matches[0].matchId).toBeDefined();
-    expect(matches[0].map).toBe('acropolis_bay_2p');
+    expect(matches[0].ticks).toBe(300);
   });
 
   it('should return stats across all matches', () => {

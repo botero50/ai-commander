@@ -8,12 +8,13 @@
  *   ├── telemetry.json      (tick-by-tick data)
  *   ├── config.json         (game config + AI models)
  *   ├── stats.json          (computed statistics)
- *   └── metadata.json       (match metadata)
+ *   └── metadata.json       (match metadata with detailed config)
  */
 
 import * as fs from 'fs';
 import * as path from 'path';
 import { Logger } from '../config/logger.js';
+import type { MatchMetadata } from './match-metadata.js';
 
 export interface MatchArchiveData {
   matchId: string;
@@ -32,6 +33,7 @@ export interface MatchArchiveData {
   gameVersion: string;
   statistics: MatchStatistics;
   tickHistory: any[];
+  metadata?: MatchMetadata; // Optional detailed metadata
 }
 
 export interface PlayerInfo {
@@ -163,34 +165,49 @@ export class MatchArchive {
     const statsFile = path.join(matchDir, 'stats.json');
     fs.writeFileSync(statsFile, JSON.stringify(data.statistics, null, 2));
 
-    // 5. Metadata
+    // 5. Metadata (simple summary or detailed if provided)
     const metadataFile = path.join(matchDir, 'metadata.json');
     const winner = data.winner
       ? `Player ${data.winner.playerId} (${data.winner.reason})`
       : 'None (tick limit)';
 
-    fs.writeFileSync(
-      metadataFile,
-      JSON.stringify(
-        {
-          matchId,
-          timestamp: now,
-          duration: {
-            ms: data.duration.totalMs,
-            seconds: data.duration.totalSeconds,
-            minutes: (data.duration.totalMs / 1000 / 60).toFixed(1),
-          },
-          map: data.map,
-          gameVersion: data.gameVersion,
-          players: data.players.length,
-          ticks: data.duration.ticks,
-          winner,
-          path: matchDir,
+    const metadataSummary = data.metadata || {
+      matchId,
+      timestamp: now,
+      duration: {
+        realTimeMs: data.duration.totalMs,
+        realTimeSeconds: data.duration.totalSeconds,
+        gameTicksCompleted: data.duration.ticks,
+      },
+      game: {
+        map: data.map,
+        gameVersion: data.gameVersion,
+        adapterVersion: 'unknown',
+        difficulty: 'moderate',
+        speed: 'normal',
+        gameType: 'skirmish',
+      },
+      players: data.players.map(p => ({
+        id: p.id,
+        civilization: p.civilization,
+        ai: {
+          id: `${p.brain.toLowerCase()}-default`,
+          name: p.brain,
+          type: p.brain.toLowerCase(),
         },
-        null,
-        2
-      )
-    );
+      })),
+      winner: data.winner
+        ? { playerId: data.winner.playerId, reason: data.winner.reason }
+        : undefined,
+      environment: {
+        os: process.platform,
+        node: process.version,
+        cpuCores: require('os').cpus().length,
+        memoryMb: Math.round(require('os').totalmem() / 1024 / 1024),
+      },
+    };
+
+    fs.writeFileSync(metadataFile, JSON.stringify(metadataSummary, null, 2));
 
     this.logger.info('Match fully archived', { matchId, directory: matchDir });
     return matchId;
@@ -224,8 +241,8 @@ export class MatchArchive {
   listMatches(limit: number = 100): Array<{
     matchId: string;
     timestamp: string;
-    map: string;
-    winner: string;
+    map?: string;
+    winner?: string;
     ticks: number;
   }> {
     const matches: Array<any> = [];
@@ -245,9 +262,9 @@ export class MatchArchive {
           matches.push({
             matchId: metadata.matchId,
             timestamp: metadata.timestamp,
-            map: metadata.map,
+            map: metadata.game?.map || metadata.map,
             winner: metadata.winner,
-            ticks: metadata.ticks,
+            ticks: metadata.duration?.gameTicksCompleted || metadata.ticks,
           });
         }
       }
