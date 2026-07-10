@@ -31,14 +31,23 @@ const RL_HOST = '127.0.0.1';
 const RL_PORT = 6000;
 const GAME_STARTUP_WAIT = 8000; // Wait 8 seconds for game to start
 const RL_CONNECT_TIMEOUT = 30000; // Try to connect for 30 seconds
-const OLLAMA_MODEL = 'neural-chat:latest';
+
+// Model options (from fastest to most capable):
+// - 'tinyllama:latest'     - Fastest (637MB) - recommended for speed
+// - 'mistral:latest'       - Fast (4.1GB) - balanced
+// - 'neural-chat:latest'   - Slower (4.1GB) - most capable
+const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'tinyllama:latest'; // Use tinyllama for speed by default
 
 // Parse CLI arguments
 const args = process.argv.slice(2);
 let maxMatches = 0; // 0 = infinite
+let decisionFrequency = 1; // Make decision every N ticks (1 = every tick, 5 = every 5 ticks = faster)
 for (let i = 0; i < args.length; i++) {
   if (args[i] === '--matches' && i + 1 < args.length) {
     maxMatches = parseInt(args[i + 1], 10);
+    i++;
+  } else if (args[i] === '--freq' && i + 1 < args.length) {
+    decisionFrequency = parseInt(args[i + 1], 10);
     i++;
   }
 }
@@ -209,17 +218,21 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
           break;
         }
 
-        // Get decision from brain
-        const decision = await brain.decide(worldState).catch(err => ({
-          playerID: 1,
-          commands: [],
-          reasoning: `Error: ${err}`,
-          timestamp: new Date(),
-        }));
+        // Get decision from brain only every N ticks (for speed)
+        let commands: any[] = [];
+        if (tick % decisionFrequency === 0) {
+          const decision = await brain.decide(worldState).catch(err => ({
+            playerID: 1,
+            commands: [],
+            reasoning: `Error: ${err}`,
+            timestamp: new Date(),
+          }));
+          commands = decision.commands || [];
+        }
 
         // Send commands
-        if (decision.commands && decision.commands.length > 0) {
-          gameState = await client.step(decision.commands);
+        if (commands && commands.length > 0) {
+          gameState = await client.step(commands);
         } else {
           gameState = await client.step([]);
         }
