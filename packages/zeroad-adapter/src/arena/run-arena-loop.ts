@@ -20,6 +20,8 @@
 
 import { spawn, exec, type ChildProcess } from 'child_process';
 import { promisify } from 'util';
+import * as fs from 'fs';
+import * as path from 'path';
 import { RLHTTPClient } from '../rl-interface/http-client.js';
 import { WorldStateMapper } from '../rl-interface/world-state-mapper.js';
 import { OllamaAIBrain } from '../rl-interface/ollama-brain.js';
@@ -57,6 +59,50 @@ for (let i = 0; i < args.length; i++) {
 }
 
 const logger = new Logger('info', 'ArenaLoop');
+
+/**
+ * Sync camera_commander mod to 0 A.D. mods directory
+ */
+async function syncCameraModToGame(): Promise<void> {
+  try {
+    const sourceModPath = path.join(__dirname, '../mods/camera_commander');
+    const destModDir = `${process.env.USERPROFILE}\\AppData\\Local\\0 A.D. Empires Ascendant\\binaries\\data\\mods`;
+    const destModPath = path.join(destModDir, 'camera_commander');
+
+    logger.info('⚙️  Syncing camera_commander mod...');
+
+    // Remove old mod if it exists
+    if (fs.existsSync(destModPath)) {
+      try {
+        fs.rmSync(destModPath, { recursive: true, force: true });
+      } catch (err) {
+        logger.warn('Could not remove old mod directory', { error: String(err) });
+      }
+    }
+
+    // Copy mod files
+    const copyDir = (src: string, dest: string) => {
+      fs.mkdirSync(dest, { recursive: true });
+      const files = fs.readdirSync(src);
+      for (const file of files) {
+        const srcFile = path.join(src, file);
+        const destFile = path.join(dest, file);
+        if (fs.statSync(srcFile).isDirectory()) {
+          copyDir(srcFile, destFile);
+        } else {
+          fs.copyFileSync(srcFile, destFile);
+        }
+      }
+    };
+
+    copyDir(sourceModPath, destModPath);
+    logger.info('✓ camera_commander mod synced');
+  } catch (error) {
+    logger.warn('Could not sync camera mod', {
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+}
 
 interface ArenaStats {
   matchesCompleted: number;
@@ -109,6 +155,9 @@ async function killGame(): Promise<void> {
  * Start a fresh 0 A.D. instance with RL Interface
  */
 async function startGame(): Promise<ChildProcess> {
+  // Sync camera mod to game directory
+  await syncCameraModToGame();
+
   // Configure game before starting
   await configureGame();
   await sleep(500); // Let config file flush to disk
