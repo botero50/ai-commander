@@ -18,6 +18,7 @@
 import { RLHTTPClient } from './rl-interface/http-client.js';
 import { WorldStateMapper } from './rl-interface/world-state-mapper.js';
 import { OllamaAIBrain } from './rl-interface/ollama-brain.js';
+import { MatchArchive } from './match/match-archive.js';
 import { Logger } from './config/logger.js';
 import type { GameCommand } from './rl-interface/http-client.js';
 import type { RawGameState } from './rl-interface/types.js';
@@ -49,6 +50,7 @@ async function main() {
   const logger = new Logger('info');
   const client = new RLHTTPClient(RL_HOST, RL_PORT, 10000, logger);
   const worldStateMapper = new WorldStateMapper(logger);
+  const archive = new MatchArchive('./matches', logger);
 
   // Create one Ollama brain for Player 1 (the human slot)
   // RL Interface can only control the human player - Player 2 & 3 are Petra AI
@@ -195,37 +197,55 @@ async function main() {
       console.log(`TIED - Both have ${lastTick.player1Units} units`);
     }
 
-    // Save results
-    const resultsPath = 'tournament-results-dual-ollama.json';
-    fs.writeFileSync(
-      resultsPath,
-      JSON.stringify(
+    // Archive match using Match Archive service
+    const matchId = archive.archive({
+      duration: { totalMs: duration, totalSeconds: duration / 1000, ticks: ticksCompleted },
+      players: [
         {
-          timestamp: new Date().toISOString(),
-          story: 'R3.1 - Ollama vs Petra AI Tournament (2-Player)',
-          configuration: {
-            maxTicks: MAX_TICKS,
-            model: OLLAMA_MODEL,
-            map: 'acropolis_bay_2p',
-            player1: { id: 1, brain: 'Ollama', controlledVia: 'RL Interface (human slot)' },
-            player2: { id: 2, brain: 'Petra AI', controlledVia: 'Game AI' },
-            strategy: 'Ollama controls Player 1. Petra AI controls Player 2.',
-            rlInterfaceConstraint: 'Can only control ONE player (the human player slot)',
-          },
-          duration: { totalMs: duration, totalSeconds: (duration / 1000).toFixed(1) },
-          ticksCompleted,
-          finalState: {
-            player1Units: lastTick.player1Units,
-            player2Units: lastTick.player2Units,
-          },
-          tickHistory,
+          id: 1,
+          civilization: 'Athenians',
+          brain: 'Ollama',
+          startingUnits: firstTick.player1Units,
+          endingUnits: lastTick.player1Units,
+          totalCommands: tickHistory.reduce((sum, t) => sum + t.player1Commands, 0),
         },
-        null,
-        2
-      )
-    );
+        {
+          id: 2,
+          civilization: 'Spartans',
+          brain: 'Petra',
+          startingUnits: firstTick.player2Units,
+          endingUnits: lastTick.player2Units,
+          totalCommands: 0,
+        },
+      ],
+      winner: lastTick.player1Units > 0 && lastTick.player2Units === 0
+        ? { playerId: 1, reason: 'elimination' }
+        : lastTick.player2Units > 0 && lastTick.player1Units === 0
+          ? { playerId: 2, reason: 'elimination' }
+          : null,
+      map: 'acropolis_bay_2p',
+      gameVersion: '0.26.13',
+      statistics: {
+        player1: {
+          units: { start: firstTick.player1Units, end: lastTick.player1Units, growth: lastTick.player1Units - firstTick.player1Units },
+          commands: tickHistory.reduce((sum, t) => sum + t.player1Commands, 0),
+          commandsPerTick: tickHistory.reduce((sum, t) => sum + t.player1Commands, 0) / ticksCompleted,
+        },
+        player2: {
+          units: { start: firstTick.player2Units, end: lastTick.player2Units, growth: lastTick.player2Units - firstTick.player2Units },
+          commands: 0,
+          commandsPerTick: 0,
+        },
+        totalCommands: tickHistory.reduce((sum, t) => sum + t.totalCommands, 0),
+        commandThroughput: tickHistory.reduce((sum, t) => sum + t.totalCommands, 0) / (duration / 1000),
+        activeTicks: tickHistory.filter(t => t.totalCommands > 0).length,
+        idleTicks: tickHistory.filter(t => t.totalCommands === 0).length,
+        idlePercentage: (tickHistory.filter(t => t.totalCommands === 0).length / ticksCompleted) * 100,
+      },
+      tickHistory,
+    });
 
-    console.log(`\nTournament results saved to ${resultsPath}`);
+    console.log(`\n✓ Match archived with ID: ${matchId}`);
 
     // Shutdown
     await brain1.shutdown();
