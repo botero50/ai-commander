@@ -64,13 +64,9 @@ async function main() {
     playerID: 1, // Controls Player 1 (Athenians) via RL Interface
   });
 
-  // brain2 is unused - we're not trying to control P2 via RL Interface
-  const brain2 = { shutdown: async () => {} } as any;
-
   try {
     await brain1.initialize();
-    await brain2.initialize();
-    console.log(`[INIT] ✓ Two Ollama brains initialized (model: ${OLLAMA_MODEL})\n`);
+    console.log(`[INIT] ✓ Ollama brain initialized (model: ${OLLAMA_MODEL})\n`);
 
     // Get initial state
     console.log('[INIT] Fetching initial game state...');
@@ -240,7 +236,6 @@ async function main() {
 
     // Shutdown
     await brain1.shutdown();
-    await brain2.shutdown();
 
     console.log('\n╔════════════════════════════════════════════════════════════╗');
     console.log('║  ✓ OLLAMA vs DUAL PETRA AI: COMPLETE                    ║');
