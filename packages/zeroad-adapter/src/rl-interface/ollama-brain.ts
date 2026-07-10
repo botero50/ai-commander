@@ -296,23 +296,23 @@ Now output your immediate MOVE orders (be very specific):`;
         }
       }
 
-      // EXPAND or BUILD action (disabled - format issues with 0 A.D.)
-      // if (trimmed.startsWith('EXPAND') || trimmed.startsWith('BUILD')) {
-      //   const buildCmd = this.createBuildCommand(worldState);
-      //   if (buildCmd) commands.push(buildCmd);
-      // }
+      // GATHER action
+      if (trimmed.startsWith('GATHER')) {
+        const gatherCmd = this.createGatherCommand(worldState);
+        if (gatherCmd) {
+          commands.push(gatherCmd);
+          this.logger.debug('Parsed GATHER command from Ollama response');
+        }
+      }
 
-      // GATHER action (disabled - format issues)
-      // if (trimmed.startsWith('GATHER')) {
-      //   const gatherCmd = this.createGatherCommand(worldState);
-      //   if (gatherCmd) commands.push(gatherCmd);
-      // }
-
-      // ATTACK action (disabled - format issues)
-      // if (trimmed.startsWith('ATTACK')) {
-      //   const attackCmd = this.createAttackCommand(worldState);
-      //   if (attackCmd) commands.push(attackCmd);
-      // }
+      // ATTACK action
+      if (trimmed.startsWith('ATTACK')) {
+        const attackCmd = this.createAttackCommand(worldState);
+        if (attackCmd) {
+          commands.push(attackCmd);
+          this.logger.debug('Parsed ATTACK command from Ollama response');
+        }
+      }
 
       // Limit to 2 commands per tick (reasonable for RTS AI)
       if (commands.length >= 2) break;

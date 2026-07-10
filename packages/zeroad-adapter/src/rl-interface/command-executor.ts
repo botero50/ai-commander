@@ -48,7 +48,7 @@ export namespace Commands {
     queued = false
   ): unknown {
     return {
-      type: 'Move',
+      type: 'move',
       entities,
       x: Math.round(x),
       z: Math.round(z),
@@ -68,7 +68,7 @@ export namespace Commands {
     queued = false
   ): unknown {
     return {
-      type: 'Attack',
+      type: 'attack',
       entities,
       target,
       queued,
@@ -87,7 +87,7 @@ export namespace Commands {
     queued = false
   ): unknown {
     return {
-      type: 'Gather',
+      type: 'gather',
       entities,
       target,
       queued,
@@ -110,7 +110,7 @@ export namespace Commands {
     angle = 0
   ): unknown {
     return {
-      type: 'Build',
+      type: 'build',
       playerID,
       template,
       x: Math.round(x),
@@ -133,7 +133,7 @@ export namespace Commands {
     buildingEntity: number
   ): unknown {
     return {
-      type: 'Train',
+      type: 'train',
       playerID,
       template,
       count,
@@ -153,7 +153,7 @@ export namespace Commands {
     buildingEntity: number
   ): unknown {
     return {
-      type: 'Research',
+      type: 'research',
       playerID,
       technology,
       buildingEntity,
@@ -163,14 +163,14 @@ export namespace Commands {
   /**
    * Set stance (aggressive/defensive/passive)
    * @param entities Entity IDs
-   * @param stance One of: "Aggressive", "Defensive", "Passive"
+   * @param stance One of: "aggressive", "defensive", "passive"
    */
   export function SetStance(
     entities: number[],
-    stance: 'Aggressive' | 'Defensive' | 'Passive'
+    stance: 'aggressive' | 'defensive' | 'passive'
   ): unknown {
     return {
-      type: 'SetStance',
+      type: 'setstance',
       entities,
       stance,
     };
@@ -183,7 +183,7 @@ export namespace Commands {
    */
   export function Repair(entities: number[], target: number): unknown {
     return {
-      type: 'Repair',
+      type: 'repair',
       entities,
       target,
     };
@@ -195,7 +195,7 @@ export namespace Commands {
    */
   export function CancelOrder(entities: number[]): unknown {
     return {
-      type: 'CancelOrder',
+      type: 'stop',
       entities,
     };
   }
