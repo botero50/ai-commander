@@ -104,6 +104,9 @@ export class AILoopOrchestrator {
 
   /**
    * Run the complete AI loop for N ticks
+   *
+   * Non-blocking mode: While brain decides, advance game with empty ticks.
+   * Only decision ticks count toward the N ticks limit.
    */
   async runLoop(ticks: number): Promise<LoopState> {
     this.state.running = true;
@@ -118,17 +121,91 @@ export class AILoopOrchestrator {
         await this.brain.initialize();
       }
 
-      // Main loop
-      for (let i = 0; i < ticks; i++) {
-        const tickMetrics = await this.runTick();
-        this.state.metrics.push(tickMetrics);
-        this.state.currentTick = tickMetrics.tick;
+      let decisionCount = 0;
+      let lastDecision: Promise<BrainDecision> | null = null;
+      let lastRawState: RawGameState | null = null;
+      let lastWorldState: WorldState | null = null;
 
-        // Log progress
-        if ((i + 1) % Math.max(1, Math.floor(ticks / 10)) === 0) {
-          this.logger.info(`AI Loop progress: ${i + 1}/${ticks} ticks`, {
-            avgLatency: this.getAverageLatency(),
-          });
+      // Main loop - advance game continuously
+      while (decisionCount < ticks) {
+        // Step 1: Collect observation (no decision tick yet)
+        const obsStart = Date.now();
+        const rawState = await this.client.step(lastDecision ? [] : []);
+        const obsTime = Date.now() - obsStart;
+
+        // Step 2: If last decision finished, execute it
+        let decisionMetrics: LoopMetrics | null = null;
+        if (lastDecision && lastRawState && lastWorldState) {
+          try {
+            const decision = await lastDecision;
+            decisionMetrics = await this.executeDecision(
+              lastRawState,
+              lastWorldState,
+              decision,
+              obsTime
+            );
+            this.state.metrics.push(decisionMetrics);
+            decisionCount++;
+            this.state.currentTick = decisionMetrics.tick;
+            lastDecision = null;
+
+            // Log progress
+            if (decisionCount % Math.max(1, Math.floor(ticks / 10)) === 0) {
+              this.logger.info(`AI Loop progress: ${decisionCount}/${ticks} ticks`, {
+                avgLatency: this.getAverageLatency(),
+              });
+            }
+          } catch (error) {
+            this.logger.error('Failed to execute decision', { error: String(error) });
+            lastDecision = null;
+          }
+        }
+
+        // Step 3: If no decision pending, start a new one
+        if (!lastDecision && decisionCount < ticks) {
+          // Validate observation
+          const validation = await this.observationReceiver.receiveObservation(rawState);
+
+          // Map to WorldState
+          try {
+            const worldState = this.worldStateMapper.mapObservationToWorldState(rawState);
+
+            // Start brain decision in background (don't wait)
+            lastDecision = this.brain.decide(worldState);
+            lastRawState = rawState;
+            lastWorldState = worldState;
+
+            this.logger.debug('Brain decision started (non-blocking)', {
+              decisionNumber: decisionCount + 1,
+            });
+          } catch (error) {
+            this.logger.error('Failed to map observation', { error: String(error) });
+          }
+        }
+
+        // Step 4: Continue advancing game (empty ticks) if decision is pending
+        if (lastDecision) {
+          // Non-blocking: just advance the game, collect observations
+          // Don't wait for decision
+          await new Promise(resolve => setTimeout(resolve, 10)); // Small delay to avoid busy loop
+        }
+      }
+
+      // Wait for any final pending decision
+      if (lastDecision && lastRawState && lastWorldState && decisionCount < ticks) {
+        try {
+          const decision = await lastDecision;
+          const decisionMetrics = await this.executeDecision(
+            lastRawState,
+            lastWorldState,
+            decision,
+            0
+          );
+          this.state.metrics.push(decisionMetrics);
+          decisionCount++;
+          this.state.currentTick = decisionMetrics.tick;
+        } catch (error) {
+          this.logger.error('Failed to execute final decision', { error: String(error) });
         }
       }
 
@@ -145,6 +222,56 @@ export class AILoopOrchestrator {
       this.logger.error('AI loop failed', { error: String(error) });
       throw error;
     }
+  }
+
+  /**
+   * Execute a decision that has finished
+   */
+  private async executeDecision(
+    rawState: RawGameState,
+    worldState: WorldState,
+    decision: BrainDecision,
+    observationTime: number
+  ): Promise<LoopMetrics> {
+    const tickStart = Date.now();
+    const metrics: LoopMetrics = {
+      tick: (rawState.tick || 0) / 4000, // Approximate tick number
+      timestamp: new Date(),
+      observationTime,
+      mappingTime: 0,
+      brainTime: 0,
+      executionTime: 0,
+      totalTime: 0,
+      observationValid: true,
+      commandsExecuted: 0,
+      commandsSuccessful: 0,
+    };
+
+    // Execute commands
+    const execStart = Date.now();
+    if (decision.commands && decision.commands.length > 0) {
+      try {
+        const batchCommands = decision.commands.map((cmd) => ({
+          playerID: cmd.playerID,
+          command: cmd.json_cmd,
+        }));
+        await this.commandExecutor.executeCommandBatch(batchCommands);
+        metrics.commandsExecuted = decision.commands.length;
+        metrics.commandsSuccessful = decision.commands.length;
+      } catch (error) {
+        this.logger.warn('Command execution failed', {
+          error: String(error),
+          commandCount: decision.commands.length,
+        });
+        metrics.commandsExecuted = decision.commands.length;
+        metrics.commandsSuccessful = 0;
+      }
+    }
+
+    metrics.executionTime = Date.now() - execStart;
+    metrics.totalTime = Date.now() - tickStart;
+
+    return metrics;
   }
 
   /**
