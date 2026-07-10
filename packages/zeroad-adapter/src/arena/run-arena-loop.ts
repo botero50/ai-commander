@@ -122,13 +122,8 @@ async function startGame(): Promise<ChildProcess> {
     '-autostart=skirmishes/acropolis_bay_2p',
     '-autostart-ai=1:petra',
     '-autostart-ai=2:petra',
-    // Display options
-    '-fullscreen',           // Start in fullscreen/maximized
-    '-xres=1920',           // Resolution width (adjust if needed)
-    '-yres=1080',           // Resolution height (adjust if needed)
-    // Camera/zoom options for maximum overview
-    '-forcemultiplay',      // Skip splash screen
-    '-nointro',             // Skip intro video
+    '-xres=1920',           // Resolution width
+    '-yres=1080',           // Resolution height
   ]);
 
   gameProcess.on('error', error => {
