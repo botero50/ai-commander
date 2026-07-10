@@ -26,6 +26,7 @@ import * as fs from 'fs';
 const RL_HOST = '127.0.0.1';
 const RL_PORT = 6000;
 const MAX_TICKS = process.argv[2] ? parseInt(process.argv[2], 10) : 300;
+const UNLIMITED_TICKS = MAX_TICKS === 0; // Pass 0 to run until match completion
 const OLLAMA_MODEL = 'neural-chat:latest';
 
 interface TournamentTick {
@@ -81,12 +82,13 @@ async function main() {
     console.log(`       Player 2 (Petra AI): ${p2Units.length} units\n`);
 
     // Tournament loop
-    console.log(`[GAME] Running tournament for ${MAX_TICKS} ticks...\n`);
+    const ticksDisplay = UNLIMITED_TICKS ? 'unlimited (until victory)' : `${MAX_TICKS} ticks`;
+    console.log(`[GAME] Running tournament for ${ticksDisplay}...\n`);
     const startTime = Date.now();
     const tickHistory: TournamentTick[] = [];
     let ticksCompleted = 0;
 
-    while (ticksCompleted < MAX_TICKS) {
+    while (UNLIMITED_TICKS || ticksCompleted < MAX_TICKS) {
       // Step 1: Get current world state
       gameState = await client.step([]);
       const worldState = worldStateMapper.mapObservationToWorldState(gameState);
