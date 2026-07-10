@@ -15,6 +15,8 @@
  */
 
 import { EventEmitter } from 'events';
+import * as http from 'http';
+import { URL } from 'url';
 import { Logger } from '../config/logger.js';
 import { ArenaController } from '../arena/arena-controller.js';
 import { BroadcastDataBridge } from '../broadcast/broadcast-data-bridge.js';
@@ -56,6 +58,7 @@ export class PublicStreamLauncher extends EventEmitter {
   private introduction: MatchIntroduction;
   private conclusion: MatchConclusion;
   private statusAPI: ArenaStatusAPI;
+  private server?: http.Server;
   private isRunning: boolean = false;
   private startTime: number = 0;
   private statusInterval?: NodeJS.Timeout;
@@ -131,17 +134,67 @@ export class PublicStreamLauncher extends EventEmitter {
    * Start REST API server
    */
   private async startStatusAPI(): Promise<void> {
-    // In production, this would initialize express and bind endpoints
-    // For now, log the endpoints that would be available
-    this.logger.info(`Status API endpoints would be available on port ${this.config.statusPort}`, {
-      endpoints: {
-        stream: '/stream/status',
-        arena: '/arena/stats',
-        metrics: '/metrics/current',
-        health: '/health',
-      },
+    this.server = http.createServer((req, res) => {
+      const path = new URL(req.url || '', `http://${req.headers.host}`).pathname;
+
+      // Set CORS headers
+      res.setHeader('Access-Control-Allow-Origin', '*');
+      res.setHeader('Content-Type', 'application/json');
+
+      if (req.method === 'OPTIONS') {
+        res.writeHead(200);
+        res.end();
+        return;
+      }
+
+      try {
+        if (path === '/arena/status') {
+          res.writeHead(200);
+          res.end(JSON.stringify(this.statusAPI.getStatus()));
+        } else if (path === '/arena/stats') {
+          res.writeHead(200);
+          res.end(JSON.stringify(this.statusAPI.getStats()));
+        } else if (path === '/arena/health') {
+          res.writeHead(200);
+          res.end(JSON.stringify(this.statusAPI.getHealth()));
+        } else if (path === '/stream/status') {
+          res.writeHead(200);
+          res.end(JSON.stringify({
+            isRunning: this.isRunning,
+            uptime: Math.floor((Date.now() - this.startTime) / 1000),
+            port: this.config.statusPort,
+            timestamp: new Date().toISOString(),
+          }));
+        } else if (path === '/health') {
+          res.writeHead(200);
+          res.end(JSON.stringify({
+            status: 'ok',
+            timestamp: new Date().toISOString(),
+          }));
+        } else {
+          res.writeHead(404);
+          res.end(JSON.stringify({ error: 'Not found' }));
+        }
+      } catch (error) {
+        this.logger.error('Request handler error', { error, path });
+        res.writeHead(500);
+        res.end(JSON.stringify({ error: 'Internal server error' }));
+      }
     });
-    return Promise.resolve();
+
+    return new Promise((resolve) => {
+      this.server!.listen(this.config.statusPort, () => {
+        this.logger.info(`✅ Status API listening on port ${this.config.statusPort}`, {
+          endpoints: {
+            arena: '/arena/stats',
+            arenaHealth: '/arena/health',
+            stream: '/stream/status',
+            health: '/health',
+          },
+        });
+        resolve();
+      });
+    });
   }
 
   /**
@@ -256,6 +309,16 @@ export class PublicStreamLauncher extends EventEmitter {
     // Stop status logging
     if (this.statusInterval) {
       clearInterval(this.statusInterval);
+    }
+
+    // Close HTTP server
+    if (this.server) {
+      await new Promise<void>((resolve) => {
+        this.server!.close(() => {
+          this.logger.info('✓ HTTP server closed');
+          resolve();
+        });
+      });
     }
 
     // Stop arena
