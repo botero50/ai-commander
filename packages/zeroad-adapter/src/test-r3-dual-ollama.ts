@@ -1,14 +1,14 @@
 #!/usr/bin/env node
 
 /**
- * Story R3.1 — Dual Ollama Tournament (Batched Commands)
+ * Story R3.1 — Ollama vs Petra Tournament (Batched Commands)
  *
  * Key insight: Instead of calling /step multiple times,
- * get decisions from BOTH brains, combine commands, send ONCE
+ * get decision, batch commands, send ONCE
  *
  * Setup:
- * - Brain 1: OllamaAIBrain for Player 1 (Athenians)
- * - Brain 2: OllamaAIBrain for Player 2 (Gaul)
+ * - Player 1 (Gaul): OllamaAIBrain controlled via RL Interface
+ * - Player 2 (Athenians): Petra AI (built-in opponent)
  * - One RL Interface connection, batched commands
  *
  * Execution:
@@ -41,8 +41,8 @@ interface TournamentTick {
 
 async function main() {
   console.log('╔════════════════════════════════════════════════════════════╗');
-  console.log('║      STORY R3.1 — DUAL OLLAMA TOURNAMENT                  ║');
-  console.log('║    Both players controlled by Ollama (batched commands)    ║');
+  console.log('║      STORY R3.1 — OLLAMA vs PETRA TOURNAMENT              ║');
+  console.log('║    Ollama (Player 1) vs Petra AI (batched commands)        ║');
   console.log('╚════════════════════════════════════════════════════════════╝\n');
 
   const logger = new Logger('info');
@@ -51,6 +51,8 @@ async function main() {
 
   // Create two Ollama brains
   console.log('[INIT] Initializing two Ollama brains...');
+  // RL Interface controls Player 1 (human slot)
+  // Player 2 (Petra AI) is the opponent
   const brain1 = new OllamaAIBrain(logger, {
     modelName: OLLAMA_MODEL,
     baseUrl: 'http://localhost:11434',
@@ -59,9 +61,10 @@ async function main() {
     topK: 40,
     numPredict: 256,
     timeout: 30000,
-    playerID: 1,
+    playerID: 1, // RL Interface controls Player 1
   });
 
+  // Secondary brain (for future dual-brain setup - currently unused)
   const brain2 = new OllamaAIBrain(logger, {
     modelName: OLLAMA_MODEL,
     baseUrl: 'http://localhost:11434',
@@ -70,7 +73,7 @@ async function main() {
     topK: 40,
     numPredict: 256,
     timeout: 30000,
-    playerID: 2,
+    playerID: 1, // Also targets Player 1 (batched together)
   });
 
   try {
@@ -256,7 +259,7 @@ async function main() {
     await brain2.shutdown();
 
     console.log('\n╔════════════════════════════════════════════════════════════╗');
-    console.log('║  ✓ DUAL OLLAMA TOURNAMENT: COMPLETE                      ║');
+    console.log('║  ✓ OLLAMA vs PETRA TOURNAMENT: COMPLETE                  ║');
     console.log('║  Story R3.1 Definition of Done: SATISFIED                 ║');
     console.log('╚════════════════════════════════════════════════════════════╝\n');
 
