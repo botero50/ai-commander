@@ -1,0 +1,2732 @@
+{
+  "timestamp": "2026-07-10T15:58:05.879Z",
+  "story": "R3.1 - Ollama vs Petra AI Tournament (2-Player)",
+  "configuration": {
+    "maxTicks": 300,
+    "model": "neural-chat:latest",
+    "map": "acropolis_bay_2p",
+    "player1": {
+      "id": 1,
+      "brain": "Ollama",
+      "controlledVia": "RL Interface (human slot)"
+    },
+    "player2": {
+      "id": 2,
+      "brain": "Petra AI",
+      "controlledVia": "Game AI"
+    },
+    "strategy": "Ollama controls Player 1. Petra AI controls Player 2.",
+    "rlInterfaceConstraint": "Can only control ONE player (the human player slot)"
+  },
+  "duration": {
+    "totalMs": 415365,
+    "totalSeconds": "415.4"
+  },
+  "ticksCompleted": 300,
+  "finalState": {
+    "player1Units": 23,
+    "player2Units": 22
+  },
+  "tickHistory": [
+    {
+      "tick": 8000,
+      "timestamp": "2026-07-10T15:51:14.365Z",
+      "player1Units": 10,
+      "player2Units": 9,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 16000,
+      "timestamp": "2026-07-10T15:51:15.313Z",
+      "player1Units": 10,
+      "player2Units": 9,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 24000,
+      "timestamp": "2026-07-10T15:51:17.381Z",
+      "player1Units": 10,
+      "player2Units": 9,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 32000,
+      "timestamp": "2026-07-10T15:51:18.226Z",
+      "player1Units": 10,
+      "player2Units": 9,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 40000,
+      "timestamp": "2026-07-10T15:51:19.118Z",
+      "player1Units": 10,
+      "player2Units": 9,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 48000,
+      "timestamp": "2026-07-10T15:51:20.438Z",
+      "player1Units": 10,
+      "player2Units": 9,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 56000,
+      "timestamp": "2026-07-10T15:51:21.648Z",
+      "player1Units": 10,
+      "player2Units": 9,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 64000,
+      "timestamp": "2026-07-10T15:51:22.743Z",
+      "player1Units": 10,
+      "player2Units": 9,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 72000,
+      "timestamp": "2026-07-10T15:51:23.764Z",
+      "player1Units": 10,
+      "player2Units": 9,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 80000,
+      "timestamp": "2026-07-10T15:51:24.948Z",
+      "player1Units": 10,
+      "player2Units": 9,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 88000,
+      "timestamp": "2026-07-10T15:51:26.841Z",
+      "player1Units": 10,
+      "player2Units": 9,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 96000,
+      "timestamp": "2026-07-10T15:51:27.776Z",
+      "player1Units": 10,
+      "player2Units": 9,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 104000,
+      "timestamp": "2026-07-10T15:51:29.137Z",
+      "player1Units": 10,
+      "player2Units": 9,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 112000,
+      "timestamp": "2026-07-10T15:51:30.390Z",
+      "player1Units": 10,
+      "player2Units": 9,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 120000,
+      "timestamp": "2026-07-10T15:51:31.817Z",
+      "player1Units": 10,
+      "player2Units": 9,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 128000,
+      "timestamp": "2026-07-10T15:51:32.779Z",
+      "player1Units": 10,
+      "player2Units": 9,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 136000,
+      "timestamp": "2026-07-10T15:51:34.405Z",
+      "player1Units": 10,
+      "player2Units": 9,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 144000,
+      "timestamp": "2026-07-10T15:51:36.218Z",
+      "player1Units": 10,
+      "player2Units": 9,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 152000,
+      "timestamp": "2026-07-10T15:51:37.691Z",
+      "player1Units": 10,
+      "player2Units": 9,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 160000,
+      "timestamp": "2026-07-10T15:51:39.437Z",
+      "player1Units": 10,
+      "player2Units": 9,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 168000,
+      "timestamp": "2026-07-10T15:51:40.535Z",
+      "player1Units": 10,
+      "player2Units": 9,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 176000,
+      "timestamp": "2026-07-10T15:51:41.990Z",
+      "player1Units": 10,
+      "player2Units": 9,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 184000,
+      "timestamp": "2026-07-10T15:51:43.993Z",
+      "player1Units": 10,
+      "player2Units": 9,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 192000,
+      "timestamp": "2026-07-10T15:51:45.252Z",
+      "player1Units": 10,
+      "player2Units": 9,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 200000,
+      "timestamp": "2026-07-10T15:51:47.596Z",
+      "player1Units": 10,
+      "player2Units": 9,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 208000,
+      "timestamp": "2026-07-10T15:51:48.412Z",
+      "player1Units": 10,
+      "player2Units": 9,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 216000,
+      "timestamp": "2026-07-10T15:51:49.942Z",
+      "player1Units": 10,
+      "player2Units": 9,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 224000,
+      "timestamp": "2026-07-10T15:51:51.192Z",
+      "player1Units": 10,
+      "player2Units": 9,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 232000,
+      "timestamp": "2026-07-10T15:51:52.856Z",
+      "player1Units": 10,
+      "player2Units": 9,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 240000,
+      "timestamp": "2026-07-10T15:51:54.596Z",
+      "player1Units": 10,
+      "player2Units": 10,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 248000,
+      "timestamp": "2026-07-10T15:51:56.232Z",
+      "player1Units": 11,
+      "player2Units": 10,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 256000,
+      "timestamp": "2026-07-10T15:51:57.329Z",
+      "player1Units": 11,
+      "player2Units": 10,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 264000,
+      "timestamp": "2026-07-10T15:51:58.063Z",
+      "player1Units": 11,
+      "player2Units": 10,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 272000,
+      "timestamp": "2026-07-10T15:51:59.258Z",
+      "player1Units": 11,
+      "player2Units": 10,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 280000,
+      "timestamp": "2026-07-10T15:52:00.901Z",
+      "player1Units": 11,
+      "player2Units": 10,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 288000,
+      "timestamp": "2026-07-10T15:52:01.847Z",
+      "player1Units": 11,
+      "player2Units": 10,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 296000,
+      "timestamp": "2026-07-10T15:52:02.833Z",
+      "player1Units": 11,
+      "player2Units": 10,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 304000,
+      "timestamp": "2026-07-10T15:52:03.669Z",
+      "player1Units": 11,
+      "player2Units": 10,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 312000,
+      "timestamp": "2026-07-10T15:52:05.630Z",
+      "player1Units": 11,
+      "player2Units": 10,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 320000,
+      "timestamp": "2026-07-10T15:52:07.319Z",
+      "player1Units": 11,
+      "player2Units": 10,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 328000,
+      "timestamp": "2026-07-10T15:52:08.699Z",
+      "player1Units": 11,
+      "player2Units": 10,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 336000,
+      "timestamp": "2026-07-10T15:52:09.666Z",
+      "player1Units": 11,
+      "player2Units": 10,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 344000,
+      "timestamp": "2026-07-10T15:52:11.633Z",
+      "player1Units": 11,
+      "player2Units": 10,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 352000,
+      "timestamp": "2026-07-10T15:52:12.538Z",
+      "player1Units": 11,
+      "player2Units": 10,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 360000,
+      "timestamp": "2026-07-10T15:52:13.493Z",
+      "player1Units": 11,
+      "player2Units": 10,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 368000,
+      "timestamp": "2026-07-10T15:52:14.960Z",
+      "player1Units": 11,
+      "player2Units": 10,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 376000,
+      "timestamp": "2026-07-10T15:52:15.833Z",
+      "player1Units": 11,
+      "player2Units": 10,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 384000,
+      "timestamp": "2026-07-10T15:52:17.196Z",
+      "player1Units": 12,
+      "player2Units": 11,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 392000,
+      "timestamp": "2026-07-10T15:52:18.754Z",
+      "player1Units": 12,
+      "player2Units": 11,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 400000,
+      "timestamp": "2026-07-10T15:52:20.258Z",
+      "player1Units": 12,
+      "player2Units": 11,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 408000,
+      "timestamp": "2026-07-10T15:52:21.214Z",
+      "player1Units": 12,
+      "player2Units": 11,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 416000,
+      "timestamp": "2026-07-10T15:52:23.087Z",
+      "player1Units": 12,
+      "player2Units": 11,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 424000,
+      "timestamp": "2026-07-10T15:52:25.543Z",
+      "player1Units": 12,
+      "player2Units": 11,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 432000,
+      "timestamp": "2026-07-10T15:52:26.968Z",
+      "player1Units": 12,
+      "player2Units": 11,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 440000,
+      "timestamp": "2026-07-10T15:52:28.796Z",
+      "player1Units": 12,
+      "player2Units": 11,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 448000,
+      "timestamp": "2026-07-10T15:52:29.936Z",
+      "player1Units": 12,
+      "player2Units": 11,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 456000,
+      "timestamp": "2026-07-10T15:52:30.896Z",
+      "player1Units": 12,
+      "player2Units": 11,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 464000,
+      "timestamp": "2026-07-10T15:52:32.388Z",
+      "player1Units": 12,
+      "player2Units": 11,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 472000,
+      "timestamp": "2026-07-10T15:52:33.358Z",
+      "player1Units": 12,
+      "player2Units": 11,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 480000,
+      "timestamp": "2026-07-10T15:52:34.399Z",
+      "player1Units": 12,
+      "player2Units": 11,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 488000,
+      "timestamp": "2026-07-10T15:52:35.723Z",
+      "player1Units": 12,
+      "player2Units": 11,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 496000,
+      "timestamp": "2026-07-10T15:52:36.589Z",
+      "player1Units": 12,
+      "player2Units": 11,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 504000,
+      "timestamp": "2026-07-10T15:52:37.768Z",
+      "player1Units": 12,
+      "player2Units": 11,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 512000,
+      "timestamp": "2026-07-10T15:52:38.697Z",
+      "player1Units": 12,
+      "player2Units": 11,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 520000,
+      "timestamp": "2026-07-10T15:52:40.665Z",
+      "player1Units": 12,
+      "player2Units": 12,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 528000,
+      "timestamp": "2026-07-10T15:52:42.611Z",
+      "player1Units": 13,
+      "player2Units": 12,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 536000,
+      "timestamp": "2026-07-10T15:52:44.382Z",
+      "player1Units": 13,
+      "player2Units": 12,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 544000,
+      "timestamp": "2026-07-10T15:52:46.065Z",
+      "player1Units": 13,
+      "player2Units": 12,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 552000,
+      "timestamp": "2026-07-10T15:52:47.049Z",
+      "player1Units": 13,
+      "player2Units": 12,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 560000,
+      "timestamp": "2026-07-10T15:52:47.950Z",
+      "player1Units": 13,
+      "player2Units": 12,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 568000,
+      "timestamp": "2026-07-10T15:52:48.978Z",
+      "player1Units": 13,
+      "player2Units": 12,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 576000,
+      "timestamp": "2026-07-10T15:52:50.345Z",
+      "player1Units": 13,
+      "player2Units": 12,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 584000,
+      "timestamp": "2026-07-10T15:52:52.171Z",
+      "player1Units": 13,
+      "player2Units": 12,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 592000,
+      "timestamp": "2026-07-10T15:52:53.827Z",
+      "player1Units": 13,
+      "player2Units": 12,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 600000,
+      "timestamp": "2026-07-10T15:52:55.205Z",
+      "player1Units": 13,
+      "player2Units": 12,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 608000,
+      "timestamp": "2026-07-10T15:52:56.591Z",
+      "player1Units": 13,
+      "player2Units": 12,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 616000,
+      "timestamp": "2026-07-10T15:52:58.677Z",
+      "player1Units": 13,
+      "player2Units": 12,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 624000,
+      "timestamp": "2026-07-10T15:52:59.880Z",
+      "player1Units": 13,
+      "player2Units": 12,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 632000,
+      "timestamp": "2026-07-10T15:53:00.932Z",
+      "player1Units": 13,
+      "player2Units": 12,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 640000,
+      "timestamp": "2026-07-10T15:53:01.814Z",
+      "player1Units": 13,
+      "player2Units": 12,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 648000,
+      "timestamp": "2026-07-10T15:53:02.731Z",
+      "player1Units": 13,
+      "player2Units": 12,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 656000,
+      "timestamp": "2026-07-10T15:53:04.351Z",
+      "player1Units": 13,
+      "player2Units": 12,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 664000,
+      "timestamp": "2026-07-10T15:53:06.065Z",
+      "player1Units": 13,
+      "player2Units": 12,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 672000,
+      "timestamp": "2026-07-10T15:53:07.129Z",
+      "player1Units": 13,
+      "player2Units": 12,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 680000,
+      "timestamp": "2026-07-10T15:53:08.564Z",
+      "player1Units": 13,
+      "player2Units": 12,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 688000,
+      "timestamp": "2026-07-10T15:53:09.498Z",
+      "player1Units": 13,
+      "player2Units": 12,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 696000,
+      "timestamp": "2026-07-10T15:53:11.444Z",
+      "player1Units": 13,
+      "player2Units": 12,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 704000,
+      "timestamp": "2026-07-10T15:53:12.357Z",
+      "player1Units": 13,
+      "player2Units": 12,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 712000,
+      "timestamp": "2026-07-10T15:53:13.338Z",
+      "player1Units": 13,
+      "player2Units": 12,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 720000,
+      "timestamp": "2026-07-10T15:53:14.304Z",
+      "player1Units": 13,
+      "player2Units": 12,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 728000,
+      "timestamp": "2026-07-10T15:53:16.076Z",
+      "player1Units": 13,
+      "player2Units": 12,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 736000,
+      "timestamp": "2026-07-10T15:53:17.906Z",
+      "player1Units": 13,
+      "player2Units": 12,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 744000,
+      "timestamp": "2026-07-10T15:53:20.016Z",
+      "player1Units": 13,
+      "player2Units": 12,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 752000,
+      "timestamp": "2026-07-10T15:53:21.726Z",
+      "player1Units": 13,
+      "player2Units": 12,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 760000,
+      "timestamp": "2026-07-10T15:53:22.987Z",
+      "player1Units": 13,
+      "player2Units": 12,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 768000,
+      "timestamp": "2026-07-10T15:53:25.126Z",
+      "player1Units": 13,
+      "player2Units": 12,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 776000,
+      "timestamp": "2026-07-10T15:53:26.867Z",
+      "player1Units": 13,
+      "player2Units": 12,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 784000,
+      "timestamp": "2026-07-10T15:53:28.614Z",
+      "player1Units": 15,
+      "player2Units": 14,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 792000,
+      "timestamp": "2026-07-10T15:53:30.943Z",
+      "player1Units": 15,
+      "player2Units": 14,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 800000,
+      "timestamp": "2026-07-10T15:53:32.605Z",
+      "player1Units": 15,
+      "player2Units": 14,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 808000,
+      "timestamp": "2026-07-10T15:53:33.819Z",
+      "player1Units": 15,
+      "player2Units": 14,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 816000,
+      "timestamp": "2026-07-10T15:53:34.746Z",
+      "player1Units": 15,
+      "player2Units": 14,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 824000,
+      "timestamp": "2026-07-10T15:53:35.641Z",
+      "player1Units": 15,
+      "player2Units": 14,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 832000,
+      "timestamp": "2026-07-10T15:53:37.657Z",
+      "player1Units": 15,
+      "player2Units": 14,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 840000,
+      "timestamp": "2026-07-10T15:53:38.692Z",
+      "player1Units": 15,
+      "player2Units": 14,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 848000,
+      "timestamp": "2026-07-10T15:53:40.196Z",
+      "player1Units": 15,
+      "player2Units": 14,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 856000,
+      "timestamp": "2026-07-10T15:53:42.391Z",
+      "player1Units": 15,
+      "player2Units": 14,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 864000,
+      "timestamp": "2026-07-10T15:53:43.797Z",
+      "player1Units": 15,
+      "player2Units": 14,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 872000,
+      "timestamp": "2026-07-10T15:53:44.933Z",
+      "player1Units": 15,
+      "player2Units": 14,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 880000,
+      "timestamp": "2026-07-10T15:53:46.514Z",
+      "player1Units": 15,
+      "player2Units": 14,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 888000,
+      "timestamp": "2026-07-10T15:53:48.579Z",
+      "player1Units": 15,
+      "player2Units": 14,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 896000,
+      "timestamp": "2026-07-10T15:53:49.726Z",
+      "player1Units": 15,
+      "player2Units": 14,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 904000,
+      "timestamp": "2026-07-10T15:53:50.612Z",
+      "player1Units": 15,
+      "player2Units": 14,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 912000,
+      "timestamp": "2026-07-10T15:53:52.036Z",
+      "player1Units": 15,
+      "player2Units": 14,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 920000,
+      "timestamp": "2026-07-10T15:53:53.353Z",
+      "player1Units": 15,
+      "player2Units": 14,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 928000,
+      "timestamp": "2026-07-10T15:53:54.526Z",
+      "player1Units": 15,
+      "player2Units": 14,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 936000,
+      "timestamp": "2026-07-10T15:53:56.021Z",
+      "player1Units": 15,
+      "player2Units": 14,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 944000,
+      "timestamp": "2026-07-10T15:53:57.290Z",
+      "player1Units": 15,
+      "player2Units": 14,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 952000,
+      "timestamp": "2026-07-10T15:53:58.981Z",
+      "player1Units": 15,
+      "player2Units": 14,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 960000,
+      "timestamp": "2026-07-10T15:54:00.506Z",
+      "player1Units": 15,
+      "player2Units": 14,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 968000,
+      "timestamp": "2026-07-10T15:54:01.588Z",
+      "player1Units": 15,
+      "player2Units": 14,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 976000,
+      "timestamp": "2026-07-10T15:54:03.155Z",
+      "player1Units": 15,
+      "player2Units": 14,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 984000,
+      "timestamp": "2026-07-10T15:54:04.363Z",
+      "player1Units": 15,
+      "player2Units": 14,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 992000,
+      "timestamp": "2026-07-10T15:54:05.906Z",
+      "player1Units": 15,
+      "player2Units": 14,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1000000,
+      "timestamp": "2026-07-10T15:54:07.605Z",
+      "player1Units": 15,
+      "player2Units": 14,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1008000,
+      "timestamp": "2026-07-10T15:54:09.194Z",
+      "player1Units": 15,
+      "player2Units": 14,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1016000,
+      "timestamp": "2026-07-10T15:54:11.024Z",
+      "player1Units": 15,
+      "player2Units": 14,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1024000,
+      "timestamp": "2026-07-10T15:54:12.782Z",
+      "player1Units": 15,
+      "player2Units": 14,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1032000,
+      "timestamp": "2026-07-10T15:54:13.880Z",
+      "player1Units": 15,
+      "player2Units": 14,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1040000,
+      "timestamp": "2026-07-10T15:54:14.948Z",
+      "player1Units": 15,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1048000,
+      "timestamp": "2026-07-10T15:54:16.561Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1056000,
+      "timestamp": "2026-07-10T15:54:17.578Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1064000,
+      "timestamp": "2026-07-10T15:54:18.425Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1072000,
+      "timestamp": "2026-07-10T15:54:19.354Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1080000,
+      "timestamp": "2026-07-10T15:54:20.189Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1088000,
+      "timestamp": "2026-07-10T15:54:21.683Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1096000,
+      "timestamp": "2026-07-10T15:54:22.729Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1104000,
+      "timestamp": "2026-07-10T15:54:24.447Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 1112000,
+      "timestamp": "2026-07-10T15:54:25.740Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1120000,
+      "timestamp": "2026-07-10T15:54:27.019Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1128000,
+      "timestamp": "2026-07-10T15:54:27.960Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1136000,
+      "timestamp": "2026-07-10T15:54:30.082Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 1144000,
+      "timestamp": "2026-07-10T15:54:31.499Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1152000,
+      "timestamp": "2026-07-10T15:54:32.640Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1160000,
+      "timestamp": "2026-07-10T15:54:33.775Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1168000,
+      "timestamp": "2026-07-10T15:54:35.486Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1176000,
+      "timestamp": "2026-07-10T15:54:36.507Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1184000,
+      "timestamp": "2026-07-10T15:54:37.369Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1192000,
+      "timestamp": "2026-07-10T15:54:38.485Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1200000,
+      "timestamp": "2026-07-10T15:54:40.585Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1208000,
+      "timestamp": "2026-07-10T15:54:41.880Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1216000,
+      "timestamp": "2026-07-10T15:54:43.295Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1224000,
+      "timestamp": "2026-07-10T15:54:44.113Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1232000,
+      "timestamp": "2026-07-10T15:54:45.461Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 1240000,
+      "timestamp": "2026-07-10T15:54:47.535Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1248000,
+      "timestamp": "2026-07-10T15:54:48.985Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1256000,
+      "timestamp": "2026-07-10T15:54:50.200Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1264000,
+      "timestamp": "2026-07-10T15:54:51.890Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1272000,
+      "timestamp": "2026-07-10T15:54:52.976Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1280000,
+      "timestamp": "2026-07-10T15:54:54.188Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1288000,
+      "timestamp": "2026-07-10T15:54:55.669Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1296000,
+      "timestamp": "2026-07-10T15:54:57.358Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1304000,
+      "timestamp": "2026-07-10T15:54:58.886Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1312000,
+      "timestamp": "2026-07-10T15:55:00.194Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1320000,
+      "timestamp": "2026-07-10T15:55:01.243Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1328000,
+      "timestamp": "2026-07-10T15:55:02.664Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1336000,
+      "timestamp": "2026-07-10T15:55:04.427Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1344000,
+      "timestamp": "2026-07-10T15:55:05.777Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1352000,
+      "timestamp": "2026-07-10T15:55:06.766Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1360000,
+      "timestamp": "2026-07-10T15:55:08.309Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1368000,
+      "timestamp": "2026-07-10T15:55:09.969Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1376000,
+      "timestamp": "2026-07-10T15:55:11.563Z",
+      "player1Units": 17,
+      "player2Units": 16,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1384000,
+      "timestamp": "2026-07-10T15:55:12.356Z",
+      "player1Units": 17,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1392000,
+      "timestamp": "2026-07-10T15:55:13.438Z",
+      "player1Units": 17,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1400000,
+      "timestamp": "2026-07-10T15:55:15.026Z",
+      "player1Units": 17,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1408000,
+      "timestamp": "2026-07-10T15:55:15.875Z",
+      "player1Units": 17,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1416000,
+      "timestamp": "2026-07-10T15:55:16.910Z",
+      "player1Units": 17,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1424000,
+      "timestamp": "2026-07-10T15:55:18.428Z",
+      "player1Units": 17,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1432000,
+      "timestamp": "2026-07-10T15:55:20.132Z",
+      "player1Units": 17,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1440000,
+      "timestamp": "2026-07-10T15:55:21.093Z",
+      "player1Units": 17,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1448000,
+      "timestamp": "2026-07-10T15:55:22.902Z",
+      "player1Units": 17,
+      "player2Units": 18,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 1456000,
+      "timestamp": "2026-07-10T15:55:24.120Z",
+      "player1Units": 17,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1464000,
+      "timestamp": "2026-07-10T15:55:25.610Z",
+      "player1Units": 17,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1472000,
+      "timestamp": "2026-07-10T15:55:26.768Z",
+      "player1Units": 17,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1480000,
+      "timestamp": "2026-07-10T15:55:27.929Z",
+      "player1Units": 17,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1488000,
+      "timestamp": "2026-07-10T15:55:30.185Z",
+      "player1Units": 17,
+      "player2Units": 18,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 1496000,
+      "timestamp": "2026-07-10T15:55:32.242Z",
+      "player1Units": 17,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1504000,
+      "timestamp": "2026-07-10T15:55:33.555Z",
+      "player1Units": 17,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1512000,
+      "timestamp": "2026-07-10T15:55:35.160Z",
+      "player1Units": 17,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1520000,
+      "timestamp": "2026-07-10T15:55:35.997Z",
+      "player1Units": 17,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1528000,
+      "timestamp": "2026-07-10T15:55:37.070Z",
+      "player1Units": 17,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1536000,
+      "timestamp": "2026-07-10T15:55:38.513Z",
+      "player1Units": 17,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1544000,
+      "timestamp": "2026-07-10T15:55:40.768Z",
+      "player1Units": 17,
+      "player2Units": 18,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 1552000,
+      "timestamp": "2026-07-10T15:55:41.779Z",
+      "player1Units": 17,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1560000,
+      "timestamp": "2026-07-10T15:55:43.410Z",
+      "player1Units": 17,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1568000,
+      "timestamp": "2026-07-10T15:55:44.719Z",
+      "player1Units": 17,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1576000,
+      "timestamp": "2026-07-10T15:55:45.584Z",
+      "player1Units": 17,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1584000,
+      "timestamp": "2026-07-10T15:55:47.180Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1592000,
+      "timestamp": "2026-07-10T15:55:48.776Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1600000,
+      "timestamp": "2026-07-10T15:55:49.703Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1608000,
+      "timestamp": "2026-07-10T15:55:50.661Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1616000,
+      "timestamp": "2026-07-10T15:55:51.646Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1624000,
+      "timestamp": "2026-07-10T15:55:53.411Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1632000,
+      "timestamp": "2026-07-10T15:55:54.990Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1640000,
+      "timestamp": "2026-07-10T15:55:55.918Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1648000,
+      "timestamp": "2026-07-10T15:55:57.802Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1656000,
+      "timestamp": "2026-07-10T15:55:58.868Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1664000,
+      "timestamp": "2026-07-10T15:56:00.482Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 1672000,
+      "timestamp": "2026-07-10T15:56:02.133Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1680000,
+      "timestamp": "2026-07-10T15:56:03.816Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 1688000,
+      "timestamp": "2026-07-10T15:56:05.338Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 1696000,
+      "timestamp": "2026-07-10T15:56:06.639Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1704000,
+      "timestamp": "2026-07-10T15:56:07.714Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1712000,
+      "timestamp": "2026-07-10T15:56:08.650Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1720000,
+      "timestamp": "2026-07-10T15:56:10.336Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1728000,
+      "timestamp": "2026-07-10T15:56:11.225Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1736000,
+      "timestamp": "2026-07-10T15:56:13.374Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 1744000,
+      "timestamp": "2026-07-10T15:56:15.220Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 1752000,
+      "timestamp": "2026-07-10T15:56:16.656Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1760000,
+      "timestamp": "2026-07-10T15:56:18.648Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1768000,
+      "timestamp": "2026-07-10T15:56:20.266Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1776000,
+      "timestamp": "2026-07-10T15:56:21.459Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1784000,
+      "timestamp": "2026-07-10T15:56:23.135Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1792000,
+      "timestamp": "2026-07-10T15:56:24.349Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1800000,
+      "timestamp": "2026-07-10T15:56:26.234Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1808000,
+      "timestamp": "2026-07-10T15:56:27.510Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1816000,
+      "timestamp": "2026-07-10T15:56:28.474Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1824000,
+      "timestamp": "2026-07-10T15:56:29.583Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1832000,
+      "timestamp": "2026-07-10T15:56:30.580Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1840000,
+      "timestamp": "2026-07-10T15:56:31.592Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1848000,
+      "timestamp": "2026-07-10T15:56:32.876Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1856000,
+      "timestamp": "2026-07-10T15:56:34.289Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1864000,
+      "timestamp": "2026-07-10T15:56:35.358Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1872000,
+      "timestamp": "2026-07-10T15:56:37.216Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1880000,
+      "timestamp": "2026-07-10T15:56:38.398Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1888000,
+      "timestamp": "2026-07-10T15:56:39.908Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1896000,
+      "timestamp": "2026-07-10T15:56:41.610Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1904000,
+      "timestamp": "2026-07-10T15:56:42.797Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1912000,
+      "timestamp": "2026-07-10T15:56:44.328Z",
+      "player1Units": 19,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1920000,
+      "timestamp": "2026-07-10T15:56:45.710Z",
+      "player1Units": 21,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1928000,
+      "timestamp": "2026-07-10T15:56:46.497Z",
+      "player1Units": 21,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1936000,
+      "timestamp": "2026-07-10T15:56:49.104Z",
+      "player1Units": 21,
+      "player2Units": 18,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 1944000,
+      "timestamp": "2026-07-10T15:56:50.212Z",
+      "player1Units": 21,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1952000,
+      "timestamp": "2026-07-10T15:56:51.307Z",
+      "player1Units": 21,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1960000,
+      "timestamp": "2026-07-10T15:56:52.426Z",
+      "player1Units": 21,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1968000,
+      "timestamp": "2026-07-10T15:56:53.644Z",
+      "player1Units": 21,
+      "player2Units": 18,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 1976000,
+      "timestamp": "2026-07-10T15:56:55.078Z",
+      "player1Units": 21,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 1984000,
+      "timestamp": "2026-07-10T15:56:56.106Z",
+      "player1Units": 21,
+      "player2Units": 18,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 1992000,
+      "timestamp": "2026-07-10T15:56:57.057Z",
+      "player1Units": 21,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2000000,
+      "timestamp": "2026-07-10T15:56:58.741Z",
+      "player1Units": 21,
+      "player2Units": 18,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 2008000,
+      "timestamp": "2026-07-10T15:57:00.641Z",
+      "player1Units": 21,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2016000,
+      "timestamp": "2026-07-10T15:57:02.381Z",
+      "player1Units": 21,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2024000,
+      "timestamp": "2026-07-10T15:57:03.376Z",
+      "player1Units": 21,
+      "player2Units": 18,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 2032000,
+      "timestamp": "2026-07-10T15:57:04.430Z",
+      "player1Units": 21,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2040000,
+      "timestamp": "2026-07-10T15:57:06.075Z",
+      "player1Units": 21,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2048000,
+      "timestamp": "2026-07-10T15:57:07.080Z",
+      "player1Units": 21,
+      "player2Units": 18,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2056000,
+      "timestamp": "2026-07-10T15:57:08.015Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2064000,
+      "timestamp": "2026-07-10T15:57:09.558Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2072000,
+      "timestamp": "2026-07-10T15:57:10.765Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2080000,
+      "timestamp": "2026-07-10T15:57:12.247Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2088000,
+      "timestamp": "2026-07-10T15:57:14.048Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2096000,
+      "timestamp": "2026-07-10T15:57:15.019Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2104000,
+      "timestamp": "2026-07-10T15:57:16.139Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2112000,
+      "timestamp": "2026-07-10T15:57:17.819Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2120000,
+      "timestamp": "2026-07-10T15:57:19.207Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2128000,
+      "timestamp": "2026-07-10T15:57:20.554Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2136000,
+      "timestamp": "2026-07-10T15:57:21.833Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2144000,
+      "timestamp": "2026-07-10T15:57:22.752Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2152000,
+      "timestamp": "2026-07-10T15:57:24.255Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2160000,
+      "timestamp": "2026-07-10T15:57:25.343Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2168000,
+      "timestamp": "2026-07-10T15:57:27.017Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2176000,
+      "timestamp": "2026-07-10T15:57:28.080Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2184000,
+      "timestamp": "2026-07-10T15:57:29.125Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2192000,
+      "timestamp": "2026-07-10T15:57:30.656Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2200000,
+      "timestamp": "2026-07-10T15:57:31.857Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2208000,
+      "timestamp": "2026-07-10T15:57:33.161Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2216000,
+      "timestamp": "2026-07-10T15:57:35.126Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2224000,
+      "timestamp": "2026-07-10T15:57:36.722Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2232000,
+      "timestamp": "2026-07-10T15:57:37.946Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2240000,
+      "timestamp": "2026-07-10T15:57:39.668Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2248000,
+      "timestamp": "2026-07-10T15:57:40.751Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2256000,
+      "timestamp": "2026-07-10T15:57:42.014Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2264000,
+      "timestamp": "2026-07-10T15:57:43.060Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2272000,
+      "timestamp": "2026-07-10T15:57:44.729Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2280000,
+      "timestamp": "2026-07-10T15:57:45.946Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 2288000,
+      "timestamp": "2026-07-10T15:57:46.880Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2296000,
+      "timestamp": "2026-07-10T15:57:47.849Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2304000,
+      "timestamp": "2026-07-10T15:57:49.412Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2312000,
+      "timestamp": "2026-07-10T15:57:50.597Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2320000,
+      "timestamp": "2026-07-10T15:57:52.087Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2328000,
+      "timestamp": "2026-07-10T15:57:53.541Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2336000,
+      "timestamp": "2026-07-10T15:57:54.387Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2344000,
+      "timestamp": "2026-07-10T15:57:55.885Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2352000,
+      "timestamp": "2026-07-10T15:57:57.959Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 0,
+      "player2Commands": 0,
+      "totalCommands": 0
+    },
+    {
+      "tick": 2360000,
+      "timestamp": "2026-07-10T15:57:58.997Z",
+      "player1Units": 21,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2368000,
+      "timestamp": "2026-07-10T15:57:59.780Z",
+      "player1Units": 23,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2376000,
+      "timestamp": "2026-07-10T15:58:01.718Z",
+      "player1Units": 23,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2384000,
+      "timestamp": "2026-07-10T15:58:02.661Z",
+      "player1Units": 23,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2392000,
+      "timestamp": "2026-07-10T15:58:04.735Z",
+      "player1Units": 23,
+      "player2Units": 20,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    },
+    {
+      "tick": 2400000,
+      "timestamp": "2026-07-10T15:58:05.878Z",
+      "player1Units": 23,
+      "player2Units": 22,
+      "player1Commands": 2,
+      "player2Commands": 0,
+      "totalCommands": 2
+    }
+  ]
+}
