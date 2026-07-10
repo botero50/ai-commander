@@ -443,10 +443,12 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
             .filter(a => (a.customData as any)?.type === 'unit')
             .map(a => {
               const customData = a.customData as any;
+              // Position can be in positionRaw or directly in agent
+              const positionRaw = customData?.positionRaw || { x: 0, z: 0 };
               return {
                 id: customData?.entityId?.toString() || '',
                 owner: a.controlledByPlayerId?.toString() || '',
-                position: customData?.position || { x: 0, z: 0 },
+                position: { x: positionRaw.x || 0, z: positionRaw.z || 0 },
                 health: customData?.health,
               };
             }),
@@ -454,11 +456,13 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
             .filter(a => (a.customData as any)?.type === 'building')
             .map(a => {
               const customData = a.customData as any;
+              // Position can be in positionRaw or directly in agent
+              const positionRaw = customData?.positionRaw || { x: 0, z: 0 };
               return {
                 id: customData?.entityId?.toString() || '',
                 owner: a.controlledByPlayerId?.toString() || '',
                 type: customData?.template || '',
-                position: customData?.position || { x: 0, z: 0 },
+                position: { x: positionRaw.x || 0, z: positionRaw.z || 0 },
               };
             }),
           players: worldState.players.map(p => ({ id: p.id, name: p.name })),
