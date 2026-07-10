@@ -15,10 +15,12 @@ set PYROGENESIS=%USERPROFILE%\AppData\Local\0 A.D. Empires Ascendant\binaries\sy
 "%PYROGENESIS%" ^
   --rl-interface=127.0.0.1:6000 ^
   --mod=public ^
-  -autostart="skirmishes/acropolis_bay_2p" ^
+  -autostart="skirmishes/acropolis_bay_3p" ^
   -autostart-ai=2:petra ^
+  -autostart-ai=3:petra ^
   -autostart-civ=1:gaul ^
-  -autostart-civ=2:athen
+  -autostart-civ=2:athen ^
+  -autostart-civ=3:kushite
 
 echo.
 echo Game process ended.
