@@ -17,11 +17,7 @@ set PYROGENESIS=%USERPROFILE%\AppData\Local\0 A.D. Empires Ascendant\binaries\sy
   --mod=public ^
   -autostart="skirmishes/alpine_mountains_3p" ^
   -autostart-ai=2:petra ^
-  -autostart-ai=3:petra ^
-  -autostart-civ=1:athen ^
-  -autostart-civ=2:gaul ^
-  -autostart-civ=3:kushite ^
-  -autostartorloadlastsave
+  -autostart-ai=3:petra
 
 echo.
 echo Game process ended.
