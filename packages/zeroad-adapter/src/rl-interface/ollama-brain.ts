@@ -57,7 +57,7 @@ export class OllamaAIBrain implements AIBrain {
       topP: config.topP !== undefined ? config.topP : 0.9,
       topK: config.topK !== undefined ? config.topK : 40,
       numPredict: config.numPredict || 256,
-      timeout: config.timeout || 30000,
+      timeout: config.timeout || 60000, // 60 seconds for slow models like tinyllama
       playerID: config.playerID || 2,
     };
   }

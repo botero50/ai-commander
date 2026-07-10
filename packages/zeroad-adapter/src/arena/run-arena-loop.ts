@@ -37,6 +37,7 @@ const RL_CONNECT_TIMEOUT = 30000; // Try to connect for 30 seconds
 // - 'mistral:latest'       - Fast (4.1GB) - balanced
 // - 'neural-chat:latest'   - Slower (4.1GB) - most capable
 const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'tinyllama:latest'; // Use tinyllama for speed by default
+const OLLAMA_TIMEOUT = process.env.OLLAMA_TIMEOUT ? parseInt(process.env.OLLAMA_TIMEOUT, 10) : 60000; // 60 seconds for slow models
 
 // Parse CLI arguments
 const args = process.argv.slice(2);
@@ -107,6 +108,7 @@ async function killGame(): Promise<void> {
 async function startGame(): Promise<ChildProcess> {
   // Configure game before starting
   await configureGame();
+  await sleep(500); // Let config file flush to disk
 
   logger.info('🟢 Starting fresh 0 A.D. instance...');
 
@@ -154,6 +156,11 @@ async function configureGame(): Promise<void> {
   try {
     logger.info('⚙️  Configuring 0 A.D. camera settings...');
 
+    // Get screen resolution from environment (or use default)
+    // Set via: SCREEN_WIDTH=2560 SCREEN_HEIGHT=1440 npx tsx ...
+    let screenWidth = parseInt(process.env.SCREEN_WIDTH || '1920', 10);
+    let screenHeight = parseInt(process.env.SCREEN_HEIGHT || '1080', 10);
+
     const userDir = `${process.env.USERPROFILE}\\AppData\\Local\\0 A.D. Empires Ascendant`;
     const configDir = path.join(userDir, 'config');
     const configPath = path.join(configDir, 'user.cfg');
@@ -173,21 +180,31 @@ async function configureGame(): Promise<void> {
       // File doesn't exist yet
     }
 
-    // Set camera zoom to maximum (zoomed out)
-    // camera.distance controls zoom: higher = zoomed out
-    const zoomDistance = 'camera.distance = 300';
+    // Ensure [view] section exists
+    if (!config.includes('[view]')) {
+      config += '\n[view]\n';
+    }
 
-    if (config.includes('camera.distance')) {
-      // Replace existing camera distance
-      config = config.replace(/camera\.distance\s*=\s*[\d.]+/g, zoomDistance);
-    } else {
-      // Add new camera distance setting
-      config += `\n${zoomDistance}\n`;
+    // Set camera zoom to maximum (zoomed out) and use native screen resolution
+    const settingsList = [
+      ['zoom.max = 300.0', /zoom\.max\s*=\s*[\d.]+/],
+      ['zoom.default = 80.0', /zoom\.default\s*=\s*[\d.]+/],
+      [`graphics.xres = ${screenWidth}`, /graphics\.xres\s*=\s*\d+/],
+      [`graphics.yres = ${screenHeight}`, /graphics\.yres\s*=\s*\d+/],
+      ['graphics.windowed = false', /graphics\.windowed\s*=\s*(true|false)/],
+    ] as const;
+
+    for (const [setting, pattern] of settingsList) {
+      if (config.match(pattern)) {
+        config = config.replace(pattern, setting);
+      } else {
+        config += `${setting}\n`;
+      }
     }
 
     // Write back config
     await fs.writeFile(configPath, config, 'utf8');
-    logger.info('✓ Camera configured for maximum zoom out');
+    logger.info(`✓ Game configured: fullscreen=true, resolution=${screenWidth}x${screenHeight}, zoom=max`);
   } catch (error) {
     logger.warn('Could not auto-configure camera settings', {
       error: error instanceof Error ? error.message : String(error),
@@ -248,7 +265,7 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
       topP: 0.9,
       topK: 40,
       numPredict: 256,
-      timeout: 30000,
+      timeout: OLLAMA_TIMEOUT,
       playerID: 1,
     });
 
@@ -262,6 +279,20 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
     let matchWinner: string | null = null;
 
     logger.info(`🎮 Match started - Initial game tick: ${gameState.tick || 0}`);
+
+    // Set camera zoom to maximum (300) via JavaScript evaluation
+    try {
+      const cameraZoomCode = `
+        let data = Engine.GetCameraData();
+        Engine.SetCameraData(data.x, data.y, 300, data.rotX, data.rotY, 300);
+      `;
+      await client.evaluate(cameraZoomCode);
+      logger.info('✓ Camera zoom set to maximum (300)');
+    } catch (error) {
+      logger.warn('Could not set camera zoom via evaluate', {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
 
     // Main match loop
     while (tick < maxTicks && !matchWinner) {
