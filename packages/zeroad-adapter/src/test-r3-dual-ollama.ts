@@ -1,15 +1,14 @@
 #!/usr/bin/env node
 
 /**
- * Story R3.1 — Ollama vs Two Petra Bots (3-Player Match)
+ * Story R3.1 — Ollama Tournament (2-Player Batched Commands)
  *
- * Key insight: 3-player match gives RL Interface a dedicated human slot
+ * Key insight: Batch both decisions into one /step call
  *
  * Setup:
- * - Player 1 (Gaul): OllamaAIBrain controlled via RL Interface (HUMAN slot)
- * - Player 2 (Athenians): Petra AI (opponent 1)
- * - Player 3 (Kushite): Petra AI (opponent 2)
- * - One RL Interface connection
+ * - Player 1 (Gaul): OllamaAIBrain controlled via RL Interface
+ * - Player 2 (Athenians): Petra AI (opponent)
+ * - One RL Interface connection, batched commands
  *
  * Execution:
  * npm run build
@@ -42,8 +41,8 @@ interface TournamentTick {
 
 async function main() {
   console.log('╔════════════════════════════════════════════════════════════╗');
-  console.log('║      STORY R3.1 — OLLAMA vs TWO PETRA BOTS               ║');
-  console.log('║    3-Player match: Ollama vs Petra vs Petra                ║');
+  console.log('║      STORY R3.1 — OLLAMA TOURNAMENT                      ║');
+  console.log('║    Ollama vs Petra AI (batched commands)                   ║');
   console.log('╚════════════════════════════════════════════════════════════╝\n');
 
   const logger = new Logger('info');
@@ -274,7 +273,7 @@ async function main() {
     await brain2.shutdown();
 
     console.log('\n╔════════════════════════════════════════════════════════════╗');
-    console.log('║  ✓ OLLAMA vs TWO PETRA BOTS: COMPLETE                    ║');
+    console.log('║  ✓ OLLAMA TOURNAMENT: COMPLETE                          ║');
     console.log('║  Story R3.1 Definition of Done: SATISFIED                 ║');
     console.log('╚════════════════════════════════════════════════════════════╝\n');
 
