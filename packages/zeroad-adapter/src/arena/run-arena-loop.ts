@@ -219,23 +219,29 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
         }
 
         // Get decision from brain only every N ticks (for speed)
-        let commands: any[] = [];
+        // Fire-and-forget: Send commands as soon as AI responds, don't wait
         if (tick % decisionFrequency === 0) {
-          const decision = await brain.decide(worldState).catch(err => ({
-            playerID: 1,
-            commands: [],
-            reasoning: `Error: ${err}`,
-            timestamp: new Date(),
-          }));
-          commands = decision.commands || [];
+          brain.decide(worldState)
+            .then(decision => {
+              if (decision.commands && decision.commands.length > 0) {
+                // Send commands immediately without waiting
+                client.step(decision.commands).catch(err => {
+                  logger.error('Failed to send AI commands', {
+                    error: err instanceof Error ? err.message : String(err),
+                  });
+                });
+              }
+            })
+            .catch(err => {
+              logger.error('Brain decision failed', {
+                tick,
+                error: err instanceof Error ? err.message : String(err),
+              });
+            });
         }
 
-        // Send commands
-        if (commands && commands.length > 0) {
-          gameState = await client.step(commands);
-        } else {
-          gameState = await client.step([]);
-        }
+        // Step game state without waiting for AI decision
+        gameState = await client.step([]);
 
         tick++;
 
