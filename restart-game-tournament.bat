@@ -23,9 +23,9 @@ REM No AI assignments (both players neutral)
   --rl-interface=127.0.0.1:6000 ^
   --mod=public ^
   -autostart="skirmishes/acropolis_bay_2p" ^
-  -autostart-ai=2:petra ^
-  -autostart-civ=1:gaul ^
-  -autostart-civ=2:athen
+  -autostart-ai=1:petra ^
+  -autostart-civ=1:athen ^
+  -autostart-civ=2:gaul
 
 echo.
 echo Game process ended.

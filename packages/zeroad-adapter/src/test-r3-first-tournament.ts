@@ -56,7 +56,7 @@ class CompetitiveBrain implements AIBrain {
       topK: 40,
       numPredict: 256,
       timeout: 30000,
-      playerID: 1, // Control Player 1 (Gaul)
+      playerID: 2, // Control Player 2 (Gaul) - RL Interface target
     });
   }
 
@@ -74,10 +74,10 @@ class CompetitiveBrain implements AIBrain {
 
       const player1Units = worldState.agents.filter(
         a => (a.customData as any)?.type === 'unit' && a.controlledByPlayerId?.toString() === '1'
-      ).length;
+      ).length; // Petra AI (Athenians)
       const player2Units = worldState.agents.filter(
         a => (a.customData as any)?.type === 'unit' && a.controlledByPlayerId?.toString() === '2'
-      ).length;
+      ).length; // Ollama (Gaul)
 
       this.decisions.push({
         tick,
@@ -92,7 +92,7 @@ class CompetitiveBrain implements AIBrain {
     } catch (error) {
       this.logger.error('Brain decision failed', { error: String(error) });
       return {
-        playerID: 1,
+        playerID: 2,
         commands: [],
         reasoning: `Error: ${error}`,
         timestamp: new Date(),
@@ -141,8 +141,8 @@ async function main() {
 
       if (player1Units.length > 0 && player2Units.length > 0) {
         console.log(`[INIT] ✓ Game ready`);
-        console.log(`       Player 1 (Gaul/Ollama): ${player1Units.length} units`);
-        console.log(`       Player 2 (Athenians/Petra AI): ${player2Units.length} units\n`);
+        console.log(`       Player 1 (Athenians/Petra AI): ${player1Units.length} units`);
+        console.log(`       Player 2 (Gaul/Ollama): ${player2Units.length} units\n`);
         break;
       }
       playableState = await client.step([]);
@@ -177,8 +177,8 @@ async function main() {
     const lastDecision = brain.decisions[brain.decisions.length - 1];
     if (lastDecision) {
       console.log(`Final Tick: ${lastDecision.tick}`);
-      console.log(`Player 1 (Ollama/Gaul): ${lastDecision.player1Units} units`);
-      console.log(`Player 2 (Petra AI/Athenians): ${lastDecision.player2Units} units`);
+      console.log(`Player 1 (Petra AI/Athenians): ${lastDecision.player1Units} units`);
+      console.log(`Player 2 (Ollama/Gaul): ${lastDecision.player2Units} units`);
 
       // Winner
       console.log('\n[WINNER]\n');
