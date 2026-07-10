@@ -274,6 +274,9 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
     logger.info(`✓ Ollama brain initialized (${OLLAMA_MODEL})\n`);
 
     // Initialize automatic camera manager for caster view
+    let cameraStateUpdateCallback: ((state: any, prev?: any) => void) | null = null;
+    let previousCameraState: any = null;
+
     const cameraManager = new AutomaticCameraManager(
       {
         injectCommand: async (command: any) => {
@@ -297,16 +300,26 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
       },
       {
         onStateUpdate: (callback: any) => {
-          // Will be called each tick with game state
-          return () => {}; // Return unsubscribe function
+          // Store callback to be called each tick
+          cameraStateUpdateCallback = callback;
+          return () => {
+            cameraStateUpdateCallback = null;
+          };
         },
-        getCurrentGameState: () => null,
+        getCurrentGameState: () => previousCameraState,
       },
       eventFeed
     );
 
     cameraManager.start();
     logger.info('✓ Automatic camera manager started\n');
+
+    // Log camera events for debugging
+    eventFeed.subscribe((type: string, data: any) => {
+      if (type.startsWith('camera:')) {
+        logger.info(`🎥 Camera: ${type}`, data);
+      }
+    });
 
     // Get initial state
     let gameState: any = await client.step([]);
@@ -380,7 +393,10 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
         };
 
         // Let camera manager process state updates (will move camera to interesting locations)
-        eventFeed.broadcast('game:state-update', gameStateForCamera);
+        if (cameraStateUpdateCallback) {
+          cameraStateUpdateCallback(gameStateForCamera, previousCameraState);
+        }
+        previousCameraState = gameStateForCamera;
 
         // Check win conditions
         if (playerUnits === 0) {
