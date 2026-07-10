@@ -1,13 +1,14 @@
 #!/usr/bin/env node
 
 /**
- * Story R3.1 — Ollama Tournament (2-Player Batched Commands)
+ * Story R3.1 — Ollama Tournament (3-Player Batched Commands)
  *
  * Key insight: Batch both decisions into one /step call
  *
  * Setup:
- * - Player 1 (Gaul): OllamaAIBrain controlled via RL Interface
- * - Player 2 (Athenians): Petra AI (opponent)
+ * - Player 1 (Athenians): OllamaAIBrain controlled via RL Interface
+ * - Player 2 (Gaul): Petra AI (opponent)
+ * - Player 3 (Kushite): Petra AI (opponent)
  * - One RL Interface connection, batched commands
  *
  * Execution:
@@ -92,8 +93,8 @@ async function main() {
     const p1Units = entities.filter(e => e.owner === 1 && (e.template || '').includes('unit'));
     const p2Units = entities.filter(e => e.owner === 2 && (e.template || '').includes('unit'));
     const p3Units = entities.filter(e => e.owner === 3 && (e.template || '').includes('unit'));
-    console.log(`       Player 1 (Gaul/Ollama): ${p1Units.length} units`);
-    console.log(`       Player 2 (Athenians/Petra): ${p2Units.length} units`);
+    console.log(`       Player 1 (Athenians/Ollama): ${p1Units.length} units`);
+    console.log(`       Player 2 (Gaul/Petra): ${p2Units.length} units`);
     console.log(`       Player 3 (Kushite/Petra): ${p3Units.length} units\n`);
 
     // Tournament loop
@@ -201,14 +202,14 @@ async function main() {
     console.log(`Duration: ${(duration / 1000).toFixed(1)}s (${ticksCompleted} ticks)`);
     console.log('');
 
-    console.log('Player 1 (Gaul/Ollama):');
+    console.log('Player 1 (Athenians/Ollama):');
     console.log(`  Start: ${firstTick.player1Units} units`);
     console.log(`  End: ${lastTick.player1Units} units`);
     console.log(`  Change: ${lastTick.player1Units - firstTick.player1Units} units`);
     console.log(`  Avg commands/tick: ${(tickHistory.reduce((s, t) => s + t.player1Commands, 0) / ticksCompleted).toFixed(1)}`);
     console.log('');
 
-    console.log('Player 2 (Athenians/Petra):');
+    console.log('Player 2 (Gaul/Petra):');
     console.log(`  Start: ${firstTick.player2Units} units`);
     console.log(`  End: ${lastTick.player2Units} units`);
     console.log(`  Change: ${lastTick.player2Units - firstTick.player2Units} units`);
