@@ -149,7 +149,7 @@ async function startGame(): Promise<ChildProcess> {
  */
 async function configureGame(): Promise<void> {
   const fs = await import('fs').then(m => m.promises);
-  const path = require('path');
+  const path = await import('path').then(m => m.default);
 
   try {
     logger.info('⚙️  Configuring 0 A.D. camera settings...');
