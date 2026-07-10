@@ -1,0 +1,70 @@
+{
+  "timestamp": "2026-07-10T16:04:20.922275",
+  "story": "R4.3 - Runtime Metrics Report",
+  "match": {
+    "duration": {
+      "real_time_ms": 415365,
+      "real_time_seconds": 415.4,
+      "real_time_minutes": 6.9
+    },
+    "ticks": {
+      "completed": 300,
+      "tick_rate": 0.72
+    }
+  },
+  "observations": {
+    "total_observations_processed": 300,
+    "total_decisions_generated": 534,
+    "total_commands_executed": 534,
+    "invalid_commands": 0,
+    "failed_commands": 0,
+    "command_throughput_per_second": 1.29
+  },
+  "player_1": {
+    "name": "Ollama",
+    "starting_units": 10,
+    "ending_units": 23,
+    "unit_growth": 13,
+    "growth_rate_percent": 130.0,
+    "average_units": 16.1,
+    "commands_generated": 534,
+    "avg_commands_per_tick": 1.78
+  },
+  "player_2": {
+    "name": "Petra AI",
+    "starting_units": 9,
+    "ending_units": 22,
+    "unit_growth": 13,
+    "growth_rate_percent": 144.4,
+    "average_units": 15.2,
+    "commands_generated": 0,
+    "avg_commands_per_tick": 0
+  },
+  "performance": {
+    "rl_interface_latency_avg_ms": "N/A",
+    "game_latency_avg_ms": 1384.5,
+    "active_decision_ticks": 267,
+    "idle_ticks": 33,
+    "idle_percentage": 11.0,
+    "decision_activity_rate_percent": 89.0
+  },
+  "economy_summary": {
+    "player_1_avg_units": 16.1,
+    "player_2_avg_units": 15.2,
+    "total_units_produced": 26,
+    "balance_ratio": 1.05
+  },
+  "military_summary": {
+    "player_1_final_army": 23,
+    "player_2_final_army": 22,
+    "force_multiplication_p1": 2.3,
+    "force_multiplication_p2": 2.4,
+    "total_military_units": 45
+  },
+  "match_outcome": {
+    "winner": "Player 1 (Ollama)",
+    "unit_advantage": 1,
+    "match_completion_status": "Stopped by tick limit",
+    "natural_conclusion": false
+  }
+}

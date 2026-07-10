@@ -1,0 +1,41 @@
+Metric,Value,Unit
+Match Duration (Real Time),415.365,seconds
+Match Duration (Real Time),6.92275,minutes
+Game Ticks Completed,300,ticks
+Tick Rate,0.7222563287710808,ticks/second
+""
+OBSERVATIONS PROCESSED,300,observations
+DECISIONS GENERATED,534,total decisions
+COMMANDS EXECUTED,534,commands
+Invalid Commands,0,count
+Failed Commands,0,count
+""
+PLAYER 1 (OLLAMA)
+Starting Units,10,units
+Ending Units,23,units
+Unit Growth,13,units
+Growth Rate,130.0,%
+Average Unit Count,16.14,units
+Commands Generated,534,count
+Commands per Tick,1.78,avg
+""
+PLAYER 2 (PETRA AI)
+Starting Units,9,units
+Ending Units,22,units
+Unit Growth,13,units
+Growth Rate,144.44444444444443,%
+Average Unit Count,15.18,units
+Commands Generated,0,count
+Commands per Tick,0.0,avg
+""
+SYSTEM PERFORMANCE
+Total Commands Throughput,1.2856162652125238,commands/second
+Average Commands per Tick,1.78,commands
+Active Decision Ticks,267,ticks
+Idle Ticks (0 commands),33,ticks
+Idle Percentage,11.0,%
+Decision Activity Rate,89.0,%
+""
+WINNER,Player 1 (Ollama),
+Unit Advantage,1,units
+Match Completion,Stopped by tick limit,status
