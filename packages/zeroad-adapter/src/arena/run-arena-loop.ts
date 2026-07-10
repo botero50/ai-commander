@@ -23,6 +23,8 @@ import { promisify } from 'util';
 import { RLHTTPClient } from '../rl-interface/http-client.js';
 import { WorldStateMapper } from '../rl-interface/world-state-mapper.js';
 import { OllamaAIBrain } from '../rl-interface/ollama-brain.js';
+import { AutomaticCameraManager } from '../camera/automatic-camera-manager.js';
+import { EventFeed } from '../match/event-feed.js';
 import { Logger } from '../config/logger.js';
 
 const execAsync = promisify(exec);
@@ -253,6 +255,9 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
     const client = new RLHTTPClient(RL_HOST, RL_PORT, 10000, logger);
     const worldStateMapper = new WorldStateMapper(logger);
 
+    // Initialize event feed for camera and broadcast events
+    const eventFeed = new EventFeed();
+
     // Initialize Ollama brain
     const brain = new OllamaAIBrain(logger, {
       modelName: OLLAMA_MODEL,
@@ -267,6 +272,41 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
 
     await brain.initialize();
     logger.info(`✓ Ollama brain initialized (${OLLAMA_MODEL})\n`);
+
+    // Initialize automatic camera manager for caster view
+    const cameraManager = new AutomaticCameraManager(
+      {
+        injectCommand: async (command: any) => {
+          // Send camera commands via evaluate endpoint
+          if (command.actionType === 'camera:set-target') {
+            const { x, z, duration } = command.parameters;
+            const code = `
+              let cam = Engine.GetCameraData();
+              // Simple pan to position (0 A.D. will handle smooth movement)
+              Engine.SetCameraData(${x}, ${z}, cam.zoom, cam.rotX, cam.rotY, cam.zoom);
+            `;
+            try {
+              await client.evaluate(code);
+              logger.debug('Camera command executed', { x, z, duration });
+            } catch (error) {
+              logger.warn('Camera command failed', { error });
+            }
+          }
+          return null;
+        },
+      },
+      {
+        onStateUpdate: (callback: any) => {
+          // Will be called each tick with game state
+          return () => {}; // Return unsubscribe function
+        },
+        getCurrentGameState: () => null,
+      },
+      eventFeed
+    );
+
+    cameraManager.start();
+    logger.info('✓ Automatic camera manager started\n');
 
     // Get initial state
     let gameState: any = await client.step([]);
@@ -309,6 +349,38 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
         const enemyUnits = worldState.agents.filter(
           a => (a.customData as any)?.type === 'unit' && a.controlledByPlayerId?.toString() === '2'
         ).length;
+
+        // Update automatic camera to follow interesting actions
+        // Convert world state to format camera manager expects
+        const gameStateForCamera = {
+          tick: worldState.time.currentTick.number,
+          units: worldState.agents
+            .filter(a => (a.customData as any)?.type === 'unit')
+            .map(a => {
+              const customData = a.customData as any;
+              return {
+                id: customData?.entityId?.toString() || '',
+                owner: a.controlledByPlayerId?.toString() || '',
+                position: customData?.position || { x: 0, z: 0 },
+                health: customData?.health,
+              };
+            }),
+          buildings: worldState.agents
+            .filter(a => (a.customData as any)?.type === 'building')
+            .map(a => {
+              const customData = a.customData as any;
+              return {
+                id: customData?.entityId?.toString() || '',
+                owner: a.controlledByPlayerId?.toString() || '',
+                type: customData?.template || '',
+                position: customData?.position || { x: 0, z: 0 },
+              };
+            }),
+          players: worldState.players.map(p => ({ id: p.id, name: p.name })),
+        };
+
+        // Let camera manager process state updates (will move camera to interesting locations)
+        eventFeed.broadcast('game:state-update', gameStateForCamera);
 
         // Check win conditions
         if (playerUnits === 0) {
@@ -365,6 +437,9 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
         break;
       }
     }
+
+    // Stop camera manager
+    cameraManager.stop();
 
     if (matchWinner) {
       stats.matchesCompleted++;
