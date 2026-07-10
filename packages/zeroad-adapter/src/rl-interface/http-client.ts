@@ -123,10 +123,18 @@ export class RLHTTPClient {
    */
   async step(commands: GameCommand[]): Promise<RawGameState> {
     try {
-      // Convert commands to official format: playerId;jsonCommand\n
+      // Convert commands to official format: just raw JSON (no playerID prefix)
+      // The RL Interface infers player ID from session context
       const body = commands
-        .map(cmd => `${cmd.playerID};${JSON.stringify(cmd.json_cmd)}`)
+        .map(cmd => JSON.stringify(cmd.json_cmd))
         .join('\n') + (commands.length > 0 ? '\n' : '');
+
+      if (commands.length > 0) {
+        this.logger.info('Sending commands to RL Interface', {
+          commandCount: commands.length,
+          body: body.substring(0, 500),
+        });
+      }
 
       this.logger.debug('Executing step', {
         commandCount: commands.length,
