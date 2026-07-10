@@ -20,7 +20,8 @@ set PYROGENESIS=%USERPROFILE%\AppData\Local\0 A.D. Empires Ascendant\binaries\sy
   -autostart-ai=3:petra ^
   -autostart-civ=1:athen ^
   -autostart-civ=2:gaul ^
-  -autostart-civ=3:kushite
+  -autostart-civ=3:kushite ^
+  -autostartorloadlastsave
 
 echo.
 echo Game process ended.
