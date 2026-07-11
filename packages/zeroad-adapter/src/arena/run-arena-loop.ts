@@ -325,8 +325,9 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
     // Initialize event feed for camera and broadcast events
     const eventFeed = new EventFeed();
 
-    // Initialize camera controller (communicates with camera_commander mod)
-    const cameraController = new CameraModController(logger);
+    // Initialize camera controller (communicates with RL Interface)
+    const cameraController = new CameraModController(logger, client);
+    cameraController.setRLClient(client);
     await cameraController.connect();
 
     // Initialize Ollama brain

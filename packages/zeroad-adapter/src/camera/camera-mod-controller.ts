@@ -21,23 +21,30 @@ export interface CameraCommand {
 }
 
 export class CameraModController {
-  private modSocket: any = null;
+  private rlClient: any = null;
   private isConnected = false;
   private commandQueue: CameraCommand[] = [];
 
-  constructor(private logger: Logger) {}
+  constructor(private logger: Logger, rlClient?: any) {
+    this.rlClient = rlClient;
+  }
 
   /**
-   * Connect to camera mod (when game starts)
+   * Connect to camera controller
    */
   connect(): Promise<void> {
     return new Promise((resolve) => {
-      // For now, just resolve - actual connection happens when game starts
-      // The mod will be loaded with the game, so we don't need to connect separately
       this.isConnected = true;
-      this.logger.info('✓ Camera mod controller ready');
+      this.logger.info('✓ Camera controller ready');
       resolve();
     });
+  }
+
+  /**
+   * Set the RL client for executing camera commands
+   */
+  setRLClient(client: any): void {
+    this.rlClient = client;
   }
 
   /**
@@ -45,8 +52,28 @@ export class CameraModController {
    */
   async panTo(x: number, z: number, duration: number = 1000): Promise<void> {
     if (!this.isConnected) {
-      this.logger.warn('Camera mod not connected');
+      this.logger.warn('Camera controller not connected');
       return;
+    }
+
+    this.logger.info(`🎥 Pan camera to (${x.toFixed(1)}, ${z.toFixed(1)}) over ${duration}ms`);
+
+    // If we have an RL client, send the command through evaluate
+    if (this.rlClient) {
+      try {
+        const code = `
+          let cam = Engine.GetCameraData ? Engine.GetCameraData() : null;
+          if (cam) {
+            Engine.SetCameraData(${x}, ${z}, cam.zoom, cam.rotX, cam.rotY, cam.zoom);
+            print("[Camera] Panned to ${x}, ${z}");
+          }
+        `;
+        await this.rlClient.evaluate(code);
+      } catch (error) {
+        this.logger.debug('Camera pan via evaluate failed (expected)', {
+          error: error instanceof Error ? error.message : String(error)
+        });
+      }
     }
 
     const command: CameraCommand = {
@@ -56,7 +83,6 @@ export class CameraModController {
       duration,
     };
 
-    this.logger.debug('Camera: pan to', { x, z, duration });
     this.commandQueue.push(command);
   }
 
@@ -65,9 +91,11 @@ export class CameraModController {
    */
   async setPosition(x: number, z: number): Promise<void> {
     if (!this.isConnected) {
-      this.logger.warn('Camera mod not connected');
+      this.logger.warn('Camera controller not connected');
       return;
     }
+
+    this.logger.info(`🎥 Set camera to (${x.toFixed(1)}, ${z.toFixed(1)})`);
 
     const command: CameraCommand = {
       action: 'set',
@@ -75,7 +103,6 @@ export class CameraModController {
       z,
     };
 
-    this.logger.debug('Camera: set position', { x, z });
     this.commandQueue.push(command);
   }
 
@@ -84,16 +111,17 @@ export class CameraModController {
    */
   async setZoom(distance: number): Promise<void> {
     if (!this.isConnected) {
-      this.logger.warn('Camera mod not connected');
+      this.logger.warn('Camera controller not connected');
       return;
     }
+
+    this.logger.info(`🎥 Set zoom to ${distance.toFixed(1)}`);
 
     const command: CameraCommand = {
       action: 'zoom',
       distance,
     };
 
-    this.logger.debug('Camera: set zoom', { distance });
     this.commandQueue.push(command);
   }
 
