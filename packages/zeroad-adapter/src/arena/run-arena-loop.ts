@@ -470,13 +470,29 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
     // Main match loop
     let gameLoopShouldRun = true;
     let cameraPositionDetectedTime: number | null = null;
+    let pausedForAddressFinder = false;
 
     while (tick < maxTicks && !matchWinner && gameLoopShouldRun) {
-      // Wait for camera position to be detected, then pause
-      if (firstCameraDetected && !cameraPositionDetectedTime) {
-        cameraPositionDetectedTime = Date.now();
-        logger.info('🔒 GAME LOOP PAUSED - Waiting for you to use CheatEngine...');
-        logger.info('   When ready, press Ctrl+C to exit and restart when done');
+      // Pause immediately after first tick to allow address finder to scan stable memory
+      if (!pausedForAddressFinder) {
+        pausedForAddressFinder = true;
+        logger.info('');
+        logger.info('╔════════════════════════════════════════════════════╗');
+        logger.info('║        🔒 GAME PAUSED FOR CAMERA ADDRESS FINDER     ║');
+        logger.info('╠════════════════════════════════════════════════════╣');
+        logger.info('║                                                    ║');
+        logger.info('║  The game is now PAUSED at tick 0.                 ║');
+        logger.info('║  This makes it easier for the Python script to     ║');
+        logger.info('║  scan memory for the camera address.               ║');
+        logger.info('║                                                    ║');
+        logger.info('║  In the other terminal, run:                       ║');
+        logger.info('║  python packages/zeroad-adapter/tools/find-camera-address.py  ║');
+        logger.info('║                                                    ║');
+        logger.info('║  When the script finishes, press Ctrl+C here,      ║');
+        logger.info('║  and restart the game to test the camera injector. ║');
+        logger.info('║                                                    ║');
+        logger.info('╚════════════════════════════════════════════════════╝');
+        logger.info('');
         await new Promise(resolve => setTimeout(resolve, 1000000)); // Wait indefinitely
       }
 
