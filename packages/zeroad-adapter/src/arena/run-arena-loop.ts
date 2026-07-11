@@ -361,7 +361,6 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
           if (command.actionType === 'camera:set-target') {
             const { x, z, duration } = command.parameters;
             await cameraController.panTo(x, z, duration || 1000);
-            logger.info('🎥 Camera pan', { x, z, duration });
           }
           return null;
         },
