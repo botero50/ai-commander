@@ -8,8 +8,6 @@
  */
 
 import { Logger } from '../config/logger.js';
-import * as fs from 'fs';
-import * as path from 'path';
 import {
   RawGameState,
   RawPlayer,
@@ -173,29 +171,6 @@ export class WorldStateMapper {
       ? rawState.entities
       : Object.values(rawState.entities);
 
-    // Log sample entity to see what position fields are available
-    if (entitiesArray.length > 0) {
-      const sampleEntity = entitiesArray[0] as any;
-      const logData = {
-        id: sampleEntity.id,
-        template: sampleEntity.template,
-        position: sampleEntity.position,
-        x: sampleEntity.x,
-        z: sampleEntity.z,
-        allKeys: Object.keys(sampleEntity),
-      };
-
-      // Write to file to debug
-      try {
-        const debugFile = path.join(process.cwd(), 'entity-debug.json');
-        fs.writeFileSync(debugFile, JSON.stringify(logData, null, 2));
-        this.logger.info('Debug info written to entity-debug.json');
-      } catch (err) {
-        // Ignore file write errors
-      }
-
-      this.logger.info('📍 Sample raw entity:', logData);
-    }
 
     return entitiesArray
       .map((rawEntity: any) => {

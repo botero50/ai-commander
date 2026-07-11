@@ -1,0 +1,750 @@
+╔════════════════════════════════════════════════════════════╗
+║       AI COMMANDER ARENA — AUTOMATED MATCH LOOP            ║
+║    Ollama vs Petra AI (Auto-restart after each match)      ║
+╚════════════════════════════════════════════════════════════╝
+
+[ArenaLoop:INFO] 🎮 ARENA STARTED { maxMatches: 1, rlInterface: '127.0.0.1:6000' }
+[ArenaLoop:INFO] 🔴 Killing any running 0 A.D. processes... 
+[ArenaLoop:INFO] ✓ Processes killed 
+[ArenaLoop:INFO] Starting game initialization... 
+[ArenaLoop:INFO] Configuring game... 
+[ArenaLoop:INFO] ⚙️  Configuring 0 A.D. camera settings... 
+[ArenaLoop:INFO] ✓ Game configured: fullscreen=true, resolution=1920x1080, zoom=max 
+[ArenaLoop:INFO] 🟢 Starting fresh 0 A.D. instance... 
+[ArenaLoop:INFO] ⏳ Waiting 5s for game to start... 
+[ArenaLoop:INFO] 
+============================================================ 
+[ArenaLoop:INFO] Match 1 - Connecting to game... 
+[ArenaLoop:INFO] ============================================================
+ 
+[ArenaLoop:INFO] 📡 Waiting for RL Interface to be ready... 
+[ArenaLoop:INFO] ✓ RL Interface is ready 
+[ArenaLoop:INFO] ✓ Camera mod controller ready 
+[ArenaLoop:INFO] Ollama initialized {
+  baseUrl: 'http://localhost:11434',
+  selectedModel: 'tinyllama:latest',
+  availableModels: 'tinyllama:latest, neural-chat:latest, mistral:latest'
+}
+[ArenaLoop:INFO] ✓ Ollama brain initialized (tinyllama:latest)
+ 
+[ArenaLoop:INFO] ✓ Automatic camera manager started
+ 
+[ArenaLoop:INFO] 🎮 Match started - Initial game tick: 8000 
+[ArenaLoop:ERROR] Failed to evaluate code { error: 'TypeError: fetch failed' }
+[ArenaLoop:WARN] Could not set camera zoom via evaluate { error: 'fetch failed' }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 12000, playersCount: 3, agentsCount: 1732 }
+[ArenaLoop:INFO] 📍 Sample unit positions: {
+  sampleUnit: {
+    id: '9340',
+    owner: '1',
+    position: { x: 599, z: 797 },
+    health: { current: 100, max: 100 }
+  },
+  totalUnits: 18,
+  allHaveZeroPos: false
+}
+[CameraInterest] Sample unit: {"id":"9340","owner":"1","position":{"x":599,"z":797}}
+[ArenaLoop:INFO] 🎥 Camera: camera:target_updated {
+  x: 581.3333333333334,
+  z: 812.1111111111111,
+  reason: 'gathering',
+  score: 60,
+  unitCount: 9
+}
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 20000, playersCount: 3, agentsCount: 1732 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 2.5320296296296303, z: 3.5371950617283954, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 28000, playersCount: 3, agentsCount: 1732 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 15.825185185185187, z: 22.10746913580247, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 36000, playersCount: 3, agentsCount: 1732 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 34.93167407407408, z: 48.79885432098766, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 44000, playersCount: 3, agentsCount: 1732 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 63.662976000000015, z: 88.935912, duration: 100 }
+[ArenaLoop:INFO] Brain decision made { decision: 5, commands: 0, responseLength: 230 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 52000, playersCount: 3, agentsCount: 1732 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 93.77604266666667, z: 131.00326755555554, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 60000, playersCount: 3, agentsCount: 1732 }
+[CameraInterest] Sample unit: {"id":"9340","owner":"1","position":{"x":601,"z":796}}
+[ArenaLoop:INFO] 🎥 Camera: camera:target_updated {
+  x: 597,
+  z: 806.1666666666666,
+  reason: 'gathering',
+  score: 60,
+  unitCount: 6
+}
+[ArenaLoop:INFO] 🎥 Camera pan { x: 129.70244266666668, z: 181.19173422222224, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 68000, playersCount: 3, agentsCount: 1732 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 130.91367793527468, z: 182.81166924711823, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 76000, playersCount: 3, agentsCount: 1732 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 134.72848750554076, z: 187.91368682895805, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 84000, playersCount: 3, agentsCount: 1732 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 142.56911745418432, z: 198.3999328954659, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 92000, playersCount: 3, agentsCount: 1732 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 155.45614564642136, z: 215.63535269910045, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 100000, playersCount: 3, agentsCount: 1732 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 184.43607096200535, z: 254.39379810957513, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 108000, playersCount: 3, agentsCount: 1732 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 203.67419217791053, z: 280.1233216617213, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 116000, playersCount: 3, agentsCount: 1733 }
+[ArenaLoop:INFO] 🎥 Camera: camera:dramatic_moment {
+  type: 'major_expansion',
+  position: { x: 529, z: 83 },
+  severity: 50,
+  description: 'New foundation|structures/pers/house constructed',
+  players: [ '2' ]
+}
+[CameraInterest] Sample unit: {"id":"9340","owner":"1","position":{"x":601,"z":796}}
+[ArenaLoop:INFO] 🎥 Camera: camera:target_updated { x: 622.8, z: 804.6, reason: 'gathering', score: 60, unitCount: 5 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 239.87043790554077, z: 328.533046628958, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 124000, playersCount: 3, agentsCount: 1734 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 241.9413209773476, z: 331.1076167127886, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 132000, playersCount: 3, agentsCount: 1734 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 246.35266953267578, z: 336.591908015623, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 140000, playersCount: 3, agentsCount: 1734 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 254.45545906659453, z: 346.66548474895427, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 148000, playersCount: 3, agentsCount: 1734 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 265.42494439781063, z: 360.30300448787744, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 156000, playersCount: 3, agentsCount: 1734 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 276.9380195162844, z: 374.61632771527485, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 164000, playersCount: 3, agentsCount: 1734 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 290.8490846480519, z: 391.9108879973381, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 172000, playersCount: 3, agentsCount: 1734 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 308.1864333105242, z: 413.4650837928528, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 180000, playersCount: 3, agentsCount: 1734 }
+[CameraInterest] Sample unit: {"id":"9340","owner":"1","position":{"x":601,"z":796}}
+[ArenaLoop:INFO] 🎥 Camera: camera:target_updated {
+  x: 606.3333333333334,
+  z: 797.3333333333334,
+  reason: 'gathering',
+  score: 60,
+  unitCount: 3
+}
+[ArenaLoop:INFO] 🎥 Camera pan { x: 329.79795664963655, z: 440.33303312923874, duration: 100 }
+[ArenaLoop:INFO] Brain decision made { decision: 22, commands: 2, responseLength: 1167 }
+[ArenaLoop:INFO] Sending commands to RL Interface {
+  commandCount: 2,
+  body: '{"type":"move","entities":[9340,9341,9342],"x":546,"z":101,"queued":false}\n' +
+    '{"type":"move","entities":[9340,9341,9342],"x":181,"z":383,"queued":false}\n'
+}
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 188000, playersCount: 3, agentsCount: 1734 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 331.33205201486584, z: 442.31351212797097, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 200000, playersCount: 3, agentsCount: 1734 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 338.95410442393967, z: 452.1533924023964, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 208000, playersCount: 3, agentsCount: 1734 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 345.40782559267785, z: 460.4849860751595, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 216000, playersCount: 3, agentsCount: 1734 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 353.72600972332344, z: 471.22355510529866, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 224000, playersCount: 3, agentsCount: 1734 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 364.7345758075718, z: 485.43534038942346, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 232000, playersCount: 3, agentsCount: 1734 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 377.3866223616043, z: 501.7688181243612, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 240000, playersCount: 3, agentsCount: 1735 }
+[CameraInterest] Sample unit: {"id":"9340","owner":"1","position":{"x":600,"z":797}}
+[ArenaLoop:INFO] 🎥 Camera: camera:target_updated {
+  x: 606,
+  z: 797.6666666666666,
+  reason: 'gathering',
+  score: 60,
+  unitCount: 3
+}
+[ArenaLoop:INFO] 🎥 Camera pan { x: 391.98990253351695, z: 520.6212899775389, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 248000, playersCount: 3, agentsCount: 1736 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 392.9760610626425, z: 521.8979150733225, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 256000, playersCount: 3, agentsCount: 1735 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 395.25446011807014, z: 524.8474017191942, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 264000, playersCount: 3, agentsCount: 1734 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 398.9297268585612, z: 529.6051943215355, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 272000, playersCount: 3, agentsCount: 1734 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 404.3596861670797, z: 536.6345127501705, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 280000, playersCount: 3, agentsCount: 1734 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 413.3385987007846, z: 548.258105443261, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 288000, playersCount: 3, agentsCount: 1734 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 421.07263827642663, z: 558.2701559629705, duration: 100 }
+[ArenaLoop:INFO] Brain decision made { decision: 35, commands: 0, responseLength: 881 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 296000, playersCount: 3, agentsCount: 1734 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 431.54581686844193, z: 571.8281410417438, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 304000, playersCount: 3, agentsCount: 1734 }
+[CameraInterest] Sample unit: {"id":"9340","owner":"1","position":{"x":602,"z":797}}
+[ArenaLoop:INFO] 🎥 Camera: camera:target_updated { x: 585.25, z: 820.125, reason: 'gathering', score: 60, unitCount: 8 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 441.27519147726264, z: 584.4232395224242, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 312000, playersCount: 3, agentsCount: 1734 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 441.78313460173086, z: 585.2547953333891, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 320000, playersCount: 3, agentsCount: 1734 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 444.1932089075977, z: 589.2003380474457, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 328000, playersCount: 3, agentsCount: 1734 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 446.5490207078524, z: 593.0570473868868, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 336000, playersCount: 3, agentsCount: 1734 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 450.33037507889355, z: 599.2475184240699, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 344000, playersCount: 3, agentsCount: 1734 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 455.3813952946939, z: 607.5165647196511, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 352000, playersCount: 3, agentsCount: 1734 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 460.9407425677852, z: 616.6177953642252, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 360000, playersCount: 3, agentsCount: 1734 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 468.0031868418539, z: 628.1797523881853, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 368000, playersCount: 3, agentsCount: 1734 }
+[CameraInterest] Sample unit: {"id":"9340","owner":"1","position":{"x":602,"z":797}}
+[ArenaLoop:INFO] 🎥 Camera: camera:target_updated { x: 607.25, z: 798.25, reason: 'gathering', score: 60, unitCount: 4 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 475.4821982285817, z: 640.4236731724604, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 376000, playersCount: 3, agentsCount: 1734 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 475.876213237612, z: 640.8956089621919, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 384000, playersCount: 3, agentsCount: 1736 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 477.19705368256865, z: 642.4776600623111, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 392000, playersCount: 3, agentsCount: 1736 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 480.26144568056475, z: 646.1480691190123, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 400000, playersCount: 3, agentsCount: 1736 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 483.7074372324909, z: 650.2755432182062, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 408000, playersCount: 3, agentsCount: 1736 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 488.1601347899507, z: 655.6088104543624, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 416000, playersCount: 3, agentsCount: 1736 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 492.84333815530925, z: 661.2181685449156, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 424000, playersCount: 3, agentsCount: 1735 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 498.676259513724, z: 668.2046139458147, duration: 100 }
+[ArenaLoop:INFO] Brain decision made { decision: 52, commands: 2, responseLength: 1072 }
+[ArenaLoop:INFO] Sending commands to RL Interface {
+  commandCount: 2,
+  body: '{"type":"move","entities":[9340,9341,9342],"x":545,"z":668,"queued":false}\n' +
+    '{"type":"move","entities":[9340,9341,9342],"x":529,"z":50,"queued":false}\n'
+}
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 432000, playersCount: 3, agentsCount: 1735 }
+[CameraInterest] Sample unit: {"id":"9340","owner":"1","position":{"x":602,"z":797}}
+[ArenaLoop:INFO] 🎥 Camera: camera:target_updated { x: 604.8, z: 800, reason: 'gathering', score: 60, unitCount: 5 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 505.1163669027015, z: 675.918323060735, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 444000, playersCount: 3, agentsCount: 1735 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 505.5505445046364, z: 676.4587676980705, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 452000, playersCount: 3, agentsCount: 1735 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 506.5908872034767, z: 677.7537392260206, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 460000, playersCount: 3, agentsCount: 1735 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 508.14896454070595, z: 679.6931634102873, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 468000, playersCount: 3, agentsCount: 1735 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 510.52223247748645, z: 682.6472999748573, duration: 100 }
+[ArenaLoop:INFO] Debug info written to entity-debug.json 
+[ArenaLoop:INFO] 📍 Sample raw entity: {
+  id: 78,
+  template: 'gaia/tree/poplar_lombardy',
+  position: [ 396.16949462890625, 188.12484741210938 ],
+  x: undefined,
+  z: undefined,
+  allKeys: [ 'id', 'template', 'position', 'angle', 'owner' ]
+}
+[ArenaLoop:INFO] World state created { tick: 476000, playersCount: 3, agentsCount: 1734 }
+[ArenaLoop:INFO] 🎥 Camera pan { x: 514.6491348877146, z: 687.784281400143, duration: 100 }
+[ArenaLoop:ERROR] Tick 57 failed { error: 'read ECONNRESET' }
+[ArenaLoop:INFO] 🎥 Camera: camera:stopped {}
+[ArenaLoop:INFO] Camera mod controller disconnected 
+[ArenaLoop:WARN] 
+⏱️  MATCH 1 TIMEOUT at 57 ticks 
+[ArenaLoop:INFO] ⏳ Waiting for 54 pending AI requests... 
+[ArenaLoop:INFO] Brain decision made { decision: 58, commands: 0, responseLength: 719 }
+[ArenaLoop:INFO] Game process exited with code 143 
