@@ -1,8 +1,8 @@
 /**
  * Camera Mod Controller
  *
- * Communicates with the camera_commander mod running in 0 A.D.
- * Sends commands to move the camera to interesting game locations.
+ * Sends camera movement commands to 0 A.D. via /step endpoint.
+ * 0 A.D. processes camera commands as game actions.
  */
 
 import { Logger } from '../config/logger.js';
@@ -23,7 +23,6 @@ export interface CameraCommand {
 export class CameraModController {
   private rlClient: any = null;
   private isConnected = false;
-  private commandQueue: CameraCommand[] = [];
 
   constructor(private logger: Logger, rlClient?: any) {
     this.rlClient = rlClient;
@@ -48,7 +47,10 @@ export class CameraModController {
   }
 
   /**
-   * Pan camera to position
+   * Pan camera to position via game command
+   *
+   * Sends camera pan command through /step endpoint.
+   * 0 A.D. will smoothly interpolate camera to target.
    */
   async panTo(x: number, z: number, duration: number = 1000): Promise<void> {
     if (!this.isConnected) {
@@ -58,32 +60,35 @@ export class CameraModController {
 
     this.logger.info(`🎥 Pan camera to (${x.toFixed(1)}, ${z.toFixed(1)}) over ${duration}ms`);
 
-    // If we have an RL client, send the command through evaluate
+    // If we have an RL client, send the command through /step
     if (this.rlClient) {
       try {
-        const code = `
-          let cam = Engine.GetCameraData ? Engine.GetCameraData() : null;
-          if (cam) {
-            Engine.SetCameraData(${x}, ${z}, cam.zoom, cam.rotX, cam.rotY, cam.zoom);
-            print("[Camera] Panned to ${x}, ${z}");
+        // Send camera pan command via /step endpoint (player 0 = gaia/system command)
+        // Command format: playerID;{"type": "camera-pan", "x": x, "z": z, "duration": duration}
+        const command = {
+          type: 'camera-pan',
+          x: Math.round(x * 100) / 100,  // Round to 2 decimal places
+          z: Math.round(z * 100) / 100,
+          duration: Math.round(duration),
+        };
+
+        this.logger.debug('Sending camera pan command', command);
+
+        // Use step with camera command (send as gaia player 0)
+        await this.rlClient.step([
+          {
+            playerID: 0,  // Gaia/system player for camera commands
+            json_cmd: command,
           }
-        `;
-        await this.rlClient.evaluate(code);
+        ]);
+
+        this.logger.debug('Camera pan command sent successfully', { x, z });
       } catch (error) {
-        this.logger.debug('Camera pan via evaluate failed (expected)', {
+        this.logger.debug('Camera pan command failed', {
           error: error instanceof Error ? error.message : String(error)
         });
       }
     }
-
-    const command: CameraCommand = {
-      action: 'pan',
-      x,
-      z,
-      duration,
-    };
-
-    this.commandQueue.push(command);
   }
 
   /**
@@ -97,13 +102,26 @@ export class CameraModController {
 
     this.logger.info(`🎥 Set camera to (${x.toFixed(1)}, ${z.toFixed(1)})`);
 
-    const command: CameraCommand = {
-      action: 'set',
-      x,
-      z,
-    };
+    if (this.rlClient) {
+      try {
+        const command = {
+          type: 'camera-set',
+          x: Math.round(x * 100) / 100,
+          z: Math.round(z * 100) / 100,
+        };
 
-    this.commandQueue.push(command);
+        await this.rlClient.step([
+          {
+            playerID: 0,
+            json_cmd: command,
+          }
+        ]);
+      } catch (error) {
+        this.logger.debug('Camera set command failed', {
+          error: error instanceof Error ? error.message : String(error)
+        });
+      }
+    }
   }
 
   /**
@@ -117,21 +135,25 @@ export class CameraModController {
 
     this.logger.info(`🎥 Set zoom to ${distance.toFixed(1)}`);
 
-    const command: CameraCommand = {
-      action: 'zoom',
-      distance,
-    };
+    if (this.rlClient) {
+      try {
+        const command = {
+          type: 'camera-zoom',
+          distance: Math.round(distance * 100) / 100,
+        };
 
-    this.commandQueue.push(command);
-  }
-
-  /**
-   * Get pending commands (called by arena loop)
-   */
-  getPendingCommands(): CameraCommand[] {
-    const commands = this.commandQueue;
-    this.commandQueue = [];
-    return commands;
+        await this.rlClient.step([
+          {
+            playerID: 0,
+            json_cmd: command,
+          }
+        ]);
+      } catch (error) {
+        this.logger.debug('Camera zoom command failed', {
+          error: error instanceof Error ? error.message : String(error)
+        });
+      }
+    }
   }
 
   /**
@@ -139,6 +161,6 @@ export class CameraModController {
    */
   disconnect(): void {
     this.isConnected = false;
-    this.logger.info('Camera mod controller disconnected');
+    this.logger.info('Camera controller disconnected');
   }
 }
