@@ -27,6 +27,7 @@ import { WorldStateMapper } from '../rl-interface/world-state-mapper.js';
 import { OllamaAIBrain } from '../rl-interface/ollama-brain.js';
 import { AutomaticCameraManager } from '../camera/automatic-camera-manager.js';
 import { CameraModController } from '../camera/camera-mod-controller.js';
+import { CameraBroadcastServer } from '../broadcast/camera-broadcast-server.js';
 import { EventFeed } from '../match/event-feed.js';
 import { Logger } from '../config/logger.js';
 
@@ -330,6 +331,10 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
     cameraController.setRLClient(client);
     await cameraController.connect();
 
+    // Initialize camera broadcast server for external tools
+    const cameraBroadcast = new CameraBroadcastServer(logger, 3001);
+    await cameraBroadcast.start();
+
     // Initialize Ollama brain
     const brain = new OllamaAIBrain(logger, {
       modelName: OLLAMA_MODEL,
@@ -377,10 +382,14 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
     cameraManager.start();
     logger.info('✓ Automatic camera manager started\n');
 
-    // Log camera events for debugging
+    // Log camera events and broadcast to external tools
     eventFeed.subscribe((type: string, data: any) => {
       if (type.startsWith('camera:')) {
         logger.info(`🎥 Camera: ${type}`, data);
+        // Broadcast to external tools (OBS, streaming software, etc.)
+        if (type === 'camera:target_updated' && data.x && data.z) {
+          cameraBroadcast.broadcastRecommendation(data.x, data.z, data.reason || 'action', data.score || 50);
+        }
       }
     });
 
