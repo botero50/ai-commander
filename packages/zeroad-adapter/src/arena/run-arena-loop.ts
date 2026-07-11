@@ -388,26 +388,8 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
       if (type.startsWith('camera:')) {
         logger.info(`🎥 Camera: ${type}`, data);
 
-        // Log first camera detection for CheatEngine
-        if (type === 'camera:target_updated' && !firstCameraDetected && data.x && data.z) {
-          firstCameraDetected = true;
-          logger.info('');
-          logger.info('╔════════════════════════════════════════════════════╗');
-          logger.info('║          📸 FIRST CAMERA POSITION DETECTED          ║');
-          logger.info('╠════════════════════════════════════════════════════╣');
-          logger.info(`║  X Coordinate: ${data.x.toFixed(2).padEnd(35)} ║`);
-          logger.info(`║  Z Coordinate: ${data.z.toFixed(2).padEnd(35)} ║`);
-          logger.info('║                                                    ║');
-          logger.info('║  ⏸️  GAME PAUSED - GO TO CHEATENGINE NOW!          ║');
-          logger.info('║                                                    ║');
-          logger.info('║  USE THESE VALUES IN CHEATENGINE:                  ║');
-          logger.info('║  1. Open CheatEngine (attach to pyrogenesis.exe)   ║');
-          logger.info(`║  2. Value Type: Float                              ║`);
-          logger.info(`║  3. Search for X = ${data.x.toFixed(2)}                      ║`);
-          logger.info('║  4. Narrow down, then verify with Z = ' + (data.z ? data.z.toFixed(2) : '???').padEnd(13) + ' ║');
-          logger.info('╚════════════════════════════════════════════════════╝');
-          logger.info('');
-        }
+        // This is just a camera target (where to look), not the actual camera position
+        // The actual camera position was already logged above
 
         // Broadcast to external tools (OBS, streaming software, etc.)
         if (type === 'camera:target_updated' && data.x && data.z) {
@@ -434,19 +416,38 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
     ];
     let nextTestIndex = 0;
 
-    // Get initial camera position for CheatEngine
+    // Get initial ACTUAL camera position (not target) for CheatEngine
+    logger.info('');
+    logger.info('═══════════════════════════════════════════════════════');
+    logger.info('📸 GETTING ACTUAL CAMERA POSITION FOR CHEATENGINE...');
+    logger.info('═══════════════════════════════════════════════════════');
+    let initialCameraX: number | null = null;
+    let initialCameraZ: number | null = null;
     try {
       const getCameraCode = `
         let data = Engine.GetCameraData();
-        print("[CAMERA_INITIAL] X=" + data.x + " Z=" + data.z + " Zoom=" + data.zoom);
-        data.x;
+        print("[CAMERA_ACTUAL] X=" + data.x + " Z=" + data.z + " Zoom=" + data.zoom);
+        JSON.stringify({x: data.x, z: data.z, zoom: data.zoom});
       `;
       const result = await client.evaluate(getCameraCode);
-      logger.info('📸 INITIAL CAMERA POSITION DETECTED');
-      logger.info('   Use this for CheatEngine scanning:');
-      logger.info('   Watch the game console output above ⬆️');
-      logger.info('   Look for line: [CAMERA_INITIAL] X=??? Z=???');
-      logger.info('   Scan for the X and Z values in CheatEngine');
+      logger.info(`Evaluate result: ${result}`);
+      if (result && typeof result === 'string') {
+        try {
+          const cameraData = JSON.parse(result);
+          initialCameraX = cameraData.x;
+          initialCameraZ = cameraData.z;
+          logger.info('');
+          logger.info('✅ ACTUAL CAMERA POSITION FOUND:');
+          logger.info(`   X Coordinate: ${initialCameraX}`);
+          logger.info(`   Z Coordinate: ${initialCameraZ}`);
+          logger.info('');
+          logger.info('These are the ACTUAL camera position values.');
+          logger.info('Use these to search in CheatEngine (not the gathering positions)');
+          logger.info('');
+        } catch (e) {
+          logger.warn('Could not parse camera data', e);
+        }
+      }
     } catch (error) {
       logger.warn('Could not get initial camera position', {
         error: error instanceof Error ? error.message : String(error),
