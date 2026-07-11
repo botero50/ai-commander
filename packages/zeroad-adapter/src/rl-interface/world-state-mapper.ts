@@ -38,6 +38,9 @@ import type {
 } from '@ai-commander/domain';
 
 export class WorldStateMapper {
+  private lastLogTick: number = 0;
+  private logInterval: number = 100; // Log every 100 ticks (~10 seconds)
+
   constructor(private logger: Logger) {}
 
   /**
@@ -73,12 +76,17 @@ export class WorldStateMapper {
 
       // Count only actual players (exclude Gaia/neutral player 0)
       const activePlayers = players.filter((p) => p.id !== ('0' as any));
+      const tick = gameTime.currentTick.number;
 
-      this.logger.info('World state created', {
-        tick: gameTime.currentTick.number,
-        playersCount: activePlayers.length,
-        agentsCount: agents.length,
-      });
+      // Log periodically to avoid spam (every 100 ticks)
+      if (tick - this.lastLogTick >= this.logInterval) {
+        this.logger.info('Arena state', {
+          tick,
+          players: activePlayers.length,
+          agents: agents.length,
+        });
+        this.lastLogTick = tick;
+      }
 
       return worldState;
     } catch (error) {
