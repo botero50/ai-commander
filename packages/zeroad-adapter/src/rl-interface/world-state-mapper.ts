@@ -54,17 +54,22 @@ export class WorldStateMapper {
       // Map map/spatial data
       const gameMap = this.mapGameMap(rawState);
 
-      // Map players
-      const players = this.mapPlayers(rawState);
+      // Map players, filtering out Gaia (player 0)
+      const activePlayers = this.mapPlayers(rawState).filter((p) => {
+        // PlayerId is created from string, so we need to check the raw data
+        // Filter out Gaia/neutral players (typically player 0 or with name "Gaia")
+        const playerNum = parseInt(p.id as any, 10);
+        return playerNum > 0;
+      });
 
       // Map agents (units and buildings)
-      const agents = this.mapAgents(rawState, players);
+      const agents = this.mapAgents(rawState, activePlayers);
 
       // Create world state
       const worldState = createWorldState(
         gameTime,
         gameMap,
-        players,
+        activePlayers,
         [], // No team support yet
         agents,
         {
@@ -74,8 +79,6 @@ export class WorldStateMapper {
         }
       );
 
-      // Count only actual players (exclude Gaia/neutral player 0)
-      const activePlayers = players.filter((p) => p.id !== ('0' as any));
       const tick = gameTime.currentTick.number;
 
       // Log periodically to avoid spam (every 100 ticks)
