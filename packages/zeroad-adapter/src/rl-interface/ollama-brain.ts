@@ -155,16 +155,20 @@ export class OllamaAIBrain implements AIBrain {
 
       return decision;
     } catch (error) {
-      this.logger.error('Brain decision failed', {
-        decision: this.decisionCount,
-        error: String(error),
-      });
+      // Suppress AbortError (expected during shutdown/reconnection)
+      const isAbortError = error instanceof Error && error.name === 'AbortError';
+      if (!isAbortError) {
+        this.logger.error('Brain decision failed', {
+          decision: this.decisionCount,
+          error: String(error),
+        });
+      }
 
       // Return empty decision on error (observe-only)
       return {
         playerID: this.playerID,
         commands: [],
-        reasoning: `Decision failed: ${error}`,
+        reasoning: isAbortError ? 'Decision aborted' : `Decision failed: ${error}`,
         timestamp: new Date(),
       };
     }
@@ -295,10 +299,14 @@ Now output your immediate MOVE orders (be very specific):`;
       const data = (await response.json()) as OllamaResponse;
       return data.response || '';
     } catch (error) {
-      this.logger.error('Ollama API call failed', {
-        error: String(error),
-        model: this.config.modelName,
-      });
+      // Suppress AbortError (expected during shutdown/reconnection)
+      const isAbortError = error instanceof Error && error.name === 'AbortError';
+      if (!isAbortError) {
+        this.logger.error('Ollama API call failed', {
+          error: String(error),
+          model: this.config.modelName,
+        });
+      }
       throw error;
     }
   }

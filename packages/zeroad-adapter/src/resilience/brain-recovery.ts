@@ -117,12 +117,16 @@ export class BrainRecovery {
     const consecutiveFailures = health.consecutiveFailures + 1;
     const isUnhealthy = consecutiveFailures >= this.config.maxConsecutiveFailures;
 
-    this.logger.warn('Brain decision failed', {
-      brainId,
-      consecutiveFailures,
-      maxAllowed: this.config.maxConsecutiveFailures,
-      error,
-    });
+    // Suppress AbortError (expected during shutdown/reconnection)
+    const isAbortError = error === 'AbortError: This operation was aborted';
+    if (!isAbortError) {
+      this.logger.warn('Brain decision failed', {
+        brainId,
+        consecutiveFailures,
+        maxAllowed: this.config.maxConsecutiveFailures,
+        error,
+      });
+    }
 
     const updated: BrainHealth = {
       isHealthy: !isUnhealthy,

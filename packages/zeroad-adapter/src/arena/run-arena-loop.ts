@@ -539,10 +539,14 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
               }
             })
             .catch(err => {
-              logger.error('Brain decision failed', {
-                tick,
-                error: err instanceof Error ? err.message : String(err),
-              });
+              // Suppress AbortError (expected during shutdown/reconnection)
+              const isAbortError = err instanceof Error && err.name === 'AbortError';
+              if (!isAbortError) {
+                logger.error('Brain decision failed', {
+                  tick,
+                  error: err instanceof Error ? err.message : String(err),
+                });
+              }
             })
             .finally(() => {
               pendingAIRequests--;

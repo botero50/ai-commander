@@ -71,9 +71,12 @@ export class WorldStateMapper {
         }
       );
 
+      // Count only actual players (exclude Gaia/neutral player 0)
+      const activePlayers = players.filter((p) => p.id !== ('0' as any));
+
       this.logger.info('World state created', {
         tick: gameTime.currentTick.number,
-        playersCount: players.length,
+        playersCount: activePlayers.length,
         agentsCount: agents.length,
       });
 

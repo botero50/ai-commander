@@ -331,9 +331,13 @@ export class AILoopOrchestrator {
         decision = await this.brain.decide(worldState);
         metrics.brainTime = Date.now() - brainStart;
       } catch (error) {
-        this.logger.error('Brain decision failed', {
-          error: String(error),
-        });
+        // Suppress AbortError (expected during shutdown/reconnection)
+        const isAbortError = error instanceof Error && error.name === 'AbortError';
+        if (!isAbortError) {
+          this.logger.error('Brain decision failed', {
+            error: String(error),
+          });
+        }
         throw error;
       }
 

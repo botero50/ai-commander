@@ -145,9 +145,15 @@ export async function runSimpleMatch(
 
           return (decision.commands || []) as any[];
         } catch (error) {
-          monitor.recordError(error as Error);
-          lifecycle.recordError(error as Error);
-          logger.error('Brain decision failed', error);
+          // Suppress AbortError (expected during shutdown/reconnection)
+          const isAbortError = error instanceof Error && error.name === 'AbortError';
+          if (!isAbortError) {
+            logger.error('Brain decision failed', error);
+          }
+          if (error instanceof Error) {
+            monitor.recordError(error);
+            lifecycle.recordError(error);
+          }
           return [];
         }
       },
