@@ -99,24 +99,40 @@ export class GameCheats {
    */
   async sendChatMessage(message: string): Promise<boolean> {
     try {
-      this.logger.info('Sending chat message', { message });
+      this.logger.debug('Sending chat message', { message });
 
-      const safeMessage = message.replace(/"/g, '\\"');
+      const safeMessage = message.replace(/"/g, '\\"').replace(/\n/g, ' ').substring(0, 200);
       const code = `
         if (Engine.PostNetworkCommand) {
-          Engine.PostNetworkCommand({
-            type: "chat",
-            message: "${safeMessage}"
-          });
+          try {
+            Engine.PostNetworkCommand({
+              type: "chat",
+              message: "${safeMessage}"
+            });
+            "chat sent";
+          } catch(e) {
+            "chat error: " + e;
+          }
+        } else {
+          "no command system";
         }
-        "message sent";
       `;
 
-      const result = await this.client.evaluate(code);
-      this.logger.info('Chat message sent', { result });
+      // Use a longer timeout for chat messages (5 seconds)
+      const result = await Promise.race([
+        this.client.evaluate(code),
+        new Promise<string>((_, reject) =>
+          setTimeout(() => reject(new Error('Chat send timeout')), 5000)
+        ),
+      ]);
+
+      this.logger.debug('Chat message queued', { result });
       return true;
     } catch (error) {
-      this.logger.error('Failed to send chat message', { error: String(error) });
+      // Don't log as error - chat failures are not critical
+      this.logger.debug('Chat send failed (non-critical)', {
+        error: error instanceof Error ? error.message : String(error),
+      });
       return false;
     }
   }

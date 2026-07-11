@@ -28,11 +28,15 @@ import { OllamaAIBrain } from '../rl-interface/ollama-brain.js';
 import { AutomaticCameraManager } from '../camera/automatic-camera-manager.js';
 import { CameraModController } from '../camera/camera-mod-controller.js';
 import { CameraBroadcastServer } from '../broadcast/camera-broadcast-server.js';
+import { CameraController } from '../rl-interface/camera-controller.js';
+import { GameCheats } from '../rl-interface/game-cheats.js';
 import { EventFeed } from '../match/event-feed.js';
 import { Logger } from '../config/logger.js';
 import { MapDiscovery } from '../match/map-discovery.js';
 import { MatchRotation } from '../match/match-rotation.js';
 import { CivilizationRotation } from '../match/civilization-rotation.js';
+import { TrashTalkGenerator, type GameContext } from '../match/trash-talk-generator.js';
+import { EventBasedCamera } from '../camera/event-based-camera.js';
 
 const execAsync = promisify(exec);
 
@@ -221,7 +225,8 @@ async function startGame(matchNumber: number): Promise<{ process: ChildProcess; 
   const gameProcess = spawn(pyrogenesis, [
     `--rl-interface=${RL_HOST}:${RL_PORT}`,
     '--mod=public',
-    // '--mod=camera_commander',  // TODO: Camera mod not working yet
+    '--mod=camera_commander',  // Enable remote camera control
+    // '--mod=bigger-minimap',  // TODO: Mod compatibility issue - disabled for now
     `-autostart=${selectedMap}`,
     '-autostart-ai=1:petra',
     '-autostart-ai=2:petra',
@@ -356,14 +361,28 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
 
     const client = new RLHTTPClient(RL_HOST, RL_PORT, 10000, logger);
     const worldStateMapper = new WorldStateMapper(logger);
+    const gameCheats = new GameCheats(client, logger);
 
     // Initialize event feed for camera and broadcast events
     const eventFeed = new EventFeed();
+
+    // Initialize trash talk generator with chat callback
+    const trashTalkGenerator = new TrashTalkGenerator(
+      logger,
+      undefined,
+      undefined,
+      async (message: string) => {
+        await gameCheats.sendChatMessage(message);
+      }
+    );
 
     // Initialize camera controller (communicates with RL Interface)
     const cameraController = new CameraModController(logger, client);
     cameraController.setRLClient(client);
     await cameraController.connect();
+
+    // Initialize event-based camera for automatic tracking (pass RL client so it can get camera position)
+    const eventCamera = new EventBasedCamera(logger, client);
 
     // Initialize camera broadcast server for external tools
     const cameraBroadcast = new CameraBroadcastServer(logger, 3001);
@@ -422,14 +441,51 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
     cameraManager.start();
     logger.info('✓ Automatic camera manager started\n');
 
-    // Log camera events and broadcast to external tools
-    let firstCameraDetected = false;
+    // Log camera events and move camera to dramatic moments
+    let firstGameEventTick: number | null = null;
+
     eventFeed.subscribe((type: string, data: any) => {
       if (type.startsWith('camera:')) {
-        logger.info(`🎥 Camera: ${type}`, data);
+        // Track first game event to establish baseline
+        if (firstGameEventTick === null && data.tick) {
+          firstGameEventTick = data.tick;
+        }
 
-        // This is just a camera target (where to look), not the actual camera position
-        // The actual camera position was already logged above
+        // Only log important moments
+        if (type === 'camera:target_updated' && data.reason === 'combat') {
+          logger.info(`📡 Camera tracking combat at (${Math.round(data.x)}, ${Math.round(data.z)})`);
+        } else if (type === 'camera:dramatic_moment') {
+          logger.info(`🎥 Dramatic: ${data.type} (severity ${data.severity})`);
+        }
+
+        // Move camera to battles
+        if (type === 'camera:dramatic_moment' && data.position && firstGameEventTick !== null) {
+          const ticksSinceStart = data.tick - firstGameEventTick;
+          const MIN_TICKS_TO_BATTLE = 1500; // Need ~25 seconds of game time before first camera move
+
+          const shouldMove =
+            ticksSinceStart > MIN_TICKS_TO_BATTLE && // Wait for civs to actually build armies and engage
+            (data.type === 'large_engagement' || // Battles - MOVE FOR THIS
+            data.type === 'player_eliminated'); // Someone eliminated - CRITICAL
+
+          if (shouldMove) {
+            logger.info(`🎬 MOVING CAMERA: ${data.type}`);
+            eventCamera.moveToEvent(
+              {
+                type: 'battle',
+                x: data.position.x,
+                z: data.position.z,
+                severity: 'high',
+                description: `${data.type}: ${data.description}`,
+              },
+              client
+            ).catch((error) => {
+              logger.debug('Failed to move camera', {
+                error: error instanceof Error ? error.message : String(error),
+              });
+            });
+          }
+        }
 
         // Broadcast to external tools (OBS, streaming software, etc.)
         if (type === 'camera:target_updated' && data.x && data.z) {
@@ -447,19 +503,33 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
 
     logger.info(`🎮 Match started - Initial game tick: ${gameState.tick || 0}`);
 
-    // Set camera zoom to maximum (300) via JavaScript evaluation
-    try {
-      const cameraZoomCode = `
-        let data = Engine.GetCameraData();
-        Engine.SetCameraData(data.x, data.y, 300, data.rotX, data.rotY, 300);
-      `;
-      await client.evaluate(cameraZoomCode);
-      logger.info('✓ Camera zoom set to maximum (300)');
-    } catch (error) {
-      logger.warn('Could not set camera zoom via evaluate', {
-        error: error instanceof Error ? error.message : String(error),
-      });
-    }
+    // Auto-zoom out at start of match - send minus key after slight delay for initialization
+    logger.info('⏳ Waiting for game initialization before zooming...');
+    setTimeout(() => {
+      logger.info('🔭 Auto-zooming camera out...');
+      try {
+        const pythonScript = path.join(process.cwd(), 'camera-controller.py');
+        logger.debug('Python script path:', { pythonScript });
+
+        // Send minus key (zoom out) 5 times
+        for (let i = 0; i < 5; i++) {
+          setTimeout(() => {
+            logger.debug(`Zoom iteration ${i + 1}/5`);
+            const proc = spawn('python', [pythonScript, 'minus', '500'], {
+              detached: true,
+              stdio: 'ignore',
+            });
+            proc.unref();
+          }, i * 600); // Stagger each zoom by 600ms
+        }
+
+        logger.info('✓ Camera zoom sequence started');
+      } catch (error) {
+        logger.error('Could not auto-zoom camera', {
+          error: error instanceof Error ? error.message : String(error),
+        });
+      }
+    }, 5000); // Wait 5 seconds for game to initialize
 
     // Main match loop
     while (tick < maxTicks && !matchWinner) {
@@ -532,6 +602,18 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
         }
         previousCameraState = gameStateForCamera;
 
+        // Detect dramatic moments and move camera
+        try {
+          // Check if this tick has a dramatic moment event
+          for (const eventData of Object.values(eventFeed['_eventListeners'] || {})) {
+            // Events are logged - we'll use the automatic camera manager's dramatic moment detection
+          }
+        } catch (error) {
+          logger.debug('Dramatic moment detection error', {
+            error: error instanceof Error ? error.message : String(error),
+          });
+        }
+
         // Check win conditions
         if (playerUnits === 0) {
           matchWinner = 'enemy (Petra AI)';
@@ -583,6 +665,33 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
         // Log progress every 100 ticks
         if (tick % 100 === 0) {
           logger.info(`  [Tick ${tick}] Ollama: ${playerUnits} units | Petra: ${enemyUnits} units`);
+
+          // Generate trash talk every 500 ticks
+          if (tick % 500 === 0) {
+            const gameContext: GameContext = {
+              player1: {
+                name: 'Ollama',
+                resources: { food: 0, wood: 0, stone: 0, metal: 0 },
+                unitCount: playerUnits,
+                buildingCount: worldState.agents.filter(
+                  a => (a.customData as any)?.type === 'building' && a.controlledByPlayerId?.toString() === '1'
+                ).length,
+              },
+              player2: {
+                name: 'Petra',
+                resources: { food: 0, wood: 0, stone: 0, metal: 0 },
+                unitCount: enemyUnits,
+                buildingCount: worldState.agents.filter(
+                  a => (a.customData as any)?.type === 'building' && a.controlledByPlayerId?.toString() === '2'
+                ).length,
+              },
+              tick,
+            };
+
+            trashTalkGenerator.generateTrashTalk(gameContext).catch(() => {
+              // Silently fail - Ollama may not be available
+            });
+          }
         }
       } catch (tickError) {
         logger.error(`Tick ${tick} failed`, {

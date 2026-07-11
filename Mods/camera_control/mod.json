@@ -1,0 +1,8 @@
+{
+  "name": "camera_control",
+  "label": "Camera Control API",
+  "version": "0.28.0",
+  "description": "Remote camera control via RL Interface HTTP API",
+  "ignoreInCompatibilityChecks": true,
+  "dependencies": ["0ad>=0.28.0"]
+}

@@ -189,50 +189,46 @@ export class DramaticMomentDetector {
    */
   private detectLargeEngagements(state: GameState): DramaticMoment[] {
     const moments: DramaticMoment[] = [];
-    const engagementDistance = 150; // Proximity threshold
-    const minUnitsPerSide = 3; // Minimum units to count as engagement
+    const engagementDistance = 200; // Larger proximity threshold
+    const minUnitsTotal = 4; // Minimum total units to count as engagement (lowered from 6)
 
     // Group units by proximity
     const clusters: Map<string, Unit[]> = new Map();
+    const processed = new Set<string>();
 
     for (const unit of state.units) {
-      let foundCluster = false;
+      const unitKey = unit.id;
+      if (processed.has(unitKey)) continue;
 
-      for (const [, clusterUnits] of clusters) {
-        for (const other of clusterUnits) {
-          const dist = Math.hypot(unit.position.x - other.position.x, unit.position.z - other.position.z);
-          if (dist < engagementDistance) {
-            clusterUnits.push(unit);
-            foundCluster = true;
-            break;
-          }
+      const cluster: Unit[] = [unit];
+      processed.add(unitKey);
+
+      // Find all nearby units
+      for (const other of state.units) {
+        if (processed.has(other.id)) continue;
+
+        const dist = Math.hypot(unit.position.x - other.position.x, unit.position.z - other.position.z);
+        if (dist < engagementDistance) {
+          cluster.push(other);
+          processed.add(other.id);
         }
-        if (foundCluster) break;
       }
 
-      if (!foundCluster) {
-        const key = `${Math.round(unit.position.x / 50)},${Math.round(unit.position.z / 50)}`;
-        clusters.set(key, [unit]);
-      }
-    }
+      // Check if cluster has units from multiple players
+      if (cluster.length >= minUnitsTotal) {
+        const owners = new Set(cluster.map((u) => u.owner));
 
-    // Analyze clusters for engagements
-    for (const [, clusterUnits] of clusters) {
-      if (clusterUnits.length >= minUnitsPerSide * 2) {
-        const owners = new Set(clusterUnits.map((u) => u.owner));
-
-        // If multiple players, it's an engagement
         if (owners.size >= 2) {
           const avgPos = {
-            x: clusterUnits.reduce((sum, u) => sum + u.position.x, 0) / clusterUnits.length,
-            z: clusterUnits.reduce((sum, u) => sum + u.position.z, 0) / clusterUnits.length,
+            x: cluster.reduce((sum, u) => sum + u.position.x, 0) / cluster.length,
+            z: cluster.reduce((sum, u) => sum + u.position.z, 0) / cluster.length,
           };
 
           moments.push({
             type: 'large_engagement',
             position: avgPos,
-            severity: Math.min(100, 50 + clusterUnits.length * 3),
-            description: `Large engagement with ${clusterUnits.length} units`,
+            severity: Math.min(100, 60 + cluster.length * 2),
+            description: `Battle with ${cluster.length} units from ${owners.size} players`,
             players: Array.from(owners),
             tick: state.tick,
           });
