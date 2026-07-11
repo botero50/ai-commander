@@ -415,44 +415,6 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
     ];
     let nextTestIndex = 0;
 
-    // Get initial ACTUAL camera position (not target) for CheatEngine
-    logger.info('');
-    logger.info('═══════════════════════════════════════════════════════');
-    logger.info('📸 GETTING ACTUAL CAMERA POSITION FOR CHEATENGINE...');
-    logger.info('═══════════════════════════════════════════════════════');
-    let initialCameraX: number | null = null;
-    let initialCameraZ: number | null = null;
-    try {
-      const getCameraCode = `
-        let data = Engine.GetCameraData();
-        print("[CAMERA_ACTUAL] X=" + data.x + " Z=" + data.z + " Zoom=" + data.zoom);
-        JSON.stringify({x: data.x, z: data.z, zoom: data.zoom});
-      `;
-      const result = await client.evaluate(getCameraCode);
-      logger.info(`Evaluate result: ${result}`);
-      if (result && typeof result === 'string') {
-        try {
-          const cameraData = JSON.parse(result);
-          initialCameraX = cameraData.x;
-          initialCameraZ = cameraData.z;
-          logger.info('');
-          logger.info('✅ ACTUAL CAMERA POSITION FOUND:');
-          logger.info(`   X Coordinate: ${initialCameraX}`);
-          logger.info(`   Z Coordinate: ${initialCameraZ}`);
-          logger.info('');
-          logger.info('These are the ACTUAL camera position values.');
-          logger.info('Use these to search in CheatEngine (not the gathering positions)');
-          logger.info('');
-        } catch (e) {
-          logger.warn('Could not parse camera data', e);
-        }
-      }
-    } catch (error) {
-      logger.warn('Could not get initial camera position', {
-        error: error instanceof Error ? error.message : String(error),
-      });
-    }
-
     // Set camera zoom to maximum (300) via JavaScript evaluation
     try {
       const cameraZoomCode = `
@@ -468,33 +430,7 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
     }
 
     // Main match loop
-    let gameLoopShouldRun = true;
-    let cameraPositionDetectedTime: number | null = null;
-    let pausedForAddressFinder = false;
-
-    while (tick < maxTicks && !matchWinner && gameLoopShouldRun) {
-      // Pause immediately after first tick to allow address finder to scan stable memory
-      if (!pausedForAddressFinder) {
-        pausedForAddressFinder = true;
-        logger.info('');
-        logger.info('╔════════════════════════════════════════════════════╗');
-        logger.info('║        🔒 GAME PAUSED FOR CAMERA ADDRESS FINDER     ║');
-        logger.info('╠════════════════════════════════════════════════════╣');
-        logger.info('║                                                    ║');
-        logger.info('║  The game is now PAUSED at tick 0.                 ║');
-        logger.info('║  This makes it easier for the Python script to     ║');
-        logger.info('║  scan memory for the camera address.               ║');
-        logger.info('║                                                    ║');
-        logger.info('║  In the other terminal, run:                       ║');
-        logger.info('║  python packages/zeroad-adapter/tools/find-camera-address.py  ║');
-        logger.info('║                                                    ║');
-        logger.info('║  When the script finishes, press Ctrl+C here,      ║');
-        logger.info('║  and restart the game to test the camera injector. ║');
-        logger.info('║                                                    ║');
-        logger.info('╚════════════════════════════════════════════════════╝');
-        logger.info('');
-        await new Promise(resolve => setTimeout(resolve, 1000000)); // Wait indefinitely
-      }
+    while (tick < maxTicks && !matchWinner) {
 
       try {
         // Map raw game state to world state using the same mapper as test-r3-dual-ollama
