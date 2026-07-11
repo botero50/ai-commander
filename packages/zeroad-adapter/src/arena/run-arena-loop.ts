@@ -398,6 +398,8 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
           logger.info(`║  X Coordinate: ${data.x.toFixed(2).padEnd(35)} ║`);
           logger.info(`║  Z Coordinate: ${data.z.toFixed(2).padEnd(35)} ║`);
           logger.info('║                                                    ║');
+          logger.info('║  ⏸️  GAME PAUSED - GO TO CHEATENGINE NOW!          ║');
+          logger.info('║                                                    ║');
           logger.info('║  USE THESE VALUES IN CHEATENGINE:                  ║');
           logger.info('║  1. Open CheatEngine (attach to pyrogenesis.exe)   ║');
           logger.info(`║  2. Value Type: Float                              ║`);
@@ -466,7 +468,18 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
     }
 
     // Main match loop
-    while (tick < maxTicks && !matchWinner) {
+    let gameLoopShouldRun = true;
+    let cameraPositionDetectedTime: number | null = null;
+
+    while (tick < maxTicks && !matchWinner && gameLoopShouldRun) {
+      // Wait for camera position to be detected, then pause
+      if (firstCameraDetected && !cameraPositionDetectedTime) {
+        cameraPositionDetectedTime = Date.now();
+        logger.info('🔒 GAME LOOP PAUSED - Waiting for you to use CheatEngine...');
+        logger.info('   When ready, press Ctrl+C to exit and restart when done');
+        await new Promise(resolve => setTimeout(resolve, 1000000)); // Wait indefinitely
+      }
+
       try {
         // Map raw game state to world state using the same mapper as test-r3-dual-ollama
         gameState = await client.step([]);
