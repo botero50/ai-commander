@@ -171,6 +171,22 @@ export class WorldStateMapper {
       ? rawState.entities
       : Object.values(rawState.entities);
 
+    // Log sample entity to see what position fields are available
+    if (entitiesArray.length > 0) {
+      const sampleEntity = entitiesArray[0] as any;
+      this.logger.info('📍 Sample raw entity from RL Interface:', {
+        id: sampleEntity.id,
+        template: sampleEntity.template,
+        hasPosition: !!sampleEntity.position,
+        hasX: !!sampleEntity.x,
+        hasZ: !!sampleEntity.z,
+        position: sampleEntity.position,
+        x: sampleEntity.x,
+        z: sampleEntity.z,
+        allKeys: Object.keys(sampleEntity).slice(0, 20).join(', '),
+      });
+    }
+
     return entitiesArray
       .map((rawEntity: any) => {
         try {
@@ -202,7 +218,19 @@ export class WorldStateMapper {
     }
 
     // Extract position (0 A.D. uses x,z not x,y)
-    const position = entity.position || { x: entity.x || 0, z: entity.z || 0 };
+    // Position comes as [x, z] array from RL Interface
+    let position: { x: number; z: number };
+
+    if (Array.isArray(entity.position) && entity.position.length >= 2) {
+      // RL Interface returns position as [x, z] array
+      position = { x: entity.position[0], z: entity.position[1] };
+    } else if (entity.position && typeof entity.position === 'object') {
+      // Fallback: might be { x, z } object format
+      position = { x: entity.position.x || 0, z: entity.position.z || 0 };
+    } else {
+      // Final fallback: try separate x, z fields
+      position = { x: entity.x || 0, z: entity.z || 0 };
+    }
 
     // Map health
     const health = entity.health || {
