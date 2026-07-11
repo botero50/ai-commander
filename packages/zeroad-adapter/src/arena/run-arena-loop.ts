@@ -383,9 +383,30 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
     logger.info('✓ Automatic camera manager started\n');
 
     // Log camera events and broadcast to external tools
+    let firstCameraDetected = false;
     eventFeed.subscribe((type: string, data: any) => {
       if (type.startsWith('camera:')) {
         logger.info(`🎥 Camera: ${type}`, data);
+
+        // Log first camera detection for CheatEngine
+        if (type === 'camera:target_updated' && !firstCameraDetected && data.x && data.z) {
+          firstCameraDetected = true;
+          logger.info('');
+          logger.info('╔════════════════════════════════════════════════════╗');
+          logger.info('║          📸 FIRST CAMERA POSITION DETECTED          ║');
+          logger.info('╠════════════════════════════════════════════════════╣');
+          logger.info(`║  X Coordinate: ${data.x.toFixed(2).padEnd(35)} ║`);
+          logger.info(`║  Z Coordinate: ${data.z.toFixed(2).padEnd(35)} ║`);
+          logger.info('║                                                    ║');
+          logger.info('║  USE THESE VALUES IN CHEATENGINE:                  ║');
+          logger.info('║  1. Open CheatEngine (attach to pyrogenesis.exe)   ║');
+          logger.info(`║  2. Value Type: Float                              ║`);
+          logger.info(`║  3. Search for X = ${data.x.toFixed(2)}                      ║`);
+          logger.info('║  4. Narrow down, then verify with Z = ' + (data.z ? data.z.toFixed(2) : '???').padEnd(13) + ' ║');
+          logger.info('╚════════════════════════════════════════════════════╝');
+          logger.info('');
+        }
+
         // Broadcast to external tools (OBS, streaming software, etc.)
         if (type === 'camera:target_updated' && data.x && data.z) {
           cameraBroadcast.broadcastRecommendation(data.x, data.z, data.reason || 'action', data.score || 50);
@@ -410,6 +431,25 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
       { time: 30000, x: 200, z: 400, label: '30s - South' },
     ];
     let nextTestIndex = 0;
+
+    // Get initial camera position for CheatEngine
+    try {
+      const getCameraCode = `
+        let data = Engine.GetCameraData();
+        print("[CAMERA_INITIAL] X=" + data.x + " Z=" + data.z + " Zoom=" + data.zoom);
+        data.x;
+      `;
+      const result = await client.evaluate(getCameraCode);
+      logger.info('📸 INITIAL CAMERA POSITION DETECTED');
+      logger.info('   Use this for CheatEngine scanning:');
+      logger.info('   Watch the game console output above ⬆️');
+      logger.info('   Look for line: [CAMERA_INITIAL] X=??? Z=???');
+      logger.info('   Scan for the X and Z values in CheatEngine');
+    } catch (error) {
+      logger.warn('Could not get initial camera position', {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
 
     // Set camera zoom to maximum (300) via JavaScript evaluation
     try {
