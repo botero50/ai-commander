@@ -19,7 +19,12 @@ import struct
 import time
 import subprocess
 import sys
+import io
 from typing import List, Tuple, Optional
+
+# Fix encoding for Windows console
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8')
 
 class CameraAddressFinder:
     def __init__(self):
@@ -32,14 +37,12 @@ class CameraAddressFinder:
         """Find pyrogenesis.exe process"""
         print("🔍 Looking for pyrogenesis.exe...")
         try:
-            # Try to find the process
-            for proc in pymem.process.list_available_processes():
-                if 'pyrogenesis' in proc.lower():
-                    print(f"✓ Found: {proc}")
-                    self.pm = pymem.Pymem(proc)
-                    self.process_id = self.pm.process_id
-                    print(f"✓ Attached to process (PID: {self.process_id})")
-                    return True
+            # Try to find the process by name
+            self.pm = pymem.Pymem("pyrogenesis.exe")
+            self.process_id = self.pm.process_id
+            print(f"✓ Found pyrogenesis.exe")
+            print(f"✓ Attached to process (PID: {self.process_id})")
+            return True
         except Exception as e:
             print(f"✗ Error finding process: {e}")
 
@@ -65,11 +68,16 @@ class CameraAddressFinder:
 
         try:
             target_x = self.float_to_bytes(x)
-            target_z = self.float_to_bytes(z)
 
             # Scan all readable memory for the X coordinate
             print(f"   Searching for X={x:.2f}...")
-            x_addresses = self.pm.search_by_bytes(target_x)
+            try:
+                x_addresses = self.pm.search_by_bytes(target_x)
+            except AttributeError:
+                # If search_by_bytes doesn't exist, use fuzzy search
+                print(f"   Using fuzzy search instead...")
+                x_addresses = self._fuzzy_search_float(x, tolerance=0.5)
+
             print(f"   Found {len(x_addresses)} addresses with X={x:.2f}")
 
             if len(x_addresses) == 0:
@@ -91,31 +99,39 @@ class CameraAddressFinder:
 
         except Exception as e:
             print(f"✗ Scan error: {e}")
+            import traceback
+            traceback.print_exc()
             return False
 
     def _fuzzy_search_float(self, target: float, tolerance: float = 0.5) -> List[int]:
         """Search for floats within a tolerance range"""
-        print(f"   Scanning all memory (may take 60+ seconds)...")
+        print(f"   Scanning memory regions (may take 30-60 seconds)...")
         results = []
         try:
-            # This is a brute-force scan of all memory
-            # It's slow but works when exact value doesn't match due to floating point precision
-            base = 0x400000
-            scan_range = 0x10000000  # Scan 256MB
+            # Scan common memory regions where game data typically lives
+            regions = [
+                (0x400000, 0x1000000),   # First 12MB
+                (0x140000000, 0x10000000),  # Higher memory regions
+            ]
 
-            for addr in range(base, base + scan_range, 4):  # 4 byte steps for floats
-                try:
-                    value = self.bytes_to_float(self.pm.read_bytes(addr, 4))
-                    if abs(value - target) < tolerance:
-                        results.append(addr)
-                except:
-                    pass
+            for base, scan_range in regions:
+                print(f"   Scanning region {hex(base)}...")
+                for addr in range(base, base + scan_range, 4):  # 4 byte steps for floats
+                    try:
+                        data = self.pm.read_bytes(addr, 4)
+                        if len(data) == 4:
+                            value = self.bytes_to_float(data)
+                            if abs(value - target) < tolerance:
+                                results.append(addr)
+                    except:
+                        pass
 
-                if len(results) % 1000 == 0 and len(results) > 0:
-                    print(f"   ... found {len(results)} so far")
+                    if len(results) % 1000 == 0 and len(results) > 0:
+                        print(f"      ... found {len(results)} so far")
 
-                if len(results) > 10000:  # Stop if too many
-                    break
+                    if len(results) > 5000:  # Stop if found enough
+                        print(f"   Found enough candidates, stopping scan")
+                        return results
 
         except Exception as e:
             print(f"   Fuzzy search error: {e}")
