@@ -74,8 +74,6 @@ export class CameraModController {
       return;
     }
 
-    this.logger.info(`🎥 Camera recommendation: pan to (${x.toFixed(1)}, ${z.toFixed(1)}) over ${duration}ms`);
-
     // Broadcast server will handle sending this to external tools
     // See CameraBroadcastServer for the actual distribution
   }
@@ -88,8 +86,6 @@ export class CameraModController {
       this.logger.warn('Camera controller not connected');
       return;
     }
-
-    this.logger.info(`🎥 Camera recommendation: move to (${x.toFixed(1)}, ${z.toFixed(1)})`);
   }
 
   /**
@@ -100,8 +96,6 @@ export class CameraModController {
       this.logger.warn('Camera controller not connected');
       return;
     }
-
-    this.logger.info(`🎥 Camera recommendation: zoom to ${distance.toFixed(1)}`);
   }
 
   /**
