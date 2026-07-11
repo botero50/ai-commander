@@ -58,8 +58,10 @@ export class AutomaticCameraManager {
   private unsubscribe: (() => void) | null = null;
   private isStarted = false;
   private previousState: GameState | null = null;
-  private targetUpdateInterval = 500; // Update target every 500ms
+  private targetUpdateInterval = 2000; // Update target every 2 seconds (was 500ms, too fast)
   private lastTargetUpdate = 0;
+  private lastBroadcastTarget: { x: number; z: number } | null = null;
+  private broadcastDebounceThreshold = 20; // Only broadcast if moved 20+ units
   private dramaticMomentCallbacks: CinematicMomentCallback[] = [];
   private lastDramaticMoment: DramaticMoment | null = null;
   private dramaticMomentCooldown = 2000; // Min ms between dramatic moment responses
@@ -190,13 +192,21 @@ export class AutomaticCameraManager {
       this.getTargetDuration(interest.reason)
     );
 
-    this.eventFeed.broadcast('camera:target_updated', {
-      x: interest.x,
-      z: interest.z,
-      reason: interest.reason,
-      score: interest.score,
-      unitCount: interest.unitCount,
-    });
+    // Broadcast only if position changed significantly (debounce jitter)
+    const shouldBroadcast = !this.lastBroadcastTarget ||
+      Math.abs(interest.x - this.lastBroadcastTarget.x) > this.broadcastDebounceThreshold ||
+      Math.abs(interest.z - this.lastBroadcastTarget.z) > this.broadcastDebounceThreshold;
+
+    if (shouldBroadcast) {
+      this.lastBroadcastTarget = { x: interest.x, z: interest.z };
+      this.eventFeed.broadcast('camera:target_updated', {
+        x: interest.x,
+        z: interest.z,
+        reason: interest.reason,
+        score: interest.score,
+        unitCount: interest.unitCount,
+      });
+    }
   }
 
   /**
