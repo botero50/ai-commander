@@ -61,11 +61,13 @@
 ## How to Start
 
 ### Step 1
-Open a terminal.
+Open a terminal and navigate to the project:
 
 ```bash
-cd C:\Users\boter\ai-commander
+cd /path/to/ai-commander
 ```
+
+(Or just clone the repository to your preferred location)
 
 ### Step 2
 Start 0 A.D. with RL Interface:

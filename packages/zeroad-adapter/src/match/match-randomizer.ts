@@ -15,6 +15,7 @@
 
 import { Logger } from '../config/logger.js';
 import type { MatchLaunchConfig } from '../demo/real-match-launcher.js';
+import { CivilizationRotation } from './civilization-rotation.js';
 
 export interface MatchRandomizerConfig {
   readonly maps: string[];
@@ -32,10 +33,12 @@ export class MatchRandomizer {
   private config: MatchRandomizerConfig;
   private lastMap: string | null = null;
   private lastCivs: Set<string> = new Set();
+  private civRotation: CivilizationRotation;
 
   constructor(config: MatchRandomizerConfig, logger?: Logger) {
     this.config = config;
     this.logger = logger || new Logger('info', 'MatchRandomizer');
+    this.civRotation = new CivilizationRotation(this.logger);
 
     this.validateConfig();
   }
@@ -126,20 +129,13 @@ export class MatchRandomizer {
 
   /**
    * Select two different civilizations, avoiding immediate repetition.
+   * Uses CivilizationRotation for fair distribution.
    */
   private selectCivilizations(): [string, string] {
-    // Get candidates: exclude civs used in last match if possible
-    const candidates = this.lastCivs.size > 0
-      ? this.config.civilizations.filter((c) => !this.lastCivs.has(c))
-      : this.config.civilizations;
-
-    // If we filtered out all civs (unlikely), use all
-    const pool = candidates.length >= 2 ? candidates : this.config.civilizations;
-
-    // Select two different civs
-    const civ1 = pool[Math.floor(Math.random() * pool.length)];
-    const remaining = pool.filter((c) => c !== civ1);
-    const civ2 = remaining[Math.floor(Math.random() * remaining.length)];
+    // Get two unique civilizations from rotation (avoids recent repeats)
+    const civs = this.civRotation.getRandomUniqueCivilizations(2);
+    const civ1 = civs[0].name;
+    const civ2 = civs[1].name;
 
     return [civ1, civ2];
   }

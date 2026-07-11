@@ -30,6 +30,9 @@ import { CameraModController } from '../camera/camera-mod-controller.js';
 import { CameraBroadcastServer } from '../broadcast/camera-broadcast-server.js';
 import { EventFeed } from '../match/event-feed.js';
 import { Logger } from '../config/logger.js';
+import { MapDiscovery } from '../match/map-discovery.js';
+import { MatchRotation } from '../match/match-rotation.js';
+import { CivilizationRotation } from '../match/civilization-rotation.js';
 
 const execAsync = promisify(exec);
 
@@ -60,6 +63,18 @@ for (let i = 0; i < args.length; i++) {
 }
 
 const logger = new Logger('info', 'ArenaLoop');
+
+// Initialize map discovery and rotation
+const mapDiscovery = new MapDiscovery(logger);
+const civRotation = new CivilizationRotation(logger);
+const matchRotation = new MatchRotation(
+  {
+    mapBlacklistSize: 3, // Don't repeat same map in last 3 matches
+    civBlacklistSize: 2, // Don't repeat same civ pair in last 2 matches
+    maxHistorySize: 144, // Keep ~1 day of history
+  },
+  logger
+);
 
 /**
  * Sync camera_commander mod to 0 A.D. mods directory
@@ -168,8 +183,26 @@ async function killGame(): Promise<void> {
 /**
  * Start a fresh 0 A.D. instance with RL Interface
  */
-async function startGame(): Promise<ChildProcess> {
+async function startGame(matchNumber: number): Promise<{ process: ChildProcess; map: string }> {
   logger.info('Starting game initialization...');
+
+  // Discover and select map for this match
+  let selectedMap = 'skirmishes/acropolis_bay_2p'; // fallback
+  try {
+    const blacklist = matchRotation.getMapBlacklist();
+    const mapInfo = await mapDiscovery.getRandomMapAvoidingBlacklist(blacklist, 2);
+    selectedMap = mapInfo.filePath;
+
+    logger.info(`📍 Selected map for match ${matchNumber}: ${selectedMap} (${mapInfo.displayName})`);
+  } catch (error) {
+    logger.warn('Failed to select map, using default', {
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
+
+  // Track civilization selection for rotation (display only, using petra AI)
+  const selectedCiv = civRotation.getRandomCivilization();
+  logger.info(`🏛️  Selected for rotation: ${selectedCiv.displayName} (match uses petra AI)`);
 
   // TODO: Sync camera mod when it's working properly
   // await syncCameraModToGame();
@@ -189,7 +222,7 @@ async function startGame(): Promise<ChildProcess> {
     `--rl-interface=${RL_HOST}:${RL_PORT}`,
     '--mod=public',
     // '--mod=camera_commander',  // TODO: Camera mod not working yet
-    '-autostart=skirmishes/acropolis_bay_2p',
+    `-autostart=${selectedMap}`,
     '-autostart-ai=1:petra',
     '-autostart-ai=2:petra',
     '-xres=1920',           // Resolution width
@@ -208,7 +241,7 @@ async function startGame(): Promise<ChildProcess> {
   logger.info(`⏳ Waiting ${GAME_STARTUP_WAIT / 1000}s for game to start...`);
   await sleep(GAME_STARTUP_WAIT);
 
-  return gameProcess;
+  return { process: gameProcess, map: selectedMap };
 }
 
 /**
@@ -307,10 +340,11 @@ async function waitForRLInterface(timeoutMs: number = RL_CONNECT_TIMEOUT): Promi
 /**
  * Run a single match
  */
-async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise<boolean> {
+async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed: string): Promise<boolean> {
   try {
     logger.info(`\n${'='.repeat(60)}`);
     logger.info(`Match ${matchNumber} - Connecting to game...`);
+    logger.info(`Map: ${mapUsed}`);
     logger.info(`${'='.repeat(60)}\n`);
 
     // Wait for RL Interface to be ready
@@ -335,20 +369,27 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
     const cameraBroadcast = new CameraBroadcastServer(logger, 3001);
     await cameraBroadcast.start();
 
-    // Initialize Ollama brain
-    const brain = new OllamaAIBrain(logger, {
-      modelName: OLLAMA_MODEL,
-      baseUrl: 'http://localhost:11434',
-      temperature: 0.7,
-      topP: 0.9,
-      topK: 40,
-      numPredict: 256,
-      timeout: OLLAMA_TIMEOUT,
-      playerID: 1,
-    });
+    // Initialize Ollama brain (optional - if not available, use Petra only)
+    let brain: OllamaAIBrain | null = null;
+    try {
+      brain = new OllamaAIBrain(logger, {
+        modelName: OLLAMA_MODEL,
+        baseUrl: 'http://localhost:11434',
+        temperature: 0.7,
+        topP: 0.9,
+        topK: 40,
+        numPredict: 256,
+        timeout: OLLAMA_TIMEOUT,
+        playerID: 1,
+      });
 
-    await brain.initialize();
-    logger.info(`✓ Ollama brain initialized (${OLLAMA_MODEL})\n`);
+      await brain.initialize();
+      logger.info(`✓ Ollama brain initialized (${OLLAMA_MODEL})\n`);
+    } catch (error) {
+      brain = null;
+      logger.warn('⚠️  Ollama not available - running with Petra AI only');
+      logger.info('To use Ollama: start it with: ollama serve\n');
+    }
 
     // Initialize automatic camera manager for caster view
     let cameraStateUpdateCallback: ((state: any, prev?: any) => void) | null = null;
@@ -405,15 +446,6 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
     const matchStartTime = Date.now();
 
     logger.info(`🎮 Match started - Initial game tick: ${gameState.tick || 0}`);
-
-    // Define test camera movements (time in milliseconds since match start)
-    const testPositions = [
-      { time: 5000, x: 100, z: 100, label: '5s - Northwest corner' },
-      { time: 10000, x: 256, z: 256, label: '10s - Center' },
-      { time: 15000, x: 400, z: 100, label: '15s - Northeast' },
-      { time: 30000, x: 200, z: 400, label: '30s - South' },
-    ];
-    let nextTestIndex = 0;
 
     // Set camera zoom to maximum (300) via JavaScript evaluation
     try {
@@ -500,16 +532,6 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
         }
         previousCameraState = gameStateForCamera;
 
-        // Execute test camera movements at scheduled times
-        const elapsedMs = Date.now() - matchStartTime;
-        while (nextTestIndex < testPositions.length && elapsedMs >= testPositions[nextTestIndex].time) {
-          const test = testPositions[nextTestIndex];
-          await cameraController.panTo(test.x, test.z, 2000);
-          logger.info(`🎥 TEST MOVEMENT: ${test.label} (x=${test.x}, z=${test.z})`);
-          eventFeed.broadcast('camera:test-movement', { label: test.label, x: test.x, z: test.z });
-          nextTestIndex++;
-        }
-
         // Check win conditions
         if (playerUnits === 0) {
           matchWinner = 'enemy (Petra AI)';
@@ -518,14 +540,14 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
         }
 
         if (enemyUnits === 0) {
-          matchWinner = 'player (Ollama)';
-          logger.info('✅ Enemy defeated - PLAYER WINS');
+          matchWinner = brain ? 'player (Ollama)' : 'player (Petra AI)';
+          logger.info(`✅ Enemy defeated - ${matchWinner} WINS`);
           break;
         }
 
         // Get decision from brain only every N ticks (for speed)
         // Fire-and-forget: Send commands as soon as AI responds, don't wait
-        if (tick % decisionFrequency === 0) {
+        if (tick % decisionFrequency === 0 && brain) {
           pendingAIRequests++;
           brain.decide(worldState)
             .then(decision => {
@@ -577,9 +599,19 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number): Promise
     if (matchWinner) {
       stats.matchesCompleted++;
       stats.wins[matchWinner] = (stats.wins[matchWinner] || 0) + 1;
+
+      // Record match in rotation system
+      const cleanMapName = mapUsed.replace('skirmishes/', '');
+      matchRotation.recordMatch(cleanMapName, ['Ollama', 'Petra']);
+
+      const rotationStats = matchRotation.getStats();
       logger.info(
         `\n✅ MATCH ${matchNumber} COMPLETE - Winner: ${matchWinner} (${tick} ticks / ~${Math.round(tick / 10)}s)`
       );
+      logger.info('📊 Map rotation stats', {
+        uniqueMaps: rotationStats.uniqueMaps,
+        totalMatches: rotationStats.totalMatches,
+      });
       return true;
     } else {
       stats.matchesFailed++;
@@ -623,11 +655,13 @@ async function main() {
       // Kill any running game
       await killGame();
 
-      // Start fresh game
-      const gameProcess = await startGame();
+      // Start fresh game (gets map for this match)
+      const gameStart = await startGame(matchNumber);
+      const gameProcess = gameStart.process;
+      const mapUsed = gameStart.map;
 
       // Run the match
-      const success = await runMatch(gameProcess, matchNumber);
+      const success = await runMatch(gameProcess, matchNumber, mapUsed);
 
       // Wait for pending AI requests before killing game
       if (pendingAIRequests > 0) {
