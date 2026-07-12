@@ -1,425 +1,266 @@
-import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { BroadcastState } from './broadcast-state.js';
+import { describe, it, expect, beforeEach } from 'vitest';
+import { BroadcastState, type ArenaMatchContext } from './broadcast-state.js';
 import { Logger } from '../config/logger.js';
+import type { WorldState } from '../rl-interface/world-state-mapper.js';
 
 describe('BroadcastState', () => {
   let broadcastState: BroadcastState;
-  let mockArena: any;
-  let mockMatchPersistence: any;
-  let mockBrain: any;
-  let mockCommentary: any;
-  let mockEventBus: any;
+  let mockWorldState: WorldState;
+  let mockContext: ArenaMatchContext;
 
   beforeEach(() => {
-    broadcastState = new BroadcastState(
-      new Logger('error', 'BroadcastState')
-    );
+    broadcastState = new BroadcastState(new Logger('error', 'BroadcastState'));
 
-    mockArena = {
-      getMatch: vi.fn().mockResolvedValue({
-        matchId: 'match-1',
-        map: {
-          name: 'acropolis_bay_2p',
-          displayName: 'Acropolis Bay',
-          players: 2,
-        },
-        players: [
-          { id: 1, name: 'Player 1', civilization: 'athenians' },
-          { id: 2, name: 'Player 2', civilization: 'persians' },
-        ],
-        startTick: 0,
-        currentTick: 1000,
-        estimatedDuration: 1200,
-      }),
+    // Mock WorldState
+    mockWorldState = {
+      agents: [
+        // Player 1 units
+        {
+          id: '1',
+          controlledByPlayerId: 1,
+          customData: { type: 'unit', entityId: '1' },
+        } as any,
+        {
+          id: '2',
+          controlledByPlayerId: 1,
+          customData: { type: 'unit', entityId: '2' },
+        } as any,
+        // Player 1 building
+        {
+          id: '10',
+          controlledByPlayerId: 1,
+          customData: { type: 'building', entityId: '10' },
+        } as any,
+        // Player 2 units
+        {
+          id: '3',
+          controlledByPlayerId: 2,
+          customData: { type: 'unit', entityId: '3' },
+        } as any,
+        // Player 2 building
+        {
+          id: '11',
+          controlledByPlayerId: 2,
+          customData: { type: 'building', entityId: '11' },
+        } as any,
+      ],
+      players: [
+        {
+          id: '1' as any,
+          name: 'Player 1',
+          customData: {
+            resources: {
+              wood: 500,
+              stone: 400,
+              food: 600,
+              metal: 100,
+            },
+            population: 45,
+          },
+        } as any,
+        {
+          id: '2' as any,
+          name: 'Player 2',
+          customData: {
+            resources: {
+              wood: 300,
+              stone: 200,
+              food: 350,
+              metal: 50,
+            },
+            population: 30,
+          },
+        } as any,
+      ],
+      time: {
+        currentTick: { number: 1000 },
+      } as any,
+    } as any;
+
+    mockContext = {
+      matchId: 'match-123',
+      matchNumber: 1,
+      map: 'acropolis_bay_2p',
+      mapDisplayName: 'Acropolis Bay',
+      worldState: mockWorldState,
+      player1: {
+        name: 'Ollama AI',
+        model: 'mistral:latest',
+        civilization: 'athenians',
+      },
+      player2: {
+        name: 'Petra AI',
+        model: 'petra',
+        civilization: 'persians',
+      },
+      tick: 1000,
+      isRunning: true,
     };
-
-    mockMatchPersistence = {
-      getMatchResult: vi.fn().mockResolvedValue(null),
-      getMatchHistory: vi.fn().mockResolvedValue({
-        matchNumber: 1,
-        previousResults: [],
-      }),
-    };
-
-    mockBrain = {
-      getPlayerMetadata: vi.fn().mockResolvedValue(null),
-    };
-
-    mockCommentary = {
-      getLatestTrashTalk: vi.fn().mockResolvedValue(null),
-    };
-
-    mockEventBus = {
-      on: vi.fn(),
-      removeAllListeners: vi.fn(),
-    };
-  });
-
-  describe('initialization', () => {
-    it('initializes with all data sources', async () => {
-      await broadcastState.initialize({
-        arena: mockArena,
-        matchPersistence: mockMatchPersistence,
-        brain: mockBrain,
-        commentary: mockCommentary,
-        eventBus: mockEventBus,
-      });
-
-      expect(mockEventBus.on).toHaveBeenCalledWith(
-        'observation:received',
-        expect.any(Function)
-      );
-      expect(mockEventBus.on).toHaveBeenCalledWith(
-        'decision:completed',
-        expect.any(Function)
-      );
-    });
-
-    it('handles partial initialization gracefully', async () => {
-      await broadcastState.initialize({
-        arena: null,
-        matchPersistence: null,
-        brain: null,
-        commentary: null,
-        eventBus: mockEventBus,
-      });
-
-      expect(mockEventBus.on).toHaveBeenCalled();
-    });
   });
 
   describe('buildState', () => {
-    beforeEach(async () => {
-      await broadcastState.initialize({
-        arena: mockArena,
-        matchPersistence: mockMatchPersistence,
-        brain: mockBrain,
-        commentary: mockCommentary,
-        eventBus: mockEventBus,
-      });
-    });
-
-    it('builds complete broadcast state from all sources', async () => {
-      const state = await broadcastState.buildState('match-1');
+    it('builds broadcast state from arena context', () => {
+      const state = broadcastState.buildState(mockContext);
 
       expect(state).toBeDefined();
-      expect(state.match.matchId).toBe('match-1');
+      expect(state.match.matchId).toBe('match-123');
       expect(state.match.map.displayName).toBe('Acropolis Bay');
+      expect(state.match.currentTick).toBe(1000);
+    });
+
+    it('includes both players with real data', () => {
+      const state = broadcastState.buildState(mockContext);
+
       expect(state.match.players).toHaveLength(2);
-      expect(state.timestamp).toBeDefined();
+      expect(state.match.players[0].name).toBe('Ollama AI');
+      expect(state.match.players[1].name).toBe('Petra AI');
     });
 
-    it('includes player information with civilizations', async () => {
-      const state = await broadcastState.buildState('match-1');
-
-      expect(state.match.players[0]).toMatchObject({
-        id: 1,
-        name: 'Player 1',
-        civilization: 'athenians',
-        faction: 'greek',
-      });
-
-      expect(state.match.players[1]).toMatchObject({
-        id: 2,
-        name: 'Player 2',
-        civilization: 'persians',
-        faction: 'persian',
-      });
-    });
-
-    it('initializes player stats with defaults', async () => {
-      const state = await broadcastState.buildState('match-1');
+    it('extracts player resources from WorldState', () => {
+      const state = broadcastState.buildState(mockContext);
 
       expect(state.match.players[0].resources).toEqual({
+        wood: 500,
+        stone: 400,
+        food: 600,
+        metal: 100,
+      });
+
+      expect(state.match.players[1].resources).toEqual({
         wood: 300,
         stone: 200,
-        food: 250,
-        metal: 0,
+        food: 350,
+        metal: 50,
       });
-      expect(state.match.players[0].units).toBe(0);
-      expect(state.match.players[0].buildings).toBe(0);
     });
 
-    it('includes match history when available', async () => {
-      mockMatchPersistence.getMatchHistory.mockResolvedValueOnce({
-        matchNumber: 5,
-        previousResults: [
-          {
-            winner: 'Player 1',
-            loser: 'Player 2',
-            duration: 1200,
-            date: '2025-01-01',
-          },
-        ],
-      });
+    it('counts units and buildings correctly', () => {
+      const state = broadcastState.buildState(mockContext);
 
-      const state = await broadcastState.buildState('match-1');
+      expect(state.match.players[0].units).toBe(2);
+      expect(state.match.players[0].buildings).toBe(1);
 
-      expect(state.match.history?.matchNumber).toBe(5);
-      expect(state.match.history?.previousResults).toHaveLength(1);
+      expect(state.match.players[1].units).toBe(1);
+      expect(state.match.players[1].buildings).toBe(1);
     });
 
-    it('includes match result when available', async () => {
-      mockMatchPersistence.getMatchResult.mockResolvedValueOnce({
-        winner: {
-          id: 1,
-          name: 'Player 1',
-          civilization: 'athenians',
-        },
-        losers: [
-          {
-            id: 2,
-            name: 'Player 2',
-            civilization: 'persians',
-          },
-        ],
-        duration: 1200,
-        reason: 'Military dominance',
-      });
+    it('gets population from WorldState', () => {
+      const state = broadcastState.buildState(mockContext);
 
-      const state = await broadcastState.buildState('match-1');
-
-      expect(state.match.result).toBeDefined();
-      expect(state.match.result?.winner.name).toBe('Player 1');
-      expect(state.match.result?.reason).toBe('Military dominance');
+      expect(state.match.players[0].population).toBe(45);
+      expect(state.match.players[1].population).toBe(30);
     });
 
-    it('handles missing arena gracefully', async () => {
-      await broadcastState.initialize({
-        arena: null,
-        matchPersistence: mockMatchPersistence,
-        brain: mockBrain,
-        commentary: mockCommentary,
-        eventBus: mockEventBus,
-      });
+    it('calculates military value based on units', () => {
+      const state = broadcastState.buildState(mockContext);
 
-      const state = await broadcastState.buildState('match-1');
+      // Player 1 has 2 units: floor(2 * 0.3) * 10 = 0
+      expect(state.match.players[0].militaryValue).toBe(0);
 
-      expect(state.match).toBeDefined();
-      expect(state.match.map.displayName).toBe('Unknown Map');
-    });
-  });
-
-  describe('real-time updates', () => {
-    let observationHandler: any;
-
-    beforeEach(async () => {
-      mockEventBus.on.mockImplementation((event: string, handler: any) => {
-        if (event === 'observation:received') {
-          observationHandler = handler;
-        }
-      });
-
-      await broadcastState.initialize({
-        arena: mockArena,
-        matchPersistence: mockMatchPersistence,
-        brain: mockBrain,
-        commentary: mockCommentary,
-        eventBus: mockEventBus,
-      });
-
-      await broadcastState.buildState('match-1');
+      // Player 2 has 1 unit: floor(1 * 0.3) * 10 = 0
+      expect(state.match.players[1].militaryValue).toBe(0);
     });
 
-    it('updates player stats on observation event', async () => {
-      observationHandler({
-        playerId: 1,
-        playerName: 'Player 1',
-        tick: 1000,
-        observation: {
-          resources: {
-            wood: 500,
-            stone: 400,
-            food: 600,
-            metal: 100,
-          },
-          units: 25,
-          buildings: 8,
-          population: 45,
-          militaryUnits: 15,
-        },
-      });
+    it('includes civilization and faction', () => {
+      const state = broadcastState.buildState(mockContext);
 
-      const state = await broadcastState.buildState('match-1');
+      expect(state.match.players[0].civilization).toBe('athenians');
+      expect(state.match.players[0].faction).toBe('greek');
 
-      expect(state.match.players[0].resources.wood).toBe(500);
-      expect(state.match.players[0].units).toBe(25);
-      expect(state.match.players[0].militaryValue).toBe(150); // 15 * 10
+      expect(state.match.players[1].civilization).toBe('persians');
+      expect(state.match.players[1].faction).toBe('persian');
     });
 
-    it('calculates military value correctly', async () => {
-      observationHandler({
-        playerId: 1,
-        playerName: 'Player 1',
-        tick: 1000,
-        observation: {
-          resources: {
-            wood: 500,
-            stone: 400,
-            food: 600,
-            metal: 100,
-          },
-          units: 30,
-          buildings: 8,
-          population: 45,
-          militaryUnits: 20,
-        },
-      });
+    it('includes model and provider', () => {
+      const state = broadcastState.buildState(mockContext);
 
-      const state = await broadcastState.buildState('match-1');
+      expect(state.match.players[0].model).toBe('mistral:latest');
+      expect(state.match.players[0].provider).toBe('mistral:latest');
 
-      expect(state.match.players[0].militaryValue).toBe(200); // 20 * 10
+      expect(state.match.players[1].model).toBe('petra');
+      expect(state.match.players[1].provider).toBe('petra');
     });
 
-    it('records events in recent event buffer', async () => {
-      observationHandler({
-        playerId: 1,
-        playerName: 'Player 1',
-        tick: 1000,
-        observation: {
-          resources: {
-            wood: 500,
-            stone: 400,
-            food: 600,
-            metal: 100,
-          },
-          units: 25,
-          buildings: 8,
-          population: 45,
-        },
-      });
+    it('includes timestamp', () => {
+      const state = broadcastState.buildState(mockContext);
 
-      const state = await broadcastState.buildState('match-1');
-
-      expect(state.recentEvents).toHaveLength(1);
-      expect(state.recentEvents?.[0].type).toBe('observation');
-      expect(state.recentEvents?.[0].playerId).toBe(1);
+      expect(state.timestamp).toBeDefined();
+      expect(new Date(state.timestamp)).toBeInstanceOf(Date);
     });
   });
 
   describe('match state determination', () => {
-    it('returns intro state for early ticks', async () => {
-      mockArena.getMatch.mockResolvedValueOnce({
-        matchId: 'match-1',
-        map: {
-          name: 'acropolis_bay_2p',
-          displayName: 'Acropolis Bay',
-          players: 2,
-        },
-        players: [
-          { id: 1, name: 'Player 1', civilization: 'athenians' },
-          { id: 2, name: 'Player 2', civilization: 'persians' },
-        ],
-        startTick: 0,
-        currentTick: 0,
-      });
+    it('returns intro state for early ticks', () => {
+      mockContext.tick = 0;
 
-      await broadcastState.initialize({
-        arena: mockArena,
-        matchPersistence: mockMatchPersistence,
-        brain: mockBrain,
-        commentary: mockCommentary,
-        eventBus: mockEventBus,
-      });
-
-      const state = await broadcastState.buildState('match-1');
+      const state = broadcastState.buildState(mockContext);
 
       expect(state.match.state).toBe('intro');
     });
 
-    it('returns running state during match', async () => {
-      mockArena.getMatch.mockResolvedValueOnce({
-        matchId: 'match-1',
-        map: {
-          name: 'acropolis_bay_2p',
-          displayName: 'Acropolis Bay',
-          players: 2,
-        },
-        players: [
-          { id: 1, name: 'Player 1', civilization: 'athenians' },
-          { id: 2, name: 'Player 2', civilization: 'persians' },
-        ],
-        startTick: 0,
-        currentTick: 5000,
-      });
+    it('returns running state during match', () => {
+      mockContext.tick = 1000;
 
-      await broadcastState.initialize({
-        arena: mockArena,
-        matchPersistence: mockMatchPersistence,
-        brain: mockBrain,
-        commentary: mockCommentary,
-        eventBus: mockEventBus,
-      });
-
-      const state = await broadcastState.buildState('match-1');
+      const state = broadcastState.buildState(mockContext);
 
       expect(state.match.state).toBe('running');
     });
 
-    it('returns conclusion state near end', async () => {
-      mockArena.getMatch.mockResolvedValueOnce({
-        matchId: 'match-1',
-        map: {
-          name: 'acropolis_bay_2p',
-          displayName: 'Acropolis Bay',
-          players: 2,
-        },
-        players: [
-          { id: 1, name: 'Player 1', civilization: 'athenians' },
-          { id: 2, name: 'Player 2', civilization: 'persians' },
-        ],
-        startTick: 0,
-        currentTick: 9800, // endTick = 10000, so 10000 - 300 = 9700
-        endTick: 10000,
-      });
+    it('returns conclusion state near end', () => {
+      mockContext.tick = 1750;
 
-      await broadcastState.initialize({
-        arena: mockArena,
-        matchPersistence: mockMatchPersistence,
-        brain: mockBrain,
-        commentary: mockCommentary,
-        eventBus: mockEventBus,
-      });
-
-      const state = await broadcastState.buildState('match-1');
+      const state = broadcastState.buildState(mockContext);
 
       expect(state.match.state).toBe('conclusion');
     });
 
-    it('returns ended state after match', async () => {
-      mockArena.getMatch.mockResolvedValueOnce({
-        matchId: 'match-1',
-        map: {
-          name: 'acropolis_bay_2p',
-          displayName: 'Acropolis Bay',
-          players: 2,
-        },
-        players: [
-          { id: 1, name: 'Player 1', civilization: 'athenians' },
-          { id: 2, name: 'Player 2', civilization: 'persians' },
-        ],
-        startTick: 0,
-        currentTick: 10000,
-        endTick: 10000,
-      });
+    it('returns ended state when match is not running', () => {
+      mockContext.isRunning = false;
 
-      await broadcastState.initialize({
-        arena: mockArena,
-        matchPersistence: mockMatchPersistence,
-        brain: mockBrain,
-        commentary: mockCommentary,
-        eventBus: mockEventBus,
-      });
-
-      const state = await broadcastState.buildState('match-1');
+      const state = broadcastState.buildState(mockContext);
 
       expect(state.match.state).toBe('ended');
     });
   });
 
+  describe('match result', () => {
+    it('includes result when player 1 wins', () => {
+      mockContext.winner = 'player1';
+      mockContext.reason = 'Military dominance';
+
+      const state = broadcastState.buildState(mockContext);
+
+      expect(state.match.result).toBeDefined();
+      expect(state.match.result!.winner.id).toBe(1);
+      expect(state.match.result!.winner.name).toBe('Ollama AI');
+      expect(state.match.result!.losers[0].id).toBe(2);
+      expect(state.match.result!.reason).toBe('Military dominance');
+    });
+
+    it('includes result when player 2 wins', () => {
+      mockContext.winner = 'player2';
+      mockContext.reason = 'All opponents defeated';
+
+      const state = broadcastState.buildState(mockContext);
+
+      expect(state.match.result).toBeDefined();
+      expect(state.match.result!.winner.id).toBe(2);
+      expect(state.match.result!.winner.name).toBe('Petra AI');
+      expect(state.match.result!.losers[0].id).toBe(1);
+    });
+
+    it('has no result when match is running', () => {
+      mockContext.winner = undefined;
+
+      const state = broadcastState.buildState(mockContext);
+
+      expect(state.match.result).toBeUndefined();
+    });
+  });
+
   describe('faction mapping', () => {
-    it('maps all civilizations to correct factions', async () => {
-      const civFactionPairs = [
+    it('maps all civilizations to correct factions', () => {
+      const civFactionPairs: Array<[string, string]> = [
         ['athenians', 'greek'],
         ['britons', 'celtic'],
         ['carthaginians', 'punic'],
@@ -438,106 +279,59 @@ describe('BroadcastState', () => {
       ];
 
       for (const [civ, expectedFaction] of civFactionPairs) {
-        mockArena.getMatch.mockResolvedValueOnce({
-          matchId: `match-${civ}`,
-          map: {
-            name: 'test_map',
-            displayName: 'Test Map',
-            players: 2,
-          },
-          players: [
-            { id: 1, name: 'Player 1', civilization: civ },
-            { id: 2, name: 'Player 2', civilization: 'persians' },
-          ],
-          startTick: 0,
-          currentTick: 1000,
-        });
+        mockContext.player1.civilization = civ;
 
-        const freshState = new BroadcastState(new Logger('error', 'BroadcastState'));
-        await freshState.initialize({
-          arena: mockArena,
-          matchPersistence: mockMatchPersistence,
-          brain: mockBrain,
-          commentary: mockCommentary,
-          eventBus: mockEventBus,
-        });
-
-        const state = await freshState.buildState(`match-${civ}`);
+        const state = broadcastState.buildState(mockContext);
 
         expect(state.match.players[0].faction).toBe(expectedFaction);
       }
     });
   });
 
-  describe('state retrieval and subscriptions', () => {
-    beforeEach(async () => {
-      await broadcastState.initialize({
-        arena: mockArena,
-        matchPersistence: mockMatchPersistence,
-        brain: mockBrain,
-        commentary: mockCommentary,
-        eventBus: mockEventBus,
-      });
+  describe('edge cases', () => {
+    it('handles missing resources', () => {
+      mockWorldState.players![0].customData = {};
 
-      await broadcastState.buildState('match-1');
-    });
+      const state = broadcastState.buildState(mockContext);
 
-    it('returns current state via getState()', async () => {
-      const state = broadcastState.getState();
-
-      expect(state).toBeDefined();
-      expect(state?.match.matchId).toBe('match-1');
-    });
-
-    it('returns null before building state', () => {
-      const freshState = new BroadcastState();
-
-      const state = freshState.getState();
-
-      expect(state).toBeNull();
-    });
-
-    it('notifies on state updates', async () => {
-      const callback = vi.fn();
-      broadcastState.onStateUpdated(callback);
-
-      await broadcastState.buildState('match-1');
-
-      expect(callback).toHaveBeenCalled();
-      expect(callback).toHaveBeenCalledWith(expect.objectContaining({
-        match: expect.objectContaining({
-          matchId: 'match-1',
-        }),
-      }));
-    });
-  });
-
-  describe('disconnection', () => {
-    beforeEach(async () => {
-      await broadcastState.initialize({
-        arena: mockArena,
-        matchPersistence: mockMatchPersistence,
-        brain: mockBrain,
-        commentary: mockCommentary,
-        eventBus: mockEventBus,
+      expect(state.match.players[0].resources).toEqual({
+        wood: 0,
+        stone: 0,
+        food: 0,
+        metal: 0,
       });
     });
 
-    it('disconnects from event bus on disconnect()', () => {
-      broadcastState.disconnect();
+    it('handles missing agents', () => {
+      mockWorldState.agents = undefined;
 
-      expect(mockEventBus.removeAllListeners).toHaveBeenCalledWith(
-        'observation:received'
-      );
-      expect(mockEventBus.removeAllListeners).toHaveBeenCalledWith(
-        'decision:completed'
-      );
-      expect(mockEventBus.removeAllListeners).toHaveBeenCalledWith(
-        'match:started'
-      );
-      expect(mockEventBus.removeAllListeners).toHaveBeenCalledWith(
-        'match:ended'
-      );
+      const state = broadcastState.buildState(mockContext);
+
+      expect(state.match.players[0].units).toBe(0);
+      expect(state.match.players[0].buildings).toBe(0);
+    });
+
+    it('handles missing players', () => {
+      mockWorldState.players = undefined;
+
+      const state = broadcastState.buildState(mockContext);
+
+      expect(state.match.players[0].resources).toEqual({
+        wood: 0,
+        stone: 0,
+        food: 0,
+        metal: 0,
+      });
+      expect(state.match.players[0].population).toBe(0);
+    });
+
+    it('handles unknown civilization', () => {
+      mockContext.player1.civilization = undefined;
+
+      const state = broadcastState.buildState(mockContext);
+
+      expect(state.match.players[0].civilization).toBe('Unknown');
+      expect(state.match.players[0].faction).toBe('unknown');
     });
   });
 });
