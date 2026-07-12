@@ -37,6 +37,7 @@ import { MatchRotation } from '../match/match-rotation.js';
 import { CivilizationRotation } from '../match/civilization-rotation.js';
 import { TrashTalkGenerator, type GameContext } from '../match/trash-talk-generator.js';
 import { EventBasedCamera } from '../camera/event-based-camera.js';
+import { BroadcastState, type ArenaMatchContext } from '../broadcast/broadcast-state.js';
 
 const execAsync = promisify(exec);
 
@@ -441,6 +442,14 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
     cameraManager.start();
     logger.info('✓ Automatic camera manager started\n');
 
+    // Initialize broadcast state (lightweight transformer for broadcast data)
+    const broadcastState = new BroadcastState(logger);
+    logger.info('✓ Broadcast state initialized\n');
+
+    // Track trash talk messages for broadcast
+    const recentTrashTalk: Array<{ playerId: number; playerName: string; message: string; tick: number }> = [];
+    const maxTrashTalkHistory = 10;
+
     // Log camera events and move camera to dramatic moments
     let firstGameEventTick: number | null = null;
 
@@ -661,6 +670,52 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
         gameState = await client.step([]);
 
         tick++;
+
+        // Build broadcast state every tick (lightweight transformation, non-blocking)
+        try {
+          const broadcastContext: ArenaMatchContext = {
+            matchId: `match-${matchNumber}`,
+            matchNumber,
+            map: mapUsed.replace('skirmishes/', ''),
+            mapDisplayName: mapUsed.replace('skirmishes/', '').split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+            worldState,
+            player1: {
+              name: brain ? 'Ollama AI' : 'Petra AI',
+              model: brain ? 'mistral' : 'petra',
+              civilization: 'athenians', // TODO: Get from Arena context
+            },
+            player2: {
+              name: 'Petra AI',
+              model: 'petra',
+              civilization: 'persians', // TODO: Get from Arena context
+            },
+            tick,
+            isRunning: true,
+          };
+
+          const currentBroadcastState = broadcastState.buildState(broadcastContext);
+
+          // Log broadcast state sample every 500 ticks for validation
+          if (tick % 500 === 0 && tick > 0) {
+            logger.info('📺 BROADCAST STATE SAMPLE', {
+              tick: currentBroadcastState.match.currentTick,
+              player1: {
+                name: currentBroadcastState.match.players[0].name,
+                units: currentBroadcastState.match.players[0].units,
+                resources: currentBroadcastState.match.players[0].resources,
+              },
+              player2: {
+                name: currentBroadcastState.match.players[1].name,
+                units: currentBroadcastState.match.players[1].units,
+                resources: currentBroadcastState.match.players[1].resources,
+              },
+            });
+          }
+        } catch (error) {
+          logger.debug('Failed to build broadcast state', {
+            error: error instanceof Error ? error.message : String(error),
+          });
+        }
 
         // Log progress every 100 ticks
         if (tick % 100 === 0) {
