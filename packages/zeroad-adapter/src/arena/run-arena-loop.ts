@@ -723,10 +723,19 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
 
           // Generate trash talk every 500 ticks
           if (tick % 500 === 0) {
+            // Extract real player resources from WorldState
+            const player1Resources = (worldState.players[0]?.customData as any)?.resources || { food: 0, wood: 0, stone: 0, metal: 0 };
+            const player2Resources = (worldState.players[1]?.customData as any)?.resources || { food: 0, wood: 0, stone: 0, metal: 0 };
+
             const gameContext: GameContext = {
               player1: {
                 name: 'Ollama',
-                resources: { food: 0, wood: 0, stone: 0, metal: 0 },
+                resources: {
+                  food: player1Resources.food || 0,
+                  wood: player1Resources.wood || 0,
+                  stone: player1Resources.stone || 0,
+                  metal: player1Resources.metal || 0,
+                },
                 unitCount: playerUnits,
                 buildingCount: worldState.agents.filter(
                   a => (a.customData as any)?.type === 'building' && a.controlledByPlayerId?.toString() === '1'
@@ -734,7 +743,12 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
               },
               player2: {
                 name: 'Petra',
-                resources: { food: 0, wood: 0, stone: 0, metal: 0 },
+                resources: {
+                  food: player2Resources.food || 0,
+                  wood: player2Resources.wood || 0,
+                  stone: player2Resources.stone || 0,
+                  metal: player2Resources.metal || 0,
+                },
                 unitCount: enemyUnits,
                 buildingCount: worldState.agents.filter(
                   a => (a.customData as any)?.type === 'building' && a.controlledByPlayerId?.toString() === '2'
@@ -743,9 +757,32 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
               tick,
             };
 
-            trashTalkGenerator.generateTrashTalk(gameContext).catch(() => {
-              // Silently fail - Ollama may not be available
-            });
+            trashTalkGenerator.generateTrashTalk(gameContext)
+              .then(trashTalk => {
+                if (trashTalk) {
+                  // Capture trash talk for broadcast feed
+                  const playerName = trashTalk.speaker === 'player1' ? 'Ollama' : 'Petra';
+                  recentTrashTalk.push({
+                    playerId: trashTalk.speaker === 'player1' ? 1 : 2,
+                    playerName,
+                    message: trashTalk.message,
+                    tick: trashTalk.tick,
+                  });
+
+                  // Maintain bounded history
+                  if (recentTrashTalk.length > maxTrashTalkHistory) {
+                    recentTrashTalk.shift();
+                  }
+
+                  logger.info('📢 Trash talk captured for broadcast', {
+                    speaker: playerName,
+                    message: trashTalk.message.substring(0, 60),
+                  });
+                }
+              })
+              .catch(() => {
+                // Silently fail - Ollama may not be available
+              });
           }
         }
       } catch (tickError) {
