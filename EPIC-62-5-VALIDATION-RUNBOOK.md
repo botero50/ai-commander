@@ -6,11 +6,23 @@
 
 ---
 
+## ⚠️ CRITICAL CORRECTION
+
+**Hardcoded fallback taunts are NOT valid evidence for EPIC 62 validation.**
+
+Only **real AI-generated messages from Ollama LLM** count toward EPIC 62.5 pass.
+
+If Ollama is unavailable, the validation FAILS (no fallback acceptance).
+
+---
+
 ## PRE-VALIDATION CHECKLIST
 
 Before starting, verify:
 
-- [ ] Ollama installed: `ollama serve` running in separate terminal
+- [ ] **Ollama MUST be installed and running:** `ollama serve` (critical requirement)
+- [ ] **Ollama model pulled:** `ollama pull mistral:latest` (or configured model)
+- [ ] **Ollama accessible:** `curl http://localhost:11434/api/tags` returns model list
 - [ ] 0 A.D. installed: `~\AppData\Local\0 A.D. Empires Ascendant\binaries\system\pyrogenesis.exe`
 - [ ] RL Interface accessible: port 6000
 - [ ] Build successful: `npm run build` (clean)
@@ -146,12 +158,14 @@ npx tsx packages/zeroad-adapter/src/arena/run-arena-loop.ts --matches 2 2>&1 | t
 - [ ] Match 2 starts with clean state
 - [ ] Match 2 progresses independently
 
-### Trash Talk ✓
-- [ ] At least 1 message generated per match
-- [ ] Correct player attribution (Ollama or Petra)
-- [ ] Message is either LLM output or hardcoded fallback
-- [ ] Message is based on real context (mentions units, resources, economy, etc.)
+### Trash Talk - REAL AI-GENERATED ONLY ✓
+- [ ] **At least 1 AI-GENERATED message captured** (Ollama LLM output, NOT fallback)
+- [ ] Message source is verified as "AI_GENERATED" in logs
+- [ ] Correct player attribution (Ollama or Petra - both use same Ollama model)
+- [ ] Message is based on real game context (units, resources, economy, etc.)
+- [ ] Message text shows in log as Ollama API response (not from DEFAULT_TAUNTS array)
 - [ ] NO messages from Match 1 appear in Match 2
+- [ ] **CRITICAL:** If ALL messages are fallback (Ollama unavailable), validation FAILS ❌
 
 ### Data Integrity ✓
 - [ ] No stale data between matches
@@ -307,11 +321,13 @@ After running 2 matches, verify:
 - [ ] Broadcast state sampled at 500+ ticks in each match
 - [ ] All broadcast fields have real, non-zero values
 - [ ] Resources show as extracted from WorldState (not all zeros)
-- [ ] At least 1 trash talk message per match
+- [ ] **At least 1 REAL AI-GENERATED trash talk message captured** (Ollama LLM response, not fallback)
+- [ ] Message source verified in logs as coming from Ollama API, not DEFAULT_TAUNTS array
 - [ ] Trash talk correctly attributed to player (Ollama or Petra)
 - [ ] No stale trash talk from Match 1 in Match 2
 - [ ] No resource values carry over from Match 1 to Match 2
 - [ ] Arena loop continues to Match 2 without manual intervention
+- [ ] **CRITICAL: If ALL messages are fallback, validation FAILS ❌**
 
 ---
 
