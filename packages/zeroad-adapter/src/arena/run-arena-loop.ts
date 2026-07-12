@@ -22,6 +22,7 @@ import { spawn, exec, type ChildProcess } from 'child_process';
 import { promisify } from 'util';
 import * as fs from 'fs';
 import * as path from 'path';
+import * as http from 'http';
 import { RLHTTPClient } from '../rl-interface/http-client.js';
 import { WorldStateMapper } from '../rl-interface/world-state-mapper.js';
 import { OllamaAIBrain } from '../rl-interface/ollama-brain.js';
@@ -69,6 +70,56 @@ for (let i = 0; i < args.length; i++) {
 }
 
 const logger = new Logger('info', 'ArenaLoop');
+
+// ✅ NEW (EPIC 62): Streaming cache for HTTP API
+interface StreamingDataCache {
+  currentMatch: {
+    matchId: string;
+    matchNumber: number;
+    tick: number;
+    players: Array<{
+      id: number;
+      name: string;
+      units: number;
+      resources: { wood: number; stone: number; food: number; metal: number };
+    }>;
+  } | null;
+  recentTrashTalk: Array<{
+    speaker: string;
+    message: string;
+    tick: number;
+  }>;
+}
+
+const streamingCache: StreamingDataCache = {
+  currentMatch: null,
+  recentTrashTalk: [],
+};
+
+// ✅ NEW (EPIC 62): Start HTTP server for OBS
+function startHttpServer(): void {
+  const server = http.createServer((req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Content-Type', 'application/json');
+
+    if (req.url === '/api/broadcast/current') {
+      res.writeHead(200);
+      res.end(JSON.stringify(streamingCache.currentMatch || {}));
+    } else if (req.url === '/api/broadcast/chat') {
+      res.writeHead(200);
+      res.end(JSON.stringify(streamingCache.recentTrashTalk.slice(-20)));
+    } else {
+      res.writeHead(404);
+      res.end(JSON.stringify({ error: 'Not found' }));
+    }
+  });
+
+  server.listen(8080, '127.0.0.1', () => {
+    logger.info('📡 HTTP API started on port 8080');
+  });
+}
+
+startHttpServer();
 
 // Initialize map discovery and rotation
 const mapDiscovery = new MapDiscovery(logger);
@@ -693,53 +744,58 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
         let allCommands: any[] = [];
 
         if (tick % decisionFrequency === 0) {
-          // Player 1 decision
+          // ✅ FIXED: Fire-and-forget async (don't wait for Ollama)
+          // Player 1 decision (non-blocking)
           if (brainP1) {
-            try {
-              const decision1 = await brainP1.decide(worldState);
-              if (decision1.commands && decision1.commands.length > 0) {
-                allCommands.push(...decision1.commands);
-                logger.debug(`P1 Ollama decision: ${decision1.commands.length} commands`, {
-                  tick,
-                  commands: decision1.commands.map((c: any) => c.json_cmd?.type || 'unknown'),
-                });
-              }
-            } catch (err) {
-              const isAbortError = err instanceof Error && err.name === 'AbortError';
-              if (!isAbortError) {
-                logger.error('P1 brain decision failed', {
-                  tick,
-                  error: err instanceof Error ? err.message : String(err),
-                });
-              }
-            }
+            brainP1.decide(worldState)
+              .then((decision1: any) => {
+                if (decision1.commands && decision1.commands.length > 0) {
+                  // Send commands immediately when ready
+                  client.step(decision1.commands).catch(() => {});
+                  logger.debug(`P1 Ollama decision: ${decision1.commands.length} commands`, {
+                    tick,
+                    commands: decision1.commands.map((c: any) => c.json_cmd?.type || 'unknown'),
+                  });
+                }
+              })
+              .catch((err: any) => {
+                const isAbortError = err instanceof Error && err.name === 'AbortError';
+                if (!isAbortError) {
+                  logger.error('P1 brain decision failed', {
+                    tick,
+                    error: err instanceof Error ? err.message : String(err),
+                  });
+                }
+              });
           }
 
-          // Player 2 decision
+          // ✅ FIXED: Player 2 decision (non-blocking)
           if (brainP2) {
-            try {
-              const decision2 = await brainP2.decide(worldState);
-              if (decision2.commands && decision2.commands.length > 0) {
-                allCommands.push(...decision2.commands);
-                logger.debug(`P2 Ollama decision: ${decision2.commands.length} commands`, {
-                  tick,
-                  commands: decision2.commands.map((c: any) => c.json_cmd?.type || 'unknown'),
-                });
-              }
-            } catch (err) {
-              const isAbortError = err instanceof Error && err.name === 'AbortError';
-              if (!isAbortError) {
-                logger.error('P2 brain decision failed', {
-                  tick,
-                  error: err instanceof Error ? err.message : String(err),
-                });
-              }
-            }
+            brainP2.decide(worldState)
+              .then((decision2: any) => {
+                if (decision2.commands && decision2.commands.length > 0) {
+                  // Send commands immediately when ready
+                  client.step(decision2.commands).catch(() => {});
+                  logger.debug(`P2 Ollama decision: ${decision2.commands.length} commands`, {
+                    tick,
+                    commands: decision2.commands.map((c: any) => c.json_cmd?.type || 'unknown'),
+                  });
+                }
+              })
+              .catch((err: any) => {
+                const isAbortError = err instanceof Error && err.name === 'AbortError';
+                if (!isAbortError) {
+                  logger.error('P2 brain decision failed', {
+                    tick,
+                    error: err instanceof Error ? err.message : String(err),
+                  });
+                }
+              });
           }
         }
 
-        // Step game state WITH both Ollama commands (if any)
-        gameState = await client.step(allCommands);
+        // ✅ FIXED: Step game with empty commands (Ollama commands sent asynchronously when ready)
+        gameState = await client.step([]);
 
         tick++;
 
@@ -782,6 +838,27 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
                 resources: currentBroadcastState.match.players[1].resources,
               },
             });
+
+            // ✅ NEW (EPIC 62): Update streaming cache for HTTP API (OBS)
+            streamingCache.currentMatch = {
+              matchId: `match-${matchNumber}`,
+              matchNumber,
+              tick,
+              players: [
+                {
+                  id: 1,
+                  name: currentBroadcastState.match.players[0].name,
+                  units: currentBroadcastState.match.players[0].units,
+                  resources: currentBroadcastState.match.players[0].resources,
+                },
+                {
+                  id: 2,
+                  name: currentBroadcastState.match.players[1].name,
+                  units: currentBroadcastState.match.players[1].units,
+                  resources: currentBroadcastState.match.players[1].resources,
+                },
+              ],
+            };
 
             // ✅ NEW (EPIC 62 Phase 1): Broadcast game state to WebSocket clients
             broadcastServer.broadcastMessage({
@@ -956,6 +1033,16 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
                     speaker: playerName,
                     message: trashTalk.message.substring(0, 60),
                   });
+
+                  // ✅ NEW (EPIC 62): Update streaming cache for HTTP API
+                  streamingCache.recentTrashTalk.push({
+                    speaker: trashTalk.speaker,
+                    message: trashTalk.message,
+                    tick: trashTalk.tick,
+                  });
+                  if (streamingCache.recentTrashTalk.length > 50) {
+                    streamingCache.recentTrashTalk.shift();
+                  }
 
                   // ✅ NEW (EPIC 62 Phase 1): Broadcast trash talk to WebSocket clients
                   broadcastServer.broadcastMessage({
