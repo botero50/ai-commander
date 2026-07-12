@@ -34,16 +34,15 @@ export class MapDiscovery {
 
   // Fallback hardcoded maps (verified to work with 0 A.D.)
   // Only includes maps that have been tested and confirmed ACTUALLY WORKING
-  // Removed: Bactriana, Caspian Sea, Coele-Syria, Dueling Cliffs, Egypt, Gold Oasis, Island of Meroë, Mediterranean Coves
+  // Removed: Bactriana, Caspian Sea, Coele-Syria, Dueling Cliffs, Egypt, Gold Oasis, Island of Meroë, Mediterranean Coves, Cisalpine Winter (buggy)
   // See test-user-maps.ts for verification results
   // Maps are organized by player count for balanced arena rotation
   private readonly FALLBACK_MAPS: MapInfo[] = [
-    // 2-Player Maps (29 verified)
+    // 2-Player Maps (28 verified)
     { name: 'acropolis_bay_2p', displayName: 'Acropolis Bay', filePath: 'skirmishes/acropolis_bay_2p', players: 2, isBuiltin: true },
     { name: 'alpine_valleys_2p', displayName: 'Alpine Valleys', filePath: 'skirmishes/alpine_valleys_2p', players: 2, isBuiltin: true },
     { name: 'arabian_oases_2p', displayName: 'Arabian Oases', filePath: 'skirmishes/arabian_oases_2p', players: 2, isBuiltin: true },
     { name: 'belgian_bog_2p', displayName: 'Belgian Bog', filePath: 'skirmishes/belgian_bog_2p', players: 2, isBuiltin: true },
-    { name: 'cisalpine_winter_2p', displayName: 'Cisalpine Winter', filePath: 'skirmishes/cisalpine_winter_2p', players: 2, isBuiltin: true },
     { name: 'corinthian_isthmus_2p', displayName: 'Corinthian Isthmus', filePath: 'skirmishes/corinthian_isthmus_2p', players: 2, isBuiltin: true },
     { name: 'death_canyon_2p', displayName: 'Death Canyon', filePath: 'skirmishes/death_canyon_2p', players: 2, isBuiltin: true },
     { name: 'deccan_plateau_2p', displayName: 'Deccan Plateau', filePath: 'skirmishes/deccan_plateau_2p', players: 2, isBuiltin: true },

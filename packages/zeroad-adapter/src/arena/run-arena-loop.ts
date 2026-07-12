@@ -229,8 +229,8 @@ async function startGame(matchNumber: number): Promise<{ process: ChildProcess; 
     '--mod=camera_commander',  // Enable remote camera control
     // '--mod=bigger-minimap',  // TODO: Mod compatibility issue - disabled for now
     `-autostart=${selectedMap}`,
-    '-autostart-ai=1:petra',
-    '-autostart-ai=2:petra',
+    '-autostart-ai=1:petra',  // Petra fallback for P1 (Ollama commands override when sent)
+    '-autostart-ai=2:petra',  // Petra fallback for P2 (Ollama commands override when sent)
     '-xres=1920',           // Resolution width
     '-yres=1080',           // Resolution height
   ]);
@@ -389,10 +389,12 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
     const cameraBroadcast = new CameraBroadcastServer(logger, 3001);
     await cameraBroadcast.start();
 
-    // Initialize Ollama brain (optional - if not available, use Petra only)
-    let brain: OllamaAIBrain | null = null;
+    // Initialize Ollama brains for BOTH players
+    let brainP1: OllamaAIBrain | null = null;
+    let brainP2: OllamaAIBrain | null = null;
+
     try {
-      brain = new OllamaAIBrain(logger, {
+      brainP1 = new OllamaAIBrain(logger, {
         modelName: OLLAMA_MODEL,
         baseUrl: 'http://localhost:11434',
         temperature: 0.7,
@@ -403,12 +405,31 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
         playerID: 1,
       });
 
-      await brain.initialize();
-      logger.info(`✓ Ollama brain initialized (${OLLAMA_MODEL})\n`);
+      await brainP1.initialize();
+      logger.info(`✓ Ollama brain P1 initialized (${OLLAMA_MODEL})\n`);
     } catch (error) {
-      brain = null;
-      logger.warn('⚠️  Ollama not available - running with Petra AI only');
+      brainP1 = null;
+      logger.warn('⚠️  Ollama P1 not available');
       logger.info('To use Ollama: start it with: ollama serve\n');
+    }
+
+    try {
+      brainP2 = new OllamaAIBrain(logger, {
+        modelName: OLLAMA_MODEL,
+        baseUrl: 'http://localhost:11434',
+        temperature: 0.7,
+        topP: 0.9,
+        topK: 40,
+        numPredict: 256,
+        timeout: OLLAMA_TIMEOUT,
+        playerID: 2,
+      });
+
+      await brainP2.initialize();
+      logger.info(`✓ Ollama brain P2 initialized (${OLLAMA_MODEL})\n`);
+    } catch (error) {
+      brainP2 = null;
+      logger.warn('⚠️  Ollama P2 not available');
     }
 
     // Initialize automatic camera manager for caster view
@@ -577,12 +598,24 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
             };
           });
 
+        // Track unit movements by player - PROOF that commands are working
+        const p1Units = units.filter(u => u.owner === '1');
+        const p2Units = units.filter(u => u.owner === '2');
+
+        // Log unit counts every 100 ticks - shows both players' units moving
+        if (tick % 100 === 0 && tick > 0) {
+          logger.info(`  [Tick ${tick}] P1 units: ${p1Units.length} | P2 units: ${p2Units.length}`, {
+            p1SamplePos: p1Units[0]?.position || { x: 0, z: 0 },
+            p2SamplePos: p2Units[0]?.position || { x: 0, z: 0 },
+          });
+        }
+
         // Log sample unit positions every 1000 ticks
         if (tick % 1000 === 0 && units.length > 0) {
-          logger.info('📍 Sample unit positions:', {
-            sampleUnit: units[0],
+          logger.info('📍 Sample unit positions by player:', {
+            p1Units: p1Units.length,
+            p2Units: p2Units.length,
             totalUnits: units.length,
-            allHaveZeroPos: units.every(u => u.position.x === 0 && u.position.z === 0),
           });
         }
 
@@ -631,43 +664,62 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
         }
 
         if (enemyUnits === 0) {
-          matchWinner = brain ? 'player (Ollama)' : 'player (Petra AI)';
+          matchWinner = brainP1 ? 'player (Ollama)' : 'player (Petra AI)';
           logger.info(`✅ Enemy defeated - ${matchWinner} WINS`);
           break;
         }
 
-        // Get decision from brain only every N ticks (for speed)
-        // Fire-and-forget: Send commands as soon as AI responds, don't wait
-        if (tick % decisionFrequency === 0 && brain) {
-          pendingAIRequests++;
-          brain.decide(worldState)
-            .then(decision => {
-              if (decision.commands && decision.commands.length > 0) {
-                // Send commands immediately without waiting
-                client.step(decision.commands).catch(err => {
-                  logger.error('Failed to send AI commands', {
-                    error: err instanceof Error ? err.message : String(err),
-                  });
+        // Get decisions from BOTH Ollama brains every N ticks
+        let allCommands: any[] = [];
+
+        if (tick % decisionFrequency === 0) {
+          // Player 1 decision
+          if (brainP1) {
+            try {
+              const decision1 = await brainP1.decide(worldState);
+              if (decision1.commands && decision1.commands.length > 0) {
+                allCommands.push(...decision1.commands);
+                logger.debug(`P1 Ollama decision: ${decision1.commands.length} commands`, {
+                  tick,
+                  commands: decision1.commands.map((c: any) => c.json_cmd?.type || 'unknown'),
                 });
               }
-            })
-            .catch(err => {
-              // Suppress AbortError (expected during shutdown/reconnection)
+            } catch (err) {
               const isAbortError = err instanceof Error && err.name === 'AbortError';
               if (!isAbortError) {
-                logger.error('Brain decision failed', {
+                logger.error('P1 brain decision failed', {
                   tick,
                   error: err instanceof Error ? err.message : String(err),
                 });
               }
-            })
-            .finally(() => {
-              pendingAIRequests--;
-            });
+            }
+          }
+
+          // Player 2 decision
+          if (brainP2) {
+            try {
+              const decision2 = await brainP2.decide(worldState);
+              if (decision2.commands && decision2.commands.length > 0) {
+                allCommands.push(...decision2.commands);
+                logger.debug(`P2 Ollama decision: ${decision2.commands.length} commands`, {
+                  tick,
+                  commands: decision2.commands.map((c: any) => c.json_cmd?.type || 'unknown'),
+                });
+              }
+            } catch (err) {
+              const isAbortError = err instanceof Error && err.name === 'AbortError';
+              if (!isAbortError) {
+                logger.error('P2 brain decision failed', {
+                  tick,
+                  error: err instanceof Error ? err.message : String(err),
+                });
+              }
+            }
+          }
         }
 
-        // Step game state without waiting for AI decision
-        gameState = await client.step([]);
+        // Step game state WITH both Ollama commands (if any)
+        gameState = await client.step(allCommands);
 
         tick++;
 
@@ -680,13 +732,13 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
             mapDisplayName: mapUsed.replace('skirmishes/', '').split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
             worldState,
             player1: {
-              name: brain ? 'Ollama AI' : 'Petra AI',
-              model: brain ? 'mistral' : 'petra',
+              name: brainP1 ? 'Ollama AI' : 'Petra AI',
+              model: brainP1 ? 'Ollama' : 'petra',
               civilization: 'athenians', // TODO: Get from Arena context
             },
             player2: {
-              name: 'Petra AI',
-              model: 'petra',
+              name: brainP2 ? 'Ollama AI' : 'Petra AI',
+              model: brainP2 ? 'Ollama' : 'petra',
               civilization: 'persians', // TODO: Get from Arena context
             },
             tick,
