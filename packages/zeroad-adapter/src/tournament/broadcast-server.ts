@@ -165,6 +165,22 @@ export class BroadcastServer {
   }
 
   /**
+   * Broadcast generic message to all clients
+   */
+  broadcastMessage(message: Partial<BroadcastMessage>): BroadcastMessage {
+    const fullMessage: BroadcastMessage = {
+      messageId: `msg_${Date.now()}_${Math.random()}`,
+      type: (message.type as any) || 'event',
+      timestamp: Date.now(),
+      payload: message.payload || {},
+      broadcast: true,
+    };
+
+    this.queueMessage(fullMessage);
+    return fullMessage;
+  }
+
+  /**
    * Send targeted message to specific client
    */
   sendToClient(clientId: string, messageType: string, payload: any): BroadcastMessage {

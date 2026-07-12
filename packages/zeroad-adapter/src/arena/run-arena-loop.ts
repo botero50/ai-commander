@@ -38,6 +38,7 @@ import { CivilizationRotation } from '../match/civilization-rotation.js';
 import { TrashTalkGenerator, type GameContext } from '../match/trash-talk-generator.js';
 import { EventBasedCamera } from '../camera/event-based-camera.js';
 import { BroadcastState, type ArenaMatchContext } from '../broadcast/broadcast-state.js';
+import { BroadcastServer } from '../tournament/broadcast-server.js';
 
 const execAsync = promisify(exec);
 
@@ -348,6 +349,10 @@ async function waitForRLInterface(timeoutMs: number = RL_CONNECT_TIMEOUT): Promi
  */
 async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed: string): Promise<boolean> {
   try {
+    // ✅ NEW (EPIC 62): Create matchId for streaming
+    const matchId = `match-${Date.now()}-${matchNumber}`;
+    const map = mapUsed;
+
     logger.info(`\n${'='.repeat(60)}`);
     logger.info(`Match ${matchNumber} - Connecting to game...`);
     logger.info(`Map: ${mapUsed}`);
@@ -389,9 +394,24 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
     const cameraBroadcast = new CameraBroadcastServer(logger, 3001);
     await cameraBroadcast.start();
 
+    // ✅ NEW (EPIC 62 Phase 1): Initialize broadcast server for streaming trash talk + game data
+    const broadcastServer = new BroadcastServer({
+      port: 8765,
+      maxConnections: 100,
+      heartbeatInterval: 1000,
+      messageBufferSize: 5000,
+      enableCompression: true,
+    });
+    broadcastServer.start();
+    logger.info(`🎬 Broadcast server started on port 8765`);
+
     // Initialize Ollama brains for BOTH players
     let brainP1: OllamaAIBrain | null = null;
     let brainP2: OllamaAIBrain | null = null;
+
+    // ✅ NEW (EPIC 62 Phase 2): Track unit counts for metrics trends
+    let lastP1Count = 0;
+    let lastP2Count = 0;
 
     try {
       brainP1 = new OllamaAIBrain(logger, {
@@ -762,6 +782,38 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
                 resources: currentBroadcastState.match.players[1].resources,
               },
             });
+
+            // ✅ NEW (EPIC 62 Phase 1): Broadcast game state to WebSocket clients
+            broadcastServer.broadcastMessage({
+              type: 'state_update',
+              timestamp: Date.now(),
+              payload: {
+                matchId: matchId,
+                tick: tick,
+                players: [
+                  {
+                    id: 1,
+                    name: currentBroadcastState.match.players[0].name,
+                    model: currentBroadcastState.match.players[0].provider || 'unknown',
+                    units: currentBroadcastState.match.players[0].units,
+                    buildings: currentBroadcastState.match.players[0].buildings,
+                    population: currentBroadcastState.match.players[0].population,
+                    resources: currentBroadcastState.match.players[0].resources,
+                    militaryValue: currentBroadcastState.match.players[0].militaryValue,
+                  },
+                  {
+                    id: 2,
+                    name: currentBroadcastState.match.players[1].name,
+                    model: currentBroadcastState.match.players[1].provider || 'unknown',
+                    units: currentBroadcastState.match.players[1].units,
+                    buildings: currentBroadcastState.match.players[1].buildings,
+                    population: currentBroadcastState.match.players[1].population,
+                    resources: currentBroadcastState.match.players[1].resources,
+                    militaryValue: currentBroadcastState.match.players[1].militaryValue,
+                  },
+                ],
+              },
+            });
           }
         } catch (error) {
           logger.debug('Failed to build broadcast state', {
@@ -772,6 +824,80 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
         // Log progress every 100 ticks
         if (tick % 100 === 0) {
           logger.info(`  [Tick ${tick}] Ollama: ${playerUnits} units | Petra: ${enemyUnits} units`);
+
+          // ✅ NEW (EPIC 62 Phase 2): Calculate and emit metrics every 100 ticks
+          const allUnits = worldState.agents.filter((a: any) => (a.customData as any)?.type === 'unit');
+          const p1Units = allUnits.filter((u: any) => u.controlledByPlayerId?.toString() === '1').length;
+          const p2Units = allUnits.filter((u: any) => u.controlledByPlayerId?.toString() === '2').length;
+
+          const p1Trend = p1Units > lastP1Count ? 'up' : p1Units < lastP1Count ? 'down' : 'stable';
+          const p2Trend = p2Units > lastP2Count ? 'up' : p2Units < lastP2Count ? 'down' : 'stable';
+
+          lastP1Count = p1Units;
+          lastP2Count = p2Units;
+
+          try {
+            const broadcastContext: ArenaMatchContext = {
+              matchId: `match-${matchNumber}`,
+              matchNumber,
+              map: mapUsed.replace('skirmishes/', ''),
+              mapDisplayName: mapUsed.replace('skirmishes/', '').split('_').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '),
+              worldState,
+              player1: {
+                name: brainP1 ? 'Ollama AI' : 'Petra AI',
+                model: brainP1 ? 'Ollama' : 'petra',
+                civilization: 'athenians',
+              },
+              player2: {
+                name: brainP2 ? 'Ollama AI' : 'Petra AI',
+                model: brainP2 ? 'Ollama' : 'petra',
+                civilization: 'persians',
+              },
+              tick,
+              isRunning: true,
+            };
+
+            const currentState = broadcastState.buildState(broadcastContext);
+            const p1Resources = currentState.match.players[0].resources;
+            const p2Resources = currentState.match.players[1].resources;
+            const p1Total = Object.values(p1Resources).reduce((a, b) => a + b, 0);
+            const p2Total = Object.values(p2Resources).reduce((a, b) => a + b, 0);
+
+            broadcastServer.broadcastMessage({
+              type: 'event',
+              timestamp: Date.now(),
+              payload: {
+                eventType: 'metrics_update',
+                tick: tick,
+                matchId: `match-${matchNumber}`,
+                metrics: {
+                  player1: {
+                    unitCount: p1Units,
+                    totalResources: p1Total,
+                    economyValue: p1Resources.wood + p1Resources.stone + p1Resources.food,
+                    militaryValue: currentState.match.players[0].militaryValue,
+                    trend: p1Trend,
+                  },
+                  player2: {
+                    unitCount: p2Units,
+                    totalResources: p2Total,
+                    economyValue: p2Resources.wood + p2Resources.stone + p2Resources.food,
+                    militaryValue: currentState.match.players[1].militaryValue,
+                    trend: p2Trend,
+                  },
+                  gameProgress: {
+                    elapsedSeconds: tick / 30,
+                    estimatedTimeRemaining: Math.max(0, (maxTicks - tick) / 30),
+                    provisionalWinner: p1Units > p2Units ? 'player1' : p2Units > p1Units ? 'player2' : 'tied',
+                  },
+                },
+              },
+            });
+          } catch (error) {
+            logger.debug('Failed to emit metrics', {
+              error: error instanceof Error ? error.message : String(error),
+            });
+          }
 
           // Generate trash talk every 500 ticks
           if (tick % 500 === 0) {
@@ -829,6 +955,18 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
                   logger.info('📢 Trash talk captured for broadcast', {
                     speaker: playerName,
                     message: trashTalk.message.substring(0, 60),
+                  });
+
+                  // ✅ NEW (EPIC 62 Phase 1): Broadcast trash talk to WebSocket clients
+                  broadcastServer.broadcastMessage({
+                    type: 'chat',
+                    timestamp: Date.now(),
+                    payload: {
+                      speaker: trashTalk.speaker,
+                      message: trashTalk.message,
+                      tick: tick,
+                      matchId: matchId,
+                    },
                   });
                 }
               })
