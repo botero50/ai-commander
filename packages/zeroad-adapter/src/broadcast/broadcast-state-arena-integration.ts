@@ -80,26 +80,32 @@ export class ArenaBroadcastAdapter {
             name: context.player1.name,
             civilization: context.player1.civilization || 'Unknown',
             faction: this.getFactionForCivilization(context.player1.civilization),
-            resources: this.extractResources(context.worldState, 1),
             units: context.player1Units,
             buildings: context.player1Buildings,
-            population: this.getPopulation(context.worldState, 1),
             militaryValue: Math.floor(context.player1Units * 0.3) * 10,
+            economyScore: Math.floor(context.player1Buildings * 50 + context.player1Units * 10),
+            phase: 'village',
+            researched_techs: 0,
+            queued_techs: 0,
             provider: context.player1.model,
             model: context.player1.model,
+            status: 'active',
           },
           {
             id: 2,
             name: context.player2.name,
             civilization: context.player2.civilization || 'Unknown',
             faction: this.getFactionForCivilization(context.player2.civilization),
-            resources: this.extractResources(context.worldState, 2),
             units: context.player2Units,
             buildings: context.player2Buildings,
-            population: this.getPopulation(context.worldState, 2),
             militaryValue: Math.floor(context.player2Units * 0.3) * 10,
+            economyScore: Math.floor(context.player2Buildings * 50 + context.player2Units * 10),
+            phase: 'village',
+            researched_techs: 0,
+            queued_techs: 0,
             provider: context.player2.model,
             model: context.player2.model,
+            status: 'active',
           },
         ],
         state: this.determineMatchState(context),
@@ -172,14 +178,24 @@ export class ArenaBroadcastAdapter {
   /**
    * Get population from world state
    */
-  private getPopulation(worldState: WorldState | undefined, playerId: number): number {
+  private getPopulation(worldState: WorldState | undefined, playerId: number): { current: number; max: number } {
     if (!worldState || !worldState.players || !worldState.players[playerId - 1]) {
-      return 0;
+      return { current: 0, max: 300 };
     }
 
     const player = worldState.players[playerId - 1];
     const customData = (player.customData || {}) as any;
-    return customData.population || 0;
+    const pop = customData.population || {};
+    if (typeof pop === 'object' && 'current' in pop) {
+      return {
+        current: pop.current || 0,
+        max: pop.max || 300,
+      };
+    }
+    return {
+      current: typeof pop === 'number' ? pop : 0,
+      max: 300,
+    };
   }
 
   /**
@@ -237,8 +253,9 @@ export class ArenaBroadcastAdapter {
         civ: p.civilization,
         units: p.units,
         buildings: p.buildings,
-        pop: p.population,
-        resources: `W:${p.resources.wood} S:${p.resources.stone}`,
+        phase: p.phase,
+        techs: p.researched_techs,
+        economy: p.economyScore,
       })),
     });
   }

@@ -312,6 +312,15 @@ export class RLHTTPClient {
           }))
         : [];
 
+      // Debug: log raw players to see if they have resources
+      if (tick % 500 === 0 && tick > 0) {
+        this.logger.debug('Raw players from 0 A.D. (before RawGameState)', {
+          tick,
+          player1: raw.players?.[0],
+          player2: raw.players?.[1],
+        });
+      }
+
       return {
         tick,
         time_elapsed: raw.timeElapsed || 0,

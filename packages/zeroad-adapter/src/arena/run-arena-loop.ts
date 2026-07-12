@@ -81,7 +81,9 @@ interface StreamingDataCache {
       id: number;
       name: string;
       units: number;
-      resources: { wood: number; stone: number; food: number; metal: number };
+      buildings: number;
+      phase: string;
+      economyScore: number;
     }>;
   } | null;
   recentTrashTalk: Array<{
@@ -645,6 +647,26 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
           break;
         }
 
+        // Debug: log resource data every 100 ticks (3.3 seconds)
+        if (tick % 100 === 0 && tick > 0) {
+          logger.debug('Raw game state resources:', {
+            tick,
+            player1: gameState.players?.[0]?.resources,
+            player2: gameState.players?.[1]?.resources,
+          });
+          logger.debug('WorldState players:', {
+            tick,
+            player1CustomData: {
+              resources: (worldState.players?.[0]?.customData as any)?.resources,
+              population: (worldState.players?.[0]?.customData as any)?.population,
+            },
+            player2CustomData: {
+              resources: (worldState.players?.[1]?.customData as any)?.resources,
+              population: (worldState.players?.[1]?.customData as any)?.population,
+            },
+          });
+        }
+
         // Get unit counts
         const playerUnits = worldState.agents.filter(
           a => (a.customData as any)?.type === 'unit' && a.controlledByPlayerId?.toString() === '1'
@@ -823,19 +845,29 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
 
           const currentBroadcastState = broadcastState.buildState(broadcastContext);
 
-          // Log broadcast state sample every 500 ticks for validation
-          if (tick % 500 === 0 && tick > 0) {
+          // Log broadcast state sample every 150 ticks (5 seconds at 30 FPS) for validation
+          if (tick % 150 === 0 && tick > 0) {
             logger.info('📺 BROADCAST STATE SAMPLE', {
               tick: currentBroadcastState.match.currentTick,
               player1: {
                 name: currentBroadcastState.match.players[0].name,
+                civilization: currentBroadcastState.match.players[0].civilization,
                 units: currentBroadcastState.match.players[0].units,
-                resources: currentBroadcastState.match.players[0].resources,
+                buildings: currentBroadcastState.match.players[0].buildings,
+                phase: currentBroadcastState.match.players[0].phase,
+                researched_techs: currentBroadcastState.match.players[0].researched_techs,
+                economyScore: currentBroadcastState.match.players[0].economyScore,
+                status: currentBroadcastState.match.players[0].status,
               },
               player2: {
                 name: currentBroadcastState.match.players[1].name,
+                civilization: currentBroadcastState.match.players[1].civilization,
                 units: currentBroadcastState.match.players[1].units,
-                resources: currentBroadcastState.match.players[1].resources,
+                buildings: currentBroadcastState.match.players[1].buildings,
+                phase: currentBroadcastState.match.players[1].phase,
+                researched_techs: currentBroadcastState.match.players[1].researched_techs,
+                economyScore: currentBroadcastState.match.players[1].economyScore,
+                status: currentBroadcastState.match.players[1].status,
               },
             });
 
@@ -849,13 +881,17 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
                   id: 1,
                   name: currentBroadcastState.match.players[0].name,
                   units: currentBroadcastState.match.players[0].units,
-                  resources: currentBroadcastState.match.players[0].resources,
+                  buildings: currentBroadcastState.match.players[0].buildings,
+                  phase: currentBroadcastState.match.players[0].phase,
+                  economyScore: currentBroadcastState.match.players[0].economyScore,
                 },
                 {
                   id: 2,
                   name: currentBroadcastState.match.players[1].name,
                   units: currentBroadcastState.match.players[1].units,
-                  resources: currentBroadcastState.match.players[1].resources,
+                  buildings: currentBroadcastState.match.players[1].buildings,
+                  phase: currentBroadcastState.match.players[1].phase,
+                  economyScore: currentBroadcastState.match.players[1].economyScore,
                 },
               ],
             };
@@ -871,22 +907,28 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
                   {
                     id: 1,
                     name: currentBroadcastState.match.players[0].name,
+                    civilization: currentBroadcastState.match.players[0].civilization,
                     model: currentBroadcastState.match.players[0].provider || 'unknown',
                     units: currentBroadcastState.match.players[0].units,
                     buildings: currentBroadcastState.match.players[0].buildings,
-                    population: currentBroadcastState.match.players[0].population,
-                    resources: currentBroadcastState.match.players[0].resources,
+                    phase: currentBroadcastState.match.players[0].phase,
+                    researched_techs: currentBroadcastState.match.players[0].researched_techs,
                     militaryValue: currentBroadcastState.match.players[0].militaryValue,
+                    economyScore: currentBroadcastState.match.players[0].economyScore,
+                    status: currentBroadcastState.match.players[0].status,
                   },
                   {
                     id: 2,
                     name: currentBroadcastState.match.players[1].name,
+                    civilization: currentBroadcastState.match.players[1].civilization,
                     model: currentBroadcastState.match.players[1].provider || 'unknown',
                     units: currentBroadcastState.match.players[1].units,
                     buildings: currentBroadcastState.match.players[1].buildings,
-                    population: currentBroadcastState.match.players[1].population,
-                    resources: currentBroadcastState.match.players[1].resources,
+                    phase: currentBroadcastState.match.players[1].phase,
+                    researched_techs: currentBroadcastState.match.players[1].researched_techs,
                     militaryValue: currentBroadcastState.match.players[1].militaryValue,
+                    economyScore: currentBroadcastState.match.players[1].economyScore,
+                    status: currentBroadcastState.match.players[1].status,
                   },
                 ],
               },
@@ -935,10 +977,6 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
             };
 
             const currentState = broadcastState.buildState(broadcastContext);
-            const p1Resources = currentState.match.players[0].resources;
-            const p2Resources = currentState.match.players[1].resources;
-            const p1Total = Object.values(p1Resources).reduce((a, b) => a + b, 0);
-            const p2Total = Object.values(p2Resources).reduce((a, b) => a + b, 0);
 
             broadcastServer.broadcastMessage({
               type: 'event',
@@ -950,16 +988,20 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
                 metrics: {
                   player1: {
                     unitCount: p1Units,
-                    totalResources: p1Total,
-                    economyValue: p1Resources.wood + p1Resources.stone + p1Resources.food,
+                    buildings: currentState.match.players[0].buildings,
+                    phase: currentState.match.players[0].phase,
+                    economyScore: currentState.match.players[0].economyScore,
                     militaryValue: currentState.match.players[0].militaryValue,
+                    researched_techs: currentState.match.players[0].researched_techs,
                     trend: p1Trend,
                   },
                   player2: {
                     unitCount: p2Units,
-                    totalResources: p2Total,
-                    economyValue: p2Resources.wood + p2Resources.stone + p2Resources.food,
+                    buildings: currentState.match.players[1].buildings,
+                    phase: currentState.match.players[1].phase,
+                    economyScore: currentState.match.players[1].economyScore,
                     militaryValue: currentState.match.players[1].militaryValue,
+                    researched_techs: currentState.match.players[1].researched_techs,
                     trend: p2Trend,
                   },
                   gameProgress: {
@@ -976,8 +1018,8 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
             });
           }
 
-          // Generate trash talk every 500 ticks
-          if (tick % 500 === 0) {
+          // Generate trash talk every 150 ticks (5 seconds at 30 FPS)
+          if (tick % 150 === 0) {
             // Extract real player resources from WorldState
             const player1Resources = (worldState.players[0]?.customData as any)?.resources || { food: 0, wood: 0, stone: 0, metal: 0 };
             const player2Resources = (worldState.players[1]?.customData as any)?.resources || { food: 0, wood: 0, stone: 0, metal: 0 };
@@ -985,29 +1027,19 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
             const gameContext: GameContext = {
               player1: {
                 name: 'Ollama',
-                resources: {
-                  food: player1Resources.food || 0,
-                  wood: player1Resources.wood || 0,
-                  stone: player1Resources.stone || 0,
-                  metal: player1Resources.metal || 0,
-                },
                 unitCount: playerUnits,
                 buildingCount: worldState.agents.filter(
                   a => (a.customData as any)?.type === 'building' && a.controlledByPlayerId?.toString() === '1'
                 ).length,
+                phase: (worldState.players[0]?.customData as any)?.phase || 'village',
               },
               player2: {
                 name: 'Petra',
-                resources: {
-                  food: player2Resources.food || 0,
-                  wood: player2Resources.wood || 0,
-                  stone: player2Resources.stone || 0,
-                  metal: player2Resources.metal || 0,
-                },
                 unitCount: enemyUnits,
                 buildingCount: worldState.agents.filter(
                   a => (a.customData as any)?.type === 'building' && a.controlledByPlayerId?.toString() === '2'
                 ).length,
+                phase: (worldState.players[1]?.customData as any)?.phase || 'village',
               },
               tick,
             };
@@ -1149,6 +1181,11 @@ async function main() {
 
       // Kill the game after match
       await killGame();
+
+      // ✅ CLEANUP: Clear broadcast cache between matches
+      streamingCache.currentMatch = null;
+      streamingCache.recentTrashTalk = [];
+      logger.info('🧹 Cleared broadcast cache for next match');
 
       // Wait before next match
       if (matchNumber < (maxMatches || Infinity)) {

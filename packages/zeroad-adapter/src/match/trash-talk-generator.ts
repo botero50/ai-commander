@@ -1,8 +1,9 @@
 /**
  * Trash Talk Generator
  *
- * Generates contextual taunts and banter between players based on game events.
- * Uses LLM to create dynamic, varied insults and boasts.
+ * Generates contextual, natural-sounding taunts and responses between players.
+ * Uses LLM to create dynamic, varied banter covering multiple game aspects.
+ * Players can taunt each other AND respond to taunts.
  */
 
 import { Logger } from '../config/logger.js';
@@ -10,17 +11,17 @@ import { Logger } from '../config/logger.js';
 export interface GameContext {
   player1: {
     name: string;
-    resources: { food: number; wood: number; stone: number; metal: number };
     unitCount: number;
     buildingCount: number;
+    phase: string;
   };
   player2: {
     name: string;
-    resources: { food: number; wood: number; stone: number; metal: number };
     unitCount: number;
     buildingCount: number;
+    phase: string;
   };
-  recentEvent?: string; // e.g., "player1_killed_unit", "player2_lost_building"
+  recentEvent?: string;
   tick: number;
 }
 
@@ -28,6 +29,8 @@ export interface TrashTalk {
   speaker: string; // "player1" or "player2"
   message: string;
   tick: number;
+  isResponse?: boolean; // True if this is a response to a previous taunt
+  respondingTo?: string; // Previous message being responded to
 }
 
 export class TrashTalkGenerator {
@@ -35,21 +38,60 @@ export class TrashTalkGenerator {
   private ollama_url: string = 'http://localhost:11434';
   private model: string = 'tinyllama:latest';
   private lastTalkTick: number = 0;
-  private talkFrequency: number = 500; // Generate trash talk every N ticks
+  private talkFrequency: number = 100; // Generate trash talk every N ticks (3.3 seconds)
   private useOllama: boolean = true;
   private chatCallback?: (message: string) => Promise<void>;
+  private lastMessage: TrashTalk | null = null; // Track last message for response generation
 
+  // More natural, varied taunts covering different game aspects
   private readonly DEFAULT_TAUNTS = [
-    'Your economy is crumbling!',
-    'My units are unstoppable!',
-    'You\'re no match for my army!',
-    'I own this map now!',
-    'Your defenses are pathetic!',
-    'Better luck next game!',
-    'I\'m too strong for you!',
-    'Your strategy is weak!',
-    'Prepare to be defeated!',
-    'The mighty are here!',
+    // Unit/Military focused
+    'My units are shredding through your defenses!',
+    'Your army can\'t match mine!',
+    'Watch your back, my cavalry is coming!',
+
+    // Economy/Tech focused
+    'I\'m reaching the next age way before you!',
+    'Your economy can\'t compete with mine!',
+    'I\'m teching up faster than you!',
+
+    // Strategy/Dominance
+    'I control the map now!',
+    'You picked the wrong opponent!',
+    'This is my game to lose!',
+    'I\'ve got you surrounded!',
+
+    // Witty/Cocky
+    'Better luck next time!',
+    'Too easy!',
+    'Is that all you got?',
+    'You\'re playing at my level now!',
+    'I\'m on another dimension!',
+    'You know you can\'t beat me!',
+
+    // Responses to pressure
+    'Nice try, but not enough!',
+    'You\'re bringing a knife to a gun fight!',
+    'Your strategy is predictable!',
+
+    // Defensive/Confident
+    'Bring it on!',
+    'I\'m just getting started!',
+    'You haven\'t seen my real army yet!',
+  ];
+
+  // Responses to being taunted
+  private readonly DEFAULT_RESPONSES = [
+    'Talk is cheap, let\'s see your moves!',
+    'We\'ll see who\'s laughing at the end!',
+    'You got lucky, that\'s all!',
+    'Keep talking, I\'m not worried!',
+    'Actions speak louder than words!',
+    'You\'re overconfident!',
+    'I\'m just warming up!',
+    'Your cockiness will be your downfall!',
+    'Don\'t count your chickens yet!',
+    'We\'ll settle this on the battlefield!',
   ];
 
   constructor(logger: Logger, ollamaUrl?: string, model?: string, chatCallback?: (message: string) => Promise<void>) {
@@ -60,12 +102,13 @@ export class TrashTalkGenerator {
   }
 
   /**
-   * Generate trash talk based on game context
+   * Generate trash talk or response based on game context
+   * Can either taunt or respond to opponent's previous taunt
    */
   async generateTrashTalk(context: GameContext): Promise<TrashTalk | null> {
     try {
-      // Only generate periodically or on specific events
-      if (context.tick - this.lastTalkTick < this.talkFrequency && !context.recentEvent) {
+      // Generate more frequently (every 100 ticks = 3.3 seconds)
+      if (context.tick - this.lastTalkTick < this.talkFrequency) {
         return null;
       }
 
@@ -77,13 +120,18 @@ export class TrashTalkGenerator {
       const speakerStats = context[speaker as keyof GameContext] as any;
       const opponentStats = context[opponent as keyof GameContext] as any;
 
-      let taunt: string | null = null;
+      // Decide if this is a response or a new taunt (50% chance if we have a previous message)
+      const isResponse = this.lastMessage && this.lastMessage.speaker === opponent && Math.random() > 0.5;
+
+      let message: string | null = null;
 
       // Try Ollama if enabled
       if (this.useOllama) {
-        const prompt = this.buildPrompt(speaker, speakerStats, opponentStats, context.recentEvent);
-
         try {
+          const prompt = isResponse
+            ? this.buildResponsePrompt(speaker, speakerStats, opponentStats, this.lastMessage!.message)
+            : this.buildTauntPrompt(speaker, speakerStats, opponentStats);
+
           const response = await fetch(`${this.ollama_url}/api/generate`, {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -91,45 +139,60 @@ export class TrashTalkGenerator {
               model: this.model,
               prompt,
               stream: false,
-              temperature: 0.8,
-              num_predict: 50,
+              temperature: 0.9, // Higher variety
+              num_predict: 60,
+              top_k: 50,
+              top_p: 0.9,
             }),
           });
 
           if (response.ok) {
             const data = (await response.json()) as { response: string };
-            taunt = data.response.trim();
+            message = data.response.trim().split('\n')[0]; // Take first line only
+            // Remove quotes if present
+            message = message.replace(/^["']|["']$/g, '');
           } else {
-            this.useOllama = false; // Disable Ollama for rest of session
+            this.useOllama = false;
             this.logger.debug('Ollama not available, using fallback taunts');
           }
         } catch (error) {
-          this.useOllama = false; // Disable Ollama for rest of session
+          this.useOllama = false;
           this.logger.debug('Ollama connection failed, using fallback taunts');
         }
       }
 
-      // Use fallback if no taunt generated
-      if (!taunt) {
-        taunt = this.DEFAULT_TAUNTS[Math.floor(Math.random() * this.DEFAULT_TAUNTS.length)];
+      // Use fallback if no message generated
+      if (!message) {
+        if (isResponse) {
+          message = this.DEFAULT_RESPONSES[Math.floor(Math.random() * this.DEFAULT_RESPONSES.length)];
+        } else {
+          message = this.DEFAULT_TAUNTS[Math.floor(Math.random() * this.DEFAULT_TAUNTS.length)];
+        }
       }
 
-      if (taunt && taunt.length > 0) {
+      if (message && message.length > 0) {
         this.lastTalkTick = context.tick;
-        this.logger.info(`🗣️  ${speaker === 'player1' ? 'Ollama' : 'Petra'}: ${taunt}`);
+        const speakerName = speaker === 'player1' ? 'Ollama' : 'Petra';
+        const badge = isResponse ? '🔄' : '🗣️';
+        this.logger.info(`${badge} ${speakerName}: ${message}`);
 
-        // Send to game chat if callback available (fire and forget - don't await)
+        // Send to game chat if callback available
         if (this.chatCallback) {
-          this.chatCallback(taunt).catch(() => {
-            // Silently ignore chat failures
-          });
+          this.chatCallback(message).catch(() => {});
         }
 
-        return {
+        const talk: TrashTalk = {
           speaker,
-          message: taunt,
+          message,
           tick: context.tick,
+          isResponse,
+          respondingTo: isResponse ? this.lastMessage!.message : undefined,
         };
+
+        // Store for potential response
+        this.lastMessage = talk;
+
+        return talk;
       }
 
       return null;
@@ -140,54 +203,53 @@ export class TrashTalkGenerator {
   }
 
   /**
-   * Build prompt for trash talk generation
+   * Build prompt for a new taunt
+   * Covers multiple game aspects: units, buildings, tech phase
    */
-  private buildPrompt(
-    speaker: string,
-    speakerStats: any,
-    opponentStats: any,
-    event?: string
-  ): string {
-    let eventContext = '';
-    if (event === 'speaker_killed_unit') {
-      eventContext = 'Just killed an enemy unit! ';
-    } else if (event === 'speaker_lost_unit') {
-      eventContext = 'Just lost a unit. ';
-    } else if (event === 'opponent_weak') {
-      eventContext = 'Opponent is falling behind. ';
-    }
+  private buildTauntPrompt(speaker: string, speakerStats: any, opponentStats: any): string {
+    const context = this.analyzeGameState(speakerStats, opponentStats);
 
-    const comparison = this.getComparison(speakerStats, opponentStats);
+    return `You are a confident esports player in an RTS game. Generate ONE SHORT taunt (max 2 sentences).
+Be witty, cocky, and trash-talk about the game. Topics: army size, economy strength, tech level, strategy.
 
-    return `You are a trash-talking AI game opponent. Generate ONE SHORT taunt (1-2 sentences max).
-${eventContext}
-Your stats: ${speakerStats.unitCount} units, ${speakerStats.buildingCount} buildings, ${speakerStats.resources.food + speakerStats.resources.wood + speakerStats.resources.stone + speakerStats.resources.metal} total resources
-Enemy stats: ${opponentStats.unitCount} units, ${opponentStats.buildingCount} buildings, ${opponentStats.resources.food + opponentStats.resources.wood + opponentStats.resources.stone + opponentStats.resources.metal} total resources
-${comparison}
+Your position: ${speakerStats.unitCount} units, ${speakerStats.buildingCount} buildings, ${speakerStats.phase} phase
+Enemy position: ${opponentStats.unitCount} units, ${opponentStats.buildingCount} buildings, ${opponentStats.phase} phase
+Situation: ${context}
 
-Generate a short, witty, confident taunt in the style of an esports trash talker. Be aggressive but not offensive. NO extra text, just the taunt:`;
+Generate a natural, confident taunt. Examples: "My army crushes yours!", "You're playing checkers while I play chess!", "Ouch, that economy!", "Face it, you've lost!"
+
+Keep it short, aggressive, witty. NO quotation marks, NO explanations. Just the taunt:`;
   }
 
   /**
-   * Compare player stats to generate contextual taunts
+   * Build prompt for responding to opponent's taunt
    */
-  private getComparison(speaker: any, opponent: any): string {
-    const speakerTotal = speaker.resources.food + speaker.resources.wood + speaker.resources.stone + speaker.resources.metal;
-    const opponentTotal = opponent.resources.food + opponent.resources.wood + opponent.resources.stone + opponent.resources.metal;
+  private buildResponsePrompt(speaker: string, speakerStats: any, opponentStats: any, previousTaunt: string): string {
+    return `You are a confident esports player responding to opponent trash talk in an RTS game. Generate ONE SHORT response (max 2 sentences).
 
-    if (speaker.unitCount > opponent.unitCount * 1.5) {
-      return 'You have significantly more units.';
-    }
-    if (speaker.buildingCount > opponent.buildingCount) {
-      return 'Your economy is stronger.';
-    }
-    if (speakerTotal > opponentTotal * 1.2) {
-      return 'You have more resources.';
-    }
-    if (opponent.unitCount > speaker.unitCount * 1.5) {
-      return 'Enemy has more units, but you are more skilled.';
-    }
-    return 'You are equally matched.';
+Opponent said: "${previousTaunt}"
+
+Your position: ${speakerStats.unitCount} units, ${speakerStats.buildingCount} buildings, ${speakerStats.phase} phase
+Enemy position: ${opponentStats.unitCount} units, ${opponentStats.buildingCount} buildings, ${opponentStats.phase} phase
+
+Fire back with a witty comeback or confident counter-taunt. Examples: "We'll see about that!", "Talk is cheap!", "You're overconfident!"
+
+Keep it short, snappy, cocky. NO quotation marks, NO explanations. Just your response:`;
+  }
+
+  /**
+   * Analyze game state to provide context for trash talk
+   */
+  private analyzeGameState(speaker: any, opponent: any): string {
+    const unitDiff = speaker.unitCount - opponent.unitCount;
+    const buildingDiff = speaker.buildingCount - opponent.buildingCount;
+
+    if (unitDiff > 10) return 'You have overwhelming military superiority';
+    if (unitDiff > 5) return 'You have a strong unit advantage';
+    if (unitDiff > 0) return 'You have slightly more units';
+    if (unitDiff === 0) return 'Equal unit count - skill determines victory';
+    if (unitDiff > -5) return 'Enemy has slight unit advantage';
+    return 'Enemy has significant military advantage';
   }
 
   /**

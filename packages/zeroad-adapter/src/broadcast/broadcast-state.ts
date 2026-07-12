@@ -26,30 +26,30 @@ export interface BroadcastPlayer {
   civilization: string;
   faction?: string;
 
-  // Real-time stats from game state
-  resources: {
-    wood: number;
-    stone: number;
-    food: number;
-    metal: number;
-  };
+  // Military & Economy
   units: number;
   buildings: number;
-  population: number;
   militaryValue: number;
+  economyScore: number; // Based on building count + unit count
+
+  // Technology Progress
+  phase: string; // 'village' | 'town' | 'city'
+  researched_techs: number; // Count of completed techs
+  queued_techs: number; // Count of techs in queue
 
   // AI metadata from Brain
-  objective?: string;
-  confidence?: number;
-  provider?: string;
-  model?: string;
-  latency?: number;
+  provider?: string; // 'Ollama' | 'petra' | etc
+  model?: string; // Model name
+  latency?: number; // Response time in ms
 
   // Trash talk from Commentary
   currentTrashTalk?: {
     message: string;
     tick: number;
   };
+
+  // Match status
+  status: 'active' | 'defeated' | 'victorious';
 }
 
 export interface BroadcastMatch {
@@ -143,6 +143,20 @@ export class BroadcastState {
    * This transforms real WorldState to broadcast format
    */
   buildState(context: ArenaMatchContext): BroadcastStreamState {
+    // Debug: log player count and structure
+    if (context.tick % 500 === 0) {
+      this.logger.debug('Building broadcast state', {
+        tick: context.tick,
+        playersInWorldState: context.worldState.players?.length || 0,
+        playerStructure: context.worldState.players?.map((p) => ({
+          id: p.id,
+          name: p.name,
+          hasCustomData: !!p.customData,
+          customDataKeys: p.customData ? Object.keys(p.customData) : [],
+        })) || [],
+      });
+    }
+
     return {
       match: {
         matchId: context.matchId,
@@ -172,10 +186,10 @@ export class BroadcastState {
   private buildPlayer(playerId: number, context: ArenaMatchContext): BroadcastPlayer {
     const worldPlayer = context.worldState.players?.[playerId - 1];
     const playerContext = playerId === 1 ? context.player1 : context.player2;
-
-    // Resources are stored in customData
     const customData = (worldPlayer?.customData || {}) as any;
-    const resources = customData.resources || {};
+
+    const units = this.countUnits(context.worldState, playerId);
+    const buildings = this.countBuildings(context.worldState, playerId);
 
     return {
       id: playerId,
@@ -183,22 +197,32 @@ export class BroadcastState {
       civilization: playerContext.civilization || 'Unknown',
       faction: this.getFaction(playerContext.civilization),
 
-      // Real data from WorldState
-      resources: {
-        wood: resources.wood || 0,
-        stone: resources.stone || 0,
-        food: resources.food || 0,
-        metal: resources.metal || 0,
-      },
-      units: this.countUnits(context.worldState, playerId),
-      buildings: this.countBuildings(context.worldState, playerId),
-      population: customData.population || 0,
+      // Military & Economy
+      units,
+      buildings,
       militaryValue: this.calculateMilitaryValue(context.worldState, playerId),
+      economyScore: this.calculateEconomyScore(units, buildings),
+
+      // Technology Progress
+      phase: customData.phase || 'village',
+      researched_techs: Array.isArray(customData.researched_techs) ? customData.researched_techs.length : 0,
+      queued_techs: Array.isArray(customData.queued_techs) ? customData.queued_techs.length : 0,
 
       // AI metadata
       provider: playerContext.model,
       model: playerContext.model,
+
+      // Match status
+      status: customData.state || 'active',
     };
+  }
+
+  /**
+   * Calculate economy score based on buildings and units
+   */
+  private calculateEconomyScore(units: number, buildings: number): number {
+    // Rough score: buildings are more valuable for economy
+    return Math.floor(buildings * 50 + units * 10);
   }
 
   /**

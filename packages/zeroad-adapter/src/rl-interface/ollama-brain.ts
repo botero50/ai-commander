@@ -17,6 +17,7 @@ import type { WorldState } from '@ai-commander/domain';
 import type { AIBrain, BrainDecision } from './ai-loop-orchestrator.js';
 import type { GameCommand } from './http-client.js';
 import { DecisionLogger } from './decision-logger.js';
+import { OllamaRequestThrottler } from './ollama-request-throttler.js';
 
 export interface OllamaConfig {
   modelName: string; // e.g., 'llama2', 'mistral', 'neural-chat'
@@ -45,6 +46,7 @@ export class OllamaAIBrain implements AIBrain {
   private decisionCount: number = 0;
   private decisionLogger: DecisionLogger;
   private playerID: number;
+  private throttler: OllamaRequestThrottler;
 
   constructor(logger: Logger, config: Partial<OllamaConfig> = {}) {
     this.logger = logger;
@@ -60,6 +62,11 @@ export class OllamaAIBrain implements AIBrain {
       timeout: config.timeout || 60000, // 60 seconds for slow models like tinyllama
       playerID: config.playerID || 2,
     };
+    // Throttle requests: max 1 every 5 seconds per brain
+    this.throttler = new OllamaRequestThrottler(logger, `Player${this.playerID}`, {
+      delayBetweenRequests: 5000, // 5 seconds between requests
+      maxQueueSize: 1, // fire-and-forget
+    });
   }
 
   /**
@@ -105,73 +112,77 @@ export class OllamaAIBrain implements AIBrain {
   }
 
   /**
-   * Make a decision based on world state
+   * Make a decision based on world state (throttled to 1 request per 3 seconds)
    */
   async decide(worldState: WorldState): Promise<BrainDecision> {
     this.decisionCount++;
 
-    try {
-      // Phase 1: Describe game state
-      const gameDescription = this.describeGameState(worldState);
+    // Throttle the Ollama request
+    return this.throttler.throttle(async () => {
+      try {
+        // Phase 1: Describe game state
+        const gameDescription = this.describeGameState(worldState);
 
-      // Phase 2: Build prompt
-      const prompt = this.buildPrompt(gameDescription);
+        // Phase 2: Build prompt
+        const prompt = this.buildPrompt(gameDescription);
 
-      // Phase 3: Query Ollama
-      this.logger.debug('Querying Ollama', {
-        decision: this.decisionCount,
-        model: this.config.modelName,
-        promptLength: prompt.length,
-      });
-
-      const response = await this.callOllama(prompt);
-
-      // Phase 4: Parse response into commands
-      const commands = this.parseCommands(response, worldState);
-
-      // Phase 5: Return decision
-      const decision: BrainDecision = {
-        playerID: this.playerID,
-        commands,
-        reasoning: response.substring(0, 300),
-        timestamp: new Date(),
-      };
-
-      // Log decision for quality analysis
-      this.decisionLogger.logDecision(
-        worldState,
-        prompt,
-        response,
-        Date.now() - (decision.timestamp.getTime() - 1000), // Rough latency estimate
-        commands,
-        true
-      );
-
-      this.logger.info('Brain decision made', {
-        decision: this.decisionCount,
-        commands: commands.length,
-        responseLength: response.length,
-      });
-
-      return decision;
-    } catch (error) {
-      // Suppress AbortError (expected during shutdown/reconnection)
-      const isAbortError = error instanceof Error && error.name === 'AbortError';
-      if (!isAbortError) {
-        this.logger.error('Brain decision failed', {
+        // Phase 3: Query Ollama
+        this.logger.debug('Querying Ollama (throttled)', {
           decision: this.decisionCount,
-          error: String(error),
+          model: this.config.modelName,
+          promptLength: prompt.length,
         });
-      }
 
-      // Return empty decision on error (observe-only)
-      return {
-        playerID: this.playerID,
-        commands: [],
-        reasoning: isAbortError ? 'Decision aborted' : `Decision failed: ${error}`,
-        timestamp: new Date(),
-      };
-    }
+        const response = await this.callOllama(prompt);
+
+        // Phase 4: Parse response into commands
+        const commands = this.parseCommands(response, worldState);
+
+        // Phase 5: Return decision
+        const decision: BrainDecision = {
+          playerID: this.playerID,
+          commands,
+          reasoning: response.substring(0, 300),
+          timestamp: new Date(),
+        };
+
+        // Log decision for quality analysis
+        this.decisionLogger.logDecision(
+          worldState,
+          prompt,
+          response,
+          Date.now() - (decision.timestamp.getTime() - 1000), // Rough latency estimate
+          commands,
+          true
+        );
+
+        this.logger.info('Brain decision made', {
+          decision: this.decisionCount,
+          commands: commands.length,
+          responseLength: response.length,
+          throttlerMetrics: this.throttler.getMetrics(),
+        });
+
+        return decision;
+      } catch (error) {
+        // Suppress AbortError (expected during shutdown/reconnection)
+        const isAbortError = error instanceof Error && error.name === 'AbortError';
+        if (!isAbortError) {
+          this.logger.error('Brain decision failed', {
+            decision: this.decisionCount,
+            error: String(error),
+          });
+        }
+
+        // Return empty decision on error (observe-only)
+        return {
+          playerID: this.playerID,
+          commands: [],
+          reasoning: isAbortError ? 'Decision aborted' : `Decision failed: ${error}`,
+          timestamp: new Date(),
+        };
+      }
+    });
   }
 
   /**
@@ -180,7 +191,9 @@ export class OllamaAIBrain implements AIBrain {
   async shutdown(): Promise<void> {
     this.logger.info('Ollama brain shutdown', {
       totalDecisions: this.decisionCount,
+      throttlerMetrics: this.throttler.getMetrics(),
     });
+    this.throttler.reset();
   }
 
   /**
