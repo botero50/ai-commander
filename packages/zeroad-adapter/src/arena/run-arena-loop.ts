@@ -23,6 +23,7 @@ import { promisify } from 'util';
 import * as fs from 'fs';
 import * as path from 'path';
 import * as http from 'http';
+import * as os from 'os';
 import { RLHTTPClient } from '../rl-interface/http-client.js';
 import { WorldStateMapper } from '../rl-interface/world-state-mapper.js';
 import { OllamaAIBrain } from '../rl-interface/ollama-brain.js';
@@ -40,8 +41,77 @@ import { TrashTalkGenerator, type GameContext } from '../match/trash-talk-genera
 import { EventBasedCamera } from '../camera/event-based-camera.js';
 import { BroadcastState, type ArenaMatchContext } from '../broadcast/broadcast-state.js';
 import { BroadcastServer } from '../tournament/broadcast-server.js';
+import { EloRating } from '../tournament/elo-rating.js';
+import { LiveMetricsHUD, createLiveMetricsHUD } from '../broadcast/live-metrics-hud.js';
 
 const execAsync = promisify(exec);
+
+// ✅ NEW: Detect system screen resolution
+function getSystemScreenResolution(): { width: number; height: number } {
+  try {
+    // Use Windows API via wmic (more reliable than PowerShell)
+    const { execSync } = require('child_process');
+
+    // Query screen resolution using Windows wmic command
+    const output = execSync('wmic path Win32_VideoController get CurrentHorizontalResolution,CurrentVerticalResolution /format:csv', {
+      encoding: 'utf8',
+      stdio: ['pipe', 'pipe', 'ignore'],
+      windowsHide: true,
+    });
+
+    const lines = output.trim().split('\n');
+    for (const line of lines) {
+      if (line && !line.includes('Node')) {
+        // Format: "DESKTOP-ABC,1920,1080"
+        const parts = line.split(',');
+        if (parts.length >= 3) {
+          const width = parseInt(parts[1]?.trim(), 10);
+          const height = parseInt(parts[2]?.trim(), 10);
+
+          if (width > 0 && height > 0) {
+            return { width, height };
+          }
+        }
+      }
+    }
+  } catch {
+    // Fallback if wmic fails
+  }
+
+  // Last resort: try simple wmic query
+  try {
+    const { execSync } = require('child_process');
+    const width = parseInt(
+      execSync('wmic desktopmonitor get screenwidth /value', {
+        encoding: 'utf8',
+        stdio: ['pipe', 'pipe', 'ignore'],
+        windowsHide: true,
+      })
+        .split('=')[1]
+        ?.trim() || '1920',
+      10
+    );
+    const height = parseInt(
+      execSync('wmic desktopmonitor get screenheight /value', {
+        encoding: 'utf8',
+        stdio: ['pipe', 'pipe', 'ignore'],
+        windowsHide: true,
+      })
+        .split('=')[1]
+        ?.trim() || '1080',
+      10
+    );
+
+    if (width > 0 && height > 0) {
+      return { width, height };
+    }
+  } catch {
+    // Final fallback
+  }
+
+  // Fallback for non-Windows or if all detection methods fail
+  return { width: 1920, height: 1080 };
+}
 
 const RL_HOST = '127.0.0.1';
 const RL_PORT = 6000;
@@ -80,10 +150,20 @@ interface StreamingDataCache {
     players: Array<{
       id: number;
       name: string;
+      civilization: string;
       units: number;
       buildings: number;
       phase: string;
+      researched_techs: number;
       economyScore: number;
+      status: string;
+      resources?: {
+        food: number;
+        wood: number;
+        stone: number;
+        metal: number;
+      };
+      population?: number;
     }>;
   } | null;
   recentTrashTalk: Array<{
@@ -98,18 +178,145 @@ const streamingCache: StreamingDataCache = {
   recentTrashTalk: [],
 };
 
+// ✅ NEW: Initialize ranking and metrics systems
+const eloRating = new EloRating(['Ollama_P1', 'Ollama_P2'], {
+  initialRating: 1600,
+  kFactor: 32,
+  maxRatingHistory: 100,
+});
+
+const liveMetricsHUD = createLiveMetricsHUD(logger);
+
+// Match history for display
+const matchHistory: Array<{
+  matchId: string;
+  player1: string;
+  player2: string;
+  winner: string;
+  duration: number; // ticks
+  timestamp: number;
+}> = [];
+
 // ✅ NEW (EPIC 62): Start HTTP server for OBS
 function startHttpServer(): void {
   const server = http.createServer((req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Content-Type', 'application/json');
 
+    // ✅ UNIFIED: /api/broadcast/current now returns both metadata + player details + resources
     if (req.url === '/api/broadcast/current') {
       res.writeHead(200);
-      res.end(JSON.stringify(streamingCache.currentMatch || {}));
+      if (streamingCache.currentMatch) {
+        const { tick, players } = streamingCache.currentMatch;
+        // Return unified format with all player details including resources
+        const response = {
+          tick,
+          player1: {
+            name: players[0].name,
+            civilization: players[0].civilization,
+            units: players[0].units,
+            buildings: players[0].buildings,
+            phase: players[0].phase,
+            researched_techs: players[0].researched_techs,
+            economyScore: players[0].economyScore,
+            status: players[0].status,
+            resources: players[0].resources,
+            population: players[0].population,
+          },
+          player2: {
+            name: players[1].name,
+            civilization: players[1].civilization,
+            units: players[1].units,
+            buildings: players[1].buildings,
+            phase: players[1].phase,
+            researched_techs: players[1].researched_techs,
+            economyScore: players[1].economyScore,
+            status: players[1].status,
+            resources: players[1].resources,
+            population: players[1].population,
+          },
+        };
+        res.end(JSON.stringify(response));
+      } else {
+        res.end(JSON.stringify({}));
+      }
     } else if (req.url === '/api/broadcast/chat') {
       res.writeHead(200);
       res.end(JSON.stringify(streamingCache.recentTrashTalk.slice(-20)));
+    } else if (req.url === '/api/rankings') {
+      // ✅ NEW: Get all brain rankings (ELO)
+      res.writeHead(200);
+      const rankings = eloRating.getAllRatings();
+      const formatted = rankings.map((r, idx) => ({
+        rank: idx + 1,
+        brainId: r.brainId,
+        name: r.brainId,
+        rating: r.rating,
+        highestRating: Math.max(...r.ratingHistory),
+        lowestRating: Math.min(...r.ratingHistory),
+        averageRating: Math.round(r.ratingHistory.reduce((a, b) => a + b, 0) / r.ratingHistory.length),
+        matches: r.ratingHistory.length - 1,
+        trend: r.ratingHistory.length >= 2 && r.rating > r.ratingHistory[r.ratingHistory.length - 2] ? 'up' : 'down',
+      }));
+      res.end(JSON.stringify(formatted));
+    } else if (req.url?.startsWith('/api/rankings/')) {
+      // ✅ NEW: Get individual brain ranking
+      const brainId = req.url.split('/').pop();
+      const stats = eloRating.getBrainStats(brainId);
+      res.writeHead(200);
+      if (stats) {
+        res.end(JSON.stringify({
+          brainId,
+          currentRating: stats.currentRating,
+          highestRating: stats.highestRating,
+          lowestRating: stats.lowestRating,
+          averageRating: stats.averageRating,
+          ratingChange: stats.ratingChange,
+          ratingHistory: eloRating.getRatingHistory(brainId),
+        }));
+      } else {
+        res.end(JSON.stringify({ error: 'Brain not found' }));
+      }
+    } else if (req.url === '/api/metrics') {
+      // ✅ NEW: Get current match metrics
+      res.writeHead(200);
+      const allMetrics = liveMetricsHUD.getAllMetrics();
+      if (allMetrics.length > 0) {
+        res.end(JSON.stringify({
+          timestamp: new Date().toISOString(),
+          players: allMetrics,
+          comparison: allMetrics.length >= 2 ? liveMetricsHUD.compareMetrics(1, 2) : null,
+        }));
+      } else {
+        res.end(JSON.stringify({ players: [] }));
+      }
+    } else if (req.url === '/api/match-history') {
+      // ✅ NEW: Get recent match history
+      res.writeHead(200);
+      res.end(JSON.stringify(matchHistory.slice(-20)));
+    } else if (req.url === '/api/dashboard') {
+      // ✅ NEW: Get complete dashboard state
+      res.writeHead(200);
+      const rankings = eloRating.getAllRatings();
+      const dashboardState = {
+        status: streamingCache.currentMatch ? 'running' : 'idle',
+        currentMatch: streamingCache.currentMatch ? {
+          matchId: streamingCache.currentMatch.matchId,
+          matchNumber: streamingCache.currentMatch.matchNumber,
+          tick: streamingCache.currentMatch.tick,
+        } : null,
+        rankings: rankings.map((r, idx) => ({
+          rank: idx + 1,
+          brainId: r.brainId,
+          rating: r.rating,
+          highestRating: Math.max(...r.ratingHistory),
+          trend: r.ratingHistory.length >= 2 && r.rating > r.ratingHistory[r.ratingHistory.length - 2] ? 'up' : 'down',
+        })),
+        recentMatches: matchHistory.slice(-10),
+        totalMatches: matchHistory.length,
+        liveMetrics: liveMetricsHUD.getAllMetrics(),
+      };
+      res.end(JSON.stringify(dashboardState));
     } else {
       res.writeHead(404);
       res.end(JSON.stringify({ error: 'Not found' }));
@@ -285,8 +492,8 @@ async function startGame(matchNumber: number): Promise<{ process: ChildProcess; 
     `-autostart=${selectedMap}`,
     '-autostart-ai=1:petra',  // Petra fallback for P1 (Ollama commands override when sent)
     '-autostart-ai=2:petra',  // Petra fallback for P2 (Ollama commands override when sent)
-    '-xres=1920',           // Resolution width
-    '-yres=1080',           // Resolution height
+    '-xres=2560',           // Resolution width (2K)
+    '-yres=1440',           // Resolution height (2K)
   ]);
 
   gameProcess.on('error', error => {
@@ -314,10 +521,20 @@ async function configureGame(): Promise<void> {
   try {
     logger.info('⚙️  Configuring 0 A.D. camera settings...');
 
-    // Get screen resolution from environment (or use default)
-    // Set via: SCREEN_WIDTH=2560 SCREEN_HEIGHT=1440 npx tsx ...
-    let screenWidth = parseInt(process.env.SCREEN_WIDTH || '1920', 10);
-    let screenHeight = parseInt(process.env.SCREEN_HEIGHT || '1080', 10);
+    // Get screen resolution: environment variables override auto-detection
+    let screenWidth: number;
+    let screenHeight: number;
+
+    if (process.env.SCREEN_WIDTH && process.env.SCREEN_HEIGHT) {
+      screenWidth = parseInt(process.env.SCREEN_WIDTH, 10);
+      screenHeight = parseInt(process.env.SCREEN_HEIGHT, 10);
+      logger.info(`📺 Using manual resolution from environment: ${screenWidth}x${screenHeight}`);
+    } else {
+      const systemResolution = getSystemScreenResolution();
+      screenWidth = systemResolution.width;
+      screenHeight = systemResolution.height;
+      logger.info(`📺 Detected system resolution: ${screenWidth}x${screenHeight}`);
+    }
 
     const userDir = `${process.env.USERPROFILE}\\AppData\\Local\\0 A.D. Empires Ascendant`;
     const configDir = path.join(userDir, 'config');
@@ -344,9 +561,10 @@ async function configureGame(): Promise<void> {
     }
 
     // Set camera zoom to maximum (zoomed out) and use native screen resolution
+    // Default zoom = 300 (maximum zoom out to see entire map)
     const settingsList = [
       ['zoom.max = 300.0', /zoom\.max\s*=\s*[\d.]+/],
-      ['zoom.default = 150.0', /zoom\.default\s*=\s*[\d.]+/],  // Start more zoomed out (150/300 = half max zoom)
+      ['zoom.default = 300.0', /zoom\.default\s*=\s*[\d.]+/],  // Start at maximum zoom (fully zoomed out)
       ['zoom.min = 0.0', /zoom\.min\s*=\s*[\d.]+/],            // Allow full zoom out
       [`graphics.xres = ${screenWidth}`, /graphics\.xres\s*=\s*\d+/],
       [`graphics.yres = ${screenHeight}`, /graphics\.yres\s*=\s*\d+/],
@@ -406,8 +624,13 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
     const matchId = `match-${Date.now()}-${matchNumber}`;
     const map = mapUsed;
 
+    // Initialize player labels (will be updated once brains are initialized)
+    let p1Label = 'Player 1';
+    let p2Label = 'Player 2';
+
     logger.info(`\n${'='.repeat(60)}`);
     logger.info(`Match ${matchNumber} - Connecting to game...`);
+    logger.info(`Players: ${p1Label} vs ${p2Label}`);
     logger.info(`Map: ${mapUsed}`);
     logger.info(`${'='.repeat(60)}\n`);
 
@@ -459,6 +682,7 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
     logger.info(`🎬 Broadcast server started on port 8765`);
 
     // Initialize Ollama brains for BOTH players
+    // Player names are tracked by which AI brain controls them (Ollama or Petra)
     let brainP1: OllamaAIBrain | null = null;
     let brainP2: OllamaAIBrain | null = null;
 
@@ -466,7 +690,10 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
     let lastP1Count = 0;
     let lastP2Count = 0;
 
+    // ✅ NEW: Require both Ollama brains to be available - fail if not
     try {
+      logger.info('🤖 Initializing Ollama AI brains...');
+
       brainP1 = new OllamaAIBrain(logger, {
         modelName: OLLAMA_MODEL,
         baseUrl: 'http://localhost:11434',
@@ -479,11 +706,18 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
       });
 
       await brainP1.initialize();
-      logger.info(`✓ Ollama brain P1 initialized (${OLLAMA_MODEL})\n`);
+      p1Label = `${OLLAMA_MODEL} (P1)`;
+      logger.info(`✓ Ollama brain P1 initialized (${OLLAMA_MODEL})`);
     } catch (error) {
-      brainP1 = null;
-      logger.warn('⚠️  Ollama P1 not available');
-      logger.info('To use Ollama: start it with: ollama serve\n');
+      logger.error('❌ FATAL: Ollama P1 initialization failed', {
+        error: error instanceof Error ? error.message : String(error),
+        model: OLLAMA_MODEL,
+        baseUrl: 'http://localhost:11434',
+      });
+      logger.error('💡 FIX: Start Ollama server in a separate terminal:');
+      logger.error('   → ollama serve');
+      logger.error('   → Then run this arena loop again\n');
+      throw new Error('Ollama P1 brain not available - cannot proceed');
     }
 
     try {
@@ -499,11 +733,22 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
       });
 
       await brainP2.initialize();
+      p2Label = `${OLLAMA_MODEL} (P2)`;
       logger.info(`✓ Ollama brain P2 initialized (${OLLAMA_MODEL})\n`);
     } catch (error) {
-      brainP2 = null;
-      logger.warn('⚠️  Ollama P2 not available');
+      logger.error('❌ FATAL: Ollama P2 initialization failed', {
+        error: error instanceof Error ? error.message : String(error),
+        model: OLLAMA_MODEL,
+        baseUrl: 'http://localhost:11434',
+      });
+      logger.error('💡 FIX: Start Ollama server in a separate terminal:');
+      logger.error('   → ollama serve');
+      logger.error('   → Then run this arena loop again\n');
+      throw new Error('Ollama P2 brain not available - cannot proceed');
     }
+
+    // Log match info with actual player names now that brains are initialized
+    logger.info(`\n🎬 MATCH START: ${p1Label} vs ${p2Label}`);
 
     // Initialize automatic camera manager for caster view
     let cameraStateUpdateCallback: ((state: any, prev?: any) => void) | null = null;
@@ -600,9 +845,14 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
     // Get initial state
     let gameState: any = await client.step([]);
     let tick = 0;
-    const maxTicks = 3600; // 1 hour max per match
+    const maxTicks = 999999; // Play until one bot wins (no artificial timeout)
     let matchWinner: string | null = null;
     const matchStartTime = Date.now();
+
+    // ✅ NEW: Track defeat states to detect when match should end
+    let ticksWithNoP1Units = 0;
+    let ticksWithNoP2Units = 0;
+    const DEFEAT_CONFIRMATION_TICKS = 300; // ~10 seconds at 30 FPS = confirm they're really defeated
 
     logger.info(`🎮 Match started - Initial game tick: ${gameState.tick || 0}`);
 
@@ -749,16 +999,40 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
           });
         }
 
-        // Check win conditions
+        // ✅ IMPROVED: Track defeat states with confirmation period
         if (playerUnits === 0) {
-          matchWinner = 'enemy (Petra AI)';
-          logger.info('❌ All player units lost - ENEMY WINS');
-          break;
+          ticksWithNoP1Units++;
+        } else {
+          ticksWithNoP1Units = 0;
         }
 
         if (enemyUnits === 0) {
-          matchWinner = brainP1 ? 'player (Ollama)' : 'player (Petra AI)';
-          logger.info(`✅ Enemy defeated - ${matchWinner} WINS`);
+          ticksWithNoP2Units++;
+        } else {
+          ticksWithNoP2Units = 0;
+        }
+
+        // Get player names dynamically
+        const p1Name = brainP1 ? 'Ollama' : 'Petra';
+        const p2Name = brainP2 ? 'Ollama' : 'Petra';
+
+        // Check win conditions - require confirmation period to avoid false positives
+        if (ticksWithNoP1Units >= DEFEAT_CONFIRMATION_TICKS && ticksWithNoP2Units >= DEFEAT_CONFIRMATION_TICKS) {
+          // Both eliminated = draw
+          matchWinner = 'draw (both eliminated)';
+          logger.info(`🤝 Both civilizations eliminated after ${tick} ticks - DRAW`);
+          break;
+        }
+
+        if (ticksWithNoP1Units >= DEFEAT_CONFIRMATION_TICKS) {
+          matchWinner = `${p2Name} (Player 2)`;
+          logger.info(`❌ Player 1 units lost for ${ticksWithNoP1Units} ticks - ${p2Name} (P2) WINS (tick ${tick})`);
+          break;
+        }
+
+        if (ticksWithNoP2Units >= DEFEAT_CONFIRMATION_TICKS) {
+          matchWinner = `${p1Name} (Player 1)`;
+          logger.info(`✅ Player 2 units lost for ${ticksWithNoP2Units} ticks - ${p1Name} (P1) WINS (tick ${tick})`);
           break;
         }
 
@@ -821,6 +1095,7 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
 
         tick++;
 
+
         // Build broadcast state every tick (lightweight transformation, non-blocking)
         try {
           const broadcastContext: ArenaMatchContext = {
@@ -844,6 +1119,33 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
           };
 
           const currentBroadcastState = broadcastState.buildState(broadcastContext);
+
+          // ✅ NEW: Update metrics for dashboard from broadcast state
+          try {
+            const p1 = currentBroadcastState.match.players[0];
+            const p2 = currentBroadcastState.match.players[1];
+
+            // Extract resources from worldState players
+            const p1Resources = (worldState.players[0]?.customData as any)?.resources || { food: 0, wood: 0, stone: 0, metal: 0 };
+            const p2Resources = (worldState.players[1]?.customData as any)?.resources || { food: 0, wood: 0, stone: 0, metal: 0 };
+            const p1Population = (worldState.players[0]?.customData as any)?.population?.current || 0;
+            const p2Population = (worldState.players[1]?.customData as any)?.population?.current || 0;
+
+            liveMetricsHUD.updateMetrics({
+              tick,
+              playerId: 1,
+              playerName: p1.name,
+              observation: { units: p1.units, buildings: p1.buildings, resources: p1Resources, population: p1Population },
+            });
+            liveMetricsHUD.updateMetrics({
+              tick,
+              playerId: 2,
+              playerName: p2.name,
+              observation: { units: p2.units, buildings: p2.buildings, resources: p2Resources, population: p2Population },
+            });
+          } catch {
+            // Silently skip on error
+          }
 
           // Log broadcast state sample every 150 ticks (5 seconds at 30 FPS) for validation
           if (tick % 150 === 0 && tick > 0) {
@@ -872,6 +1174,12 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
             });
 
             // ✅ NEW (EPIC 62): Update streaming cache for HTTP API (OBS)
+            // Get resources from worldState
+            const p1Res = (worldState.players[0]?.customData as any)?.resources || { food: 0, wood: 0, stone: 0, metal: 0 };
+            const p2Res = (worldState.players[1]?.customData as any)?.resources || { food: 0, wood: 0, stone: 0, metal: 0 };
+            const p1Pop = (worldState.players[0]?.customData as any)?.population?.current || 0;
+            const p2Pop = (worldState.players[1]?.customData as any)?.population?.current || 0;
+
             streamingCache.currentMatch = {
               matchId: `match-${matchNumber}`,
               matchNumber,
@@ -880,18 +1188,28 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
                 {
                   id: 1,
                   name: currentBroadcastState.match.players[0].name,
+                  civilization: currentBroadcastState.match.players[0].civilization,
                   units: currentBroadcastState.match.players[0].units,
                   buildings: currentBroadcastState.match.players[0].buildings,
                   phase: currentBroadcastState.match.players[0].phase,
+                  researched_techs: currentBroadcastState.match.players[0].researched_techs,
                   economyScore: currentBroadcastState.match.players[0].economyScore,
+                  status: 'active',
+                  resources: p1Res,
+                  population: p1Pop,
                 },
                 {
                   id: 2,
                   name: currentBroadcastState.match.players[1].name,
+                  civilization: currentBroadcastState.match.players[1].civilization,
                   units: currentBroadcastState.match.players[1].units,
                   buildings: currentBroadcastState.match.players[1].buildings,
                   phase: currentBroadcastState.match.players[1].phase,
+                  researched_techs: currentBroadcastState.match.players[1].researched_techs,
                   economyScore: currentBroadcastState.match.players[1].economyScore,
+                  status: 'active',
+                  resources: p2Res,
+                  population: p2Pop,
                 },
               ],
             };
@@ -943,6 +1261,14 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
         // Log progress every 100 ticks
         if (tick % 100 === 0) {
           logger.info(`  [Tick ${tick}] Ollama: ${playerUnits} units | Petra: ${enemyUnits} units`);
+
+          // Log defeat confirmation progress
+          if (ticksWithNoP1Units > 0) {
+            logger.debug(`  P1 defeated for ${ticksWithNoP1Units}/${DEFEAT_CONFIRMATION_TICKS} ticks`);
+          }
+          if (ticksWithNoP2Units > 0) {
+            logger.debug(`  P2 defeated for ${ticksWithNoP2Units}/${DEFEAT_CONFIRMATION_TICKS} ticks`);
+          }
 
           // ✅ NEW (EPIC 62 Phase 2): Calculate and emit metrics every 100 ticks
           const allUnits = worldState.agents.filter((a: any) => (a.customData as any)?.type === 'unit');
@@ -1106,26 +1432,85 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
     cameraManager.stop();
     cameraController.disconnect();
 
-    if (matchWinner) {
+    // ✅ FIX: Handle both winner and timeout cases
+    const isTimeout = !matchWinner;
+    const matchCompleted = matchWinner || isTimeout; // Match complete if winner found OR timeout reached
+
+    if (matchCompleted) {
       stats.matchesCompleted++;
-      stats.wins[matchWinner] = (stats.wins[matchWinner] || 0) + 1;
+      if (matchWinner) {
+        stats.wins[matchWinner] = (stats.wins[matchWinner] || 0) + 1;
+      }
 
       // Record match in rotation system
       const cleanMapName = mapUsed.replace('skirmishes/', '');
       matchRotation.recordMatch(cleanMapName, ['Ollama', 'Petra']);
 
+      // ✅ FIXED: Use distinct names for ELO tracking (both are Ollama, distinguished by position)
+      const p1BrainName = 'Ollama_P1';
+      const p2BrainName = 'Ollama_P2';
+
+      // Determine ELO result based on matchWinner
+      let eloResult = 0.5; // Default to draw (timeout)
+      let winnerName = 'Draw';
+
+      if (matchWinner?.includes('Player 1')) {
+        eloResult = 1; // P1 wins
+        winnerName = `${p1BrainName} (P1)`;
+      } else if (matchWinner?.includes('Player 2')) {
+        eloResult = 0; // P2 wins
+        winnerName = `${p2BrainName} (P2)`;
+      } else if (matchWinner?.includes('draw')) {
+        eloResult = 0.5;
+        winnerName = 'Draw';
+      }
+
+      const ratingChanges = eloRating.recordMatch(p1BrainName, p2BrainName, eloResult);
+      logger.info('🏆 ELO UPDATED:', {
+        match: `${p1BrainName} (P1) vs ${p2BrainName} (P2)`,
+        result: eloResult === 1 ? `${p1BrainName} Wins` : eloResult === 0 ? `${p2BrainName} Wins` : 'Draw (Timeout)',
+        changes: ratingChanges.map(c => ({
+          brain: c.brainId,
+          oldRating: c.oldRating,
+          newRating: c.newRating,
+          change: c.change > 0 ? `+${c.change}` : c.change,
+        })),
+      });
+
+      matchHistory.push({
+        matchId: `match-${matchNumber}`,
+        player1: p1BrainName,
+        player2: p2BrainName,
+        winner: winnerName,
+        duration: tick,
+        timestamp: Date.now(),
+      });
+
       const rotationStats = matchRotation.getStats();
-      logger.info(
-        `\n✅ MATCH ${matchNumber} COMPLETE - Winner: ${matchWinner} (${tick} ticks / ~${Math.round(tick / 10)}s)`
-      );
+      const completeMsg = matchWinner
+        ? `✅ MATCH ${matchNumber} COMPLETE - Winner: ${matchWinner} (${tick} ticks / ~${Math.round(tick / 10)}s)`
+        : `⏱️  MATCH ${matchNumber} TIMEOUT at ${tick}/${maxTicks} ticks (Recorded as Draw)`;
+      logger.info(`\n${completeMsg}`);
       logger.info('📊 Map rotation stats', {
         uniqueMaps: rotationStats.uniqueMaps,
         totalMatches: rotationStats.totalMatches,
       });
+
+      // Show current leaderboard
+      const rankings = eloRating.getAllRatings();
+      logger.info('📈 CURRENT STANDINGS:', {
+        rankings: rankings.map((r, idx) => ({
+          rank: idx + 1,
+          brain: r.brainId,
+          rating: r.rating,
+          matches: r.ratingHistory.length - 1,
+        })),
+      });
+
       return true;
     } else {
       stats.matchesFailed++;
-      logger.warn(`\n⏱️  MATCH ${matchNumber} TIMEOUT at ${tick} ticks`);
+      logger.warn(`\n💥 MATCH ${matchNumber} FAILED`);
       return false;
     }
   } catch (error) {

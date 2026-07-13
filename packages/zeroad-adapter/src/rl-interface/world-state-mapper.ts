@@ -127,23 +127,48 @@ export class WorldStateMapper {
       return [];
     }
 
-    return rawState.players.map((rawPlayer) =>
-      createPlayer(
-        createPlayerId(String(rawPlayer.id)),
-        rawPlayer.name || `Player ${rawPlayer.id}`,
+    // ✅ NEW: Filter out Gaia (neutral player, civ='gaia') and only map actual human/AI players
+    const actualPlayers = rawState.players.filter(p => p.civ !== 'gaia');
+
+    return actualPlayers.map((rawPlayer, index) => {
+      // Extract resources - try resourceCounts first (new format), fallback to resources (legacy)
+      const resourcesData = rawPlayer.resourceCounts || rawPlayer.resources || {
+        food: 0,
+        wood: 0,
+        stone: 0,
+        metal: 0,
+      };
+
+      // Extract population - try popCount/popLimit first (new format), fallback to population object (legacy)
+      const populationData = rawPlayer.popCount !== undefined && rawPlayer.popLimit !== undefined
+        ? {
+            current: rawPlayer.popCount,
+            limit: rawPlayer.popLimit,
+          }
+        : rawPlayer.population || {
+            current: 0,
+            limit: 200,
+          };
+
+      // Use entity ID as player ID if available, otherwise use index + 1
+      const playerId = rawPlayer.entity !== undefined ? String(rawPlayer.entity) : String(index + 1);
+
+      return createPlayer(
+        createPlayerId(playerId),
+        rawPlayer.name || `Player ${index + 1}`,
         null, // No teams
         false, // Assume AI (0 A.D. has mixed control)
         {
-          civ: (rawPlayer as any).civ || 'unknown',
+          civ: rawPlayer.civ || 'unknown',
           phase: rawPlayer.phase || 'village',
           state: rawPlayer.state || 'active',
-          resources: rawPlayer.resources,
-          population: rawPlayer.population,
+          resources: resourcesData,
+          population: populationData,
           researched_techs: rawPlayer.researched_techs,
           queued_techs: rawPlayer.queued_techs,
         }
-      )
-    );
+      );
+    });
   }
 
   /**

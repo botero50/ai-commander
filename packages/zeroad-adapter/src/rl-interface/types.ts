@@ -23,10 +23,33 @@ export interface RawGameState {
  * Raw player state
  */
 export interface RawPlayer {
-  id: number;
+  id?: number;
   name: string;
+  civ?: string;  // Civilization (e.g., 'han', 'sele', 'brit')
+  entity?: number;  // Entity ID controlling this player
+  color?: {
+    r: number;
+    g: number;
+    b: number;
+    a: number;
+  };
+  controlsAll?: boolean;
 
-  resources: {
+  // Population stats
+  popCount?: number;  // Current population
+  popLimit?: number;  // Population limit
+  popMax?: number;  // Maximum possible population
+
+  // Resource counts (NEW: actual field name from 0 A.D.)
+  resourceCounts?: {
+    food: number;
+    wood: number;
+    stone: number;
+    metal: number;
+  };
+
+  // Legacy field names (for backward compatibility)
+  resources?: {
     food: number;
     wood: number;
     stone: number;
