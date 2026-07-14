@@ -533,9 +533,18 @@ async function killGame(): Promise<void> {
 async function startGame(matchNumber: number): Promise<{ process: ChildProcess; map: string }> {
   logger.info('Starting game initialization...');
 
-  // Use fixed map for consistent minimap calibration (screen interaction testing)
-  const selectedMap = 'skirmishes/acropolis_bay_2p';
-  logger.info(`📍 Using fixed map for match ${matchNumber}: ${selectedMap}`);
+  // Select map using rotation to avoid repetition
+  let selectedMap = 'skirmishes/acropolis_bay_2p'; // fallback
+  try {
+    const blacklist = matchRotation.getMapBlacklist();
+    const mapInfo = await mapDiscovery.getRandomMapAvoidingBlacklist(blacklist, 2);
+    selectedMap = mapInfo.filePath;
+    logger.info(`📍 Selected map for match ${matchNumber}: ${selectedMap} (${mapInfo.displayName})`);
+  } catch (error) {
+    logger.warn('Failed to select map, using default', {
+      error: error instanceof Error ? error.message : String(error),
+    });
+  }
 
   // Track civilization selection for rotation (display only, using petra AI)
   const selectedCiv = civRotation.getRandomCivilization();
