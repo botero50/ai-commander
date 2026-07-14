@@ -276,13 +276,18 @@ export class MapDiscovery {
       availableMaps = availableMaps.filter(m => !blacklist.has(m.filePath) && !blacklist.has(m.name));
     }
 
+    // Filter out nomad maps (no fixed town centers)
+    availableMaps = availableMaps.filter(m => !m.name?.toLowerCase().includes('nomad'));
+
     if (availableMaps.length === 0) {
-      // If all maps are blacklisted, use all available maps
+      // If all maps are blacklisted/nomad, use all available maps
       if (players) {
         availableMaps = await this.getMapsForPlayerCount(players);
       } else {
         availableMaps = await this.discoverMaps();
       }
+      // Still filter out nomad maps on fallback
+      availableMaps = availableMaps.filter(m => !m.name?.toLowerCase().includes('nomad'));
     }
 
     if (availableMaps.length === 0) {

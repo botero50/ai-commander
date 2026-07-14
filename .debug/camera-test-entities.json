@@ -1,0 +1,276 @@
+{
+  "tick": 300,
+  "p1Units": [
+    {
+      "template": "units/maur/support_civilian",
+      "x": 389,
+      "z": 776
+    },
+    {
+      "template": "units/maur/support_civilian",
+      "x": 427,
+      "z": 906
+    },
+    {
+      "template": "units/maur/support_civilian",
+      "x": 363,
+      "z": 791
+    },
+    {
+      "template": "units/maur/support_civilian",
+      "x": 428,
+      "z": 908
+    },
+    {
+      "template": "units/maur/infantry_spearman_b",
+      "x": 361,
+      "z": 790
+    },
+    {
+      "template": "units/maur/infantry_spearman_b",
+      "x": 486,
+      "z": 685
+    },
+    {
+      "template": "units/maur/infantry_archer_b",
+      "x": 427,
+      "z": 904
+    },
+    {
+      "template": "units/maur/infantry_archer_b",
+      "x": 427,
+      "z": 902
+    },
+    {
+      "template": "units/maur/cavalry_javelineer_b",
+      "x": 387,
+      "z": 785
+    },
+    {
+      "template": "units/maur/support_elephant",
+      "x": 423,
+      "z": 835
+    },
+    {
+      "template": "units/maur/support_civilian",
+      "x": 486,
+      "z": 683
+    },
+    {
+      "template": "units/maur/support_civilian",
+      "x": 426,
+      "z": 908
+    },
+    {
+      "template": "units/maur/support_civilian",
+      "x": 391,
+      "z": 847
+    },
+    {
+      "template": "units/maur/support_civilian",
+      "x": 426,
+      "z": 832
+    },
+    {
+      "template": "units/maur/infantry_archer_b",
+      "x": 444,
+      "z": 734
+    },
+    {
+      "template": "units/maur/infantry_archer_b",
+      "x": 446,
+      "z": 736
+    },
+    {
+      "template": "units/maur/support_civilian",
+      "x": 426,
+      "z": 900
+    },
+    {
+      "template": "units/maur/support_civilian",
+      "x": 384,
+      "z": 840
+    },
+    {
+      "template": "units/maur/support_civilian",
+      "x": 401,
+      "z": 770
+    },
+    {
+      "template": "units/maur/support_civilian",
+      "x": 403,
+      "z": 770
+    }
+  ],
+  "p2Units": [
+    {
+      "template": "units/germ/infantry_spearman_b",
+      "x": 639,
+      "z": 229
+    },
+    {
+      "template": "units/germ/infantry_spearman_b",
+      "x": 687,
+      "z": 191
+    },
+    {
+      "template": "units/germ/infantry_slinger_b",
+      "x": 653,
+      "z": 246
+    },
+    {
+      "template": "units/germ/infantry_slinger_b",
+      "x": 678,
+      "z": 207
+    },
+    {
+      "template": "units/germ/support_wagon",
+      "x": 565,
+      "z": 230
+    },
+    {
+      "template": "units/germ/cavalry_javelineer_b",
+      "x": 632,
+      "z": 172
+    },
+    {
+      "template": "units/germ/support_civilian",
+      "x": 564,
+      "z": 235
+    },
+    {
+      "template": "units/germ/support_civilian",
+      "x": 677,
+      "z": 193
+    },
+    {
+      "template": "units/germ/support_civilian",
+      "x": 567,
+      "z": 234
+    },
+    {
+      "template": "units/germ/support_civilian",
+      "x": 681,
+      "z": 208
+    },
+    {
+      "template": "units/germ/support_civilian",
+      "x": 679,
+      "z": 194
+    },
+    {
+      "template": "units/germ/support_civilian",
+      "x": 680,
+      "z": 199
+    },
+    {
+      "template": "units/germ/support_civilian",
+      "x": 696,
+      "z": 170
+    },
+    {
+      "template": "units/germ/support_civilian",
+      "x": 677,
+      "z": 201
+    },
+    {
+      "template": "units/germ/support_civilian",
+      "x": 676,
+      "z": 198
+    },
+    {
+      "template": "units/germ/infantry_spearman_b",
+      "x": 656,
+      "z": 146
+    },
+    {
+      "template": "units/germ/infantry_spearman_b",
+      "x": 631,
+      "z": 171
+    },
+    {
+      "template": "units/germ/support_civilian",
+      "x": 701,
+      "z": 175
+    },
+    {
+      "template": "units/germ/support_civilian",
+      "x": 569,
+      "z": 236
+    },
+    {
+      "template": "units/germ/infantry_spearman_b",
+      "x": 678,
+      "z": 197
+    },
+    {
+      "template": "units/germ/infantry_spearman_b",
+      "x": 676,
+      "z": 196
+    },
+    {
+      "template": "units/germ/support_civilian",
+      "x": 558,
+      "z": 194
+    },
+    {
+      "template": "units/germ/support_civilian",
+      "x": 559,
+      "z": 195
+    },
+    {
+      "template": "units/germ/support_civilian",
+      "x": 627,
+      "z": 200
+    },
+    {
+      "template": "units/germ/support_civilian",
+      "x": 629,
+      "z": 198
+    }
+  ],
+  "p1Buildings": [
+    {
+      "template": "structures/maur/civil_centre",
+      "x": 368,
+      "z": 822
+    },
+    {
+      "template": "structures/maur/storehouse",
+      "x": 417,
+      "z": 905
+    },
+    {
+      "template": "structures/maur/house",
+      "x": 319,
+      "z": 728
+    },
+    {
+      "template": "structures/maur/farmstead",
+      "x": 425,
+      "z": 714
+    },
+    {
+      "template": "foundation|structures/maur/house",
+      "x": 328,
+      "z": 736
+    }
+  ],
+  "p2Buildings": [
+    {
+      "template": "structures/germ/civil_centre",
+      "x": 616,
+      "z": 211
+    },
+    {
+      "template": "structures/germ/house",
+      "x": 651,
+      "z": 133
+    },
+    {
+      "template": "structures/germ/storehouse",
+      "x": 689,
+      "z": 177
+    }
+  ]
+}

@@ -1,3 +1,6 @@
+import { promises as fs } from 'fs';
+import path from 'path';
+
 /**
  * ELO Rating System
  *
@@ -250,5 +253,48 @@ export class EloRating {
    */
   getConfig(): EloConfig {
     return { ...this.config };
+  }
+
+  /**
+   * Save ratings to file
+   */
+  async saveToFile(filePath: string): Promise<void> {
+    const data = {
+      config: this.config,
+      ratings: Array.from(this.ratings.entries()).map(([brainId, rating]) => ({
+        brainId,
+        rating: rating.rating,
+        ratingHistory: [...rating.ratingHistory],
+      })),
+      ratingChanges: this.ratingChanges,
+    };
+    await fs.mkdir(path.dirname(filePath), { recursive: true });
+    await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf8');
+  }
+
+  /**
+   * Load ratings from file
+   */
+  async loadFromFile(filePath: string): Promise<boolean> {
+    try {
+      const content = await fs.readFile(filePath, 'utf8');
+      const data = JSON.parse(content);
+
+      // Load ratings
+      this.ratings.clear();
+      for (const entry of data.ratings) {
+        this.ratings.set(entry.brainId, {
+          brainId: entry.brainId,
+          rating: entry.rating,
+          ratingHistory: entry.ratingHistory,
+        });
+      }
+
+      // Load rating changes
+      this.ratingChanges = data.ratingChanges || [];
+      return true;
+    } catch (error) {
+      return false;
+    }
   }
 }

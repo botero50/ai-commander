@@ -16,6 +16,15 @@ export interface MinimapCoordinates {
   screenY: number;
 }
 
+export interface ViewportBounds {
+  left: number;      // Left edge of viewport (e.g., 378)
+  top: number;       // Top edge of viewport (e.g., 1081)
+  right: number;     // Right edge of viewport (e.g., 729)
+  bottom: number;    // Bottom edge of viewport (e.g., 1432)
+  worldMaxX?: number; // Max world X coordinate (default: 350)
+  worldMaxZ?: number; // Max world Z coordinate (default: 350)
+}
+
 export interface ScreenCapture {
   path: string;
   timestamp: number;
@@ -342,6 +351,42 @@ export class ScreenController {
         reject(error);
       }
     });
+  }
+
+  /**
+   * Click at world coordinates by mapping to viewport screen position
+   * Converts game world coordinates to screen viewport coordinates and clicks
+   */
+  async clickAtWorldCoordinatesInViewport(worldX: number, worldZ: number, viewportBounds: ViewportBounds): Promise<void> {
+    try {
+      // Get world bounds (default to 350x350 for standard maps)
+      const worldMaxX = viewportBounds.worldMaxX ?? 350;
+      const worldMaxZ = viewportBounds.worldMaxZ ?? 350;
+
+      // Calculate scaling factors
+      const viewportWidth = viewportBounds.right - viewportBounds.left;
+      const viewportHeight = viewportBounds.bottom - viewportBounds.top;
+      const scaleX = viewportWidth / worldMaxX;
+      const scaleZ = viewportHeight / worldMaxZ;
+
+      // Convert world coordinates to screen coordinates
+      const screenX = Math.round(viewportBounds.left + worldX * scaleX);
+      const screenY = Math.round(viewportBounds.top + worldZ * scaleZ);
+
+      this.logger.info(`🌍 Converting world (${worldX}, ${worldZ}) to viewport screen (${screenX}, ${screenY})`, {
+        viewportBounds,
+        scale: { x: scaleX, z: scaleZ },
+      });
+
+      // Click at the calculated viewport coordinates
+      await this.clickAt(screenX, screenY);
+      this.logger.info(`✅ VIEWPORT CLICK SUCCESSFUL - clicked world (${worldX}, ${worldZ}) at screen (${screenX}, ${screenY})`);
+    } catch (error) {
+      this.logger.error('Viewport click failed', {
+        error: error instanceof Error ? error.message : String(error),
+      });
+      throw error;
+    }
   }
 
   /**

@@ -44,10 +44,21 @@ export class EventBasedCamera {
   private rlClient: any = null;
   private enableAutoZoom = process.env.ENABLE_AUTO_ZOOM !== 'false';
   private autoZoomAmount = parseInt(process.env.AUTO_ZOOM_AMOUNT || '2', 10);
+  private autoEventDetectionEnabled = true; // Can be disabled for testing
 
   constructor(logger: Logger, rlClient?: any) {
     this.logger = logger;
     this.rlClient = rlClient;
+  }
+
+  // Disable automatic event detection (for manual camera test)
+  disableAutoEventDetection(): void {
+    this.autoEventDetectionEnabled = false;
+  }
+
+  // Re-enable automatic event detection
+  enableAutoEventDetection(): void {
+    this.autoEventDetectionEnabled = true;
   }
 
 
@@ -56,6 +67,9 @@ export class EventBasedCamera {
    */
   detectEvents(currentState: RawGameState): GameEvent[] {
     const events: GameEvent[] = [];
+
+    // Skip auto event detection if disabled (for manual testing)
+    if (!this.autoEventDetectionEnabled) return events;
 
     if (!currentState.entities) return events;
 
@@ -241,22 +255,22 @@ export class EventBasedCamera {
       // Use our tracked camera position
       const currentCamPos = { x: this.cameraX, z: this.cameraZ };
 
-      // Try to move via RL Interface if client is available
-      if (rlClient) {
-        await this.moveViaRLInterface(rlClient, event.x, event.z);
-      }
-
       // Calculate movement needed
-      const dx = event.x - currentCamPos.x;
-      const dz = event.z - currentCamPos.z;
+      // Camera controls are inverted: if target > current, we need to move in the inverted direction
+      // If target.x > current.x, we need to move RIGHT visually, but that means pressing A (inverted)
+      // If target.z > current.z, we need to move DOWN visually, but that means pressing S (inverted)
+      const dx = currentCamPos.x - event.x;  // Inverted: positive = move left (A), negative = move right (D)
+      const dz = currentCamPos.z - event.z;  // Inverted: positive = move up (W), negative = move down (S)
 
       this.logger.info('🎥 Moving camera', {
         from: `(${Math.round(currentCamPos.x)}, ${Math.round(currentCamPos.z)})`,
         to: `(${Math.round(event.x)}, ${Math.round(event.z)})`,
         distance: Math.round(Math.sqrt(dx * dx + dz * dz)),
+        dx,
+        dz,
       });
 
-      // Send keyboard commands to move camera
+      // Send keyboard commands to move camera (with independent durations per axis)
       await this.sendCameraMovement(dx, dz);
 
       // Update our tracked position (assume movement succeeded)
@@ -291,47 +305,22 @@ export class EventBasedCamera {
 
   /**
    * Send keyboard input to move camera using Python pynput
+   * Each axis gets its own duration based on distance
    */
   private async sendCameraMovement(dx: number, dz: number): Promise<void> {
     try {
       const pythonScript = path.join(process.cwd(), 'camera-controller.py');
 
-      // Calculate movement duration (empirical: ~3ms per unit of distance)
-      const dxDuration = Math.abs(dx) * 3;
-      const dzDuration = Math.abs(dz) * 3;
+      // Simple approach: just zoom out when panning to events
+      // Duration calculation removed - let the user/AI handle navigation
 
-      // Cap at 3 seconds max movement
-      const maxDuration = 3000;
-      const finalDxDuration = Math.min(dxDuration, maxDuration);
-      const finalDzDuration = Math.min(dzDuration, maxDuration);
-
-      // Send horizontal movement
-      if (dx > 0) {
-        this.sendKeyViaPython(pythonScript, 'd', finalDxDuration);
-      } else if (dx < 0) {
-        this.sendKeyViaPython(pythonScript, 'a', finalDxDuration);
-      }
-
-      // Send vertical movement (with slight delay to queue them)
-      if (dz > 0) {
-        setTimeout(() => {
-          this.sendKeyViaPython(pythonScript, 's', finalDzDuration);
-        }, Math.max(finalDxDuration, 100));
-      } else if (dz < 0) {
-        setTimeout(() => {
-          this.sendKeyViaPython(pythonScript, 'w', finalDzDuration);
-        }, Math.max(finalDxDuration, 100));
-      }
+      const gameEvent = event as unknown as GameEvent;
+      this.logger.info(`🎮 Camera event at (${Math.round(gameEvent.x)}, ${Math.round(gameEvent.z)}), zooming out to see more`);
 
       // Zoom out slightly when moving to battle (so we can see more)
       if (this.enableAutoZoom && this.autoZoomAmount > 0) {
-        setTimeout(() => {
-          this.sendKeyViaPython(pythonScript, 'scroll_down', this.autoZoomAmount * 100);
-        }, Math.max(finalDxDuration, finalDzDuration) + 200);
-
-        this.logger.info(`🎮 Camera movement: dx=${dx.toFixed(0)}, dz=${dz.toFixed(0)} | sending ${finalDxDuration}ms + ${finalDzDuration}ms + zoom out (${this.autoZoomAmount} levels)`);
-      } else {
-        this.logger.info(`🎮 Camera movement: dx=${dx.toFixed(0)}, dz=${dz.toFixed(0)} | sending ${finalDxDuration}ms + ${finalDzDuration}ms`);
+        this.sendKeyViaPython(pythonScript, 'scroll_down', this.autoZoomAmount * 100);
+        this.logger.info(`🔍 Zooming out (${this.autoZoomAmount} levels)`);
       }
     } catch (error) {
       this.logger.debug('sendCameraMovement error', {
@@ -364,6 +353,14 @@ export class EventBasedCamera {
    */
   getCameraPosition(): { x: number; z: number } {
     return { x: this.cameraX, z: this.cameraZ };
+  }
+
+  /**
+   * Set camera position estimate (useful for testing/initialization)
+   */
+  setCameraPosition(x: number, z: number): void {
+    this.cameraX = x;
+    this.cameraZ = z;
   }
 
   /**

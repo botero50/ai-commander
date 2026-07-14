@@ -1110,8 +1110,19 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
         }
 
 
-        // ✅ NEW: Minimap calibration at tick 100 - detect actual base coordinates and test clicking
+        // ✅ NEW: Viewport-based world coordinate clicking at tick 100
         if (tick === 100) {
+          // Viewport bounds from user calibration: P2 (top-left) = (378, 1081), P3 (bottom-right) = (729, 1432)
+          const viewportBounds = {
+            left: 378,
+            top: 1081,
+            right: 729,
+            bottom: 1432,
+            worldMaxX: 350,
+            worldMaxZ: 350,
+          };
+
+          // Detect town centers
           const p1Buildings = worldState.agents.filter(a => {
             const data = (a.customData as any);
             const template = data?.template?.toLowerCase() || '';
@@ -1132,24 +1143,21 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
             const p1Pos = (p1Buildings[0].customData as any)?.positionRaw || { x: 0, z: 0 };
             const p2Pos = (p2Buildings[0].customData as any)?.positionRaw || { x: 0, z: 0 };
 
-            const redWorldPos = { x: Math.round(p1Pos.x), z: Math.round(p1Pos.z) };
-            const blueWorldPos = { x: Math.round(p2Pos.x), z: Math.round(p2Pos.z) };
+            const p2WorldX = Math.round(p2Pos.x);
+            const p2WorldZ = Math.round(p2Pos.z);
 
-            logger.info('📌 MINIMAP CALIBRATION - Detected town center coordinates:', {
-              redBaseWorldPos: redWorldPos,
-              blueBaseWorldPos: blueWorldPos,
+            logger.info('📍 DETECTED BASES - Town center coordinates:', {
+              player1Red: { x: Math.round(p1Pos.x), z: Math.round(p1Pos.z) },
+              player2Blue: { x: p2WorldX, z: p2WorldZ },
             });
 
-            // ✅ Test clicking map center with dynamic calibration
-            logger.info('🎬 SCREEN CONTROLLER TEST: Clicking map center (175, 175) with detected calibration...');
+            // Test viewport clicking: click on Player 2's detected base
+            logger.info(`🎬 VIEWPORT TEST: Clicking Player 2 base at world (${p2WorldX}, ${p2WorldZ})...`);
 
             (async () => {
               try {
-                await screenController.clickAtWorldCoordinatesWithCalibration(175, 175, {
-                  red: redWorldPos,
-                  blue: blueWorldPos,
-                });
-                logger.info('✅ WORLD COORDINATE CLICK SUCCESSFUL - clicked (175, 175) using detected calibration');
+                await screenController.clickAtWorldCoordinatesInViewport(p2WorldX, p2WorldZ, viewportBounds);
+                logger.info(`✅ BASE CLICK SUCCESSFUL - clicked Player 2 base at (${p2WorldX}, ${p2WorldZ})`);
 
                 // Take a screenshot after clicking to verify
                 try {
@@ -1159,7 +1167,7 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
                   logger.debug('Could not take screenshot');
                 }
               } catch (error) {
-                logger.error('World coordinate click failed', {
+                logger.error('Base click failed', {
                   error: error instanceof Error ? error.message : String(error),
                 });
               }
