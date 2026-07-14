@@ -178,11 +178,11 @@ def detect_minimap():
         win_left, win_top, win_right, win_bottom = rect
         print(f"Window: ({win_left}, {win_top}) to ({win_right}, {win_bottom})")
 
-        # Minimap is in bottom-left corner
-        # Search the left 20% of screen, bottom 30%
+        # Minimap is in bottom-left area of screen
+        # Search the full width at the bottom 30% height
         search_left = win_left
         search_top = int(win_top + (win_bottom - win_top) * 0.70)  # Bottom 30% of screen
-        search_right = int(win_left + (win_right - win_left) * 0.20)  # Left 20% of screen
+        search_right = win_right  # Full screen width (don't limit to left 20%)
         search_bottom = win_bottom
 
         print(f"Searching in area: ({search_left}, {search_top}) to ({search_right}, {search_bottom})")
