@@ -48,6 +48,7 @@ import { EventBasedCamera } from '../camera/event-based-camera.js';
 import { BroadcastState, type ArenaMatchContext } from '../broadcast/broadcast-state.js';
 import { BroadcastServer } from '../tournament/broadcast-server.js';
 import { EloRating } from '../tournament/elo-rating.js';
+import { ScreenController } from '../screen/index.js';
 import { LiveMetricsHUD, createLiveMetricsHUD } from '../broadcast/live-metrics-hud.js';
 
 const execAsync = promisify(exec);
@@ -209,6 +210,11 @@ const matchHistory: Array<{
   timestamp: number;
 }> = [];
 
+// Store last world state for debug endpoint
+let lastWorldState: any = null;
+let lastRawGameState: any = null;
+let lastCameraTest: any = null;
+
 // ✅ NEW (EPIC 62): Start HTTP server for OBS
 function startHttpServer(): void {
   const server = http.createServer((req, res) => {
@@ -329,6 +335,69 @@ function startHttpServer(): void {
         liveMetrics: liveMetricsHUD.getAllMetrics(),
       };
       res.end(JSON.stringify(dashboardState));
+    } else if (req.url === '/api/debug/camera-position') {
+      // ✅ DEBUG: Get last saved camera position
+      res.writeHead(200);
+      res.end(JSON.stringify(lastCameraTest ? {
+        p1Target: lastCameraTest.p1Pos,
+        p2Target: lastCameraTest.p2Pos,
+        message: 'Camera targets from last test run. Check logs for real-time position updates.'
+      } : { error: 'No camera test data yet' }));
+    } else if (req.url === '/api/debug/raw-game-state') {
+      // ✅ DEBUG: Get raw game state (from RL Interface - most raw data)
+      res.writeHead(200);
+      if (lastRawGameState) {
+        res.end(JSON.stringify(lastRawGameState));
+      } else {
+        res.end(JSON.stringify({ error: 'No raw game state data yet' }));
+      }
+    } else if (req.url === '/api/debug/camera-test') {
+      // ✅ DEBUG: Get last camera test data with raw entities
+      res.writeHead(200);
+      res.end(JSON.stringify(lastCameraTest || { error: 'No camera test data yet' }));
+    } else if (req.url === '/api/debug/world-state') {
+      // ✅ DEBUG: Get last world state with all positions
+      res.writeHead(200);
+      if (lastWorldState) {
+        const debugData = {
+          tick: lastWorldState.tick,
+          p1Units: lastWorldState.agents
+            .filter((a: any) => (a.customData as any)?.type === 'unit' && a.controlledByPlayerId?.toString() === '1')
+            .map((u: any) => ({
+              id: (u.customData as any)?.id,
+              template: (u.customData as any)?.template,
+              x: (u.customData as any)?.positionRaw?.x,
+              z: (u.customData as any)?.positionRaw?.z,
+            })),
+          p2Units: lastWorldState.agents
+            .filter((a: any) => (a.customData as any)?.type === 'unit' && a.controlledByPlayerId?.toString() === '2')
+            .map((u: any) => ({
+              id: (u.customData as any)?.id,
+              template: (u.customData as any)?.template,
+              x: (u.customData as any)?.positionRaw?.x,
+              z: (u.customData as any)?.positionRaw?.z,
+            })),
+          p1Buildings: lastWorldState.agents
+            .filter((a: any) => (a.customData as any)?.type === 'building' && a.controlledByPlayerId?.toString() === '1')
+            .map((b: any) => ({
+              id: (b.customData as any)?.id,
+              template: (b.customData as any)?.template,
+              x: (b.customData as any)?.positionRaw?.x,
+              z: (b.customData as any)?.positionRaw?.z,
+            })),
+          p2Buildings: lastWorldState.agents
+            .filter((a: any) => (a.customData as any)?.type === 'building' && a.controlledByPlayerId?.toString() === '2')
+            .map((b: any) => ({
+              id: (b.customData as any)?.id,
+              template: (b.customData as any)?.template,
+              x: (b.customData as any)?.positionRaw?.x,
+              z: (b.customData as any)?.positionRaw?.z,
+            })),
+        };
+        res.end(JSON.stringify(debugData));
+      } else {
+        res.end(JSON.stringify({ error: 'No world state data yet' }));
+      }
     } else {
       res.writeHead(404);
       res.end(JSON.stringify({ error: 'Not found' }));
@@ -464,19 +533,9 @@ async function killGame(): Promise<void> {
 async function startGame(matchNumber: number): Promise<{ process: ChildProcess; map: string }> {
   logger.info('Starting game initialization...');
 
-  // Discover and select map for this match
-  let selectedMap = 'skirmishes/acropolis_bay_2p'; // fallback
-  try {
-    const blacklist = matchRotation.getMapBlacklist();
-    const mapInfo = await mapDiscovery.getRandomMapAvoidingBlacklist(blacklist, 2);
-    selectedMap = mapInfo.filePath;
-
-    logger.info(`📍 Selected map for match ${matchNumber}: ${selectedMap} (${mapInfo.displayName})`);
-  } catch (error) {
-    logger.warn('Failed to select map, using default', {
-      error: error instanceof Error ? error.message : String(error),
-    });
-  }
+  // Use fixed map for consistent minimap calibration (screen interaction testing)
+  const selectedMap = 'skirmishes/acropolis_bay_2p';
+  logger.info(`📍 Using fixed map for match ${matchNumber}: ${selectedMap}`);
 
   // Track civilization selection for rotation (display only, using petra AI)
   const selectedCiv = civRotation.getRandomCivilization();
@@ -656,6 +715,7 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
     const client = new RLHTTPClient(RL_HOST, RL_PORT, 10000, logger);
     const worldStateMapper = new WorldStateMapper(logger);
     const gameCheats = new GameCheats(client, logger);
+    const screenController = new ScreenController(logger);
 
     // Initialize event feed for camera and broadcast events
     const eventFeed = new EventFeed();
@@ -946,64 +1006,164 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
           });
         }
 
-        // ✅ NEW: Camera test at 10 seconds (tick 300) - pan between town centers
-        if (tick === 300) {
-          logger.info('🎬 CAMERA TEST: Panning between town centers...');
+        // ✅ NEW: Camera test at 10 seconds (tick 300) - pan between town centers with progress tracking
+        if (tick === 300 && false) {  // DISABLED: Camera test logs
+          logger.info('🎬 CAMERA TEST START: Panning between town centers...');
 
-          // Find town centers or bases
-          const p1Buildings = worldState.agents.filter(
-            a => (a.customData as any)?.type === 'building' && a.controlledByPlayerId?.toString() === '1'
-          );
-          const p2Buildings = worldState.agents.filter(
-            a => (a.customData as any)?.type === 'building' && a.controlledByPlayerId?.toString() === '2'
-          );
+          // Save world state and raw game state for debug
+          lastWorldState = worldState;
+          lastRawGameState = gameState;
 
-          if (p1Buildings.length > 0 && p2Buildings.length > 0) {
-            const p1Building = p1Buildings[0];
-            const p2Building = p2Buildings[0];
+          // Get player civil centres (town halls)
+          const p1CivilCentres = worldState.agents.filter(a => {
+            const data = (a.customData as any);
+            const template = data?.template?.toLowerCase() || '';
+            return data?.type === 'building' &&
+                   a.controlledByPlayerId?.toString() === '1' &&
+                   (template.includes('civil') || template.includes('townhall'));
+          });
 
-            const p1Pos = (p1Building.customData as any)?.positionRaw || { x: 0, z: 0 };
-            const p2Pos = (p2Building.customData as any)?.positionRaw || { x: 0, z: 0 };
+          const p2CivilCentres = worldState.agents.filter(a => {
+            const data = (a.customData as any);
+            const template = data?.template?.toLowerCase() || '';
+            return data?.type === 'building' &&
+                   a.controlledByPlayerId?.toString() === '2' &&
+                   (template.includes('civil') || template.includes('townhall'));
+          });
 
-            logger.info(`📍 Player 1 building at (${p1Pos.x.toFixed(0)}, ${p1Pos.z.toFixed(0)})`);
-            logger.info(`📍 Player 2 building at (${p2Pos.x.toFixed(0)}, ${p2Pos.z.toFixed(0)})`);
+          if (p1CivilCentres.length > 0 && p2CivilCentres.length > 0) {
+            const p1Building = p1CivilCentres[0];
+            const p2Building = p2CivilCentres[0];
 
-            // Move camera to P1 building first
-            try {
-              const pythonScript = path.join(process.cwd(), 'camera-controller.py');
+            const p1Pos = (p1Building.customData as any)?.positionRaw || { x: 512, z: 512 };
+            const p2Pos = (p2Building.customData as any)?.positionRaw || { x: 512, z: 512 };
 
-              // Pan to P1
-              setTimeout(() => {
-                logger.info('🎥 Panning to Player 1 base...');
-                eventCamera.moveToEvent({
-                  type: 'battle',
-                  x: p1Pos.x || 512,
-                  z: p1Pos.z || 512,
-                  severity: 'high',
-                  description: 'Player 1 Base (Camera Test)',
-                }, client).catch(e => logger.debug('P1 pan error', { e: String(e) }));
-              }, 100);
+            // Save camera test data
+            lastCameraTest = {
+              tick,
+              p1Pos: { x: p1Pos.x, z: p1Pos.z },
+              p2Pos: { x: p2Pos.x, z: p2Pos.z },
+              p1Building: {
+                template: (p1Building.customData as any)?.template,
+                x: p1Pos.x,
+                z: p1Pos.z,
+              },
+              p2Building: {
+                template: (p2Building.customData as any)?.template,
+                x: p2Pos.x,
+                z: p2Pos.z,
+              },
+            };
 
-              // Pan to P2 after 3 seconds
-              setTimeout(() => {
-                logger.info('🎥 Panning to Player 2 base...');
-                eventCamera.moveToEvent({
-                  type: 'battle',
-                  x: p2Pos.x || 512,
-                  z: p2Pos.z || 512,
-                  severity: 'high',
-                  description: 'Player 2 Base (Camera Test)',
-                }, client).catch(e => logger.debug('P2 pan error', { e: String(e) }));
-              }, 3100);
+            logger.info(`📍 TARGET: Player 1 base at (${p1Pos.x.toFixed(0)}, ${p1Pos.z.toFixed(0)})`);
+            logger.info(`📍 TARGET: Player 2 base at (${p2Pos.x.toFixed(0)}, ${p2Pos.z.toFixed(0)})`);
 
-              logger.info('✓ Camera test panning sequence started');
-            } catch (error) {
-              logger.debug('Camera test error', {
-                error: error instanceof Error ? error.message : String(error),
-              });
-            }
+            // Disable auto event detection during manual camera test
+            eventCamera.disableAutoEventDetection();
+
+            logger.info('🎥 CAMERA TEST: Camera is at Player 1 base');
+
+            // Now move from P1 to P2
+            logger.info('🎥 BEGIN: Moving camera from Player 1 to Player 2...');
+            await eventCamera.moveToEvent({
+              type: 'battle',
+              x: p2Pos.x,
+              z: p2Pos.z,
+              severity: 'high',
+              description: 'Player 2 Base (Camera Test)',
+            }, client).catch(e => logger.error('P2 pan error', { e: String(e) }));
+
+            // Monitor movement progress
+            let monitorCount = 0;
+            const monitorInterval = setInterval(() => {
+              if (monitorCount >= 120) { // Stop after 6 seconds (120 * 50ms) to allow 1914ms movement
+                clearInterval(monitorInterval);
+                logger.info('✅ CAMERA TEST COMPLETE');
+                // Re-enable auto event detection after test
+                eventCamera.enableAutoEventDetection();
+
+                // ✅ NEW: Test screen controller - click red base on minimap
+                logger.info('🎬 SCREEN CONTROLLER TEST START: Clicking red base on minimap...');
+                setTimeout(async () => {
+                  try {
+                    const coords = await screenController.clickRedBase();
+                    logger.info(`✅ RED BASE CLICK TEST COMPLETE`, {
+                      minimapX: coords.x,
+                      minimapZ: coords.z,
+                      screenX: coords.screenX,
+                      screenY: coords.screenY,
+                    });
+                  } catch (error) {
+                    logger.error('Screen controller test failed', {
+                      error: error instanceof Error ? error.message : String(error),
+                    });
+                  }
+                }, 500);
+
+                return;
+              }
+              monitorCount++;
+            }, 50);
           } else {
             logger.warn('⚠️ Could not find buildings for camera test');
+          }
+        }
+
+
+        // ✅ NEW: Minimap calibration at tick 100 - detect actual base coordinates and test clicking
+        if (tick === 100) {
+          const p1Buildings = worldState.agents.filter(a => {
+            const data = (a.customData as any);
+            const template = data?.template?.toLowerCase() || '';
+            return data?.type === 'building' &&
+                   a.controlledByPlayerId?.toString() === '1' &&
+                   (template.includes('civil') || template.includes('townhall'));
+          });
+
+          const p2Buildings = worldState.agents.filter(a => {
+            const data = (a.customData as any);
+            const template = data?.template?.toLowerCase() || '';
+            return data?.type === 'building' &&
+                   a.controlledByPlayerId?.toString() === '2' &&
+                   (template.includes('civil') || template.includes('townhall'));
+          });
+
+          if (p1Buildings.length > 0 && p2Buildings.length > 0) {
+            const p1Pos = (p1Buildings[0].customData as any)?.positionRaw || { x: 0, z: 0 };
+            const p2Pos = (p2Buildings[0].customData as any)?.positionRaw || { x: 0, z: 0 };
+
+            const redWorldPos = { x: Math.round(p1Pos.x), z: Math.round(p1Pos.z) };
+            const blueWorldPos = { x: Math.round(p2Pos.x), z: Math.round(p2Pos.z) };
+
+            logger.info('📌 MINIMAP CALIBRATION - Detected town center coordinates:', {
+              redBaseWorldPos: redWorldPos,
+              blueBaseWorldPos: blueWorldPos,
+            });
+
+            // ✅ Test clicking map center with dynamic calibration
+            logger.info('🎬 SCREEN CONTROLLER TEST: Clicking map center (175, 175) with detected calibration...');
+
+            (async () => {
+              try {
+                await screenController.clickAtWorldCoordinatesWithCalibration(175, 175, {
+                  red: redWorldPos,
+                  blue: blueWorldPos,
+                });
+                logger.info('✅ WORLD COORDINATE CLICK SUCCESSFUL - clicked (175, 175) using detected calibration');
+
+                // Take a screenshot after clicking to verify
+                try {
+                  await screenController.takeScreenshot('click-result.png');
+                  logger.info('📸 Screenshot saved: click-result.png');
+                } catch (e) {
+                  logger.debug('Could not take screenshot');
+                }
+              } catch (error) {
+                logger.error('World coordinate click failed', {
+                  error: error instanceof Error ? error.message : String(error),
+                });
+              }
+            })();
           }
         }
 
@@ -1494,9 +1654,7 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
         stats.wins[matchWinner] = (stats.wins[matchWinner] || 0) + 1;
       }
 
-      // Record match in rotation system
-      const cleanMapName = mapUsed.replace('skirmishes/', '');
-      matchRotation.recordMatch(cleanMapName, ['Ollama', 'Petra']);
+      // Skip rotation tracking - using fixed map for minimap calibration
 
       // ✅ UPDATED: Use brain IDs for ELO tracking
       const p1BrainName = BRAIN_P1_ID;
@@ -1595,6 +1753,15 @@ async function main() {
     rlInterface: `${RL_HOST}:${RL_PORT}`,
   });
 
+  // Load rankings from file
+  const rankingsFile = path.join(process.cwd(), '.data', 'rankings.json');
+  const rankingsLoaded = await eloRating.loadFromFile(rankingsFile);
+  if (rankingsLoaded) {
+    logger.info('📊 Loaded existing rankings from file');
+  } else {
+    logger.info('📊 Starting with fresh rankings (no previous data)');
+  }
+
   let matchNumber = 1;
 
   try {
@@ -1623,6 +1790,14 @@ async function main() {
       streamingCache.currentMatch = null;
       streamingCache.recentTrashTalk = [];
       logger.info('🧹 Cleared broadcast cache for next match');
+
+      // Save rankings to file
+      try {
+        await eloRating.saveToFile(rankingsFile);
+        logger.info('💾 Rankings saved to file');
+      } catch (error) {
+        logger.warn('⚠️ Failed to save rankings', { error });
+      }
 
       // Wait before next match
       if (matchNumber < (maxMatches || Infinity)) {
