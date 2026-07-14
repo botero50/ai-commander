@@ -44,6 +44,7 @@ import { MapDiscovery } from '../match/map-discovery.js';
 import { MatchRotation } from '../match/match-rotation.js';
 import { CivilizationRotation } from '../match/civilization-rotation.js';
 import { TrashTalkGenerator, type GameContext } from '../match/trash-talk-generator.js';
+import { PiperTTSService } from '../match/piper-tts-service.js';
 import { EventBasedCamera } from '../camera/event-based-camera.js';
 import { BroadcastState, type ArenaMatchContext } from '../broadcast/broadcast-state.js';
 import { BroadcastServer } from '../tournament/broadcast-server.js';
@@ -261,6 +262,23 @@ function startHttpServer(): void {
     } else if (req.url === '/api/broadcast/chat') {
       res.writeHead(200);
       res.end(JSON.stringify(streamingCache.recentTrashTalk.slice(-20)));
+    } else if (req.url?.startsWith('/api/broadcast/audio/')) {
+      // ✅ NEW: Serve audio files for trash talk
+      const filename = req.url.split('/').pop();
+      const audioPath = `.data/audio/trash_talk/${filename}`;
+      try {
+        const stat = fs.statSync(audioPath);
+        res.setHeader('Content-Type', 'audio/wav');
+        res.setHeader('Content-Length', stat.size);
+        res.setHeader('Cache-Control', 'public, max-age=3600');
+        res.writeHead(200);
+        const stream = fs.createReadStream(audioPath);
+        stream.pipe(res);
+      } catch (error) {
+        logger.warn('Audio file not found', { filename });
+        res.writeHead(404);
+        res.end(JSON.stringify({ error: 'Audio file not found' }));
+      }
     } else if (req.url === '/api/rankings') {
       // ✅ NEW: Get all brain rankings (ELO)
       res.writeHead(200);
@@ -738,6 +756,10 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
         await gameCheats.sendChatMessage(message);
       }
     );
+
+    // Initialize Piper TTS for converting trash talk to speech
+    const piperTTS = new PiperTTSService(logger);
+    await piperTTS.initialize();
 
     // Initialize camera controller (communicates with RL Interface)
     const cameraController = new CameraModController(logger, client);
@@ -1536,7 +1558,7 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
             };
 
             trashTalkGenerator.generateTrashTalk(gameContext)
-              .then(trashTalk => {
+              .then(async (trashTalk) => {
                 if (trashTalk) {
                   // Capture trash talk for broadcast feed
                   const playerName = trashTalk.speaker === 'player1' ? 'Ollama' : 'Petra';
@@ -1556,6 +1578,35 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
                     speaker: playerName,
                     message: trashTalk.message.substring(0, 60),
                   });
+
+                  // ✅ NEW: Generate voice for trash talk using Piper TTS
+                  try {
+                    const audioPath = await piperTTS.synthesize(trashTalk.message);
+                    const httpAudioPath = piperTTS.getHttpPath(audioPath);
+                    logger.info('🔊 Trash talk voice synthesized', {
+                      speaker: playerName,
+                      audioFile: httpAudioPath,
+                    });
+
+                    // Broadcast trash talk with audio
+                    broadcastServer.broadcastMessage({
+                      type: 'event',
+                      timestamp: Date.now(),
+                      payload: {
+                        eventType: 'trash_talk_audio',
+                        speaker: playerName,
+                        message: trashTalk.message,
+                        audioFile: httpAudioPath,
+                        tick: trashTalk.tick,
+                      },
+                    });
+                  } catch (ttsError) {
+                    logger.warn('Failed to synthesize trash talk voice', {
+                      error: ttsError instanceof Error ? ttsError.message : String(ttsError),
+                      message: trashTalk.message.substring(0, 60),
+                    });
+                    // Continue without audio - broadcast text-only
+                  }
 
                   // ✅ NEW (EPIC 62): Update streaming cache for HTTP API
                   streamingCache.recentTrashTalk.push({
