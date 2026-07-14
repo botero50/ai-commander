@@ -12,8 +12,10 @@ import sys
 import time
 import ctypes
 from pynput.keyboard import Controller, Key
+from pynput.mouse import Controller as MouseController, Button
 
 keyboard = Controller()
+mouse = MouseController()
 
 def focus_game_window():
     """Focus the 0 A.D. game window using Windows API"""
@@ -68,6 +70,8 @@ def send_key(key_name, duration_ms):
         'minus': '-',
         'plus': '+',
         'underscore': '_',
+        'scroll_up': 'scroll_up',      # Mouse wheel up (zoom in)
+        'scroll_down': 'scroll_down',  # Mouse wheel down (zoom out)
     }
 
     if key_name not in key_map:
@@ -75,12 +79,29 @@ def send_key(key_name, duration_ms):
         print(f"Valid keys: {', '.join(key_map.keys())}")
         sys.exit(1)
 
-    key = key_map[key_name]
-    duration_sec = duration_ms / 1000.0
-
     # Focus the game window first
     focus_game_window()
     time.sleep(0.15)
+
+    # Handle mouse scroll separately
+    if key_name == 'scroll_up':
+        # Scroll wheel up (zoom in)
+        for _ in range(5):
+            mouse.scroll(0, 1)
+            time.sleep(0.05)
+        print(f"✓ Sent mouse scroll UP for {duration_ms}ms")
+        return
+    elif key_name == 'scroll_down':
+        # Scroll wheel down (zoom out)
+        for _ in range(5):
+            mouse.scroll(0, -1)
+            time.sleep(0.05)
+        print(f"✓ Sent mouse scroll DOWN for {duration_ms}ms")
+        return
+
+    # Handle keyboard keys
+    key = key_map[key_name]
+    duration_sec = duration_ms / 1000.0
 
     # Press key down
     keyboard.press(key)

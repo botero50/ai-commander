@@ -10,6 +10,8 @@
  * 4. Close the game
  * 5. Repeat
  *
+ * Configuration: Set values in .env file or via environment variables
+ *
  * Usage:
  *   npx tsx src/arena/run-arena-loop.ts [--matches N]
  *
@@ -17,6 +19,9 @@
  *   npx tsx src/arena/run-arena-loop.ts              # Run forever
  *   npx tsx src/arena/run-arena-loop.ts --matches 10 # Run 10 matches
  */
+
+// Load environment variables from .env file
+import 'dotenv/config.js';
 
 import { spawn, exec, type ChildProcess } from 'child_process';
 import { promisify } from 'util';
@@ -26,7 +31,8 @@ import * as http from 'http';
 import * as os from 'os';
 import { RLHTTPClient } from '../rl-interface/http-client.js';
 import { WorldStateMapper } from '../rl-interface/world-state-mapper.js';
-import { OllamaAIBrain } from '../rl-interface/ollama-brain.js';
+import { createBrain } from '../rl-interface/brain-factory.js';
+import type { AIBrain } from '../rl-interface/ai-loop-orchestrator.js';
 import { AutomaticCameraManager } from '../camera/automatic-camera-manager.js';
 import { CameraModController } from '../camera/camera-mod-controller.js';
 import { CameraBroadcastServer } from '../broadcast/camera-broadcast-server.js';
@@ -118,17 +124,20 @@ const RL_PORT = 6000;
 const GAME_STARTUP_WAIT = process.env.STARTUP_WAIT ? parseInt(process.env.STARTUP_WAIT, 10) : 5000; // Wait 5 seconds for game to start (override with STARTUP_WAIT env var)
 const RL_CONNECT_TIMEOUT = 30000; // Try to connect for 30 seconds
 
-// Model options (from fastest to most capable):
-// - 'tinyllama:latest'     - Fastest (637MB) - recommended for speed
-// - 'mistral:latest'       - Fast (4.1GB) - balanced
-// - 'neural-chat:latest'   - Slower (4.1GB) - most capable
-const OLLAMA_MODEL = process.env.OLLAMA_MODEL || 'tinyllama:latest'; // Use tinyllama for speed by default
-const OLLAMA_TIMEOUT = process.env.OLLAMA_TIMEOUT ? parseInt(process.env.OLLAMA_TIMEOUT, 10) : 60000; // 60 seconds for slow models
+// Brain configuration - specify which AI to use
+// Format: "provider:model"
+// Examples:
+//   - ollama:mistral, ollama:llama2, ollama:tinyllama
+//   - openai:gpt-4, openai:gpt-3.5-turbo
+//   - anthropic:claude-3-opus-20240229, anthropic:claude-3-sonnet-20240229
+const BRAIN_P1_ID = process.env.BRAIN_P1 || 'ollama:mistral'; // Player 1 brain
+const BRAIN_P2_ID = process.env.BRAIN_P2 || 'ollama:llama2'; // Player 2 brain
+const BRAIN_TIMEOUT = process.env.BRAIN_TIMEOUT ? parseInt(process.env.BRAIN_TIMEOUT, 10) : 60000; // 60 seconds
 
 // Parse CLI arguments
 const args = process.argv.slice(2);
 let maxMatches = 0; // 0 = infinite
-let decisionFrequency = 1; // Make decision every N ticks (1 = every tick, 5 = every 5 ticks = faster)
+let decisionFrequency = 5; // Make decision every N ticks (1 = every tick, 5 = every 5 ticks = faster, default 5)
 for (let i = 0; i < args.length; i++) {
   if (args[i] === '--matches' && i + 1 < args.length) {
     maxMatches = parseInt(args[i + 1], 10);
@@ -178,8 +187,11 @@ const streamingCache: StreamingDataCache = {
   recentTrashTalk: [],
 };
 
-// ✅ NEW: Initialize ranking and metrics systems
-const eloRating = new EloRating(['Ollama_P1', 'Ollama_P2'], {
+// ✅ NEW: Initialize ranking and metrics systems with brain IDs
+const eloRating = new EloRating([
+  BRAIN_P1_ID,
+  BRAIN_P2_ID,
+], {
   initialRating: 1600,
   kFactor: 32,
   maxRatingHistory: 100,
@@ -681,70 +693,51 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
     broadcastServer.start();
     logger.info(`🎬 Broadcast server started on port 8765`);
 
-    // Initialize Ollama brains for BOTH players
-    // Player names are tracked by which AI brain controls them (Ollama or Petra)
-    let brainP1: OllamaAIBrain | null = null;
-    let brainP2: OllamaAIBrain | null = null;
+    // Initialize AI brains from factory (supports Ollama, OpenAI, Anthropic, etc.)
+    let brainP1: AIBrain | null = null;
+    let brainP2: AIBrain | null = null;
 
     // ✅ NEW (EPIC 62 Phase 2): Track unit counts for metrics trends
     let lastP1Count = 0;
     let lastP2Count = 0;
 
-    // ✅ NEW: Require both Ollama brains to be available - fail if not
+    // ✅ UPDATED: Initialize brains using factory (supports multiple providers)
     try {
-      logger.info('🤖 Initializing Ollama AI brains...');
+      logger.info('🤖 Initializing AI brains from factory...');
 
-      brainP1 = new OllamaAIBrain(logger, {
-        modelName: OLLAMA_MODEL,
-        baseUrl: 'http://localhost:11434',
-        temperature: 0.7,
-        topP: 0.9,
-        topK: 40,
-        numPredict: 256,
-        timeout: OLLAMA_TIMEOUT,
+      brainP1 = createBrain(BRAIN_P1_ID, logger, {
         playerID: 1,
+        timeout: BRAIN_TIMEOUT,
+        apiKey: process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY,
       });
 
-      await brainP1.initialize();
-      p1Label = `${OLLAMA_MODEL} (P1)`;
-      logger.info(`✓ Ollama brain P1 initialized (${OLLAMA_MODEL})`);
+      await brainP1.initialize?.();
+      p1Label = `${BRAIN_P1_ID} (P1)`;
+      logger.info(`✓ Brain P1 initialized (${BRAIN_P1_ID})`);
     } catch (error) {
-      logger.error('❌ FATAL: Ollama P1 initialization failed', {
+      logger.error('❌ FATAL: Brain P1 initialization failed', {
         error: error instanceof Error ? error.message : String(error),
-        model: OLLAMA_MODEL,
-        baseUrl: 'http://localhost:11434',
+        brainId: BRAIN_P1_ID,
       });
-      logger.error('💡 FIX: Start Ollama server in a separate terminal:');
-      logger.error('   → ollama serve');
-      logger.error('   → Then run this arena loop again\n');
-      throw new Error('Ollama P1 brain not available - cannot proceed');
+      throw new Error(`Brain P1 (${BRAIN_P1_ID}) initialization failed`);
     }
 
     try {
-      brainP2 = new OllamaAIBrain(logger, {
-        modelName: OLLAMA_MODEL,
-        baseUrl: 'http://localhost:11434',
-        temperature: 0.7,
-        topP: 0.9,
-        topK: 40,
-        numPredict: 256,
-        timeout: OLLAMA_TIMEOUT,
+      brainP2 = createBrain(BRAIN_P2_ID, logger, {
         playerID: 2,
+        timeout: BRAIN_TIMEOUT,
+        apiKey: process.env.OPENAI_API_KEY || process.env.ANTHROPIC_API_KEY,
       });
 
-      await brainP2.initialize();
-      p2Label = `${OLLAMA_MODEL} (P2)`;
-      logger.info(`✓ Ollama brain P2 initialized (${OLLAMA_MODEL})\n`);
+      await brainP2.initialize?.();
+      p2Label = `${BRAIN_P2_ID} (P2)`;
+      logger.info(`✓ Brain P2 initialized (${BRAIN_P2_ID})\n`);
     } catch (error) {
-      logger.error('❌ FATAL: Ollama P2 initialization failed', {
+      logger.error('❌ FATAL: Brain P2 initialization failed', {
         error: error instanceof Error ? error.message : String(error),
-        model: OLLAMA_MODEL,
-        baseUrl: 'http://localhost:11434',
+        brainId: BRAIN_P2_ID,
       });
-      logger.error('💡 FIX: Start Ollama server in a separate terminal:');
-      logger.error('   → ollama serve');
-      logger.error('   → Then run this arena loop again\n');
-      throw new Error('Ollama P2 brain not available - cannot proceed');
+      throw new Error(`Brain P2 (${BRAIN_P2_ID}) initialization failed`);
     }
 
     // Log match info with actual player names now that brains are initialized
@@ -864,10 +857,10 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
         const pythonScript = path.join(process.cwd(), 'camera-controller.py');
         logger.debug('Python script path:', { pythonScript });
 
-        // Send minus key (zoom out) 5 times
-        for (let i = 0; i < 5; i++) {
+        // Send minus key (zoom out) 3 times
+        for (let i = 0; i < 3; i++) {
           setTimeout(() => {
-            logger.debug(`Zoom iteration ${i + 1}/5`);
+            logger.debug(`Zoom iteration ${i + 1}/3`);
             const proc = spawn('python', [pythonScript, 'minus', '500'], {
               detached: true,
               stdio: 'ignore',
@@ -953,6 +946,67 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
           });
         }
 
+        // ✅ NEW: Camera test at 10 seconds (tick 300) - pan between town centers
+        if (tick === 300) {
+          logger.info('🎬 CAMERA TEST: Panning between town centers...');
+
+          // Find town centers or bases
+          const p1Buildings = worldState.agents.filter(
+            a => (a.customData as any)?.type === 'building' && a.controlledByPlayerId?.toString() === '1'
+          );
+          const p2Buildings = worldState.agents.filter(
+            a => (a.customData as any)?.type === 'building' && a.controlledByPlayerId?.toString() === '2'
+          );
+
+          if (p1Buildings.length > 0 && p2Buildings.length > 0) {
+            const p1Building = p1Buildings[0];
+            const p2Building = p2Buildings[0];
+
+            const p1Pos = (p1Building.customData as any)?.positionRaw || { x: 0, z: 0 };
+            const p2Pos = (p2Building.customData as any)?.positionRaw || { x: 0, z: 0 };
+
+            logger.info(`📍 Player 1 building at (${p1Pos.x.toFixed(0)}, ${p1Pos.z.toFixed(0)})`);
+            logger.info(`📍 Player 2 building at (${p2Pos.x.toFixed(0)}, ${p2Pos.z.toFixed(0)})`);
+
+            // Move camera to P1 building first
+            try {
+              const pythonScript = path.join(process.cwd(), 'camera-controller.py');
+
+              // Pan to P1
+              setTimeout(() => {
+                logger.info('🎥 Panning to Player 1 base...');
+                eventCamera.moveToEvent({
+                  type: 'battle',
+                  x: p1Pos.x || 512,
+                  z: p1Pos.z || 512,
+                  severity: 'high',
+                  description: 'Player 1 Base (Camera Test)',
+                }, client).catch(e => logger.debug('P1 pan error', { e: String(e) }));
+              }, 100);
+
+              // Pan to P2 after 3 seconds
+              setTimeout(() => {
+                logger.info('🎥 Panning to Player 2 base...');
+                eventCamera.moveToEvent({
+                  type: 'battle',
+                  x: p2Pos.x || 512,
+                  z: p2Pos.z || 512,
+                  severity: 'high',
+                  description: 'Player 2 Base (Camera Test)',
+                }, client).catch(e => logger.debug('P2 pan error', { e: String(e) }));
+              }, 3100);
+
+              logger.info('✓ Camera test panning sequence started');
+            } catch (error) {
+              logger.debug('Camera test error', {
+                error: error instanceof Error ? error.message : String(error),
+              });
+            }
+          } else {
+            logger.warn('⚠️ Could not find buildings for camera test');
+          }
+        }
+
         // Log sample unit positions every 1000 ticks
         if (tick % 1000 === 0 && units.length > 0) {
           logger.info('📍 Sample unit positions by player:', {
@@ -1036,17 +1090,13 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
           break;
         }
 
-        // Get decisions from BOTH Ollama brains every N ticks
-        let allCommands: any[] = [];
-
+        // Get decisions from BOTH Ollama brains every N ticks (fire-and-forget, non-blocking)
         if (tick % decisionFrequency === 0) {
-          // ✅ FIXED: Fire-and-forget async (don't wait for Ollama)
-          // Player 1 decision (non-blocking)
+          // ✅ OPTIMIZED: Fire-and-forget async (don't wait for decisions)
           if (brainP1) {
             brainP1.decide(worldState)
               .then((decision1: any) => {
                 if (decision1.commands && decision1.commands.length > 0) {
-                  // Send commands immediately when ready
                   client.step(decision1.commands).catch(() => {});
                   logger.debug(`P1 Ollama decision: ${decision1.commands.length} commands`, {
                     tick,
@@ -1056,7 +1106,9 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
               })
               .catch((err: any) => {
                 const isAbortError = err instanceof Error && err.name === 'AbortError';
-                if (!isAbortError) {
+                const isTimeoutError = err instanceof Error && (err.message.includes('503') || err.message.includes('timeout'));
+                // Suppress timeout errors - they don't affect gameplay, just log as debug
+                if (!isAbortError && !isTimeoutError) {
                   logger.error('P1 brain decision failed', {
                     tick,
                     error: err instanceof Error ? err.message : String(err),
@@ -1065,12 +1117,10 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
               });
           }
 
-          // ✅ FIXED: Player 2 decision (non-blocking)
           if (brainP2) {
             brainP2.decide(worldState)
               .then((decision2: any) => {
                 if (decision2.commands && decision2.commands.length > 0) {
-                  // Send commands immediately when ready
                   client.step(decision2.commands).catch(() => {});
                   logger.debug(`P2 Ollama decision: ${decision2.commands.length} commands`, {
                     tick,
@@ -1080,7 +1130,9 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
               })
               .catch((err: any) => {
                 const isAbortError = err instanceof Error && err.name === 'AbortError';
-                if (!isAbortError) {
+                const isTimeoutError = err instanceof Error && (err.message.includes('503') || err.message.includes('timeout'));
+                // Suppress timeout errors - they don't affect gameplay, just log as debug
+                if (!isAbortError && !isTimeoutError) {
                   logger.error('P2 brain decision failed', {
                     tick,
                     error: err instanceof Error ? err.message : String(err),
@@ -1090,7 +1142,7 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
           }
         }
 
-        // ✅ FIXED: Step game with empty commands (Ollama commands sent asynchronously when ready)
+        // ✅ OPTIMIZED: Step game immediately (AI commands sent asynchronously when ready)
         gameState = await client.step([]);
 
         tick++;
@@ -1446,9 +1498,9 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
       const cleanMapName = mapUsed.replace('skirmishes/', '');
       matchRotation.recordMatch(cleanMapName, ['Ollama', 'Petra']);
 
-      // ✅ FIXED: Use distinct names for ELO tracking (both are Ollama, distinguished by position)
-      const p1BrainName = 'Ollama_P1';
-      const p2BrainName = 'Ollama_P2';
+      // ✅ UPDATED: Use brain IDs for ELO tracking
+      const p1BrainName = BRAIN_P1_ID;
+      const p2BrainName = BRAIN_P2_ID;
 
       // Determine ELO result based on matchWinner
       let eloResult = 0.5; // Default to draw (timeout)

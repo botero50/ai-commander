@@ -62,10 +62,10 @@ export class OllamaAIBrain implements AIBrain {
       timeout: config.timeout || 60000, // 60 seconds for slow models like tinyllama
       playerID: config.playerID || 2,
     };
-    // Throttle requests: max 1 every 5 seconds per brain
+    // Throttle requests: max 1 every 2 seconds per brain (prevent 503 overload errors)
     this.throttler = new OllamaRequestThrottler(logger, `Player${this.playerID}`, {
-      delayBetweenRequests: 5000, // 5 seconds between requests
-      maxQueueSize: 1, // fire-and-forget
+      delayBetweenRequests: 2000, // 2 seconds between requests per brain (conservative)
+      maxQueueSize: 5, // Limit queue size to prevent backlog
     });
   }
 
@@ -312,10 +312,12 @@ Now output your immediate MOVE orders (be very specific):`;
       const data = (await response.json()) as OllamaResponse;
       return data.response || '';
     } catch (error) {
-      // Suppress AbortError (expected during shutdown/reconnection)
+      // Suppress non-critical errors (AbortError, 503 timeout, etc.)
       const isAbortError = error instanceof Error && error.name === 'AbortError';
-      if (!isAbortError) {
-        this.logger.error('Ollama API call failed', {
+      const isTimeoutError = error instanceof Error && (error.message.includes('503') || error.message.includes('timeout'));
+      // Only log actual failures, not transient overload errors
+      if (!isAbortError && !isTimeoutError) {
+        this.logger.debug('Ollama API call failed (timeout/overload - retrying)', {
           error: String(error),
           model: this.config.modelName,
         });

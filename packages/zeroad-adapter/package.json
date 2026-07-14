@@ -6,7 +6,9 @@
   "type": "module",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
-  "files": ["dist"],
+  "files": [
+    "dist"
+  ],
   "scripts": {
     "build": "tsc",
     "test": "node --test 'dist/**/*.test.js'",
@@ -16,7 +18,8 @@
   "dependencies": {
     "@ai-commander/adapter": "file:../adapter",
     "@ai-commander/brain": "file:../brain",
-    "@ai-commander/domain": "file:../domain"
+    "@ai-commander/domain": "file:../domain",
+    "dotenv": "^17.4.2"
   },
   "devDependencies": {
     "typescript": "^5.0.0"

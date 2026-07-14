@@ -40,8 +40,10 @@ export class EventBasedCamera {
   private cameraX = 512;
   private cameraZ = 512;
   private lastEventTime = 0;
-  private eventDebounceMs = 2000; // Don't move camera more than once per 2 seconds
+  private eventDebounceMs = parseInt(process.env.CAMERA_EVENT_DEBOUNCE_MS || '2000', 10);
   private rlClient: any = null;
+  private enableAutoZoom = process.env.ENABLE_AUTO_ZOOM !== 'false';
+  private autoZoomAmount = parseInt(process.env.AUTO_ZOOM_AMOUNT || '2', 10);
 
   constructor(logger: Logger, rlClient?: any) {
     this.logger = logger;
@@ -321,7 +323,16 @@ export class EventBasedCamera {
         }, Math.max(finalDxDuration, 100));
       }
 
-      this.logger.info(`🎮 Camera movement: dx=${dx.toFixed(0)}, dz=${dz.toFixed(0)} | sending ${finalDxDuration}ms + ${finalDzDuration}ms`);
+      // Zoom out slightly when moving to battle (so we can see more)
+      if (this.enableAutoZoom && this.autoZoomAmount > 0) {
+        setTimeout(() => {
+          this.sendKeyViaPython(pythonScript, 'scroll_down', this.autoZoomAmount * 100);
+        }, Math.max(finalDxDuration, finalDzDuration) + 200);
+
+        this.logger.info(`🎮 Camera movement: dx=${dx.toFixed(0)}, dz=${dz.toFixed(0)} | sending ${finalDxDuration}ms + ${finalDzDuration}ms + zoom out (${this.autoZoomAmount} levels)`);
+      } else {
+        this.logger.info(`🎮 Camera movement: dx=${dx.toFixed(0)}, dz=${dz.toFixed(0)} | sending ${finalDxDuration}ms + ${finalDzDuration}ms`);
+      }
     } catch (error) {
       this.logger.debug('sendCameraMovement error', {
         error: error instanceof Error ? error.message : String(error),
