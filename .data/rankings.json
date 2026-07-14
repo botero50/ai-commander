@@ -9,7 +9,6 @@
       "brainId": "ollama:mistral",
       "rating": 1616,
       "ratingHistory": [
-        1600,
         1616,
         1616,
         1616,
@@ -101,6 +100,10 @@
         1600,
         1600,
         1600,
+        1616,
+        1616,
+        1616,
+        1616,
         1616,
         1616,
         1616,
@@ -1453,6 +1456,62 @@
       "newRating": 1616,
       "change": 0,
       "matchId": "match_1784064216528_4npcdkgx5"
+    },
+    {
+      "brainId": "ollama:mistral",
+      "oldRating": 1616,
+      "newRating": 1616,
+      "change": 0,
+      "matchId": "match_1784065805222_teaw476xc"
+    },
+    {
+      "brainId": "ollama:mistral",
+      "oldRating": 1616,
+      "newRating": 1616,
+      "change": 0,
+      "matchId": "match_1784065805222_teaw476xc"
+    },
+    {
+      "brainId": "ollama:mistral",
+      "oldRating": 1616,
+      "newRating": 1616,
+      "change": 0,
+      "matchId": "match_1784066623238_8naqpbkff"
+    },
+    {
+      "brainId": "ollama:mistral",
+      "oldRating": 1616,
+      "newRating": 1616,
+      "change": 0,
+      "matchId": "match_1784066623238_8naqpbkff"
+    },
+    {
+      "brainId": "ollama:mistral",
+      "oldRating": 1616,
+      "newRating": 1616,
+      "change": 0,
+      "matchId": "match_1784066644782_90zndgqg7"
+    },
+    {
+      "brainId": "ollama:mistral",
+      "oldRating": 1616,
+      "newRating": 1616,
+      "change": 0,
+      "matchId": "match_1784066644782_90zndgqg7"
+    },
+    {
+      "brainId": "ollama:mistral",
+      "oldRating": 1616,
+      "newRating": 1616,
+      "change": 0,
+      "matchId": "match_1784067156199_u1td6ez63"
+    },
+    {
+      "brainId": "ollama:mistral",
+      "oldRating": 1616,
+      "newRating": 1616,
+      "change": 0,
+      "matchId": "match_1784067156199_u1td6ez63"
     }
   ]
 }

@@ -16,15 +16,6 @@ export interface MinimapCoordinates {
   screenY: number;
 }
 
-export interface ViewportBounds {
-  left: number;      // Left edge of viewport (e.g., 378)
-  top: number;       // Top edge of viewport (e.g., 1081)
-  right: number;     // Right edge of viewport (e.g., 729)
-  bottom: number;    // Bottom edge of viewport (e.g., 1432)
-  worldMaxX?: number; // Max world X coordinate (default: 350)
-  worldMaxZ?: number; // Max world Z coordinate (default: 350)
-}
-
 export interface ScreenCapture {
   path: string;
   timestamp: number;
@@ -207,113 +198,6 @@ export class ScreenController {
   }
 
   /**
-   * Click at specific world coordinates on the minimap
-   * This maps world game coordinates (e.g., battle location) to minimap screen position
-   * Uses default calibration points (Acropolis Bay 2P)
-   */
-  async clickAtWorldCoordinates(worldX: number, worldZ: number): Promise<void> {
-    return new Promise((resolve, reject) => {
-      try {
-        const proc = spawn('python', [this.pythonScript, 'click-world', worldX.toString(), worldZ.toString()], {
-          stdio: 'pipe',
-        });
-
-        let stdout = '';
-        let stderr = '';
-
-        proc.stdout?.on('data', (data) => {
-          stdout += data.toString();
-          this.logger.debug('Python stdout', { output: data.toString() });
-        });
-
-        proc.stderr?.on('data', (data) => {
-          stderr += data.toString();
-          this.logger.debug('Python stderr', { output: data.toString() });
-        });
-
-        proc.on('close', (code) => {
-          if (code === 0) {
-            this.logger.info(`🎯 Clicked world coordinates (${worldX}, ${worldZ})`);
-            resolve();
-          } else {
-            this.logger.error('World coordinates click failed', { code, stdout, stderr });
-            reject(new Error(`Click at world coordinates failed: ${stdout || stderr}`));
-          }
-        });
-
-        proc.on('error', (err) => {
-          this.logger.error('Python process error', { error: err.message });
-          reject(err);
-        });
-      } catch (error) {
-        reject(error);
-      }
-    });
-  }
-
-  /**
-   * Click at specific world coordinates using map-specific calibration
-   * Pass the detected town center coordinates for accurate minimap clicking
-   */
-  async clickAtWorldCoordinatesWithCalibration(
-    worldX: number,
-    worldZ: number,
-    calibration: { red: { x: number; z: number }; blue: { x: number; z: number } }
-  ): Promise<void> {
-    return new Promise((resolve, reject) => {
-      try {
-        const args = [
-          this.pythonScript,
-          'click-world-calibrated',
-          worldX.toString(),
-          worldZ.toString(),
-          Math.round(calibration.red.x).toString(),
-          Math.round(calibration.red.z).toString(),
-          Math.round(calibration.blue.x).toString(),
-          Math.round(calibration.blue.z).toString(),
-        ];
-
-        const proc = spawn('python', args, {
-          stdio: 'pipe',
-        });
-
-        let stdout = '';
-        let stderr = '';
-
-        proc.stdout?.on('data', (data) => {
-          stdout += data.toString();
-          this.logger.debug('Python stdout', { output: data.toString() });
-        });
-
-        proc.stderr?.on('data', (data) => {
-          stderr += data.toString();
-          this.logger.debug('Python stderr', { output: data.toString() });
-        });
-
-        proc.on('close', (code) => {
-          if (code === 0) {
-            this.logger.info(`🎯 Clicked world coordinates (${worldX}, ${worldZ}) with calibration`, {
-              redBase: calibration.red,
-              blueBase: calibration.blue,
-            });
-            resolve();
-          } else {
-            this.logger.error('World coordinates click with calibration failed', { code, stdout, stderr });
-            reject(new Error(`Click at world coordinates with calibration failed: ${stdout || stderr}`));
-          }
-        });
-
-        proc.on('error', (err) => {
-          this.logger.error('Python process error', { error: err.message });
-          reject(err);
-        });
-      } catch (error) {
-        reject(error);
-      }
-    });
-  }
-
-  /**
    * Click the blue base on minimap
    */
   async clickBlueBase(): Promise<void> {
@@ -351,42 +235,6 @@ export class ScreenController {
         reject(error);
       }
     });
-  }
-
-  /**
-   * Click at world coordinates by mapping to viewport screen position
-   * Converts game world coordinates to screen viewport coordinates and clicks
-   */
-  async clickAtWorldCoordinatesInViewport(worldX: number, worldZ: number, viewportBounds: ViewportBounds): Promise<void> {
-    try {
-      // Get world bounds (default to 350x350 for standard maps)
-      const worldMaxX = viewportBounds.worldMaxX ?? 350;
-      const worldMaxZ = viewportBounds.worldMaxZ ?? 350;
-
-      // Calculate scaling factors
-      const viewportWidth = viewportBounds.right - viewportBounds.left;
-      const viewportHeight = viewportBounds.bottom - viewportBounds.top;
-      const scaleX = viewportWidth / worldMaxX;
-      const scaleZ = viewportHeight / worldMaxZ;
-
-      // Convert world coordinates to screen coordinates
-      const screenX = Math.round(viewportBounds.left + worldX * scaleX);
-      const screenY = Math.round(viewportBounds.top + worldZ * scaleZ);
-
-      this.logger.info(`🌍 Converting world (${worldX}, ${worldZ}) to viewport screen (${screenX}, ${screenY})`, {
-        viewportBounds,
-        scale: { x: scaleX, z: scaleZ },
-      });
-
-      // Click at the calculated viewport coordinates
-      await this.clickAt(screenX, screenY);
-      this.logger.info(`✅ VIEWPORT CLICK SUCCESSFUL - clicked world (${worldX}, ${worldZ}) at screen (${screenX}, ${screenY})`);
-    } catch (error) {
-      this.logger.error('Viewport click failed', {
-        error: error instanceof Error ? error.message : String(error),
-      });
-      throw error;
-    }
   }
 
   /**

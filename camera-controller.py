@@ -376,16 +376,12 @@ def detect_bases_on_minimap():
         traceback.print_exc()
         return None
 
-def click_at_minimap_coordinates(world_x, world_z, red_world_x=None, red_world_z=None, blue_world_x=None, blue_world_z=None):
+def click_at_minimap_coordinates(world_x, world_z):
     """Click at specific world coordinates on the minimap
 
     Args:
-        world_x: World X coordinate (0-350 for standard map)
-        world_z: World Z coordinate (0-350 for standard map)
-        red_world_x: Red base world X coordinate (optional, uses default if None)
-        red_world_z: Red base world Z coordinate (optional, uses default if None)
-        blue_world_x: Blue base world X coordinate (optional, uses default if None)
-        blue_world_z: Blue base world Z coordinate (optional, uses default if None)
+        world_x: World X coordinate
+        world_z: World Z coordinate
     """
     try:
         import win32gui
@@ -402,21 +398,12 @@ def click_at_minimap_coordinates(world_x, world_z, red_world_x=None, red_world_z
             print("Error: Could not detect bases for calibration")
             sys.exit(1)
 
-        red_pos = bases['red_pos']  # minimap pixel (512, 175)
-        blue_pos = bases['blue_pos']  # minimap pixel (418, 208)
+        red_pos = bases['red_pos']
+        blue_pos = bases['blue_pos']
 
-        # Use provided calibration coordinates or fall back to defaults
-        # Default: Acropolis Bay 2P calibration (measured from actual base positions)
-        if red_world_x is None:
-            red_world_x = 220
-            print("⚠️  WARNING: Using default red base calibration (220, 230) - consider passing actual coordinates")
-        if red_world_z is None:
-            red_world_z = 230
-        if blue_world_x is None:
-            blue_world_x = 90
-            print("⚠️  WARNING: Using default blue base calibration (90, 90) - consider passing actual coordinates")
-        if blue_world_z is None:
-            blue_world_z = 90
+        # Use default calibration for Acropolis Bay 2P
+        red_world_x, red_world_z = 220, 230
+        blue_world_x, blue_world_z = 90, 90
 
         # Calculate scale from the two reference points
         delta_pixel_x = red_pos[0] - blue_pos[0]  # 512 - 418 = 94
@@ -575,23 +562,6 @@ if __name__ == '__main__':
             click_at_minimap_coordinates(world_x, world_z)
         except ValueError:
             print("Error: Invalid world coordinates (must be integers)")
-            sys.exit(1)
-
-    elif command == 'click-world-calibrated':
-        if len(sys.argv) < 8:
-            print("Error: click-world-calibrated requires <worldX> <worldZ> <redWorldX> <redWorldZ> <blueWorldX> <blueWorldZ>")
-            sys.exit(1)
-        try:
-            world_x = int(sys.argv[2])
-            world_z = int(sys.argv[3])
-            red_world_x = int(sys.argv[4])
-            red_world_z = int(sys.argv[5])
-            blue_world_x = int(sys.argv[6])
-            blue_world_z = int(sys.argv[7])
-            print(f"OK: Using calibration - Red base: ({red_world_x}, {red_world_z}), Blue base: ({blue_world_x}, {blue_world_z})")
-            click_at_minimap_coordinates(world_x, world_z, red_world_x, red_world_z, blue_world_x, blue_world_z)
-        except ValueError:
-            print("Error: Invalid coordinates (must be integers)")
             sys.exit(1)
 
     else:
