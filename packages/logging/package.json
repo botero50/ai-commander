@@ -1,5 +1,5 @@
 {
-  "name": "@ai-commander/adapter",
+  "name": "@ai-commander/logging",
   "version": "1.0.0",
   "description": "Package for AI Commander framework",
   "type": "module",
