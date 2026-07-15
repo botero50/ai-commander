@@ -232,6 +232,16 @@ export class OllamaAIBrain implements AIBrain {
     const friendlyBuildings = buildings.filter(b => b.controlledByPlayerId?.toString() === this.playerID.toString()).length;
     const enemyBuildings = buildings.filter(b => b.controlledByPlayerId?.toString() !== this.playerID.toString()).length;
 
+    // Calculate unit advantage/disadvantage
+    const unitDifference = friendlyUnits - enemyUnits;
+    const buildingDifference = friendlyBuildings - enemyBuildings;
+    const strength = unitDifference > 0 ? 'STRONGER' : unitDifference < 0 ? 'WEAKER' : 'EQUAL';
+
+    // Describe resource availability
+    const resourceInfo = resources.length > 0
+      ? `${resources.length} resource points visible on map`
+      : 'NO resources visible - must explore or secure existing areas';
+
     return `
 GAME STATE AT TICK ${worldState.time.currentTick.number}
 
@@ -241,46 +251,69 @@ ${players.map(p => `- ${p.name} (ID: ${p.id})`).join('\n')}
 YOUR FORCES:
 - Units: ${friendlyUnits}
 - Buildings: ${friendlyBuildings}
-- Total Agents: ${friendlyUnits + friendlyBuildings}
 
 ENEMY FORCES:
 - Units: ${enemyUnits}
 - Buildings: ${enemyBuildings}
-- Total Agents: ${enemyUnits + enemyBuildings}
+
+SITUATION:
+- You are ${strength} than the enemy (${unitDifference > 0 ? '+' : ''}${unitDifference} units)
+- ${resourceInfo}
 
 MAP: ${worldState.map?.name || 'Unknown'} (${worldState.map?.width}x${worldState.map?.height})
-VISIBLE RESOURCES: ${resources.length}
 
-OBJECTIVE: Expand your civilization, gather resources, and eliminate enemy forces.
+STRATEGY PRIORITIES (in order):
+1. If enemy has more units: DEFEND your base and BUILD more units to catch up
+2. If you have fewer buildings: BUILD structures to produce units and gather resources
+3. If enemy is close: MOVE units to defensive positions near your base
+4. If resources are nearby: MOVE workers to gather (especially wood/stone for building)
+5. If ahead: MOVE to attack/expand and BUILD additional structures
+
+CRITICAL: You must TRAIN new units constantly - you only win by having more/better units than the enemy!
     `.trim();
   }
 
   /**
-   * Build prompt for Ollama inference
+   * Build strategic prompt for Ollama inference
    *
-   * Focus on MOVE commands only (other command types have format issues).
-   * MOVE is proven to work with 0 A.D. RL Interface.
+   * Asks for diverse actions: TRAIN (most important for winning), BUILD, MOVE, GATHER, ATTACK
+   * These get parsed into game commands and executed via RL Interface.
    */
   private buildPrompt(gameDescription: string): string {
-    return `You are an AI commander in Age of Empires 2. Your primary job is to move units strategically.
+    return `You are a strategic commander in Age of Empires 2. Your civilization is at war.
 
 ${gameDescription}
 
-IMMEDIATE ACTIONS YOU SHOULD TAKE:
-- MOVE your units to good positions for gathering resources
-- MOVE to explore the map and find enemy positions
-- MOVE to defend your base from threats
+=== YOUR STRATEGIC DECISION ===
 
-Based on the game state above, output 2-3 MOVE orders for your units RIGHT NOW.
+You must take 2-3 IMMEDIATE ACTIONS from the options below:
 
-For each action, start with: MOVE - [description of where to move and why]
+AVAILABLE ACTIONS:
+1. TRAIN - Order your buildings to produce new units (BEST WAY TO WIN - more units = victory)
+2. BUILD - Construct new structures (houses, barracks, workshops) to support your economy
+3. MOVE - Reposition units for defense, gathering, or attack
+4. GATHER - Send workers to collect wood/stone/food from nearby resources
+5. ATTACK - Assault enemy units or structures (only if you have unit advantage)
+
+DECISION CRITERIA:
+- If you have fewer units than enemy: TRAIN or BUILD military structures (urgent!)
+- If you have fewer buildings: BUILD economic/military structures
+- If resources are exposed: MOVE workers to GATHER them
+- If enemy is attacking: MOVE defense units and TRAIN more
+- If you're ahead: ATTACK to destroy enemy structures and units
+
+=== OUTPUT YOUR ORDERS ===
+
+For each action, write:
+[ACTION TYPE] - [description of why and what]
 
 Example format:
-MOVE - Send scouts north to find resource locations and enemy positions
-MOVE - Position defenders near the town center to protect against attacks
-MOVE - Move workers to nearby wood and stone resources
+TRAIN - Build 5 infantry units at the barracks to counter enemy forces
+BUILD - Construct a new barracks to produce military units faster
+MOVE - Reposition defense units around the town center perimeter
+GATHER - Send 4 workers to the nearby wood forest northeast of base
 
-Now output your immediate MOVE orders (be very specific):`;
+NOW OUTPUT 2-3 STRATEGIC ACTIONS FOR THIS TICK (be specific and justify why):`;
   }
 
   /**
@@ -369,8 +402,19 @@ Now output your immediate MOVE orders (be very specific):`;
             commands.push(moveCmd);
             this.logger.info('✓ Parsed MOVE command from Ollama', { line: trimmed.substring(0, 80) });
           }
-        } else if (action === 'GATHER' || action === 'TRAIN' || action === 'BUILD' || action === 'RESEARCH') {
-          // These secondary actions get mapped to gather for now (can be expanded later)
+        } else if (action === 'BUILD') {
+          const buildCmd = this.createBuildCommand(worldState);
+          if (buildCmd) {
+            commands.push(buildCmd);
+            this.logger.info('✓ Parsed BUILD command from Ollama', { line: trimmed.substring(0, 80) });
+          }
+        } else if (action === 'TRAIN') {
+          const trainCmd = this.createTrainCommand(worldState);
+          if (trainCmd) {
+            commands.push(trainCmd);
+            this.logger.info('✓ Parsed TRAIN command from Ollama', { line: trimmed.substring(0, 80) });
+          }
+        } else if (action === 'GATHER' || action === 'RESEARCH') {
           const gatherCmd = this.createGatherCommand(worldState);
           if (gatherCmd) {
             commands.push(gatherCmd);
@@ -384,8 +428,8 @@ Now output your immediate MOVE orders (be very specific):`;
           }
         }
 
-        // Limit to 2 commands per tick (reasonable for RTS AI)
-        if (commands.length >= 2) break;
+        // Limit to 3 commands per tick (allows more diverse actions)
+        if (commands.length >= 3) break;
       }
     }
 
@@ -498,15 +542,85 @@ Now output your immediate MOVE orders (be very specific):`;
   }
 
   /**
-   * Create a Build command for new structures
+   * Create a Build command for new structures (barracks, houses, economic buildings)
    *
-   * Note: Build is complex - requires builder unit to execute.
-   * For now, focus on Move commands which are proven to work.
+   * BUILD is critical for winning - it produces units and infrastructure.
+   * We build near the player's existing town center.
    */
   private createBuildCommand(worldState: WorldState): GameCommand | null {
-    // Disabled for now - Build commands have format issues
-    // Return null to skip build attempts
-    return null;
+    // Find our buildings to build near them
+    const friendlyBuildings = worldState.agents
+      .filter(a => (a.customData as any)?.type === 'building')
+      .filter(a => a.controlledByPlayerId?.toString() === this.playerID.toString());
+
+    if (friendlyBuildings.length === 0) return null;
+
+    // Build near our first building (town center)
+    const existingBuilding = friendlyBuildings[0];
+    const baseX = (existingBuilding.customData as any)?.positionRaw?.x || 200;
+    const baseZ = (existingBuilding.customData as any)?.positionRaw?.z || 200;
+
+    // Pick a random offset from base to avoid overlap
+    const offsetX = (Math.random() - 0.5) * 60;
+    const offsetZ = (Math.random() - 0.5) * 60;
+
+    // Prioritize barracks (produces soldiers) then houses (supports population)
+    const buildingTypes = ['structures/athen_barracks', 'structures/house', 'structures/storage_house'];
+    const buildingType = buildingTypes[Math.floor(Math.random() * buildingTypes.length)];
+
+    return {
+      playerID: this.playerID,
+      json_cmd: {
+        type: 'build',
+        template: buildingType,
+        x: Math.round(baseX + offsetX),
+        z: Math.round(baseZ + offsetZ),
+        angle: 0,
+        queued: false,
+      },
+    };
+  }
+
+  /**
+   * Create a Train command - order buildings to produce units
+   *
+   * TRAIN is the primary win condition - more units = victory!
+   * We find our barracks and order it to produce soldiers.
+   */
+  private createTrainCommand(worldState: WorldState): GameCommand | null {
+    // Find barracks buildings that can produce units
+    const barracks = worldState.agents
+      .filter(a => (a.customData as any)?.type === 'building')
+      .filter(a => a.controlledByPlayerId?.toString() === this.playerID.toString())
+      .filter(b => {
+        const template = (b.customData as any)?.template || '';
+        return template.includes('barracks') || template.includes('stable') || template.includes('range');
+      });
+
+    if (barracks.length === 0) return null;
+
+    // Pick first available barracks
+    const barrackId = (barracks[0].customData as any)?.entityId;
+    if (!barrackId) return null;
+
+    // Train different unit types (infantry, ranged, cavalry)
+    const unitTypes = [
+      'units/athen_infantry_swordsman_b',
+      'units/athen_cavalry',
+      'units/athen_ranged',
+    ];
+
+    const unitType = unitTypes[Math.floor(Math.random() * unitTypes.length)];
+
+    return {
+      playerID: this.playerID,
+      json_cmd: {
+        type: 'train',
+        building: barrackId,
+        template: unitType,
+        queued: true, // Queue training (allows production to chain)
+      },
+    };
   }
 
   /**
