@@ -25,6 +25,9 @@ export class TournamentDashboard {
      */
     updateFromResults(result, eloRatings) {
         this.rankings = [...result.rankings];
+        if (result.startTime) {
+            this.startTime = new Date(result.startTime);
+        }
         this.matchHistory = result.matches.slice(-20).map((match) => ({
             matchId: match.matchId,
             player1: this.getBrainName(match.brain1Id),
@@ -80,7 +83,10 @@ export class TournamentDashboard {
      */
     getBrainName(brainId) {
         const rating = this.eloRatings.get(brainId);
-        return rating?.name || brainId;
+        if (rating?.name) return rating.name;
+        const ranking = this.rankings.find((r) => r.brainId === brainId);
+        if (ranking?.name) return ranking.name;
+        return brainId;
     }
     /**
      * Format ranking entry
