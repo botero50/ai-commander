@@ -10,10 +10,10 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { OllamaAIBrain, OllamaConfig } from './ollama-brain.js';
+import { OllamaBrain, type OllamaBrainConfig } from './ollama-brain.js';
 
 describe('OllamaAIBrain', () => {
-  let config: OllamaConfig;
+  let config: OllamaBrainConfig;
 
   beforeEach(() => {
     config = {
@@ -30,7 +30,7 @@ describe('OllamaAIBrain', () => {
 
   describe('Constructor', () => {
     it('should initialize with valid config', () => {
-      const brain = new OllamaAIBrain(config);
+      const brain = new OllamaBrain(config);
       expect(brain).toBeDefined();
     });
 
@@ -39,7 +39,7 @@ describe('OllamaAIBrain', () => {
         modelName: 'mistral',
         baseUrl: 'http://localhost:11434',
       };
-      const brain = new OllamaAIBrain(minimalConfig);
+      const brain = new OllamaBrain(minimalConfig);
       expect(brain).toBeDefined();
     });
 
@@ -48,7 +48,7 @@ describe('OllamaAIBrain', () => {
         modelName: 'llama2',
         baseUrl: 'http://localhost:11434',
       };
-      const brain = new OllamaAIBrain(defaultConfig);
+      const brain = new OllamaBrain(defaultConfig);
       expect(defaultConfig.baseUrl).toContain('localhost');
     });
   });
@@ -59,7 +59,7 @@ describe('OllamaAIBrain', () => {
         ...config,
         modelName: 'llama2',
       };
-      const brain = new OllamaAIBrain(llama2Config);
+      const brain = new OllamaBrain(llama2Config);
       expect(brain).toBeDefined();
     });
 
@@ -68,7 +68,7 @@ describe('OllamaAIBrain', () => {
         ...config,
         modelName: 'mistral',
       };
-      const brain = new OllamaAIBrain(mistralConfig);
+      const brain = new OllamaBrain(mistralConfig);
       expect(brain).toBeDefined();
     });
 
@@ -77,7 +77,7 @@ describe('OllamaAIBrain', () => {
         ...config,
         modelName: 'neural-chat',
       };
-      const brain = new OllamaAIBrain(neuralConfig);
+      const brain = new OllamaBrain(neuralConfig);
       expect(brain).toBeDefined();
     });
 
@@ -86,7 +86,7 @@ describe('OllamaAIBrain', () => {
         ...config,
         modelName: 'tinyllama',
       };
-      const brain = new OllamaAIBrain(tinyConfig);
+      const brain = new OllamaBrain(tinyConfig);
       expect(brain).toBeDefined();
     });
   });
@@ -97,7 +97,7 @@ describe('OllamaAIBrain', () => {
         ...config,
         temperature: 0.2,
       };
-      const brain = new OllamaAIBrain(customConfig);
+      const brain = new OllamaBrain(customConfig);
       expect(brain).toBeDefined();
     });
 
@@ -106,7 +106,7 @@ describe('OllamaAIBrain', () => {
         ...config,
         topP: 0.5,
       };
-      const brain = new OllamaAIBrain(customConfig);
+      const brain = new OllamaBrain(customConfig);
       expect(brain).toBeDefined();
     });
 
@@ -115,7 +115,7 @@ describe('OllamaAIBrain', () => {
         ...config,
         topK: 20,
       };
-      const brain = new OllamaAIBrain(customConfig);
+      const brain = new OllamaBrain(customConfig);
       expect(brain).toBeDefined();
     });
 
@@ -124,7 +124,7 @@ describe('OllamaAIBrain', () => {
         ...config,
         numPredict: 1000,
       };
-      const brain = new OllamaAIBrain(customConfig);
+      const brain = new OllamaBrain(customConfig);
       expect(brain).toBeDefined();
     });
   });
@@ -135,7 +135,7 @@ describe('OllamaAIBrain', () => {
         modelName: 'llama2',
         baseUrl: 'http://localhost:11434',
       };
-      const brain = new OllamaAIBrain(defaultConfig);
+      const brain = new OllamaBrain(defaultConfig);
       expect(brain).toBeDefined();
       // Default should be player 2 based on code
     });
@@ -145,14 +145,14 @@ describe('OllamaAIBrain', () => {
         ...config,
         playerID: 1,
       };
-      const brain1 = new OllamaAIBrain(p1Config);
+      const brain1 = new OllamaBrain(p1Config);
       expect(brain1).toBeDefined();
 
       const p2Config: OllamaConfig = {
         ...config,
         playerID: 2,
       };
-      const brain2 = new OllamaAIBrain(p2Config);
+      const brain2 = new OllamaBrain(p2Config);
       expect(brain2).toBeDefined();
     });
   });
@@ -163,7 +163,7 @@ describe('OllamaAIBrain', () => {
         ...config,
         timeout: 60000,
       };
-      const brain = new OllamaAIBrain(timeoutConfig);
+      const brain = new OllamaBrain(timeoutConfig);
       expect(brain).toBeDefined();
     });
 
@@ -172,7 +172,7 @@ describe('OllamaAIBrain', () => {
         modelName: 'llama2',
         baseUrl: 'http://localhost:11434',
       };
-      const brain = new OllamaAIBrain(defaultConfig);
+      const brain = new OllamaBrain(defaultConfig);
       expect(defaultConfig).toBeDefined();
     });
   });
@@ -191,13 +191,13 @@ describe('OllamaAIBrain', () => {
         ...config,
         baseUrl: 'http://192.168.1.100:11434',
       };
-      const brain = new OllamaAIBrain(customConfig);
+      const brain = new OllamaBrain(customConfig);
       expect(brain).toBeDefined();
     });
 
     it('should be low-cost since it runs locally', () => {
       // Ollama runs locally, so no API costs
-      const brain = new OllamaAIBrain(config);
+      const brain = new OllamaBrain(config);
       expect(brain).toBeDefined();
       // Cost should be 0 since it's local
     });
@@ -205,7 +205,7 @@ describe('OllamaAIBrain', () => {
 
   describe('Error Handling', () => {
     it('should handle Ollama server not running', () => {
-      const brain = new OllamaAIBrain(config);
+      const brain = new OllamaBrain(config);
       // Should gracefully handle connection errors
       expect(brain).toBeDefined();
     });
@@ -215,7 +215,7 @@ describe('OllamaAIBrain', () => {
         ...config,
         timeout: 100,
       };
-      const brain = new OllamaAIBrain(quickTimeoutConfig);
+      const brain = new OllamaBrain(quickTimeoutConfig);
       expect(brain).toBeDefined();
     });
 
@@ -225,7 +225,7 @@ describe('OllamaAIBrain', () => {
         baseUrl: 'http://localhost:11434',
       };
       // Should attempt to use model, Ollama will error if not found
-      const brain = new OllamaAIBrain(invalidConfig);
+      const brain = new OllamaBrain(invalidConfig);
       expect(brain).toBeDefined();
     });
   });
@@ -236,7 +236,7 @@ describe('OllamaAIBrain', () => {
         ...config,
         modelName: 'tinyllama',
       };
-      const brain = new OllamaAIBrain(fastConfig);
+      const brain = new OllamaBrain(fastConfig);
       expect(brain).toBeDefined();
     });
 
@@ -245,7 +245,7 @@ describe('OllamaAIBrain', () => {
         ...config,
         modelName: 'mistral',
       };
-      const brain = new OllamaAIBrain(accurateConfig);
+      const brain = new OllamaBrain(accurateConfig);
       expect(brain).toBeDefined();
     });
   });
@@ -254,12 +254,12 @@ describe('OllamaAIBrain', () => {
     it('should have throttling mechanism', () => {
       // Ollama brain should implement request throttling
       // to prevent overwhelming the local server
-      const brain = new OllamaAIBrain(config);
+      const brain = new OllamaBrain(config);
       expect(brain).toBeDefined();
     });
 
     it('should queue requests appropriately', () => {
-      const brain = new OllamaAIBrain(config);
+      const brain = new OllamaBrain(config);
       // Multiple rapid requests should be throttled
       expect(brain).toBeDefined();
     });
