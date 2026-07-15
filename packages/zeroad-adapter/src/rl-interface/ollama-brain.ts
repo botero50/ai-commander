@@ -340,8 +340,10 @@ Now output your immediate MOVE orders (be very specific):`;
   private parseCommands(response: string, worldState: WorldState): GameCommand[] {
     const commands: GameCommand[] = [];
 
-    // Look for numbered action instructions (1. MOVE -, 2. MOVE -, etc.)
-    // This is the format we prompt Ollama to use
+    // Look for action instructions in multiple formats:
+    // - "1. MOVE - ..." (primary format we prompt for)
+    // - "1. "Move ..." (alternative format some models use)
+    // - "MOVE ..." (unnumbered format)
     const lines = response.split('\n');
 
     this.logger.debug('Parsing Ollama response for commands', {
@@ -351,10 +353,12 @@ Now output your immediate MOVE orders (be very specific):`;
 
     for (const line of lines) {
       const trimmed = line.trim();
+      if (!trimmed) continue;
 
-      // Look for numbered instructions like "1. MOVE - ..." or "2. ATTACK - ..."
-      // This matches the format we ask Ollama to use in the prompt
-      const actionMatch = trimmed.match(/^\d+\.\s+(MOVE|GATHER|ATTACK|DEFEND|BUILD|TRAIN|RESEARCH)[\s\-]/i);
+      // Format 1: "1. MOVE - ..." or "1. ATTACK - ..."
+      // Format 2: "1. "Move ..." (quoted format)
+      // Format 3: "MOVE - ..." (unnumbered)
+      const actionMatch = trimmed.match(/(?:^\d+\.\s+)?["\']?(MOVE|GATHER|ATTACK|DEFEND|BUILD|TRAIN|RESEARCH)/i);
 
       if (actionMatch) {
         const action = actionMatch[1].toUpperCase();
@@ -386,9 +390,9 @@ Now output your immediate MOVE orders (be very specific):`;
     }
 
     if (commands.length === 0) {
-      this.logger.warn('⚠️ No numbered commands parsed from Ollama response', {
+      this.logger.warn('⚠️ No commands parsed from Ollama response', {
         responseLength: response.length,
-        expectedFormat: '1. MOVE - ... or 2. ATTACK - ...',
+        supportedFormats: ['1. MOVE - ...', '1. "Move ...', 'MOVE - ...'],
         firstLines: lines.slice(0, 3).join(' | '),
       });
     }
