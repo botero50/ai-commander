@@ -2,8 +2,7 @@
  * Ollama AI Brain
  *
  * Implements AIBrain interface using local Ollama LLM inference.
- * Converts WorldState to natural language prompts, gets LLM decisions,
- * parses responses into GameCommand[] for execution.
+ * Orchestrates request building, API calls, and response parsing via specialized modules.
  *
  * Prerequisites:
  * - Ollama running on localhost:11434
@@ -13,8 +12,7 @@
  */
 
 import { Logger } from '../config/logger.js';
-// import type { WorldState } from '@ai-commander/domain';
-// TODO: WorldState needs to be imported from domain or defined locally
+
 interface WorldState {
   tick: { number: number };
   players: Array<{ id: number; name: string; [key: string]: any }>;
@@ -25,23 +23,19 @@ import type { AIBrain, BrainDecision } from './ai-loop-orchestrator.js';
 import type { GameCommand } from './http-client.js';
 import { DecisionLogger } from './decision-logger.js';
 import { OllamaRequestThrottler } from './ollama-request-throttler.js';
+import { OllamaAPIClient } from './ollama-api-client.js';
+import { OllamaRequestBuilder } from './ollama-request-builder.js';
+import { OllamaResponseParser } from './ollama-response-parser.js';
 
 export interface OllamaConfig {
-  modelName: string; // e.g., 'llama2', 'mistral', 'neural-chat'
-  baseUrl: string; // e.g., 'http://localhost:11434'
-  temperature: number; // 0.0 - 1.0 (lower = deterministic, higher = creative)
-  topP: number; // Nucleus sampling
-  topK: number; // Diversity
-  numPredict: number; // Max response tokens
-  timeout: number; // Request timeout in ms
-  playerID?: number; // Player to control (1 or 2). Default: 2
-}
-
-export interface OllamaResponse {
-  model: string;
-  created_at: string;
-  response: string;
-  done: boolean;
+  modelName: string;
+  baseUrl: string;
+  temperature: number;
+  topP: number;
+  topK: number;
+  numPredict: number;
+  timeout: number;
+  playerID?: number;
 }
 
 /**
@@ -54,6 +48,9 @@ export class OllamaAIBrain implements AIBrain {
   private decisionLogger: DecisionLogger;
   private playerID: number;
   private throttler: OllamaRequestThrottler;
+  private apiClient: OllamaAPIClient;
+  private requestBuilder: OllamaRequestBuilder;
+  private responseParser: OllamaResponseParser;
 
   constructor(logger: Logger, config: Partial<OllamaConfig> = {}) {
     this.logger = logger;
@@ -66,13 +63,19 @@ export class OllamaAIBrain implements AIBrain {
       topP: config.topP !== undefined ? config.topP : 0.9,
       topK: config.topK !== undefined ? config.topK : 40,
       numPredict: config.numPredict || 256,
-      timeout: config.timeout || 60000, // 60 seconds for slow models like tinyllama
+      timeout: config.timeout || 60000,
       playerID: config.playerID || 2,
     };
-    // Throttle requests: max 1 every 2 seconds per brain (prevent 503 overload errors)
+
+    // Initialize helper modules
+    this.apiClient = new OllamaAPIClient(logger, this.config);
+    this.requestBuilder = new OllamaRequestBuilder(logger, this.playerID);
+    this.responseParser = new OllamaResponseParser(logger, this.playerID);
+
+    // Throttle requests: max 1 per 3 seconds per brain (prevent 500 errors)
     this.throttler = new OllamaRequestThrottler(logger, `Player${this.playerID}`, {
-      delayBetweenRequests: 2000, // 2 seconds between requests per brain (conservative)
-      maxQueueSize: 5, // Limit queue size to prevent backlog
+      delayBetweenRequests: 3000,
+      maxQueueSize: 5,
     });
   }
 
@@ -80,47 +83,7 @@ export class OllamaAIBrain implements AIBrain {
    * Initialize brain (verify Ollama is reachable)
    */
   async initialize(): Promise<void> {
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), this.config.timeout);
-
-      const response = await fetch(`${this.config.baseUrl}/api/tags`, {
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        throw new Error(`Ollama health check failed: ${response.status}`);
-      }
-
-      const data = (await response.json()) as { models: Array<{ name: string }> };
-      const availableModels = data.models.map(m => m.name);
-
-      this.logger.info('Ollama initialized', {
-        baseUrl: this.config.baseUrl,
-        selectedModel: this.config.modelName,
-        availableModels: availableModels.join(', '),
-      });
-
-      // Check if model is available (handle both "model" and "model:latest" formats)
-      const modelWithLatest = `${this.config.modelName}:latest`;
-      const modelAvailable = availableModels.includes(this.config.modelName) ||
-                             availableModels.includes(modelWithLatest);
-
-      if (!modelAvailable) {
-        this.logger.warn('Selected model not available', {
-          model: this.config.modelName,
-          available: availableModels,
-        });
-      }
-    } catch (error) {
-      this.logger.error('Failed to initialize Ollama brain', {
-        error: String(error),
-        baseUrl: this.config.baseUrl,
-      });
-      throw error;
-    }
+    await this.apiClient.healthCheck();
   }
 
   /**
@@ -129,28 +92,24 @@ export class OllamaAIBrain implements AIBrain {
   async decide(worldState: WorldState): Promise<BrainDecision> {
     this.decisionCount++;
 
-    // Throttle the Ollama request
     return this.throttler.throttle(async () => {
       try {
-        // Phase 1: Describe game state
-        const gameDescription = this.describeGameState(worldState);
+        // Build prompt via request builder
+        const gameDescription = this.requestBuilder.describeGameState(worldState);
+        const prompt = this.requestBuilder.buildPrompt(gameDescription);
 
-        // Phase 2: Build prompt
-        const prompt = this.buildPrompt(gameDescription);
-
-        // Phase 3: Query Ollama
         this.logger.debug('Querying Ollama (throttled)', {
           decision: this.decisionCount,
           model: this.config.modelName,
           promptLength: prompt.length,
         });
 
-        const response = await this.callOllama(prompt);
+        // Get response via API client
+        const response = await this.apiClient.generateResponse(prompt);
 
-        // Phase 4: Parse response into commands
-        const commands = this.parseCommands(response, worldState);
+        // Parse commands via response parser
+        const commands = this.responseParser.parseCommands(response, worldState);
 
-        // Phase 5: Return decision
         const decision: BrainDecision = {
           playerID: this.playerID,
           commands,
@@ -158,12 +117,11 @@ export class OllamaAIBrain implements AIBrain {
           timestamp: new Date(),
         };
 
-        // Log decision for quality analysis
         this.decisionLogger.logDecision(
           worldState,
           prompt,
           response,
-          Date.now() - (decision.timestamp.getTime() - 1000), // Rough latency estimate
+          Date.now() - (decision.timestamp.getTime() - 1000),
           commands,
           true
         );
@@ -177,7 +135,6 @@ export class OllamaAIBrain implements AIBrain {
 
         return decision;
       } catch (error) {
-        // Suppress AbortError (expected during shutdown/reconnection)
         const isAbortError = error instanceof Error && error.name === 'AbortError';
         if (!isAbortError) {
           this.logger.error('Brain decision failed', {
@@ -186,7 +143,6 @@ export class OllamaAIBrain implements AIBrain {
           });
         }
 
-        // Return empty decision on error (observe-only)
         return {
           playerID: this.playerID,
           commands: [],
@@ -222,498 +178,6 @@ export class OllamaAIBrain implements AIBrain {
     return this.decisionLogger.exportToJSON();
   }
 
-  /**
-   * Convert WorldState to natural language game description
-   */
-  private describeGameState(worldState: WorldState): string {
-    const agents = worldState.agents;
-    const players = worldState.players;
-
-    const units = agents.filter(a => (a.customData as any)?.type === 'unit');
-    const buildings = agents.filter(a => (a.customData as any)?.type === 'building');
-    const resources = agents.filter(a => (a.customData as any)?.type === 'resource');
-
-    const friendlyUnits = units.filter(u => u.controlledByPlayerId?.toString() === this.playerID.toString()).length;
-    const enemyUnits = units.filter(u => u.controlledByPlayerId?.toString() !== this.playerID.toString()).length;
-
-    const friendlyBuildings = buildings.filter(b => b.controlledByPlayerId?.toString() === this.playerID.toString()).length;
-    const enemyBuildings = buildings.filter(b => b.controlledByPlayerId?.toString() !== this.playerID.toString()).length;
-
-    // Calculate unit advantage/disadvantage
-    const unitDifference = friendlyUnits - enemyUnits;
-    const buildingDifference = friendlyBuildings - enemyBuildings;
-    const strength = unitDifference > 0 ? 'STRONGER' : unitDifference < 0 ? 'WEAKER' : 'EQUAL';
-
-    // Describe resource availability
-    const resourceInfo = resources.length > 0
-      ? `${resources.length} resource points visible on map`
-      : 'NO resources visible - must explore or secure existing areas';
-
-    return `
-GAME STATE AT TICK ${worldState.time.currentTick.number}
-
-PLAYERS:
-${players.map(p => `- ${p.name} (ID: ${p.id})`).join('\n')}
-
-YOUR FORCES:
-- Units: ${friendlyUnits}
-- Buildings: ${friendlyBuildings}
-
-ENEMY FORCES:
-- Units: ${enemyUnits}
-- Buildings: ${enemyBuildings}
-
-SITUATION:
-- You are ${strength} than the enemy (${unitDifference > 0 ? '+' : ''}${unitDifference} units)
-- ${resourceInfo}
-
-MAP: ${worldState.map?.name || 'Unknown'} (${worldState.map?.width}x${worldState.map?.height})
-
-STRATEGY PRIORITIES (in order):
-1. If enemy has more units: DEFEND your base and BUILD more units to catch up
-2. If you have fewer buildings: BUILD structures to produce units and gather resources
-3. If enemy is close: MOVE units to defensive positions near your base
-4. If resources are nearby: MOVE workers to gather (especially wood/stone for building)
-5. If ahead: MOVE to attack/expand and BUILD additional structures
-
-CRITICAL: You must TRAIN new units constantly - you only win by having more/better units than the enemy!
-    `.trim();
-  }
-
-  /**
-   * Build strategic prompt for Ollama inference
-   *
-   * Asks for diverse actions: TRAIN (most important for winning), BUILD, MOVE, GATHER, ATTACK
-   * These get parsed into game commands and executed via RL Interface.
-   */
-  private buildPrompt(gameDescription: string): string {
-    return `You are a strategic commander in Age of Empires 2. Your civilization is at war.
-
-${gameDescription}
-
-=== YOUR STRATEGIC DECISION ===
-
-You must take 2-3 IMMEDIATE ACTIONS from the options below:
-
-AVAILABLE ACTIONS:
-1. TRAIN - Order your buildings to produce new units (BEST WAY TO WIN - more units = victory)
-2. BUILD - Construct new structures (houses, barracks, workshops) to support your economy
-3. MOVE - Reposition units for defense, gathering, or attack
-4. GATHER - Send workers to collect wood/stone/food from nearby resources
-5. ATTACK - Assault enemy units or structures (only if you have unit advantage)
-
-DECISION CRITERIA:
-- If you have fewer units than enemy: TRAIN or BUILD military structures (urgent!)
-- If you have fewer buildings: BUILD economic/military structures
-- If resources are exposed: MOVE workers to GATHER them
-- If enemy is attacking: MOVE defense units and TRAIN more
-- If you're ahead: ATTACK to destroy enemy structures and units
-
-=== OUTPUT YOUR ORDERS ===
-
-For each action, write:
-[ACTION TYPE] - [description of why and what]
-
-Example format:
-TRAIN - Build 5 infantry units at the barracks to counter enemy forces
-BUILD - Construct a new barracks to produce military units faster
-MOVE - Reposition defense units around the town center perimeter
-GATHER - Send 4 workers to the nearby wood forest northeast of base
-
-NOW OUTPUT 2-3 STRATEGIC ACTIONS FOR THIS TICK (be specific and justify why):`;
-  }
-
-  /**
-   * Call Ollama API and get response
-   */
-  private async callOllama(prompt: string): Promise<string> {
-    const requestBody = {
-      model: this.config.modelName,
-      prompt,
-      stream: false,
-      temperature: this.config.temperature,
-      top_p: this.config.topP,
-      top_k: this.config.topK,
-      num_predict: this.config.numPredict,
-    };
-
-    try {
-      const controller = new AbortController();
-      const timeoutId = setTimeout(() => controller.abort(), this.config.timeout);
-
-      const response = await fetch(`${this.config.baseUrl}/api/generate`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(requestBody),
-        signal: controller.signal,
-      });
-
-      clearTimeout(timeoutId);
-
-      if (!response.ok) {
-        throw new Error(`Ollama API error: ${response.status}`);
-      }
-
-      const data = (await response.json()) as OllamaResponse;
-      return data.response || '';
-    } catch (error) {
-      // Suppress non-critical errors (AbortError, 503 timeout, etc.)
-      const isAbortError = error instanceof Error && error.name === 'AbortError';
-      const isTimeoutError = error instanceof Error && (error.message.includes('503') || error.message.includes('timeout'));
-      // Only log actual failures, not transient overload errors
-      if (!isAbortError && !isTimeoutError) {
-        this.logger.debug('Ollama API call failed (timeout/overload - retrying)', {
-          error: String(error),
-          model: this.config.modelName,
-        });
-      }
-      throw error;
-    }
-  }
-
-  /**
-   * Parse Ollama response into GameCommand array
-   *
-   * Strategy: Look for action keywords (MOVE, GATHER, ATTACK, EXPAND)
-   * For each keyword found, generate a corresponding command.
-   */
-  private parseCommands(response: string, worldState: WorldState): GameCommand[] {
-    const commands: GameCommand[] = [];
-
-    // Look for action instructions in multiple formats:
-    // - "1. MOVE - ..." (primary format we prompt for)
-    // - "1. "Move ..." (alternative format some models use)
-    // - "MOVE ..." (unnumbered format)
-    const lines = response.split('\n');
-
-    this.logger.debug('Parsing Ollama response for commands', {
-      responsePreview: response.substring(0, 200),
-      totalLines: lines.length,
-    });
-
-    for (const line of lines) {
-      const trimmed = line.trim();
-      if (!trimmed) continue;
-
-      // Format 1: "1. MOVE - ..." or "1. ATTACK - ..."
-      // Format 2: "1. "Move ..." (quoted format)
-      // Format 3: "MOVE - ..." (unnumbered)
-      const actionMatch = trimmed.match(/(?:^\d+\.\s+)?["\']?(MOVE|GATHER|ATTACK|DEFEND|BUILD|TRAIN|RESEARCH)/i);
-
-      if (actionMatch) {
-        const action = actionMatch[1].toUpperCase();
-
-        if (action === 'MOVE' || action === 'DEFEND') {
-          const moveCmd = this.createMoveCommand(worldState);
-          if (moveCmd) {
-            commands.push(moveCmd);
-            this.logger.info('✓ Parsed MOVE command from Ollama', { line: trimmed.substring(0, 80) });
-          }
-        } else if (action === 'BUILD') {
-          const buildCmd = this.createBuildCommand(worldState);
-          if (buildCmd) {
-            commands.push(buildCmd);
-            this.logger.info('✓ Parsed BUILD command from Ollama', { line: trimmed.substring(0, 80) });
-          }
-        } else if (action === 'TRAIN') {
-          const trainCmd = this.createTrainCommand(worldState);
-          if (trainCmd) {
-            commands.push(trainCmd);
-            this.logger.info('✓ Parsed TRAIN command from Ollama', { line: trimmed.substring(0, 80) });
-          }
-        } else if (action === 'GATHER' || action === 'RESEARCH') {
-          const gatherCmd = this.createGatherCommand(worldState);
-          if (gatherCmd) {
-            commands.push(gatherCmd);
-            this.logger.info(`✓ Parsed ${action} command from Ollama`, { line: trimmed.substring(0, 80) });
-          }
-        } else if (action === 'ATTACK') {
-          const attackCmd = this.createAttackCommand(worldState);
-          if (attackCmd) {
-            commands.push(attackCmd);
-            this.logger.info('✓ Parsed ATTACK command from Ollama', { line: trimmed.substring(0, 80) });
-          }
-        }
-
-        // Limit to 3 commands per tick (allows more diverse actions)
-        if (commands.length >= 3) break;
-      }
-    }
-
-    if (commands.length === 0) {
-      this.logger.warn('⚠️ No commands parsed from Ollama response', {
-        responseLength: response.length,
-        supportedFormats: ['1. MOVE - ...', '1. "Move ...', 'MOVE - ...'],
-        firstLines: lines.slice(0, 3).join(' | '),
-      });
-    }
-
-    return commands;
-  }
-
-  /**
-   * Create a Move command from available units
-   *
-   * IMPORTANT: Filter for military/support units only, not Gaia creatures
-   * Gaia fauna (sheep, deer) have owner=0 and will not respond to commands
-   */
-  private createMoveCommand(worldState: WorldState): GameCommand | null {
-    // Get all units first
-    const allUnits = worldState.agents
-      .filter(a => (a.customData as any)?.type === 'unit')
-      .filter(a => a.controlledByPlayerId?.toString() === this.playerID.toString());
-
-    // Debug log what we found
-    const templateSummary = allUnits.map(u => {
-      const template = (u.customData as any)?.template || 'unknown';
-      const isFauna = template.includes('fauna') || template.includes('flora');
-      return `${(u.customData as any)?.entityId}:${template}(fauna=${isFauna})`;
-    }).join(' | ');
-
-    this.logger.debug('Unit selection for Move command', {
-      allUnitsCount: allUnits.length,
-      unitSummary: templateSummary,
-    });
-
-    // Filter out fauna
-    const units = allUnits
-      .filter(u => {
-        const template = (u.customData as any)?.template || '';
-        return !template.includes('fauna') && !template.includes('flora');
-      })
-      .slice(0, 3); // Limit to first 3 units
-
-    this.logger.debug('After fauna filter', {
-      selectedCount: units.length,
-      selectedIds: units.map(u => (u.customData as any)?.entityId).join(','),
-    });
-
-    if (units.length === 0) return null;
-
-    const unitIds = units
-      .map(u => (u.customData as any)?.entityId)
-      .filter(Boolean) as number[];
-
-    if (unitIds.length === 0) return null;
-
-    // Move to a strategic location (not center, but towards resources)
-    const targetX = Math.random() * ((worldState.map?.width || 256) * 0.8) + 50;
-    const targetZ = Math.random() * ((worldState.map?.height || 256) * 0.8) + 50;
-
-    return {
-      playerID: this.playerID,
-      json_cmd: {
-        type: 'move',
-        entities: unitIds,
-        x: Math.round(targetX),
-        z: Math.round(targetZ),
-        queued: false,
-      },
-    };
-  }
-
-  /**
-   * Create a Gather command from available resources
-   */
-  private createGatherCommand(worldState: WorldState): GameCommand | null {
-    const gatherUnits = worldState.agents
-      .filter(a => (a.customData as any)?.type === 'unit')
-      .filter(a => a.controlledByPlayerId?.toString() === this.playerID.toString())
-      // Skip Gaia fauna - only use actual player-controlled units
-      .filter(u => {
-        const template = (u.customData as any)?.template || '';
-        return !template.includes('fauna') && !template.includes('flora');
-      })
-      .slice(0, 2);
-
-    const resources = worldState.agents
-      .filter(a => (a.customData as any)?.type === 'resource')
-      .slice(0, 1);
-
-    if (gatherUnits.length === 0 || resources.length === 0) return null;
-
-    const unitIds = gatherUnits.map(u => (u.customData as any)?.entityId).filter(Boolean) as number[];
-    const resourceId = (resources[0].customData as any)?.entityId;
-
-    if (unitIds.length === 0 || !resourceId) return null;
-
-    return {
-      playerID: this.playerID,
-      json_cmd: {
-        type: 'gather',
-        entities: unitIds,
-        target: resourceId,
-        queued: false,
-      },
-    };
-  }
-
-  /**
-   * Create a Build command for new structures (barracks, houses, economic buildings)
-   *
-   * BUILD is critical for winning - it produces units and infrastructure.
-   * We build near the player's existing town center, trying different building types.
-   */
-  private createBuildCommand(worldState: WorldState): GameCommand | null {
-    // Find our buildings to build near them
-    const friendlyBuildings = worldState.agents
-      .filter(a => (a.customData as any)?.type === 'building')
-      .filter(a => a.controlledByPlayerId?.toString() === this.playerID.toString());
-
-    if (friendlyBuildings.length === 0) {
-      this.logger.debug('No friendly buildings found to build near');
-      return null;
-    }
-
-    // Build near our first building (town center)
-    const existingBuilding = friendlyBuildings[0];
-    const baseX = (existingBuilding.customData as any)?.positionRaw?.x || 200;
-    const baseZ = (existingBuilding.customData as any)?.positionRaw?.z || 200;
-
-    // Pick a random offset from base to avoid overlap
-    const offsetX = (Math.random() - 0.5) * 80;
-    const offsetZ = (Math.random() - 0.5) * 80;
-
-    // Prioritize barracks (produces soldiers) then houses/storage (support economy)
-    // Support multiple civilization building names
-    const buildingTypes = [
-      'structures/athen_barracks',          // Athenian barracks
-      'structures/mace_barracks',           // Macedonian barracks (fallback)
-      'structures/pers_barracks',           // Persian barracks (fallback)
-      'structures/barracks',                // Generic barracks
-      'structures/house',                   // House for population
-      'structures/storage_house',           // Storage house for resources
-      'structures/warehouse',               // Warehouse (fallback)
-    ];
-
-    const buildingType = buildingTypes[Math.floor(Math.random() * buildingTypes.length)];
-
-    this.logger.info('Building structure', {
-      type: buildingType,
-      position: { x: Math.round(baseX + offsetX), z: Math.round(baseZ + offsetZ) },
-    });
-
-    return {
-      playerID: this.playerID,
-      json_cmd: {
-        type: 'build',
-        template: buildingType,
-        x: Math.round(baseX + offsetX),
-        z: Math.round(baseZ + offsetZ),
-        angle: 0,
-        queued: false,
-      },
-    };
-  }
-
-  /**
-   * Create a Train command - order buildings to produce units
-   *
-   * TRAIN is the primary win condition - more units = victory!
-   * We find ANY production building (barracks, stables, temples) and order unit production.
-   */
-  private createTrainCommand(worldState: WorldState): GameCommand | null {
-    // Find all buildings that might produce units
-    const allBuildings = worldState.agents
-      .filter(a => (a.customData as any)?.type === 'building')
-      .filter(a => a.controlledByPlayerId?.toString() === this.playerID.toString());
-
-    // Log what buildings we have
-    if (allBuildings.length > 0) {
-      const buildingTemplates = allBuildings.map(b => (b.customData as any)?.template || 'unknown');
-      this.logger.debug('Available buildings for training', {
-        count: allBuildings.length,
-        templates: buildingTemplates.join(', '),
-      });
-    }
-
-    // Find production buildings (barracks, stables, temples, ranges)
-    const productionBuildings = allBuildings
-      .filter(b => {
-        const template = (b.customData as any)?.template || '';
-        return template.includes('barracks') ||
-               template.includes('stable') ||
-               template.includes('range') ||
-               template.includes('temple') ||
-               template.includes('armory');
-      });
-
-    if (productionBuildings.length === 0) {
-      this.logger.debug('No production buildings found yet', {
-        totalBuildings: allBuildings.length,
-      });
-      return null;
-    }
-
-    // Pick first available production building
-    const productionBuilding = productionBuildings[0];
-    const buildingId = (productionBuilding.customData as any)?.entityId;
-    if (!buildingId) return null;
-
-    // Train different unit types - support multiple civilizations
-    const unitTypes = [
-      'units/athen_infantry_swordsman_b',  // Athenian infantry
-      'units/athen_cavalry',                // Athenian cavalry
-      'units/athen_ranged',                 // Athenian ranged
-      'units/mace_cavalry',                 // Macedonian cavalry (fallback)
-      'units/pers_cavalry',                 // Persian cavalry (fallback)
-    ];
-
-    const unitType = unitTypes[Math.floor(Math.random() * unitTypes.length)];
-
-    this.logger.info('Queueing unit training', {
-      building: (productionBuilding.customData as any)?.template,
-      buildingId,
-      unit: unitType,
-    });
-
-    return {
-      playerID: this.playerID,
-      json_cmd: {
-        type: 'train',
-        building: buildingId,
-        template: unitType,
-        queued: true,
-      },
-    };
-  }
-
-  /**
-   * Create an Attack command against enemy units
-   */
-  private createAttackCommand(worldState: WorldState): GameCommand | null {
-    const attackUnits = worldState.agents
-      .filter(a => (a.customData as any)?.type === 'unit')
-      .filter(a => a.controlledByPlayerId?.toString() === this.playerID.toString())
-      // Skip Gaia fauna - only use actual player-controlled units
-      .filter(u => {
-        const template = (u.customData as any)?.template || '';
-        return !template.includes('fauna') && !template.includes('flora');
-      })
-      .slice(0, 2);
-
-    const enemyUnits = worldState.agents
-      .filter(a => (a.customData as any)?.type === 'unit')
-      .filter(a => a.controlledByPlayerId?.toString() !== '1')
-      .slice(0, 1);
-
-    if (attackUnits.length === 0 || enemyUnits.length === 0) return null;
-
-    const unitIds = attackUnits.map(u => (u.customData as any)?.entityId).filter(Boolean) as number[];
-    const targetId = (enemyUnits[0].customData as any)?.entityId;
-
-    if (unitIds.length === 0 || !targetId) return null;
-
-    return {
-      playerID: this.playerID,
-      json_cmd: {
-        type: 'attack',
-        entities: unitIds,
-        target: targetId,
-        queued: false,
-      },
-    };
-  }
 
   /**
    * Generate metrics report
@@ -739,3 +203,4 @@ NOW OUTPUT 2-3 STRATEGIC ACTIONS FOR THIS TICK (be specific and justify why):`;
     return lines.join('\n');
   }
 }
+
