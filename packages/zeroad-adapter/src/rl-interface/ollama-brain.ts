@@ -340,52 +340,56 @@ Now output your immediate MOVE orders (be very specific):`;
   private parseCommands(response: string, worldState: WorldState): GameCommand[] {
     const commands: GameCommand[] = [];
 
-    // Look for explicit action keywords at line start
+    // Look for numbered action instructions (1. MOVE -, 2. MOVE -, etc.)
+    // This is the format we prompt Ollama to use
     const lines = response.split('\n');
 
-    this.logger.info('Parsing Ollama response for commands', {
+    this.logger.debug('Parsing Ollama response for commands', {
       responsePreview: response.substring(0, 200),
       totalLines: lines.length,
     });
 
     for (const line of lines) {
-      const trimmed = line.trim().toUpperCase();
+      const trimmed = line.trim();
 
-      // MOVE action - look for MOVE anywhere in the line, not just start
-      if (trimmed.includes('MOVE') && !trimmed.includes('IMPROVE')) {
-        const moveCmd = this.createMoveCommand(worldState);
-        if (moveCmd) {
-          commands.push(moveCmd);
-          this.logger.info('✓ Parsed MOVE command from Ollama', { line: line.trim() });
+      // Look for numbered instructions like "1. MOVE - ..." or "2. ATTACK - ..."
+      // This matches the format we ask Ollama to use in the prompt
+      const actionMatch = trimmed.match(/^\d+\.\s+(MOVE|GATHER|ATTACK|DEFEND|BUILD|TRAIN|RESEARCH)[\s\-]/i);
+
+      if (actionMatch) {
+        const action = actionMatch[1].toUpperCase();
+
+        if (action === 'MOVE' || action === 'DEFEND') {
+          const moveCmd = this.createMoveCommand(worldState);
+          if (moveCmd) {
+            commands.push(moveCmd);
+            this.logger.info('✓ Parsed MOVE command from Ollama', { line: trimmed.substring(0, 80) });
+          }
+        } else if (action === 'GATHER' || action === 'TRAIN' || action === 'BUILD' || action === 'RESEARCH') {
+          // These secondary actions get mapped to gather for now (can be expanded later)
+          const gatherCmd = this.createGatherCommand(worldState);
+          if (gatherCmd) {
+            commands.push(gatherCmd);
+            this.logger.info(`✓ Parsed ${action} command from Ollama`, { line: trimmed.substring(0, 80) });
+          }
+        } else if (action === 'ATTACK') {
+          const attackCmd = this.createAttackCommand(worldState);
+          if (attackCmd) {
+            commands.push(attackCmd);
+            this.logger.info('✓ Parsed ATTACK command from Ollama', { line: trimmed.substring(0, 80) });
+          }
         }
-      }
 
-      // GATHER action
-      if (trimmed.includes('GATHER') || trimmed.includes('RESOURCE')) {
-        const gatherCmd = this.createGatherCommand(worldState);
-        if (gatherCmd) {
-          commands.push(gatherCmd);
-          this.logger.info('✓ Parsed GATHER command from Ollama', { line: line.trim() });
-        }
+        // Limit to 2 commands per tick (reasonable for RTS AI)
+        if (commands.length >= 2) break;
       }
-
-      // ATTACK action
-      if (trimmed.includes('ATTACK') || trimmed.includes('FIGHT') || trimmed.includes('COMBAT')) {
-        const attackCmd = this.createAttackCommand(worldState);
-        if (attackCmd) {
-          commands.push(attackCmd);
-          this.logger.info('✓ Parsed ATTACK command from Ollama', { line: line.trim() });
-        }
-      }
-
-      // Limit to 2 commands per tick (reasonable for RTS AI)
-      if (commands.length >= 2) break;
     }
 
     if (commands.length === 0) {
-      this.logger.warn('⚠️ No commands parsed from Ollama response', {
+      this.logger.warn('⚠️ No numbered commands parsed from Ollama response', {
         responseLength: response.length,
-        firstWords: response.split(' ').slice(0, 20).join(' '),
+        expectedFormat: '1. MOVE - ... or 2. ATTACK - ...',
+        firstLines: lines.slice(0, 3).join(' | '),
       });
     }
 
