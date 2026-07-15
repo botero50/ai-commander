@@ -1288,85 +1288,62 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
           break;
         }
 
-        // Get decisions from BOTH AI brains every N ticks
-        // ✅ FIX: Wait for decisions BEFORE stepping game (not fire-and-forget)
-        // This ensures AI actually controls the game instead of Petra AI
-        const allCommands: any[] = [];
-
+        // Request decisions from AI brains (fire-and-forget, non-blocking)
+        // ✅ FAST: Don't wait for responses - step game immediately
+        // Collect commands from pending decisions asynchronously
         if (tick % decisionFrequency === 0) {
-          // Get P1 decision with timeout
           if (brainP1) {
-            try {
-              const decision1 = await Promise.race([
-                brainP1.decide(worldState),
-                new Promise((_, reject) =>
-                  setTimeout(() => reject(new Error('P1 decision timeout')), BRAIN_TIMEOUT)
-                ),
-              ]) as any;
-
-              if (decision1.commands && decision1.commands.length > 0) {
-                allCommands.push(...decision1.commands);
-                logger.info(`🤖 P1 decision: ${decision1.commands.length} commands`, {
-                  tick,
-                  commands: decision1.commands.map((c: any) => c.json_cmd?.type || 'unknown'),
-                });
-              } else {
-                logger.info(`⚠️ P1 decision received but NO commands (0 length)`, { tick });
-              }
-            } catch (err: any) {
-              const isAbortError = err instanceof Error && err.name === 'AbortError';
-              const isTimeoutError = err instanceof Error && err.message.includes('timeout');
-              // Suppress timeout errors - they don't affect gameplay, just log as debug
-              if (!isAbortError && !isTimeoutError) {
-                logger.warn('P1 brain decision failed', {
-                  tick,
-                  error: err instanceof Error ? err.message : String(err),
-                });
-              }
-            }
+            brainP1.decide(worldState)
+              .then((decision1: any) => {
+                if (decision1.commands && decision1.commands.length > 0) {
+                  // Send commands immediately to game
+                  client.step(decision1.commands).catch(() => {});
+                  logger.info(`🤖 P1 commands: ${decision1.commands.length}`, {
+                    tick,
+                    types: decision1.commands.map((c: any) => c.json_cmd?.type || 'unknown'),
+                  });
+                }
+              })
+              .catch((err: any) => {
+                const isAbortError = err instanceof Error && err.name === 'AbortError';
+                const isTimeoutError = err instanceof Error && (err.message.includes('503') || err.message.includes('timeout'));
+                if (!isAbortError && !isTimeoutError) {
+                  logger.warn('P1 decision failed', {
+                    tick,
+                    error: err instanceof Error ? err.message : String(err),
+                  });
+                }
+              });
           }
 
-          // Get P2 decision with timeout
           if (brainP2) {
-            try {
-              const decision2 = await Promise.race([
-                brainP2.decide(worldState),
-                new Promise((_, reject) =>
-                  setTimeout(() => reject(new Error('P2 decision timeout')), BRAIN_TIMEOUT)
-                ),
-              ]) as any;
-
-              if (decision2.commands && decision2.commands.length > 0) {
-                allCommands.push(...decision2.commands);
-                logger.info(`🤖 P2 decision: ${decision2.commands.length} commands`, {
-                  tick,
-                  commands: decision2.commands.map((c: any) => c.json_cmd?.type || 'unknown'),
-                });
-              } else {
-                logger.info(`⚠️ P2 decision received but NO commands (0 length)`, { tick });
-              }
-            } catch (err: any) {
-              const isAbortError = err instanceof Error && err.name === 'AbortError';
-              const isTimeoutError = err instanceof Error && err.message.includes('timeout');
-              // Suppress timeout errors - they don't affect gameplay, just log as debug
-              if (!isAbortError && !isTimeoutError) {
-                logger.warn('P2 brain decision failed', {
-                  tick,
-                  error: err instanceof Error ? err.message : String(err),
-                });
-              }
-            }
+            brainP2.decide(worldState)
+              .then((decision2: any) => {
+                if (decision2.commands && decision2.commands.length > 0) {
+                  // Send commands immediately to game
+                  client.step(decision2.commands).catch(() => {});
+                  logger.info(`🤖 P2 commands: ${decision2.commands.length}`, {
+                    tick,
+                    types: decision2.commands.map((c: any) => c.json_cmd?.type || 'unknown'),
+                  });
+                }
+              })
+              .catch((err: any) => {
+                const isAbortError = err instanceof Error && err.name === 'AbortError';
+                const isTimeoutError = err instanceof Error && (err.message.includes('503') || err.message.includes('timeout'));
+                if (!isAbortError && !isTimeoutError) {
+                  logger.warn('P2 decision failed', {
+                    tick,
+                    error: err instanceof Error ? err.message : String(err),
+                  });
+                }
+              });
           }
         }
 
-        // ✅ FIXED: Step game with AI commands collected above
-        // This ensures AI actually controls the game
-        if (allCommands.length > 0 && tick % 50 === 0) {
-          logger.info(`⏩ Stepping game with ${allCommands.length} total commands at tick ${tick}`);
-        } else if (allCommands.length === 0 && tick % decisionFrequency === 0) {
-          logger.info(`⏩ Stepping game with 0 commands at tick ${tick} (Petra AI takes over)`);
-        }
-        gameState = await client.step(allCommands);
+        // ✅ OPTIMIZED: Step game immediately (AI commands sent asynchronously)
+        // Game loop runs at full speed while Ollama thinks in background
+        gameState = await client.step([]);
 
         tick++;
 
