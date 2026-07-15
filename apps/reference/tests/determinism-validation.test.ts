@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { MissionAgent } from '../src/mission-agent.js';
+import { MissionAgent } from '../src/mission-agent.ts';
 
 describe('Determinism Validation', () => {
   it('should execute identical missions with identical traces', async () => {

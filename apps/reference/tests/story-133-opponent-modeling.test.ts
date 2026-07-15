@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { OpponentModel } from '../src/opponent-model.js';
+import { OpponentModel } from '../src/opponent-model.ts';
 
 describe('Story 133: Opponent Modeling', () => {
   describe('Observation Recording', () => {

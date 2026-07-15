@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { MissionAgent } from '../src/mission-agent.js';
+import { MissionAgent } from '../src/mission-agent.ts';
 
 describe('Story 117: Scouting Integration', () => {
   it('should record scouting target selection', async () => {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { StrategyProfile } from '../src/strategy-profile.js';
+import { StrategyProfile } from '../src/strategy-profile.ts';
 
 describe('Story 131: Strategy Profiles', () => {
   describe('Strategy Creation', () => {

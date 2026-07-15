@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { AIEvaluationSuite } from '../src/ai-evaluation-suite.js';
+import { AIEvaluationSuite } from '../src/ai-evaluation-suite.ts';
 
 describe('Story 129: AI Evaluation Suite', () => {
   describe('Single Game Execution', () => {

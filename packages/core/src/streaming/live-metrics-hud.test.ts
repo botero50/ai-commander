@@ -60,42 +60,48 @@ describe('Live Metrics HUD (Story 57.4)', () => {
       expect(metrics?.resources.wood).toBe(500);
     });
 
-    it('should emit metrics-update event', (done) => {
-      hud.onMetricsUpdate((update) => {
-        expect(update.type).toBe('metrics-update');
-        expect(update.players.length).toBeGreaterThan(0);
-        done();
-      });
+    it('should emit metrics-update event', () => {
+      return new Promise<void>((resolve) => {
+        hud.onMetricsUpdate((update) => {
+          expect(update.type).toBe('metrics-update');
+          expect(update.players.length).toBeGreaterThan(0);
+          resolve();
+        });
 
-      hud.updateMetrics(createObservation());
+        hud.updateMetrics(createObservation());
+      });
     });
 
-    it('should track multiple players', (done) => {
-      hud.onMetricsUpdate(() => {});
+    it('should track multiple players', () => {
+      return new Promise<void>((resolve) => {
+        hud.onMetricsUpdate(() => {});
 
-      hud.updateMetrics(createObservation(1, 'Player1'));
-      hud.updateMetrics(createObservation(2, 'Player2'));
+        hud.updateMetrics(createObservation(1, 'Player1'));
+        hud.updateMetrics(createObservation(2, 'Player2'));
 
-      const all = hud.getAllMetrics();
-      expect(all.length).toBe(2);
-      done();
+        const all = hud.getAllMetrics();
+        expect(all.length).toBe(2);
+        resolve();
+      });
     });
 
-    it('should skip duplicate ticks', (done) => {
-      let updateCount = 0;
+    it('should skip duplicate ticks', () => {
+      return new Promise<void>((resolve) => {
+        let updateCount = 0;
 
-      hud.onMetricsUpdate(() => {
-        updateCount++;
+        hud.onMetricsUpdate(() => {
+          updateCount++;
+        });
+
+        hud.updateMetrics(createObservation());
+        hud.updateMetrics(createObservation()); // Same tick
+        hud.updateMetrics(createObservation()); // Same tick again
+
+        setTimeout(() => {
+          expect(updateCount).toBe(1); // Only first update emitted
+          resolve();
+        }, 100);
       });
-
-      hud.updateMetrics(createObservation());
-      hud.updateMetrics(createObservation()); // Same tick
-      hud.updateMetrics(createObservation()); // Same tick again
-
-      setTimeout(() => {
-        expect(updateCount).toBe(1); // Only first update emitted
-        done();
-      }, 100);
     });
   });
 
@@ -249,38 +255,42 @@ describe('Live Metrics HUD (Story 57.4)', () => {
   });
 
   describe('broadcast integration', () => {
-    it('should emit broadcast-ready events', (done) => {
-      hud.onMetricsUpdate((update) => {
-        expect(update.timestamp).toBeDefined();
-        expect(update.tick).toBeDefined();
-        expect(update.players).toBeInstanceOf(Array);
+    it('should emit broadcast-ready events', () => {
+      return new Promise<void>((resolve) => {
+        hud.onMetricsUpdate((update) => {
+          expect(update.timestamp).toBeDefined();
+          expect(update.tick).toBeDefined();
+          expect(update.players).toBeInstanceOf(Array);
 
-        // Should be JSON serializable
-        expect(() => JSON.stringify(update)).not.toThrow();
-        done();
+          // Should be JSON serializable
+          expect(() => JSON.stringify(update)).not.toThrow();
+          resolve();
+        });
+
+        hud.updateMetrics(createObservation());
       });
-
-      hud.updateMetrics(createObservation());
     });
 
-    it('should handle continuous stream of observations', (done) => {
-      const updates: any[] = [];
+    it('should handle continuous stream of observations', () => {
+      return new Promise<void>((resolve) => {
+        const updates: any[] = [];
 
-      hud.onMetricsUpdate((update) => {
-        updates.push(update);
+        hud.onMetricsUpdate((update) => {
+          updates.push(update);
+        });
+
+        // Simulate continuous observations
+        for (let tick = 0; tick < 10; tick++) {
+          const obs = createObservation();
+          obs.tick = tick;
+          hud.updateMetrics(obs);
+        }
+
+        setTimeout(() => {
+          expect(updates.length).toBeGreaterThan(0);
+          resolve();
+        }, 100);
       });
-
-      // Simulate continuous observations
-      for (let tick = 0; tick < 10; tick++) {
-        const obs = createObservation();
-        obs.tick = tick;
-        hud.updateMetrics(obs);
-      }
-
-      setTimeout(() => {
-        expect(updates.length).toBeGreaterThan(0);
-        done();
-      }, 100);
     });
 
     it('should provide data for HUD overlay', () => {
@@ -298,36 +308,38 @@ describe('Live Metrics HUD (Story 57.4)', () => {
   });
 
   describe('realistic match scenario', () => {
-    it('should track player progression through match', (done) => {
-      const updates: any[] = [];
+    it('should track player progression through match', () => {
+      return new Promise<void>((resolve) => {
+        const updates: any[] = [];
 
-      hud.onMetricsUpdate((update) => {
-        updates.push(update);
+        hud.onMetricsUpdate((update) => {
+          updates.push(update);
+        });
+
+        // Early game: players building up
+        for (let tick = 0; tick < 5; tick++) {
+          const obs = createObservation();
+          obs.tick = tick * 50;
+          obs.observation.resources = {
+            wood: 300 + tick * 50,
+            stone: 200 + tick * 30,
+            food: 150 + tick * 20,
+          };
+          hud.updateMetrics(obs);
+        }
+
+        setTimeout(() => {
+          const history = hud.getMetricsHistory();
+          expect(history.length).toBeGreaterThan(0);
+
+          // Verify progression
+          const firstMetrics = history[0].metrics[0].resources.wood;
+          const lastMetrics = history[history.length - 1].metrics[0].resources.wood;
+          expect(lastMetrics).toBeGreaterThan(firstMetrics);
+
+          resolve();
+        }, 100);
       });
-
-      // Early game: players building up
-      for (let tick = 0; tick < 5; tick++) {
-        const obs = createObservation();
-        obs.tick = tick * 50;
-        obs.observation.resources = {
-          wood: 300 + tick * 50,
-          stone: 200 + tick * 30,
-          food: 150 + tick * 20,
-        };
-        hud.updateMetrics(obs);
-      }
-
-      setTimeout(() => {
-        const history = hud.getMetricsHistory();
-        expect(history.length).toBeGreaterThan(0);
-
-        // Verify progression
-        const firstMetrics = history[0].metrics[0].resources.wood;
-        const lastMetrics = history[history.length - 1].metrics[0].resources.wood;
-        expect(lastMetrics).toBeGreaterThan(firstMetrics);
-
-        done();
-      }, 100);
     });
 
     it('should support multi-player HUD display', () => {

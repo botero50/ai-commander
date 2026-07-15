@@ -76,21 +76,23 @@ describe('Stream Monitor', () => {
       expect(metrics.averageMatchDuration).toBe(1900);
     });
 
-    it('should alert on long match duration', (done) => {
-      monitor.on('alert', (alert) => {
-        if (alert.message.includes('exceeded expected duration')) {
-          expect(alert.severity).toBe('warning');
-          done();
-        }
-      });
+    it('should alert on long match duration', () => {
+      return new Promise<void>((resolve) => {
+        monitor.on('alert', (alert) => {
+          if (alert.message.includes('exceeded expected duration')) {
+            expect(alert.severity).toBe('warning');
+            resolve();
+          }
+        });
 
-      monitor.recordMatch({
-        matchNumber: 1,
-        duration: 4000,
-        startTime: Date.now(),
-        endTime: Date.now() + 4000000,
-        winner: 'Player 1',
-        statistics: { totalCommands: 100, militaryValue: 50, economyScore: 75 },
+        monitor.recordMatch({
+          matchNumber: 1,
+          duration: 4000,
+          startTime: Date.now(),
+          endTime: Date.now() + 4000000,
+          winner: 'Player 1',
+          statistics: { totalCommands: 100, militaryValue: 50, economyScore: 75 },
+        });
       });
     });
   });
@@ -132,15 +134,17 @@ describe('Stream Monitor', () => {
       expect(metrics.recoveryCount).toBe(1);
     });
 
-    it('should log recovery details', (done) => {
-      monitor.on('alert', (alert) => {
-        if (alert.message.includes('recovered')) {
-          expect(alert.severity).toBe('info');
-          done();
-        }
-      });
+    it('should log recovery details', () => {
+      return new Promise<void>((resolve) => {
+        monitor.on('alert', (alert) => {
+          if (alert.message.includes('recovered')) {
+            expect(alert.severity).toBe('info');
+            resolve();
+          }
+        });
 
-      monitor.recordRecovery('network', 3000);
+        monitor.recordRecovery('network', 3000);
+      });
     });
   });
 
@@ -152,15 +156,17 @@ describe('Stream Monitor', () => {
       expect(metrics.apiResponseTime).toBe(50);
     });
 
-    it('should alert on slow API responses', (done) => {
-      monitor.on('alert', (alert) => {
-        if (alert.message.includes('Slow API response')) {
-          expect(alert.severity).toBe('warning');
-          done();
-        }
-      });
+    it('should alert on slow API responses', () => {
+      return new Promise<void>((resolve) => {
+        monitor.on('alert', (alert) => {
+          if (alert.message.includes('Slow API response')) {
+            expect(alert.severity).toBe('warning');
+            resolve();
+          }
+        });
 
-      monitor.recordApiRequest('/metrics/current', 150);
+        monitor.recordApiRequest('/metrics/current', 150);
+      });
     });
   });
 
@@ -179,41 +185,47 @@ describe('Stream Monitor', () => {
       expect(metrics.memoryUsage).toBe(300 * 1024 * 1024);
     });
 
-    it('should alert on high memory usage', (done) => {
-      monitor.on('alert', (alert) => {
-        if (alert.message.includes('High memory usage')) {
-          expect(alert.severity).toBe('warning');
-          done();
-        }
-      });
+    it('should alert on high memory usage', () => {
+      return new Promise<void>((resolve) => {
+        monitor.on('alert', (alert) => {
+          if (alert.message.includes('High memory usage')) {
+            expect(alert.severity).toBe('warning');
+            resolve();
+          }
+        });
 
-      monitor.recordResourceUsage(45, 600 * 1024 * 1024);
+        monitor.recordResourceUsage(45, 600 * 1024 * 1024);
+      });
     });
 
-    it('should alert on high CPU usage', (done) => {
-      monitor.on('alert', (alert) => {
-        if (alert.message.includes('High CPU usage')) {
-          expect(alert.severity).toBe('warning');
-          done();
-        }
-      });
+    it('should alert on high CPU usage', () => {
+      return new Promise<void>((resolve) => {
+        monitor.on('alert', (alert) => {
+          if (alert.message.includes('High CPU usage')) {
+            expect(alert.severity).toBe('warning');
+            resolve();
+          }
+        });
 
-      monitor.recordResourceUsage(85, 250 * 1024 * 1024);
+        monitor.recordResourceUsage(85, 250 * 1024 * 1024);
+      });
     });
   });
 
   describe('uptime tracking', () => {
-    it('should track uptime', (done) => {
-      const metrics1 = monitor.getMetrics();
-      const uptime1 = metrics1.uptime;
+    it('should track uptime', () => {
+      return new Promise<void>((resolve) => {
+        const metrics1 = monitor.getMetrics();
+        const uptime1 = metrics1.uptime;
 
-      setTimeout(() => {
-        const metrics2 = monitor.getMetrics();
-        const uptime2 = metrics2.uptime;
+        setTimeout(() => {
+          const metrics2 = monitor.getMetrics();
+          const uptime2 = metrics2.uptime;
 
-        expect(uptime2).toBeGreaterThanOrEqual(uptime1);
-        done();
-      }, 100);
+          expect(uptime2).toBeGreaterThanOrEqual(uptime1);
+          resolve();
+        }, 100);
+      });
     });
   });
 
@@ -223,41 +235,45 @@ describe('Stream Monitor', () => {
       expect(health.status).toBe('healthy');
     });
 
-    it('should report degraded status with multiple warnings', (done) => {
-      monitor.recordApiRequest('/test', 150);
-      monitor.recordApiRequest('/test', 150);
-      monitor.recordApiRequest('/test', 150);
-      monitor.recordApiRequest('/test', 150);
+    it('should report degraded status with multiple warnings', () => {
+      return new Promise<void>((resolve) => {
+        monitor.recordApiRequest('/test', 150);
+        monitor.recordApiRequest('/test', 150);
+        monitor.recordApiRequest('/test', 150);
+        monitor.recordApiRequest('/test', 150);
 
-      setTimeout(() => {
-        const health = monitor.getHealthStatus();
-        expect(health.alerts.length).toBeGreaterThan(0);
-        done();
-      }, 100);
+        setTimeout(() => {
+          const health = monitor.getHealthStatus();
+          expect(health.alerts.length).toBeGreaterThan(0);
+          resolve();
+        }, 100);
+      });
     });
 
-    it('should report critical status with critical alerts', (done) => {
-      for (let i = 0; i < 15; i++) {
-        monitor.recordMatch({
-          matchNumber: i,
-          duration: 1800,
-          startTime: Date.now(),
-          endTime: Date.now() + 1800000,
-          winner: 'Player 1',
-          statistics: { totalCommands: 100, militaryValue: 50, economyScore: 75 },
-        });
-      }
+    it('should report critical status with critical alerts', () => {
+      return new Promise<void>((resolve) => {
+        for (let i = 0; i < 15; i++) {
+          monitor.recordMatch({
+            matchNumber: i,
+            duration: 1800,
+            startTime: Date.now(),
+            endTime: Date.now() + 1800000,
+            winner: 'Player 1',
+            statistics: { totalCommands: 100, militaryValue: 50, economyScore: 75 },
+          });
+        }
 
-      // Trigger many errors to create critical alert
-      for (let i = 0; i < 5; i++) {
-        monitor.recordError(new Error('Error'), 'test');
-      }
+        // Trigger many errors to create critical alert
+        for (let i = 0; i < 5; i++) {
+          monitor.recordError(new Error('Error'), 'test');
+        }
 
-      setTimeout(() => {
-        const health = monitor.getHealthStatus();
-        expect(health.alerts.length).toBeGreaterThan(0);
-        done();
-      }, 100);
+        setTimeout(() => {
+          const health = monitor.getHealthStatus();
+          expect(health.alerts.length).toBeGreaterThan(0);
+          resolve();
+        }, 100);
+      });
     });
   });
 
@@ -387,31 +403,35 @@ describe('Stream Monitor', () => {
   });
 
   describe('event emissions', () => {
-    it('should emit alert events', (done) => {
-      monitor.on('alert', (alert) => {
-        expect(alert).toHaveProperty('severity');
-        expect(alert).toHaveProperty('message');
-        expect(alert).toHaveProperty('timestamp');
-        done();
-      });
+    it('should emit alert events', () => {
+      return new Promise<void>((resolve) => {
+        monitor.on('alert', (alert) => {
+          expect(alert).toHaveProperty('severity');
+          expect(alert).toHaveProperty('message');
+          expect(alert).toHaveProperty('timestamp');
+          resolve();
+        });
 
-      monitor.recordRecovery('test', 100);
+        monitor.recordRecovery('test', 100);
+      });
     });
 
-    it('should emit multiple alert types', (done) => {
-      let alertCount = 0;
+    it('should emit multiple alert types', () => {
+      return new Promise<void>((resolve) => {
+        let alertCount = 0;
 
-      monitor.on('alert', () => {
-        alertCount++;
+        monitor.on('alert', () => {
+          alertCount++;
+        });
+
+        monitor.recordRecovery('test1', 100);
+        monitor.recordRecovery('test2', 100);
+
+        setTimeout(() => {
+          expect(alertCount).toBe(2);
+          resolve();
+        }, 100);
       });
-
-      monitor.recordRecovery('test1', 100);
-      monitor.recordRecovery('test2', 100);
-
-      setTimeout(() => {
-        expect(alertCount).toBe(2);
-        done();
-      }, 100);
     });
   });
 });

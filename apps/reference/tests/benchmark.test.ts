@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { BenchmarkSuite } from '../src/benchmark-suite.js';
-import { MissionAgent } from '../src/mission-agent.js';
+import { BenchmarkSuite } from '../src/benchmark-suite.ts';
+import { MissionAgent } from '../src/mission-agent.ts';
 
 describe('Performance Benchmarks', () => {
   describe('Tick Latency', () => {

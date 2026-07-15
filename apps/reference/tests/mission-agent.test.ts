@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { MissionAgent } from '../src/mission-agent.js';
-import { MovementPlanner } from '../src/movement-planner.js';
+import { MissionAgent } from '../src/mission-agent.ts';
+import { MovementPlanner } from '../src/movement-planner.ts';
 import type { PlanningRequest, Planner } from '@ai-commander/planner';
 import {
   createGoal,

@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { ReplayManager } from '../src/replay-manager.js';
-import { MissionAgent } from '../src/mission-agent.js';
+import { ReplayManager } from '../src/replay-manager.ts';
+import { MissionAgent } from '../src/mission-agent.ts';
 
 describe('Story 127: Replay Analysis', () => {
   describe('ReplayManager Search', () => {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { TacticalPositioning } from '../src/tactical-positioning.js';
+import { TacticalPositioning } from '../src/tactical-positioning.ts';
 
 describe('Story 113: Autonomous Tactical Positioning', () => {
   describe('Military Unit Observation', () => {

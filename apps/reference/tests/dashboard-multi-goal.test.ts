@@ -1,10 +1,10 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { MissionAgent } from '../src/mission-agent.js';
-import { DashboardServer } from '../src/dashboard-server.js';
-import { DashboardIntegration } from '../src/dashboard-integration.js';
-import { TimelineInspector } from '../src/timeline-inspector.js';
-import { GoalEvaluator } from '../src/goal-evaluator.js';
-import type { ExecutionTrace } from '../src/execution-trace.js';
+import { MissionAgent } from '../src/mission-agent.ts';
+import { DashboardServer } from '../src/dashboard-server.ts';
+import { DashboardIntegration } from '../src/dashboard-integration.ts';
+import { TimelineInspector } from '../src/timeline-inspector.ts';
+import { GoalEvaluator } from '../src/goal-evaluator.ts';
+import type { ExecutionTrace } from '../src/execution-trace.ts';
 import {
   createGoal,
   createGoalId,

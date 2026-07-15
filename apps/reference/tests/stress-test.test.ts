@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { MissionAgent } from '../src/mission-agent.js';
+import { MissionAgent } from '../src/mission-agent.ts';
 
 describe('Stress Testing', () => {
   it('should complete long-running missions without memory leaks', async () => {

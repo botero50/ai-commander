@@ -3,9 +3,9 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { TimelineInspector } from '../src/timeline-inspector.js';
-import type { ExecutionTrace } from '../src/execution-trace.js';
-import type { RuntimeMetrics } from '../src/runtime-metrics.js';
+import { TimelineInspector } from '../src/timeline-inspector.ts';
+import type { ExecutionTrace } from '../src/execution-trace.ts';
+import type { RuntimeMetrics } from '../src/runtime-metrics.ts';
 
 describe('TimelineInspector', () => {
   let inspector: TimelineInspector;

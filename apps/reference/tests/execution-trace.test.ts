@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { ExecutionTracer, formatTrace, traceToJson } from '../src/execution-trace.js';
-import { MissionAgent } from '../src/mission-agent.js';
+import { ExecutionTracer, formatTrace, traceToJson } from '../src/execution-trace.ts';
+import { MissionAgent } from '../src/mission-agent.ts';
 import {
   createGoal,
   createGoalId,

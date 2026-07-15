@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { SelfEvaluator } from '../src/self-evaluator.js';
-import { MissionAgent } from '../src/mission-agent.js';
+import { SelfEvaluator } from '../src/self-evaluator.ts';
+import { MissionAgent } from '../src/mission-agent.ts';
 
 describe('Story 136: Self-Evaluation', () => {
   describe('Match Review', () => {

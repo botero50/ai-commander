@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ArmyFormationController } from '../src/army-formations.js';
+import { ArmyFormationController } from '../src/army-formations.ts';
 import type { WorldState } from '@ai-commander/domain';
 
 describe('Story 141: Advanced Army Formations', () => {

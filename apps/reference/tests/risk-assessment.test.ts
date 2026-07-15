@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { RiskAssessor } from '../src/risk-assessment.js';
+import { RiskAssessor } from '../src/risk-assessment.ts';
 
 describe('Story 147: Risk Assessment', () => {
   const assessor = new RiskAssessor();

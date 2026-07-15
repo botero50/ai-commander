@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { CounterProducer } from '../src/counter-production.js';
+import { CounterProducer } from '../src/counter-production.ts';
 import type { WorldState } from '@ai-commander/domain';
 
 describe('Story 143: Counter Unit Production', () => {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { CombatDecisionMaker } from '../src/combat-decision.js';
+import { CombatDecisionMaker } from '../src/combat-decision.ts';
 
 describe('Story 115: Autonomous Combat Decision Making', () => {
   describe('Combat Action Decision', () => {

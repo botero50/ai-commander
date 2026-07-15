@@ -47,13 +47,13 @@ importers:
         version: file:packages/agent-runtime
       '@ai-commander/core':
         specifier: file:../../packages/core
-        version: link:../../packages/core
+        version: file:packages/core
       '@ai-commander/decision':
         specifier: file:../../packages/decision
         version: file:packages/decision
       '@ai-commander/domain':
         specifier: file:../../packages/domain
-        version: link:../../packages/domain
+        version: file:packages/domain
       '@ai-commander/engine':
         specifier: file:../../packages/engine
         version: file:packages/engine
@@ -109,57 +109,67 @@ importers:
 
   packages/adapter:
     dependencies:
-      '@ai-commander/core':
+      '@ai-commander/contracts':
         specifier: workspace:*
-        version: link:../core
-      '@ai-commander/decision':
-        specifier: workspace:*
-        version: link:../decision
-      '@ai-commander/domain':
-        specifier: workspace:*
-        version: link:../domain
-      '@ai-commander/engine':
-        specifier: workspace:*
-        version: link:../engine
-      '@ai-commander/planner':
-        specifier: workspace:*
-        version: link:../planner
+        version: link:../contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@vitest/ui':
+        specifier: ^0.34.0
+        version: 0.34.7(vitest@0.34.6)
+      vitest:
+        specifier: ^0.34.0
+        version: 0.34.6(@vitest/ui@0.34.7)
 
   packages/agent-runtime:
     dependencies:
-      '@ai-commander/adapter':
+      '@ai-commander/contracts':
         specifier: workspace:*
-        version: link:../adapter
-      '@ai-commander/brain':
+        version: link:../contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@vitest/ui':
+        specifier: ^0.34.0
+        version: 0.34.7(vitest@0.34.6)
+      vitest:
+        specifier: ^0.34.0
+        version: 0.34.6(@vitest/ui@0.34.7)
+
+  packages/analytics:
+    dependencies:
+      '@ai-commander/contracts':
         specifier: workspace:*
-        version: link:../brain
-      '@ai-commander/core':
-        specifier: workspace:*
-        version: link:../core
-      '@ai-commander/decision':
-        specifier: workspace:*
-        version: link:../decision
-      '@ai-commander/domain':
-        specifier: workspace:*
-        version: link:../domain
-      '@ai-commander/engine':
-        specifier: workspace:*
-        version: link:../engine
-      '@ai-commander/goals':
-        specifier: workspace:*
-        version: link:../goals
-      '@ai-commander/planner':
-        specifier: workspace:*
-        version: link:../planner
+        version: link:../contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@vitest/ui':
+        specifier: ^0.34.0
+        version: 0.34.7(vitest@0.34.6)
+      vitest:
+        specifier: ^0.34.0
+        version: 0.34.6(@vitest/ui@0.34.7)
 
   packages/behavior-tree:
     dependencies:
-      '@ai-commander/core':
+      '@ai-commander/contracts':
         specifier: workspace:*
-        version: link:../core
-      '@ai-commander/domain':
-        specifier: workspace:*
-        version: link:../domain
+        version: link:../contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@vitest/ui':
+        specifier: ^0.34.0
+        version: 0.34.7(vitest@0.34.6)
+      vitest:
+        specifier: ^0.34.0
+        version: 0.34.6(@vitest/ui@0.34.7)
 
   packages/benchmark-reporter:
     dependencies:
@@ -177,6 +187,16 @@ importers:
       '@anthropic-ai/sdk':
         specifier: ^0.16.0
         version: 0.16.1
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@vitest/ui':
+        specifier: ^0.34.0
+        version: 0.34.7(vitest@0.34.6)
+      vitest:
+        specifier: ^0.34.0
+        version: 0.34.6(@vitest/ui@0.34.7)
 
   packages/brain-gemini:
     dependencies:
@@ -184,14 +204,34 @@ importers:
         specifier: workspace:*
         version: link:../brain
       '@google/generative-ai':
-        specifier: ^0.3.0
-        version: 0.3.1
+        specifier: ^0.11.0
+        version: 0.11.5
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@vitest/ui':
+        specifier: ^0.34.0
+        version: 0.34.7(vitest@0.34.6)
+      vitest:
+        specifier: ^0.34.0
+        version: 0.34.6(@vitest/ui@0.34.7)
 
   packages/brain-ollama:
     dependencies:
       '@ai-commander/brain':
         specifier: workspace:*
         version: link:../brain
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@vitest/ui':
+        specifier: ^0.34.0
+        version: 0.34.7(vitest@0.34.6)
+      vitest:
+        specifier: ^0.34.0
+        version: 0.34.6(@vitest/ui@0.34.7)
 
   packages/brain-openai:
     dependencies:
@@ -201,110 +241,227 @@ importers:
       openai:
         specifier: ^4.0.0
         version: 4.104.0
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@vitest/ui':
+        specifier: ^0.34.0
+        version: 0.34.7(vitest@0.34.6)
+      vitest:
+        specifier: ^0.34.0
+        version: 0.34.6(@vitest/ui@0.34.7)
+
+  packages/broadcast:
+    dependencies:
+      '@ai-commander/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@vitest/ui':
+        specifier: ^0.34.0
+        version: 0.34.7(vitest@0.34.6)
+      vitest:
+        specifier: ^0.34.0
+        version: 0.34.6(@vitest/ui@0.34.7)
+
+  packages/cache:
+    dependencies:
+      '@ai-commander/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@vitest/ui':
+        specifier: ^0.34.0
+        version: 0.34.7(vitest@0.34.6)
+      vitest:
+        specifier: ^0.34.0
+        version: 0.34.6(@vitest/ui@0.34.7)
 
   packages/checkers-adapter:
     dependencies:
-      '@ai-commander/brain':
+      '@ai-commander/contracts':
         specifier: workspace:*
-        version: link:../brain
+        version: link:../contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@vitest/ui':
+        specifier: ^0.34.0
+        version: 0.34.7(vitest@0.34.6)
+      vitest:
+        specifier: ^0.34.0
+        version: 0.34.6(@vitest/ui@0.34.7)
 
   packages/chess-adapter:
     dependencies:
-      '@ai-commander/brain':
+      '@ai-commander/contracts':
         specifier: workspace:*
-        version: link:../brain
+        version: link:../contracts
+      chess.js:
+        specifier: ^1.0.0-beta.8
+        version: 1.4.0
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@vitest/ui':
+        specifier: ^0.34.0
+        version: 0.34.7(vitest@0.34.6)
+      vitest:
+        specifier: ^0.34.0
+        version: 0.34.6(@vitest/ui@0.34.7)
 
   packages/cli:
     dependencies:
-      '@ai-commander/benchmark-reporter':
+      '@ai-commander/contracts':
         specifier: workspace:*
-        version: link:../benchmark-reporter
-      '@ai-commander/brain':
-        specifier: workspace:*
-        version: link:../brain
-      '@ai-commander/experiment-runner':
-        specifier: workspace:*
-        version: link:../experiment-runner
-      '@ai-commander/match-runner':
-        specifier: workspace:*
-        version: link:../match-runner
-      '@ai-commander/replay-player':
-        specifier: workspace:*
-        version: link:../replay-player
-      '@ai-commander/research-dashboard':
-        specifier: workspace:*
-        version: link:../research-dashboard
-      '@ai-commander/strategy-analyzer':
-        specifier: workspace:*
-        version: link:../strategy-analyzer
-      '@ai-commander/tournament-engine':
-        specifier: workspace:*
-        version: link:../tournament-engine
+        version: link:../contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@vitest/ui':
+        specifier: ^0.34.0
+        version: 0.34.7(vitest@0.34.6)
+      vitest:
+        specifier: ^0.34.0
+        version: 0.34.6(@vitest/ui@0.34.7)
 
   packages/community: {}
 
   packages/compliance: {}
 
+  packages/concurrency:
+    dependencies:
+      '@ai-commander/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@vitest/ui':
+        specifier: ^0.34.0
+        version: 0.34.7(vitest@0.34.6)
+      vitest:
+        specifier: ^0.34.0
+        version: 0.34.6(@vitest/ui@0.34.7)
+
   packages/config:
     dependencies:
-      '@ai-commander/brain':
+      '@ai-commander/contracts':
         specifier: workspace:*
-        version: link:../brain
+        version: link:../contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@vitest/ui':
+        specifier: ^0.34.0
+        version: 0.34.7(vitest@0.34.6)
+      vitest:
+        specifier: ^0.34.0
+        version: 0.34.6(@vitest/ui@0.34.7)
 
-  packages/core: {}
+  packages/contracts: {}
+
+  packages/core:
+    dependencies:
+      '@ai-commander/domain':
+        specifier: workspace:*
+        version: link:../domain
+    devDependencies:
+      typescript:
+        specifier: ^5.0.0
+        version: 5.9.3
 
   packages/decision:
     dependencies:
-      '@ai-commander/core':
+      '@ai-commander/contracts':
         specifier: workspace:*
-        version: link:../core
-      '@ai-commander/domain':
-        specifier: workspace:*
-        version: link:../domain
-      '@ai-commander/engine':
-        specifier: workspace:*
-        version: link:../engine
-      '@ai-commander/goals':
-        specifier: workspace:*
-        version: link:../goals
-      '@ai-commander/planner':
-        specifier: workspace:*
-        version: link:../planner
+        version: link:../contracts
     devDependencies:
       '@types/node':
-        specifier: ^22.0.0
-        version: 22.20.0
-      typescript:
-        specifier: ^5.5.4
-        version: 5.9.3
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@vitest/ui':
+        specifier: ^0.34.0
+        version: 0.34.7(vitest@0.34.6)
       vitest:
-        specifier: ^2.1.9
-        version: 2.1.9(@types/node@22.20.0)
+        specifier: ^0.34.0
+        version: 0.34.6(@vitest/ui@0.34.7)
 
-  packages/domain: {}
+  packages/domain:
+    dependencies:
+      '@ai-commander/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@vitest/ui':
+        specifier: ^0.34.0
+        version: 0.34.7(vitest@0.34.6)
+      vitest:
+        specifier: ^0.34.0
+        version: 0.34.6(@vitest/ui@0.34.7)
 
-  packages/ecs: {}
+  packages/ecs:
+    dependencies:
+      '@ai-commander/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@vitest/ui':
+        specifier: ^0.34.0
+        version: 0.34.7(vitest@0.34.6)
+      vitest:
+        specifier: ^0.34.0
+        version: 0.34.6(@vitest/ui@0.34.7)
 
   packages/engine:
     dependencies:
-      '@ai-commander/core':
+      '@ai-commander/contracts':
         specifier: workspace:*
-        version: link:../core
-      '@ai-commander/domain':
-        specifier: workspace:*
-        version: link:../domain
-      '@ai-commander/ecs':
-        specifier: workspace:*
-        version: link:../ecs
+        version: link:../contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@vitest/ui':
+        specifier: ^0.34.0
+        version: 0.34.7(vitest@0.34.6)
+      vitest:
+        specifier: ^0.34.0
+        version: 0.34.6(@vitest/ui@0.34.7)
 
   packages/experiment-runner:
     dependencies:
-      '@ai-commander/brain':
+      '@ai-commander/contracts':
         specifier: workspace:*
-        version: link:../brain
-      '@ai-commander/tournament-engine':
-        specifier: workspace:*
-        version: link:../tournament-engine
+        version: link:../contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@vitest/ui':
+        specifier: ^0.34.0
+        version: 0.34.7(vitest@0.34.6)
+      vitest:
+        specifier: ^0.34.0
+        version: 0.34.6(@vitest/ui@0.34.7)
 
   packages/fake-game-adapter:
     dependencies:
@@ -336,11 +493,53 @@ importers:
         specifier: workspace:*
         version: link:../domain
 
+  packages/logging:
+    dependencies:
+      '@ai-commander/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@vitest/ui':
+        specifier: ^0.34.0
+        version: 0.34.7(vitest@0.34.6)
+      vitest:
+        specifier: ^0.34.0
+        version: 0.34.6(@vitest/ui@0.34.7)
+
   packages/match-runner:
     dependencies:
-      '@ai-commander/brain':
+      '@ai-commander/contracts':
         specifier: workspace:*
-        version: link:../brain
+        version: link:../contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@vitest/ui':
+        specifier: ^0.34.0
+        version: 0.34.7(vitest@0.34.6)
+      vitest:
+        specifier: ^0.34.0
+        version: 0.34.6(@vitest/ui@0.34.7)
+
+  packages/metrics:
+    dependencies:
+      '@ai-commander/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@vitest/ui':
+        specifier: ^0.34.0
+        version: 0.34.7(vitest@0.34.6)
+      vitest:
+        specifier: ^0.34.0
+        version: 0.34.6(@vitest/ui@0.34.7)
 
   packages/monitor:
     dependencies:
@@ -366,7 +565,55 @@ importers:
         specifier: workspace:*
         version: link:../goals
 
+  packages/plugins:
+    dependencies:
+      '@ai-commander/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@vitest/ui':
+        specifier: ^0.34.0
+        version: 0.34.7(vitest@0.34.6)
+      vitest:
+        specifier: ^0.34.0
+        version: 0.34.6(@vitest/ui@0.34.7)
+
+  packages/pool:
+    dependencies:
+      '@ai-commander/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@vitest/ui':
+        specifier: ^0.34.0
+        version: 0.34.7(vitest@0.34.6)
+      vitest:
+        specifier: ^0.34.0
+        version: 0.34.6(@vitest/ui@0.34.7)
+
   packages/profiler: {}
+
+  packages/queue:
+    dependencies:
+      '@ai-commander/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@vitest/ui':
+        specifier: ^0.34.0
+        version: 0.34.7(vitest@0.34.6)
+      vitest:
+        specifier: ^0.34.0
+        version: 0.34.6(@vitest/ui@0.34.7)
 
   packages/rating-system: {}
 
@@ -384,6 +631,22 @@ importers:
       '@ai-commander/tournament-engine':
         specifier: workspace:*
         version: link:../tournament-engine
+
+  packages/scheduler:
+    dependencies:
+      '@ai-commander/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@vitest/ui':
+        specifier: ^0.34.0
+        version: 0.34.7(vitest@0.34.6)
+      vitest:
+        specifier: ^0.34.0
+        version: 0.34.6(@vitest/ui@0.34.7)
 
   packages/server:
     dependencies:
@@ -420,7 +683,23 @@ importers:
         version: 5.9.3
       vitest:
         specifier: ^0.34.0
-        version: 0.34.6
+        version: 0.34.6(@vitest/ui@0.34.7)
+
+  packages/state-manager:
+    dependencies:
+      '@ai-commander/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@vitest/ui':
+        specifier: ^0.34.0
+        version: 0.34.7(vitest@0.34.6)
+      vitest:
+        specifier: ^0.34.0
+        version: 0.34.6(@vitest/ui@0.34.7)
 
   packages/strategy-analyzer:
     dependencies:
@@ -428,33 +707,53 @@ importers:
         specifier: workspace:*
         version: link:../match-runner
 
+  packages/stream:
+    dependencies:
+      '@ai-commander/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@vitest/ui':
+        specifier: ^0.34.0
+        version: 0.34.7(vitest@0.34.6)
+      vitest:
+        specifier: ^0.34.0
+        version: 0.34.6(@vitest/ui@0.34.7)
+
   packages/tournament-engine:
     dependencies:
-      '@ai-commander/brain':
+      '@ai-commander/contracts':
         specifier: workspace:*
-        version: link:../brain
-      '@ai-commander/match-runner':
-        specifier: workspace:*
-        version: link:../match-runner
-
-  packages/zeroad-adapter:
-    dependencies:
-      '@ai-commander/adapter':
-        specifier: file:../adapter
-        version: file:packages/adapter
-      '@ai-commander/brain':
-        specifier: file:../brain
-        version: link:../brain
-      '@ai-commander/domain':
-        specifier: file:../domain
-        version: link:../domain
-      dotenv:
-        specifier: ^17.4.2
-        version: 17.4.2
+        version: link:../contracts
     devDependencies:
-      typescript:
-        specifier: ^5.0.0
-        version: 5.9.3
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@vitest/ui':
+        specifier: ^0.34.0
+        version: 0.34.7(vitest@0.34.6)
+      vitest:
+        specifier: ^0.34.0
+        version: 0.34.6(@vitest/ui@0.34.7)
+
+  packages/utils:
+    dependencies:
+      '@ai-commander/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@vitest/ui':
+        specifier: ^0.34.0
+        version: 0.34.7(vitest@0.34.6)
+      vitest:
+        specifier: ^0.34.0
+        version: 0.34.6(@vitest/ui@0.34.7)
 
 packages:
 
@@ -464,8 +763,14 @@ packages:
   '@ai-commander/agent-runtime@file:packages/agent-runtime':
     resolution: {directory: packages/agent-runtime, type: directory}
 
+  '@ai-commander/core@file:packages/core':
+    resolution: {directory: packages/core, type: directory}
+
   '@ai-commander/decision@file:packages/decision':
     resolution: {directory: packages/decision, type: directory}
+
+  '@ai-commander/domain@file:packages/domain':
+    resolution: {directory: packages/domain, type: directory}
 
   '@ai-commander/engine@file:packages/engine':
     resolution: {directory: packages/engine, type: directory}
@@ -750,8 +1055,8 @@ packages:
     resolution: {integrity: sha512-+CNAzxglkrpNf/kKywqQfk74QjtceuOE7Qm+AF8miRvPF/wmmK5+OJOgVh3AVTT3RP2mH3+FOaxlE5v72owk0A==}
     engines: {node: ^20.19.0 || ^22.13.0 || >=24}
 
-  '@google/generative-ai@0.3.1':
-    resolution: {integrity: sha512-Zh1EK5nCWqIhxPm3K1KOM2mOwwgBvp6lkze74yTj6+Zqibtf55Db1q87cbbzWZeET3ZbNgHMYjVf2JyMM6pI7A==}
+  '@google/generative-ai@0.11.5':
+    resolution: {integrity: sha512-DviMgrnljEKh6qkDT2pVFW+NEuVhggqBUoEnyy2PNL7l4ewxXRJubk3PctC9yPl1AdRIlhqP7E076QQt+IWuTg==}
     engines: {node: '>=18.0.0'}
 
   '@humanfs/core@0.19.2':
@@ -814,6 +1119,9 @@ packages:
   '@nodelib/fs.walk@1.2.8':
     resolution: {integrity: sha512-oGB+UxlgWcgQkgwo8GcEGwemoTFt3FIO9ababBmaGwXIoBKZ+GTy0pP185beGg7Llih/NSHSV2XAs1lnznocSg==}
     engines: {node: '>= 8'}
+
+  '@polka/url@1.0.0-next.29':
+    resolution: {integrity: sha512-wwQAWhWSuHaag8c4q/KN/vCoeOJYshAIvMQwD4GpSb3OiZklFfvAgmj0VCBBImRpuF/aFgIRzllXlVX93Jevww==}
 
   '@rolldown/pluginutils@1.0.0-beta.27':
     resolution: {integrity: sha512-+d0F4MKMCbeVUJwG96uQ4SgAznZNSq93I3V+9NHA4OpvqG8mRCpGdKmK8l/dl02h2CCDHwW2FqilnTyDcAnqjA==}
@@ -1187,8 +1495,16 @@ packages:
   '@vitest/spy@2.1.9':
     resolution: {integrity: sha512-E1B35FwzXXTs9FHNK6bDszs7mtydNi5MIfUWpceJ8Xbfb1gBMscAnwLbEu+B44ed6W3XjL9/ehLPHR1fkf1KLQ==}
 
+  '@vitest/ui@0.34.7':
+    resolution: {integrity: sha512-iizUu9R5Rsvsq8FtdJ0suMqEfIsIIzziqnasMHe4VH8vG+FnZSA3UAtCHx6rLeRupIFVAVg7bptMmuvMcsn8WQ==}
+    peerDependencies:
+      vitest: '>=0.30.1 <1'
+
   '@vitest/utils@0.34.6':
     resolution: {integrity: sha512-IG5aDD8S6zlvloDsnzHw0Ut5xczlF+kv2BOTo+iXfPr54Yhi5qbVOgGB1hZaVq4iJ4C/MZ2J0y15IlsV/ZcI0A==}
+
+  '@vitest/utils@0.34.7':
+    resolution: {integrity: sha512-ziAavQLpCYS9sLOorGrFFKmy2gnfiNU0ZJ15TsMz/K92NAPS/rp9K4z6AJQQk5Y8adCy4Iwpxy7pQumQ/psnRg==}
 
   '@vitest/utils@1.6.1':
     resolution: {integrity: sha512-jOrrUvXM4Av9ZWiG1EajNto0u96kWAhJ1LmPmJhXXQx/32MecEKd10pOLYgS2BQx1TgkGhloPU1ArDW2vvaY6g==}
@@ -1325,6 +1641,9 @@ packages:
     resolution: {integrity: sha512-PAJdDJusoxnwm1VwW07VWwUN1sl7smmC3OKggvndJFadxxDRyFJBX/ggnu/KE4kQAB7a3Dp8f/YXC1FlUprWmA==}
     engines: {node: '>= 16'}
 
+  chess.js@1.4.0:
+    resolution: {integrity: sha512-BBJgrrtKQOzFLonR0l+k64A98NLemPwNsCskwb+29bRwobUa4iTm51E1kwGPbWXAcfdDa18nad6vpPPKPWarqw==}
+
   color-convert@2.0.1:
     resolution: {integrity: sha512-RRECPsj7iu/xb5oKYcsFHSppFNnsj/52OVTRKb4zP5onXwVF3zVmmToNcOfGC+CRDpfK/U584fMg38ZHCaElKQ==}
     engines: {node: '>=7.0.0'}
@@ -1405,10 +1724,6 @@ packages:
   doctrine@3.0.0:
     resolution: {integrity: sha512-yS+Q5i3hBf7GBkd4KG8a7eBNNWNGLTaEwwYWUijIYM7zrlYDM0BFXHjjPWlWZ1Rg7UaddZeIDmi9jF3HmqiQ2w==}
     engines: {node: '>=6.0.0'}
-
-  dotenv@17.4.2:
-    resolution: {integrity: sha512-nI4U3TottKAcAD9LLud4Cb7b2QztQMUEfHbvhTH09bqXTxnSie8WnjPALV/WMCrJZ6UV/qHJ6L03OqO3LcdYZw==}
-    engines: {node: '>=12'}
 
   dunder-proto@1.0.1:
     resolution: {integrity: sha512-KIN/nDJBQRcXw0MLVhZE9iQHmG68qAVIBg9CqmUYjmQIhgij9U5MFvrqkUL5FbtyyzZuOeOt0zdeRe4UY7ct+A==}
@@ -1544,6 +1859,9 @@ packages:
     peerDependenciesMeta:
       picomatch:
         optional: true
+
+  fflate@0.8.3:
+    resolution: {integrity: sha512-tbZNuJrLwGUp3zshBtdy4W+ORxZuIh8a5ilyIEQDC5rY1f3U20JMry0Ll3WBzU58EZKsEuJFXhb5gwv8CsPvgA==}
 
   file-entry-cache@6.0.1:
     resolution: {integrity: sha512-7Gps/XWymbLk2QLYK4NzpMOrYjMhdIxXuIvy2QBsLE6ljuodKvdkWs/cpyJJ3CVIVpH0Oi1Hvg1ovbMzLdFBBg==}
@@ -1837,6 +2155,10 @@ packages:
   mlly@1.8.2:
     resolution: {integrity: sha512-d+ObxMQFmbt10sretNDytwt85VrbkhhUA/JBGm1MPaWJ65Cl4wOgLaB1NYvJSZ0Ef03MMEU/0xpPMXUIQ29UfA==}
 
+  mrmime@2.0.1:
+    resolution: {integrity: sha512-Y3wQdFg2Va6etvQ5I82yUhGdsKrcYox6p7FfL1LbK2J4V01F9TGlepTIhnK24t7koZibmg82KGglhA1XK5IsLQ==}
+    engines: {node: '>=10'}
+
   ms@2.1.3:
     resolution: {integrity: sha512-6FlzubTLZG3J2a/NVCAleEhjzq5oxgHyaCU9yYXvcLsvoVaHJq/s5xXI6/XXP6tz7R9xAOtHnSO/tXtF3WRTlA==}
 
@@ -2056,6 +2378,10 @@ packages:
     resolution: {integrity: sha512-bzyZ1e88w9O1iNJbKnOlvYTrWPDl46O1bG0D3XInv+9tkPrxrN8jUUTiFlDkkmKWgn1M6CfIA13SuGqOa9Korw==}
     engines: {node: '>=14'}
 
+  sirv@2.0.4:
+    resolution: {integrity: sha512-94Bdh3cC2PKrbgSOUqTiGPWVZeSiXfKOVZNJniWoqrWrRkB1CJzBU3NEbiTsPcYy1lDsANA/THzS+9WBiy5nfQ==}
+    engines: {node: '>= 10'}
+
   slash@3.0.0:
     resolution: {integrity: sha512-g9Q1haeby36OSStwb4ntCGGGaKsaVSjQ68fBxoQcutl5fS1vuY18H3wSt3jFyFtrkx+Kz0V1G85A4MyAdDMi2Q==}
     engines: {node: '>=8'}
@@ -2132,6 +2458,10 @@ packages:
   to-regex-range@5.0.1:
     resolution: {integrity: sha512-65P7iz6X5yEr1cwcgvQxbbIw7Uk3gOy5dIdtZ4rDveLqhrdJP+Li/Hx6tyK0NEb+2GCyneCMJiGqrADCSNk8sQ==}
     engines: {node: '>=8.0'}
+
+  totalist@3.0.1:
+    resolution: {integrity: sha512-sf4i37nQ2LBx4m3wB74y+ubopq6W/dIzXg0FDGjsYnZHVa1Da8FH853wlL2gtUhg+xJXjfk3kUZS3BRoQeoQBQ==}
+    engines: {node: '>=6'}
 
   tr46@0.0.3:
     resolution: {integrity: sha512-N3WMsuqV66lT30CrXNbEjx4GEwlow3v6rr4mCcv6prnfwhS01rkgyFdjPNBYd9br7LpXV1+Emh01fHnq2Gdgrw==}
@@ -2360,36 +2690,27 @@ snapshots:
 
   '@ai-commander/adapter@file:packages/adapter':
     dependencies:
-      '@ai-commander/core': link:packages/core
-      '@ai-commander/decision': link:packages/decision
-      '@ai-commander/domain': link:packages/domain
-      '@ai-commander/engine': link:packages/engine
-      '@ai-commander/planner': link:packages/planner
+      '@ai-commander/contracts': link:packages/contracts
 
   '@ai-commander/agent-runtime@file:packages/agent-runtime':
     dependencies:
-      '@ai-commander/adapter': link:packages/adapter
-      '@ai-commander/brain': link:packages/brain
-      '@ai-commander/core': link:packages/core
-      '@ai-commander/decision': link:packages/decision
+      '@ai-commander/contracts': link:packages/contracts
+
+  '@ai-commander/core@file:packages/core':
+    dependencies:
       '@ai-commander/domain': link:packages/domain
-      '@ai-commander/engine': link:packages/engine
-      '@ai-commander/goals': link:packages/goals
-      '@ai-commander/planner': link:packages/planner
 
   '@ai-commander/decision@file:packages/decision':
     dependencies:
-      '@ai-commander/core': link:packages/core
-      '@ai-commander/domain': link:packages/domain
-      '@ai-commander/engine': link:packages/engine
-      '@ai-commander/goals': link:packages/goals
-      '@ai-commander/planner': link:packages/planner
+      '@ai-commander/contracts': link:packages/contracts
+
+  '@ai-commander/domain@file:packages/domain':
+    dependencies:
+      '@ai-commander/contracts': link:packages/contracts
 
   '@ai-commander/engine@file:packages/engine':
     dependencies:
-      '@ai-commander/core': link:packages/core
-      '@ai-commander/domain': link:packages/domain
-      '@ai-commander/ecs': link:packages/ecs
+      '@ai-commander/contracts': link:packages/contracts
 
   '@ai-commander/fake-game-adapter@file:packages/fake-game-adapter':
     dependencies:
@@ -2658,7 +2979,7 @@ snapshots:
       '@eslint/core': 1.2.1
       levn: 0.4.1
 
-  '@google/generative-ai@0.3.1': {}
+  '@google/generative-ai@0.11.5': {}
 
   '@humanfs/core@0.19.2':
     dependencies:
@@ -2720,6 +3041,8 @@ snapshots:
     dependencies:
       '@nodelib/fs.scandir': 2.1.5
       fastq: 1.20.1
+
+  '@polka/url@1.0.0-next.29': {}
 
   '@rolldown/pluginutils@1.0.0-beta.27': {}
 
@@ -3125,7 +3448,24 @@ snapshots:
     dependencies:
       tinyspy: 3.0.2
 
+  '@vitest/ui@0.34.7(vitest@0.34.6)':
+    dependencies:
+      '@vitest/utils': 0.34.7
+      fast-glob: 3.3.3
+      fflate: 0.8.3
+      flatted: 3.4.2
+      pathe: 1.1.2
+      picocolors: 1.1.1
+      sirv: 2.0.4
+      vitest: 0.34.6(@vitest/ui@0.34.7)
+
   '@vitest/utils@0.34.6':
+    dependencies:
+      diff-sequences: 29.6.3
+      loupe: 2.3.7
+      pretty-format: 29.7.0
+
+  '@vitest/utils@0.34.7':
     dependencies:
       diff-sequences: 29.6.3
       loupe: 2.3.7
@@ -3266,6 +3606,8 @@ snapshots:
 
   check-error@2.1.3: {}
 
+  chess.js@1.4.0: {}
+
   color-convert@2.0.1:
     dependencies:
       color-name: 1.1.4
@@ -3329,8 +3671,6 @@ snapshots:
   doctrine@3.0.0:
     dependencies:
       esutils: 2.0.3
-
-  dotenv@17.4.2: {}
 
   dunder-proto@1.0.1:
     dependencies:
@@ -3546,6 +3886,8 @@ snapshots:
   fdir@6.5.0(picomatch@4.0.4):
     optionalDependencies:
       picomatch: 4.0.4
+
+  fflate@0.8.3: {}
 
   file-entry-cache@6.0.1:
     dependencies:
@@ -3821,6 +4163,8 @@ snapshots:
       pkg-types: 1.3.1
       ufo: 1.6.4
 
+  mrmime@2.0.1: {}
+
   ms@2.1.3: {}
 
   nanoid@3.3.15: {}
@@ -4022,6 +4366,12 @@ snapshots:
 
   signal-exit@4.1.0: {}
 
+  sirv@2.0.4:
+    dependencies:
+      '@polka/url': 1.0.0-next.29
+      mrmime: 2.0.1
+      totalist: 3.0.1
+
   slash@3.0.0: {}
 
   source-map-js@1.2.1: {}
@@ -4076,6 +4426,8 @@ snapshots:
   to-regex-range@5.0.1:
     dependencies:
       is-number: 7.0.0
+
+  totalist@3.0.1: {}
 
   tr46@0.0.3: {}
 
@@ -4177,7 +4529,7 @@ snapshots:
       '@types/node': 22.20.0
       fsevents: 2.3.3
 
-  vitest@0.34.6:
+  vitest@0.34.6(@vitest/ui@0.34.7):
     dependencies:
       '@types/chai': 4.3.20
       '@types/chai-subset': 1.3.6(@types/chai@4.3.20)
@@ -4203,6 +4555,8 @@ snapshots:
       vite: 5.4.21(@types/node@22.20.0)
       vite-node: 0.34.6(@types/node@22.20.0)
       why-is-node-running: 2.3.0
+    optionalDependencies:
+      '@vitest/ui': 0.34.7(vitest@0.34.6)
     transitivePeerDependencies:
       - less
       - lightningcss

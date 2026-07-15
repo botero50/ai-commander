@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { PerformanceProfiler } from '../src/performance-profiler.js';
-import { MissionAgent } from '../src/mission-agent.js';
+import { PerformanceProfiler } from '../src/performance-profiler.ts';
+import { MissionAgent } from '../src/mission-agent.ts';
 
 describe('Story 128: Performance Optimization', () => {
   describe('PerformanceProfiler', () => {

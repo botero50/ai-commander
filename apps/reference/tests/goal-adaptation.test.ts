@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { MissionAgent } from '../src/mission-agent.js';
-import { TimelineInspector } from '../src/timeline-inspector.js';
+import { MissionAgent } from '../src/mission-agent.ts';
+import { TimelineInspector } from '../src/timeline-inspector.ts';
 
 describe('Story 100: Observable Goal Adaptation', () => {
   let agent: MissionAgent;

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { LongTermPlanner } from '../src/long-term-planner.js';
+import { LongTermPlanner } from '../src/long-term-planner.ts';
 
 describe('Story 134: Long-Term Planning', () => {
   describe('Plan Creation', () => {

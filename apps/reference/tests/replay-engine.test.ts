@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { ReplayEngine, formatReplayReport, replayReportToJson } from '../src/replay-engine.js';
-import { MissionAgent } from '../src/mission-agent.js';
-import { ExecutionTracer } from '../src/execution-trace.js';
+import { ReplayEngine, formatReplayReport, replayReportToJson } from '../src/replay-engine.ts';
+import { MissionAgent } from '../src/mission-agent.ts';
+import { ExecutionTracer } from '../src/execution-trace.ts';
 
 describe('Replay Engine - Trace Validation', () => {
   it('should validate a complete trace', async () => {

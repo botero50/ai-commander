@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { BotTournament } from '../src/bot-tournament.js';
+import { BotTournament } from '../src/bot-tournament.ts';
 
 describe('Story 130: Bot Tournament', () => {
   describe('Tournament Registration', () => {

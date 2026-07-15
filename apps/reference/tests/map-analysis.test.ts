@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { MapAnalyzer } from '../src/map-analysis.js';
+import { MapAnalyzer } from '../src/map-analysis.ts';
 import type { WorldState } from '@ai-commander/domain';
 
 describe('Story 138: Map Analysis', () => {

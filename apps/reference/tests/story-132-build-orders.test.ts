@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { BuildOrderManager } from '../src/build-order.js';
+import { BuildOrderManager } from '../src/build-order.ts';
 
 describe('Story 132: Build Orders', () => {
   describe('Build Order Management', () => {

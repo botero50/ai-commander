@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ArmyCoordination } from '../src/army-coordination.js';
+import { ArmyCoordination } from '../src/army-coordination.ts';
 
 describe('Story 116: Autonomous Army Coordination', () => {
   describe('Military Group Formation', () => {

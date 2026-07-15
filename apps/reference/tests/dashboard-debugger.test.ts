@@ -3,9 +3,9 @@
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import { DashboardDebugger, formatTickInspection } from '../src/dashboard-debugger.js';
-import type { ExecutionTrace } from '../src/execution-trace.js';
-import type { RuntimeMetrics } from '../src/runtime-metrics.js';
+import { DashboardDebugger, formatTickInspection } from '../src/dashboard-debugger.ts';
+import type { ExecutionTrace } from '../src/execution-trace.ts';
+import type { RuntimeMetrics } from '../src/runtime-metrics.ts';
 
 describe('DashboardDebugger', () => {
   let debugger_: DashboardDebugger;

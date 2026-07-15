@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { HypothesisEngine } from '../src/hypothesis-engine.js';
+import { HypothesisEngine } from '../src/hypothesis-engine.ts';
 
 describe('Story 144: Hypothesis Engine', () => {
   describe('Deterministic Generation', () => {

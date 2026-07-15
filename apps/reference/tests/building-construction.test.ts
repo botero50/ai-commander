@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { BuildingConstruction } from '../src/building-construction.js';
+import { BuildingConstruction } from '../src/building-construction.ts';
 
 describe('Story 111: Autonomous Building Construction', () => {
   describe('Building Observation', () => {

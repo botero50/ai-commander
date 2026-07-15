@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { InfluenceMapper } from '../src/influence-maps.js';
+import { InfluenceMapper } from '../src/influence-maps.ts';
 import type { WorldState } from '@ai-commander/domain';
 
 describe('Story 139: Influence Maps', () => {

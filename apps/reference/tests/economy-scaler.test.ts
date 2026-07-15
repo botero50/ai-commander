@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { EconomyScaler } from '../src/economy-scaler.js';
+import { EconomyScaler } from '../src/economy-scaler.ts';
 import type { WorldState } from '@ai-commander/domain';
 
 describe('EconomyScaler', () => {

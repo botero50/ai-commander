@@ -1,8 +1,8 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { ExecutionTracer } from '../src/execution-trace.js';
-import { TimelineInspector } from '../src/timeline-inspector.js';
-import { DashboardIntegration } from '../src/dashboard-integration.js';
-import { DashboardServer } from '../src/dashboard-server.js';
+import { ExecutionTracer } from '../src/execution-trace.ts';
+import { TimelineInspector } from '../src/timeline-inspector.ts';
+import { DashboardIntegration } from '../src/dashboard-integration.ts';
+import { DashboardServer } from '../src/dashboard-server.ts';
 
 describe('Story 102: Observable Resource Gathering', () => {
   let tracer: ExecutionTracer;

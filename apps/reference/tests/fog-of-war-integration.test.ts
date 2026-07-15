@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { MissionAgent } from '../src/mission-agent.js';
+import { MissionAgent } from '../src/mission-agent.ts';
 
 describe('Story 118: Fog of War Integration', () => {
   it('should record enemy discovery', async () => {

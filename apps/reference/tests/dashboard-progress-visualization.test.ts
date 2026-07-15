@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { DashboardServer } from '../src/dashboard-server.js';
-import { DashboardIntegration } from '../src/dashboard-integration.js';
-import { TimelineInspector } from '../src/timeline-inspector.js';
-import { ExecutionTracer } from '../src/execution-trace.js';
-import { RuntimeMetricsCollector } from '../src/runtime-metrics.js';
+import { DashboardServer } from '../src/dashboard-server.ts';
+import { DashboardIntegration } from '../src/dashboard-integration.ts';
+import { TimelineInspector } from '../src/timeline-inspector.ts';
+import { ExecutionTracer } from '../src/execution-trace.ts';
+import { RuntimeMetricsCollector } from '../src/runtime-metrics.ts';
 import { createGoal, createGoalId, GoalStatus, GoalPriorityLevel, createGoalPriority } from '@ai-commander/goals';
 import {
   createWorldState,

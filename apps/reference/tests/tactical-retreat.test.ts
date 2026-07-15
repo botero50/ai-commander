@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { TacticalRetreater } from '../src/tactical-retreat.js';
+import { TacticalRetreater } from '../src/tactical-retreat.ts';
 import type { WorldState } from '@ai-commander/domain';
 
 describe('Story 142: Tactical Retreat', () => {

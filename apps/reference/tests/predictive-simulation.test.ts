@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { PredictiveSimulator } from '../src/predictive-simulation.js';
+import { PredictiveSimulator } from '../src/predictive-simulation.ts';
 
 describe('Story 146: Predictive Simulation', () => {
   const simulator = new PredictiveSimulator();

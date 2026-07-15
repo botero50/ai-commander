@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
-import { RuntimeMetricsCollector, formatMetrics, metricsToJson } from '../src/runtime-metrics.js';
-import { MissionAgent } from '../src/mission-agent.js';
-import { ExecutionTracer } from '../src/execution-trace.js';
+import { RuntimeMetricsCollector, formatMetrics, metricsToJson } from '../src/runtime-metrics.ts';
+import { MissionAgent } from '../src/mission-agent.ts';
+import { ExecutionTracer } from '../src/execution-trace.ts';
 
 describe('Runtime Metrics - Performance Measurement', () => {
   it('should collect metrics from execution trace', async () => {

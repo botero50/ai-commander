@@ -323,13 +323,15 @@ describe('Stream Analytics', () => {
   });
 
   describe('event emissions', () => {
-    it('should emit match-recorded events', (done) => {
-      analytics.on('match-recorded', (match) => {
-        expect(match.matchId).toBe('match-1');
-        done();
-      });
+    it('should emit match-recorded events', () => {
+      return new Promise<void>((resolve) => {
+        analytics.on('match-recorded', (match) => {
+          expect(match.matchId).toBe('match-1');
+          resolve();
+        });
 
-      analytics.recordMatch(createMatch(1));
+        analytics.recordMatch(createMatch(1));
+      });
     });
   });
 

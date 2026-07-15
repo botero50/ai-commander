@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { DecisionExplainer } from '../src/explainable-decisions.js';
+import { DecisionExplainer } from '../src/explainable-decisions.ts';
 
 describe('Story 148: Explainable Decisions', () => {
   const explainer = new DecisionExplainer();

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { PerformanceBenchmarking } from '../src/performance-benchmarking.js';
+import { PerformanceBenchmarking } from '../src/performance-benchmarking.ts';
 
 describe('Comprehensive Performance Benchmarking', () => {
   describe('Benchmark Report Generation', () => {

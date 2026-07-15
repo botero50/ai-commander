@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { MilitaryProduction } from '../src/military-production.js';
+import { MilitaryProduction } from '../src/military-production.ts';
 
 describe('Story 112: Autonomous Military Unit Production', () => {
   describe('Production Building Observation', () => {

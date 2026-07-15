@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ReferenceApp } from '../src/app.js';
+import { ReferenceApp } from '../src/app.ts';
 import { testPlanner, testDecisionEngine } from './test-doubles.js';
 
 describe('Reference Application', () => {

@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
-import { VisibleActionDemo } from '../src/visible-action-demo.js';
-import type { IntegrationHostCallbacks } from '../src/game adapter-integration-host.js';
+import { VisibleActionDemo } from '../src/visible-action-demo.ts';
+import type { IntegrationHostCallbacks } from '../src/game adapter-integration-host.ts';
 import type { OpenRAGameState } from '@ai-commander/openra-adapter';
 
 describe('Visible Action Demo', () => {

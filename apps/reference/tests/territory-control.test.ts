@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { TerritoryController } from '../src/territory-control.js';
+import { TerritoryController } from '../src/territory-control.ts';
 import type { WorldState } from '@ai-commander/domain';
 
 describe('Story 140: Strategic Territory Control', () => {

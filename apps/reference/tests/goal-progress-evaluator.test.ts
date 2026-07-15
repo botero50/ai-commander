@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { GoalProgressEvaluator } from '../src/goal-progress-evaluator.js';
+import { GoalProgressEvaluator } from '../src/goal-progress-evaluator.ts';
 import {
   createGoal,
   createGoalId,

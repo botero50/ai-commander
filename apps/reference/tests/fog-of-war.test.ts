@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { FogOfWar } from '../src/fog-of-war.js';
+import { FogOfWar } from '../src/fog-of-war.ts';
 
 describe('Story 118: Fog of War', () => {
   describe('Exploration Tracking', () => {

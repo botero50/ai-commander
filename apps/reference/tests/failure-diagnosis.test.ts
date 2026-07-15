@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { FailureDiagnoser, RecoveryStrategy } from '../src/failure-diagnosis.js';
+import { FailureDiagnoser, RecoveryStrategy } from '../src/failure-diagnosis.ts';
 import type { Plan } from '@ai-commander/planner';
 import type { Goal } from '@ai-commander/goals';
 import {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { ThreatDetection } from '../src/threat-detection.js';
+import { ThreatDetection } from '../src/threat-detection.ts';
 
 describe('Story 114: Autonomous Threat Detection', () => {
   describe('Enemy Observation', () => {

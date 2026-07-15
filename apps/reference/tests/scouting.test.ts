@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { Scouting } from '../src/scouting.js';
+import { Scouting } from '../src/scouting.ts';
 
 describe('Story 117: Scouting', () => {
   describe('Scout Observation', () => {

@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { BeliefState } from '../src/belief-state.js';
+import { BeliefState } from '../src/belief-state.ts';
 
 describe('Story 145: Belief State', () => {
   describe('Observation Recording', () => {

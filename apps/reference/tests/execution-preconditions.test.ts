@@ -1,5 +1,5 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { ExecutionPreconditionValidator } from '../src/execution-preconditions.js';
+import { ExecutionPreconditionValidator } from '../src/execution-preconditions.ts';
 import type { Command, WorldState, Goal } from '@ai-commander/domain';
 import {
   createCommand,

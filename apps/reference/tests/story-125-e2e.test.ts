@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { MissionAgent } from '../src/mission-agent.js';
+import { MissionAgent } from '../src/mission-agent.ts';
 
 describe('Story 125: End-to-End RTS Gameplay', () => {
   it('should execute complete RTS loop: Economy → Production → Expansion → Army → Scouting → Defense → Combat', async () => {

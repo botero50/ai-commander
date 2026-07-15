@@ -1,9 +1,9 @@
 import { describe, it, expect } from 'vitest';
-import { CombatExecution } from '../src/combat-execution.js';
-import { UnitMicro } from '../src/unit-micro.js';
-import { ArmyReinforcement } from '../src/army-reinforcement.js';
-import { ArmyStaging } from '../src/army-staging.js';
-import { AttackTiming } from '../src/attack-timing.js';
+import { CombatExecution } from '../src/combat-execution.ts';
+import { UnitMicro } from '../src/unit-micro.ts';
+import { ArmyReinforcement } from '../src/army-reinforcement.ts';
+import { ArmyStaging } from '../src/army-staging.ts';
+import { AttackTiming } from '../src/attack-timing.ts';
 
 describe('Story 120-124: Combat & Army Systems', () => {
   describe('Story 120: Combat Execution', () => {

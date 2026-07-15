@@ -1,6 +1,6 @@
 import { describe, it, expect } from 'vitest';
-import { GameplayMetricsCollector } from '../src/gameplay-metrics.js';
-import { MissionAgent } from '../src/mission-agent.js';
+import { GameplayMetricsCollector } from '../src/gameplay-metrics.ts';
+import { MissionAgent } from '../src/mission-agent.ts';
 
 describe('Story 126: Gameplay Benchmarking', () => {
   describe('GameplayMetricsCollector', () => {

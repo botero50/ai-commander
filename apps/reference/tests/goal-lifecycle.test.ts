@@ -1,9 +1,9 @@
 import { describe, it, expect, beforeEach } from 'vitest';
-import { MissionAgent } from '../src/mission-agent.js';
-import { GoalLifecycleTracker } from '../src/goal-lifecycle-tracker.js';
-import { TimelineInspector } from '../src/timeline-inspector.js';
-import { DashboardServer } from '../src/dashboard-server.js';
-import { DashboardIntegration } from '../src/dashboard-integration.js';
+import { MissionAgent } from '../src/mission-agent.ts';
+import { GoalLifecycleTracker } from '../src/goal-lifecycle-tracker.ts';
+import { TimelineInspector } from '../src/timeline-inspector.ts';
+import { DashboardServer } from '../src/dashboard-server.ts';
+import { DashboardIntegration } from '../src/dashboard-integration.ts';
 
 /**
  * Story 099: Observable Goal Lifecycle

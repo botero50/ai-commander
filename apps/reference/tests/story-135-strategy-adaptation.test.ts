@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { StrategyAdapter } from '../src/strategy-adapter.js';
+import { StrategyAdapter } from '../src/strategy-adapter.ts';
 
 describe('Story 135: Strategy Adaptation', () => {
   describe('Adaptation Evaluation', () => {

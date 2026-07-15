@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { BenchmarkSuite } from '../src/benchmark-suite.js';
+import { BenchmarkSuite } from '../src/benchmark-suite.ts';
 
 describe('Benchmark Suite', () => {
   describe('Mission Benchmarking', () => {

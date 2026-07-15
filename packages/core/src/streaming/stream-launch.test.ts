@@ -202,37 +202,43 @@ describe('Stream Launch (Story 59.3)', () => {
   });
 
   describe('launcher events', () => {
-    it('should emit launched event', (done) => {
-      let launched = false;
+    it('should emit launched event', () => {
+      return new Promise<void>((resolve) => {
+        let launched = false;
 
-      const launcher = launch.getLauncher();
-      launcher.on('launched', () => {
-        launched = true;
+        const launcher = launch.getLauncher();
+        launcher.on('launched', () => {
+          launched = true;
+        });
+
+        // Setup without actually launching (which runs forever)
+        expect(launcher).toBeDefined();
+        resolve();
       });
-
-      // Setup without actually launching (which runs forever)
-      expect(launcher).toBeDefined();
-      done();
     });
 
-    it('should emit metrics-update events', (done) => {
-      const launcher = launch.getLauncher();
-      launcher.on('metrics-update', (update) => {
-        expect(update).toBeDefined();
-      });
+    it('should emit metrics-update events', () => {
+      return new Promise<void>((resolve) => {
+        const launcher = launch.getLauncher();
+        launcher.on('metrics-update', (update) => {
+          expect(update).toBeDefined();
+        });
 
-      expect(launcher).toBeDefined();
-      done();
+        expect(launcher).toBeDefined();
+        resolve();
+      });
     });
 
-    it('should emit arena-error events', (done) => {
-      const launcher = launch.getLauncher();
-      launcher.on('arena-error', (error) => {
-        expect(error).toBeDefined();
-      });
+    it('should emit arena-error events', () => {
+      return new Promise<void>((resolve) => {
+        const launcher = launch.getLauncher();
+        launcher.on('arena-error', (error) => {
+          expect(error).toBeDefined();
+        });
 
-      expect(launcher).toBeDefined();
-      done();
+        expect(launcher).toBeDefined();
+        resolve();
+      });
     });
   });
 

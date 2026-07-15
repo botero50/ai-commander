@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { LearningSystem } from '../src/learning-system.js';
+import { LearningSystem } from '../src/learning-system.ts';
 
 describe('Story 137: Learning From Outcomes', () => {
   describe('Outcome Recording', () => {

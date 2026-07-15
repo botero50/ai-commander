@@ -3,8 +3,8 @@ import {
   RuntimeInspector,
   formatRuntimeSnapshot,
   snapshotToJson,
-} from '../src/runtime-inspector.js';
-import { MissionAgent } from '../src/mission-agent.js';
+} from '../src/runtime-inspector.ts';
+import { MissionAgent } from '../src/mission-agent.ts';
 
 describe('Runtime Inspector - Snapshot Capture', () => {
   it('should capture a runtime snapshot', async () => {

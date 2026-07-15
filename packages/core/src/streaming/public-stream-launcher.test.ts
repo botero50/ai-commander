@@ -85,17 +85,19 @@ describe('Public Stream Launcher (EPIC 59.1)', () => {
       expect(status.uptime).toBeGreaterThanOrEqual(0);
     });
 
-    it('should track uptime', (done) => {
-      const status1 = launcher.getStatus();
-      const uptime1 = status1.uptime;
+    it('should track uptime', () => {
+      return new Promise<void>((resolve) => {
+        const status1 = launcher.getStatus();
+        const uptime1 = status1.uptime;
 
-      setTimeout(() => {
-        const status2 = launcher.getStatus();
-        const uptime2 = status2.uptime;
+        setTimeout(() => {
+          const status2 = launcher.getStatus();
+          const uptime2 = status2.uptime;
 
-        expect(uptime2).toBeGreaterThanOrEqual(uptime1);
-        done();
-      }, 100);
+          expect(uptime2).toBeGreaterThanOrEqual(uptime1);
+          resolve();
+        }, 100);
+      });
     });
 
     it('should include health status', () => {
@@ -153,45 +155,51 @@ describe('Public Stream Launcher (EPIC 59.1)', () => {
   });
 
   describe('broadcast integration', () => {
-    it('should emit launched event', (done) => {
-      let launched = false;
+    it('should emit launched event', () => {
+      return new Promise<void>((resolve) => {
+        let launched = false;
 
-      launcher.on('launched', () => {
-        launched = true;
+        launcher.on('launched', () => {
+          launched = true;
+        });
+
+        // Note: actual launch would start arena which runs forever
+        // This test validates event emission structure only
+        expect(launcher).toBeDefined();
+        resolve();
       });
-
-      // Note: actual launch would start arena which runs forever
-      // This test validates event emission structure only
-      expect(launcher).toBeDefined();
-      done();
     });
 
-    it('should emit metrics-update events', (done) => {
-      let metricsUpdated = false;
+    it('should emit metrics-update events', () => {
+      return new Promise<void>((resolve) => {
+        let metricsUpdated = false;
 
-      launcher.on('metrics-update', (update) => {
-        metricsUpdated = true;
-        expect(update).toHaveProperty('type');
-        expect(update).toHaveProperty('timestamp');
-        expect(update).toHaveProperty('players');
+        launcher.on('metrics-update', (update) => {
+          metricsUpdated = true;
+          expect(update).toHaveProperty('type');
+          expect(update).toHaveProperty('timestamp');
+          expect(update).toHaveProperty('players');
+        });
+
+        // Test event structure (actual updates would come during arena run)
+        expect(launcher).toBeDefined();
+        resolve();
       });
-
-      // Test event structure (actual updates would come during arena run)
-      expect(launcher).toBeDefined();
-      done();
     });
 
-    it('should handle arena errors', (done) => {
-      let arenaError = false;
+    it('should handle arena errors', () => {
+      return new Promise<void>((resolve) => {
+        let arenaError = false;
 
-      launcher.on('arena-error', (error) => {
-        arenaError = true;
-        expect(error).toBeDefined();
+        launcher.on('arena-error', (error) => {
+          arenaError = true;
+          expect(error).toBeDefined();
+        });
+
+        // Test error handling structure
+        expect(launcher).toBeDefined();
+        resolve();
       });
-
-      // Test error handling structure
-      expect(launcher).toBeDefined();
-      done();
     });
   });
 

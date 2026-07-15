@@ -6,7 +6,7 @@ import {
   LogLevel,
   AccessibilityHelper,
   InteractivePrompt,
-} from '../src/cli-enhanced.js';
+} from '../src/cli-enhanced.ts';
 import {
   AiCommanderError,
   InitializationError,
@@ -18,7 +18,7 @@ import {
   UserFacingErrors,
   ValidationErrors,
   ConfigurationErrors,
-} from '../src/error-handling.js';
+} from '../src/error-handling.ts';
 
 describe('Product Polish - CLI Enhancements', () => {
   describe('CliFormatter', () => {

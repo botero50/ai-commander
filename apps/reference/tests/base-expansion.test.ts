@@ -1,5 +1,5 @@
 import { describe, it, expect } from 'vitest';
-import { BaseExpansion } from '../src/base-expansion.js';
+import { BaseExpansion } from '../src/base-expansion.ts';
 import type { WorldState } from '@ai-commander/domain';
 
 describe('BaseExpansion', () => {

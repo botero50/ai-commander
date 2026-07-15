@@ -3,13 +3,13 @@
  */
 
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
-import { DashboardServer } from '../src/dashboard-server.js';
-import { DashboardIntegration } from '../src/dashboard-integration.js';
+import { DashboardServer } from '../src/dashboard-server.ts';
+import { DashboardIntegration } from '../src/dashboard-integration.ts';
 import type {
   DashboardRuntimeState,
   DashboardMissionState,
   DashboardWorldState,
-} from '../src/dashboard-server.js';
+} from '../src/dashboard-server.ts';
 
 describe('DashboardServer', () => {
   let server: DashboardServer;
