@@ -1,0 +1,338 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Commander - Match History</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: transparent;
+            font-family: 'Arial', sans-serif;
+            color: #ffffff;
+            padding: 8px;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+
+        .container {
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 30, 30, 0.85) 100%);
+            border: 2px solid #4ecdc4;
+            border-radius: 8px;
+            padding: 8px;
+            box-shadow: 0 0 15px rgba(78, 205, 196, 0.3), inset 0 0 10px rgba(78, 205, 196, 0.1);
+            animation: glow 2s ease-in-out infinite;
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow: hidden;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 20px rgba(78, 205, 196, 0.3), inset 0 0 10px rgba(78, 205, 196, 0.1); }
+            50% { box-shadow: 0 0 30px rgba(78, 205, 196, 0.5), inset 0 0 15px rgba(78, 205, 196, 0.2); }
+        }
+
+        .title {
+            font-size: clamp(12px, 2vw, 14px);
+            font-weight: bold;
+            margin-bottom: 6px;
+            color: #4ecdc4;
+            text-shadow: 0 0 10px rgba(78, 205, 196, 0.8);
+            letter-spacing: 1px;
+            text-align: center;
+            flex-shrink: 0;
+        }
+
+        .stats-summary {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            margin-bottom: 6px;
+            padding-bottom: 6px;
+            border-bottom: 1px solid rgba(78, 205, 196, 0.3);
+            flex-shrink: 0;
+        }
+
+        .stat-box {
+            text-align: center;
+            background: rgba(78, 205, 196, 0.1);
+            padding: 4px;
+            border-radius: 4px;
+            border: 1px solid rgba(78, 205, 196, 0.3);
+        }
+
+        .stat-label {
+            font-size: 8px;
+            color: #aaaaaa;
+            text-transform: uppercase;
+            margin-bottom: 2px;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-value {
+            font-size: clamp(10px, 1.5vw, 12px);
+            font-weight: bold;
+            color: #4ecdc4;
+            text-shadow: 0 0 8px rgba(78, 205, 196, 0.6);
+        }
+
+        .matches-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            flex: 1;
+            min-height: 0;
+            overflow-y: auto;
+        }
+
+        .matches-list::-webkit-scrollbar {
+            width: 3px;
+        }
+
+        .matches-list::-webkit-scrollbar-track {
+            background: rgba(78, 205, 196, 0.1);
+            border-radius: 2px;
+        }
+
+        .matches-list::-webkit-scrollbar-thumb {
+            background: rgba(78, 205, 196, 0.5);
+            border-radius: 2px;
+        }
+
+        .matches-list::-webkit-scrollbar-thumb:hover {
+            background: rgba(78, 205, 196, 0.8);
+        }
+
+        .match {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(78, 205, 196, 0.3);
+            border-left: 2px solid #4ecdc4;
+            padding: 6px;
+            border-radius: 4px;
+            animation: slideIn 0.5s ease-out;
+            flex-shrink: 0;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateX(-10px);
+            }
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .match-header {
+            font-size: 8px;
+            color: #888888;
+            margin-bottom: 3px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .match-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 4px;
+            font-size: clamp(9px, 1.2vw, 11px);
+        }
+
+        .player-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .player-name {
+            font-size: clamp(9px, 1.3vw, 11px);
+            font-weight: bold;
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            margin-bottom: 2px;
+        }
+
+        .rating-change {
+            font-size: 8px;
+            padding: 2px 4px;
+            border-radius: 2px;
+            display: inline-block;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .positive {
+            color: #00ff00;
+        }
+
+        .negative {
+            color: #ff6b6b;
+        }
+
+        .result {
+            text-align: center;
+            font-weight: bold;
+            font-size: clamp(8px, 1.1vw, 10px);
+            min-width: 45px;
+        }
+
+        .winner {
+            color: #00ff00;
+            text-shadow: 0 0 8px rgba(0, 255, 0, 0.6);
+        }
+
+        .loser {
+            color: #ff6b6b;
+        }
+
+        .separator {
+            color: #666666;
+            font-size: clamp(7px, 1vw, 9px);
+            margin: 0 2px;
+        }
+
+        .empty {
+            text-align: center;
+            color: #888888;
+            padding: 40px 20px;
+            font-size: 16px;
+        }
+
+        .loading {
+            text-align: center;
+            color: #4ecdc4;
+            padding: 40px 20px;
+            font-size: 18px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="title">🏆 TOP 5 MATCHES</div>
+
+        <div class="stats-summary" id="summary">
+            <div class="stat-box">
+                <div class="stat-label">Total Matches</div>
+                <div class="stat-value" id="total-matches">0</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Last Winner</div>
+                <div class="stat-value" id="last-winner" style="font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">--</div>
+            </div>
+            <div class="stat-box">
+                <div class="stat-label">Top Brain</div>
+                <div class="stat-value" id="top-brain" style="font-size: 12px; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;">--</div>
+            </div>
+        </div>
+
+        <div class="matches-list" id="matches">
+            <div class="loading">Loading match history...</div>
+        </div>
+    </div>
+
+    <script>
+        const API_URL = 'http://localhost:8080/api/match-history';
+        const RANKINGS_URL = 'http://localhost:8080/api/rankings';
+
+        function updateMatches() {
+            fetch(API_URL)
+                .then(response => response.json())
+                .then(data => {
+                    if (!data.recentMatches || data.recentMatches.length === 0) {
+                        document.getElementById('matches').innerHTML =
+                            '<div class="empty">No matches yet...</div>';
+                        return;
+                    }
+
+                    // Update summary
+                    document.getElementById('total-matches').textContent = data.totalMatches || 0;
+
+                    if (data.recentMatches.length > 0) {
+                        const lastMatch = data.recentMatches[data.recentMatches.length - 1];
+                        const lastWinner = lastMatch.winner === 'player1' ?
+                            lastMatch.player1.brainId :
+                            lastMatch.player2.brainId;
+                        document.getElementById('last-winner').textContent =
+                            lastWinner.split(':')[1] || lastWinner;
+                    }
+
+                    // Fetch rankings for top brain
+                    fetch(RANKINGS_URL)
+                        .then(r => r.json())
+                        .then(rankings => {
+                            if (rankings.length > 0) {
+                                document.getElementById('top-brain').textContent =
+                                    rankings[0].brainId.split(':')[1] || rankings[0].brainId;
+                            }
+                        })
+                        .catch(() => {});
+
+                    // Show last 5 matches
+                    const matches = data.recentMatches.slice(-5).reverse();
+                    const html = matches.map((match, idx) => {
+                        const p1 = match.player1;
+                        const p2 = match.player2;
+                        const p1Won = match.winner === 'player1';
+                        const p1Name = p1.brainId.split(':')[1] || p1.brainId;
+                        const p2Name = p2.brainId.split(':')[1] || p2.brainId;
+
+                        return `
+                            <div class="match">
+                                <div class="match-header">Match #${data.totalMatches - matches.length + idx + 1}</div>
+                                <div class="match-content">
+                                    <div class="player-info">
+                                        <div class="player-name">${p1Name}</div>
+                                        <div class="rating-change">
+                                            <span class="${p1.ratingChange >= 0 ? 'positive' : 'negative'}">
+                                                ${p1.ratingChange >= 0 ? '+' : ''}${p1.ratingChange}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="result">
+                                        <div class="${p1Won ? 'winner' : 'loser'}">
+                                            ${p1Won ? '✓ WIN' : '✗ LOSS'}
+                                        </div>
+                                    </div>
+                                    <div class="separator">vs</div>
+                                    <div class="result">
+                                        <div class="${!p1Won ? 'winner' : 'loser'}">
+                                            ${!p1Won ? '✓ WIN' : '✗ LOSS'}
+                                        </div>
+                                    </div>
+                                    <div class="player-info" style="text-align: right;">
+                                        <div class="player-name">${p2Name}</div>
+                                        <div class="rating-change">
+                                            <span class="${p2.ratingChange >= 0 ? 'positive' : 'negative'}">
+                                                ${p2.ratingChange >= 0 ? '+' : ''}${p2.ratingChange}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+
+                    document.getElementById('matches').innerHTML = html;
+                })
+                .catch(error => {
+                    console.error('Error fetching matches:', error);
+                    document.getElementById('matches').innerHTML =
+                        '<div class="loading">Connecting to arena...</div>';
+                });
+        }
+
+        // Update every 10 seconds
+        setInterval(updateMatches, 10000);
+        updateMatches();
+    </script>
+</body>
+</html>

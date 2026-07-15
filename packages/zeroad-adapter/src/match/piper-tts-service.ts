@@ -7,7 +7,7 @@
  * - No GPU needed, runs on CPU
  */
 
-import { spawn } from 'child_process';
+import { spawn, ChildProcess } from 'child_process';
 import * as path from 'path';
 import * as fs from 'fs/promises';
 import { Logger } from '../config/logger.js';
@@ -23,13 +23,23 @@ export class PiperTTSService {
   private outputDir: string;
   private voice: string;
   private rate: number;
+  private voiceDataDir: string;
   private isInitialized: boolean = false;
+  private synthesisQueue: Array<{
+    text: string;
+    voice?: string;
+    resolve: (path: string) => void;
+    reject: (error: Error) => void;
+  }> = [];
+  private isProcessing: boolean = false;
 
   constructor(logger: Logger, config: PiperConfig = {}) {
     this.logger = logger;
     this.outputDir = config.outputDir || '.data/audio/trash_talk';
-    this.voice = config.voice || 'en_US-hfc_female-medium';
+    this.voice = config.voice || 'en_US-lessac-medium';
     this.rate = config.rate || 1.0;
+    // Voice models stored in project: packages/zeroad-adapter/voices/
+    this.voiceDataDir = path.join(process.cwd(), 'packages', 'zeroad-adapter', 'voices');
   }
 
   /**
@@ -50,18 +60,76 @@ export class PiperTTSService {
   }
 
   /**
-   * Convert text to speech using Piper TTS
-   * Returns path to generated WAV file
+   * Queue text for synthesis (non-blocking)
+   * Returns path to generated WAV file once synthesized
+   * On error, returns empty string (graceful fallback)
    */
   async synthesize(text: string, voice?: string): Promise<string> {
     if (!this.isInitialized) {
       await this.initialize();
     }
 
+    return new Promise((resolve) => {
+      this.synthesisQueue.push({
+        text,
+        voice,
+        resolve: (path: string) => resolve(path),
+        reject: (error: Error) => {
+          // Log error but don't fail - synthesis is optional
+          this.logger.warn('Skipping TTS synthesis due to error', {
+            error: error.message,
+            textPreview: text.substring(0, 50),
+          });
+          resolve(''); // Return empty string on error
+        },
+      });
+      this.processQueue();
+    });
+  }
+
+  /**
+   * Process synthesis queue one at a time
+   */
+  private async processQueue(): Promise<void> {
+    if (this.isProcessing || this.synthesisQueue.length === 0) {
+      return;
+    }
+
+    this.isProcessing = true;
+    const item = this.synthesisQueue.shift();
+
+    if (!item) {
+      this.isProcessing = false;
+      return;
+    }
+
+    try {
+      const result = await this.performSynthesis(item.text, item.voice);
+      item.resolve(result);
+    } catch (error) {
+      item.reject(error as Error);
+    } finally {
+      this.isProcessing = false;
+      // Process next item in queue
+      if (this.synthesisQueue.length > 0) {
+        this.processQueue();
+      }
+    }
+  }
+
+  /**
+   * Actually perform the synthesis via piper command
+   */
+  private performSynthesis(text: string, voice?: string): Promise<string> {
     const selectedVoice = voice || this.voice;
     const timestamp = Date.now();
-    const filename = `trash_talk_${timestamp}.wav`;
+    const random = Math.random().toString(36).substr(2, 9);
+    const filename = `trash_talk_${timestamp}_${random}.wav`;
     const outputPath = path.join(this.outputDir, filename);
+
+    this.logger.debug('Piper voice data directory', {
+      voiceDataDir: this.voiceDataDir,
+    });
 
     return new Promise((resolve, reject) => {
       try {
@@ -69,49 +137,55 @@ export class PiperTTSService {
           textLength: text.length,
           voice: selectedVoice,
           outputFile: filename,
+          queueLength: this.synthesisQueue.length,
         });
 
-        // Spawn Piper TTS process
+        // Spawn Piper TTS process with proper arguments
         const piperProcess = spawn('piper', [
           '--model', selectedVoice,
+          '--data-dir', this.voiceDataDir,
           '--output-file', outputPath,
         ], {
-          stdio: ['pipe', 'pipe', 'pipe'],
+          stdio: ['pipe', 'inherit', 'inherit'],
         });
 
         // Send text to stdin
-        piperProcess.stdin?.write(text);
-        piperProcess.stdin?.end();
+        if (piperProcess.stdin) {
+          piperProcess.stdin.write(text);
+          piperProcess.stdin.end();
+        }
 
         let stderr = '';
 
-        piperProcess.stderr?.on('data', (data) => {
-          stderr += data.toString();
-        });
+        const timeout = setTimeout(() => {
+          piperProcess.kill();
+          reject(new Error(`Piper TTS timeout after 30 seconds for: ${text.substring(0, 50)}`));
+        }, 30000);
 
         piperProcess.on('close', (code) => {
+          clearTimeout(timeout);
           if (code === 0) {
             this.logger.info(`✓ Synthesized trash talk: ${filename}`, {
               textLength: text.length,
-              outputFile: filename,
             });
             resolve(outputPath);
           } else {
             const error = `Piper TTS failed (code ${code}): ${stderr}`;
-            this.logger.error('Piper TTS synthesis failed', { error, text });
+            this.logger.warn('Piper TTS synthesis failed', { error, textPreview: text.substring(0, 50) });
             reject(new Error(error));
           }
         });
 
         piperProcess.on('error', (err) => {
-          this.logger.error('Failed to spawn Piper TTS', {
+          clearTimeout(timeout);
+          this.logger.warn('Failed to spawn Piper TTS', {
             error: err.message,
             voice: selectedVoice,
           });
           reject(err);
         });
       } catch (error) {
-        this.logger.error('Error in synthesize', { error });
+        this.logger.error('Error in performSynthesis', { error });
         reject(error);
       }
     });
@@ -134,24 +208,31 @@ export class PiperTTSService {
   }
 
   /**
-   * Cleanup old audio files (older than 1 hour)
+   * Cleanup old audio files - keep only the last N files
    */
-  async cleanup(maxAgeMs: number = 3600000): Promise<void> {
+  async cleanup(maxFiles: number = 2): Promise<void> {
     try {
       if (!this.isInitialized) return;
 
       const files = await fs.readdir(this.outputDir);
-      const now = Date.now();
+      if (files.length <= maxFiles) return;
 
-      for (const file of files) {
-        const filePath = path.join(this.outputDir, file);
-        const stat = await fs.stat(filePath);
-        const age = now - stat.mtimeMs;
+      // Get file stats with modification times
+      const filesWithStats = await Promise.all(
+        files.map(async (file) => ({
+          file,
+          path: path.join(this.outputDir, file),
+          mtime: (await fs.stat(path.join(this.outputDir, file))).mtimeMs,
+        }))
+      );
 
-        if (age > maxAgeMs) {
-          await fs.unlink(filePath);
-          this.logger.debug('Cleaned up old audio file', { file, ageHours: Math.round(age / 3600000) });
-        }
+      // Sort by modification time (newest first)
+      filesWithStats.sort((a, b) => b.mtime - a.mtime);
+
+      // Remove files beyond the max
+      for (let i = maxFiles; i < filesWithStats.length; i++) {
+        await fs.unlink(filesWithStats[i].path);
+        this.logger.debug('Cleaned up old audio file', { file: filesWithStats[i].file });
       }
     } catch (error) {
       this.logger.warn('Cleanup failed', { error });

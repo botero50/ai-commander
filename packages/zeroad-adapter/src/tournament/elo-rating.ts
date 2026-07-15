@@ -17,6 +17,7 @@ export interface BrainRating {
   readonly brainId: string;
   readonly rating: number;
   readonly ratingHistory: readonly number[];
+  readonly matchCount: number; // Total matches played (not capped by history limit)
 }
 
 /**
@@ -62,6 +63,7 @@ export class EloRating {
         brainId,
         rating: this.initialRating,
         ratingHistory: [this.initialRating],
+        matchCount: 0,
       });
     }
   }
@@ -84,11 +86,31 @@ export class EloRating {
       throw new Error('Result must be between 0 (loss) and 1 (win), 0.5 for draw');
     }
 
+    // Auto-initialize brains if they don't exist yet (handles dynamic brain changes)
+    if (!this.ratings.has(brain1Id)) {
+      this.ratings.set(brain1Id, {
+        brainId: brain1Id,
+        rating: this.initialRating,
+        ratingHistory: [this.initialRating],
+        matchCount: 0,
+      });
+    }
+
+    if (!this.ratings.has(brain2Id)) {
+      this.ratings.set(brain2Id, {
+        brainId: brain2Id,
+        rating: this.initialRating,
+        ratingHistory: [this.initialRating],
+        matchCount: 0,
+      });
+    }
+
     const brain1Rating = this.ratings.get(brain1Id);
     const brain2Rating = this.ratings.get(brain2Id);
 
+    // This should never fail now, but keep as safety check
     if (!brain1Rating || !brain2Rating) {
-      throw new Error('One or both brains not found in rating system');
+      throw new Error('Failed to initialize brains in rating system');
     }
 
     const player1Score = result;
@@ -130,12 +152,14 @@ export class EloRating {
       ...brain1Rating,
       rating: player1RatingRounded,
       ratingHistory: this.appendToHistory(brain1Rating.ratingHistory, player1RatingRounded),
+      matchCount: brain1Rating.matchCount + 1,
     };
 
     const updatedBrain2: BrainRating = {
       ...brain2Rating,
       rating: player2RatingRounded,
       ratingHistory: this.appendToHistory(brain2Rating.ratingHistory, player2RatingRounded),
+      matchCount: brain2Rating.matchCount + 1,
     };
 
     this.ratings.set(brain1Id, updatedBrain1);
@@ -274,20 +298,41 @@ export class EloRating {
 
   /**
    * Load ratings from file
+   *
+   * IMPORTANT: This preserves ratings for ALL brains in the file, not just
+   * the ones currently initialized. This allows brain IDs to change between
+   * runs (e.g., switching from llama2 to mistral for Player 2) while preserving
+   * historical ratings for all brains.
    */
   async loadFromFile(filePath: string): Promise<boolean> {
     try {
       const content = await fs.readFile(filePath, 'utf8');
       const data = JSON.parse(content);
 
-      // Load ratings
-      this.ratings.clear();
+      // Store original brain IDs (currently active brains)
+      const originalBrainIds = Array.from(this.ratings.keys());
+
+      // Load ALL ratings from file - this includes both current and historical brains
       for (const entry of data.ratings) {
         this.ratings.set(entry.brainId, {
           brainId: entry.brainId,
           rating: entry.rating,
           ratingHistory: entry.ratingHistory,
+          matchCount: entry.matchCount ?? entry.ratingHistory.length - 1,
         });
+      }
+
+      // Ensure all currently initialized brains have ratings
+      // (they may have been initialized from scratch, so add them if missing from file)
+      for (const brainId of originalBrainIds) {
+        if (!this.ratings.has(brainId)) {
+          this.ratings.set(brainId, {
+            brainId,
+            rating: this.initialRating,
+            ratingHistory: [this.initialRating],
+            matchCount: 0,
+          });
+        }
       }
 
       // Load rating changes

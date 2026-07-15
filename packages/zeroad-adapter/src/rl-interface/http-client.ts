@@ -210,7 +210,12 @@ export class RLHTTPClient {
 
       return await response.text();
     } catch (error) {
-      this.logger.error('Failed to evaluate code', { error: String(error) });
+      // Evaluate failures are typically non-critical (e.g., camera operations)
+      // Log as debug instead of error to avoid alarming logs
+      this.logger.debug('Evaluate request failed (non-critical)', {
+        error: String(error),
+        codePreview: code.substring(0, 50),
+      });
       throw error;
     }
   }

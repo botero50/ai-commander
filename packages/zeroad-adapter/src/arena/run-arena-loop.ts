@@ -620,8 +620,11 @@ async function startGame(matchNumber: number): Promise<{ process: ChildProcess; 
     // Only Ollama controls the players via RL Interface commands
     // If we start with Petra, it runs in parallel even when Ollama sends no commands
     // This would mean Petra continues playing if Ollama crashes
-    '-autostart-ai=1:null',  // No AI - Ollama controls via RL Interface
-    '-autostart-ai=2:null',  // No AI - Ollama controls via RL Interface
+    // ✅ CRITICAL: RL Interface can ONLY control Player 1 (human slot)
+    // Player 1 is controlled by Ollama via RL Interface commands
+    // Player 2 must be Petra AI (0 A.D.'s built-in AI)
+    '-autostart-ai=1:null',  // Player 1: No AI - Ollama controls via RL Interface
+    '-autostart-ai=2:petra', // Player 2: Petra AI (internal 0 A.D. AI)
     '-xres=2560',           // Resolution width (2K)
     '-yres=1440',           // Resolution height (2K)
   ]);
@@ -1294,14 +1297,17 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
         }
 
         // Collect pending commands from previous tick decisions
-        const allCommands: any[] = [...pendingP1Commands, ...pendingP2Commands];
+        // ✅ CRITICAL: Only send P1 commands to RL Interface
+        // RL Interface can only control Player 1 (human slot)
+        // Player 2 is controlled by Petra AI internally, not via commands
+        const allCommands: any[] = [...pendingP1Commands];  // Only P1 commands
         pendingP1Commands = [];
-        pendingP2Commands = [];
+        pendingP2Commands = [];  // P2 commands are NOT sent (Petra controls P2)
 
         // ✅ STEP GAME WITH COMMANDS from previous tick's decisions
         // This ensures commands are actually executed
         if (allCommands.length > 0 && tick % 50 === 0) {
-          logger.info(`⏩ Stepping game with ${allCommands.length} pending commands at tick ${tick}`);
+          logger.info(`⏩ Stepping game with ${allCommands.length} P1 commands (P2 controlled by Petra) at tick ${tick}`);
         }
         gameState = await client.step(allCommands);
 

@@ -1,240 +1,269 @@
-# 🎬 AI Commander: Public Stream
+# AI Commander: AI vs AI Arena
 
-**Continuous AI vs AI strategy game streaming with professional broadcast presentation.**
+**Automated AI tournaments for 0 A.D. with Ollama decision-making and Piper TTS voice synthesis.**
 
-AI Commander is a complete, production-ready system for running infinite real AI vs AI matches in 0 A.D. with real-time metrics display and esports-quality streaming.
+Run infinite matches with real AI models competing in real gameplay. Includes automatic recovery, live metrics, and synthesized trash talk.
 
 ---
 
-## 🚀 Quick Start (3 Steps)
+## Quick Start (5 Minutes)
 
-### Step 1: Launch
-```bash
-npm run stream:launch
-```
+### Prerequisites
+- Node.js 18+
+- Python 3.8+
+- 0 A.D.
+- Ollama
+- 15+ GB free disk space
 
-### Step 2: Open Broadcast
-```
-http://localhost:3000
-```
-
-### Step 3: Watch Live
-The broadcast displays real-time AI vs AI gameplay with metrics.
+### Complete Setup
+1. **[Follow INSTALLATION.md](INSTALLATION.md)** — Detailed step-by-step guide
+2. **Run matches:**
+   ```bash
+   npx tsx packages/zeroad-adapter/src/arena/run-arena-loop.ts --matches 10
+   ```
 
 ---
 
 ## What You Get
 
-✅ **Real Gameplay** — Zero simulations, real 0 A.D., real AI decisions  
-✅ **Infinite Rotation** — Automatic maps, civilizations, match rotation  
-✅ **Auto-Recovery** — Automatic crash recovery, zero manual intervention  
-✅ **Professional Display** — Esports overlay with real-time metrics  
-✅ **REST API** — 7 endpoints for broadcast integration  
+✅ **Real Gameplay** — 0 A.D. game engine running actual matches  
+✅ **AI Decisions** — Ollama models making strategic choices every tick  
+✅ **Automatic Recovery** — Crash detection and game restart  
+✅ **Trash Talk** — AI-generated messages synthesized to voice via Piper TTS  
+✅ **Match Rotation** — Random maps and civilizations  
+✅ **ELO Ratings** — Persistent tournament rankings  
 ✅ **Production Ready** — Tested, documented, deployable  
 
 ---
 
-## Configure
+## Features
 
-```bash
-# Custom port
-STREAM_PORT=5000 npm run stream:launch
+### Core
+- Real 0 A.D. matches (not simulated)
+- Ollama AI decision-making
+- RL Interface protocol compliance
+- Per-tick command execution
 
-# Tournament mode (16 matches)
-STREAM_MATCHES=16 npm run stream:launch
+### Tournament
+- Continuous match loop with auto-restart
+- ELO rating system
+- Map/civilization rotation
+- Match result tracking
 
-# Production config
-STREAM_PORT=3000 STREAM_MATCHES=0 STREAM_LOG_INTERVAL=300 npm run stream:launch
-```
+### Experience
+- AI-generated trash talk
+- Text-to-speech voice synthesis (Piper TTS)
+- Real-time game state HUD
+- Match history and statistics
 
-**Done!** You've just watched two AI models play a complete game.
-
----
-
-## 📚 Documentation
-
-| Guide | Purpose |
-|-------|---------|
-| **[INSTALLATION.md](INSTALLATION.md)** | Complete setup guide with Ollama commands |
-| **[demo/README.md](demo/README.md)** | Demo details & configuration options |
-| **[CONTRIBUTING.md](CONTRIBUTING.md)** | How to contribute to the project |
-| **[SECURITY.md](SECURITY.md)** | Security policies |
-
----
-
-## 🎯 What You Can Do
-
-### Run a Match
-```bash
-npm run demo
-```
-Executes a complete game between two AI models with Ollama.
-
-### Configure the Match
-```bash
-# Use different models
-PLAYER1_MODEL=mistral PLAYER2_MODEL=neural-chat npm run demo
-
-# Adjust match length
-MAX_TICKS=100 npm run demo
-
-# Quick test without Ollama
-DEMO_MODE=true npm run demo
-```
-
-### View Results
-```bash
-npm run replay
-```
-Display match timeline and statistics.
+### Reliability
+- Automatic game process recovery
+- Per-component health monitoring
+- Heartbeat-based crash detection
+- Graceful error fallbacks
 
 ---
 
-## 🤖 AI Providers
+## Configuration
 
-### Local & Free (Recommended for Getting Started)
-**Ollama** — Run models on your own machine
+### Run Options
+
 ```bash
-ollama pull mistral      # 4.1 GB, high quality
-ollama pull neural-chat  # 4.1 GB, fast
-ollama pull tinyllama    # 637 MB, very fast (for testing)
+# Run N matches
+npx tsx packages/zeroad-adapter/src/arena/run-arena-loop.ts --matches 10
+
+# Run forever
+npx tsx packages/zeroad-adapter/src/arena/run-arena-loop.ts
+
+# Faster decisions (every 5 ticks instead of 1)
+npx tsx packages/zeroad-adapter/src/arena/run-arena-loop.ts --freq 5
+
+# Use different model
+OLLAMA_MODEL=neural-chat:latest npx tsx packages/zeroad-adapter/src/arena/run-arena-loop.ts
 ```
 
+### Models
+
+| Model | Size | Speed | Quality |
+|-------|------|-------|---------|
+| tinyllama | 637 MB | 🚀 Very Fast | Basic |
+| mistral | 4.1 GB | ⚡ Fast | Good |
+| neural-chat | 4.1 GB | 🐢 Slow | Excellent |
+
+### Voice Models
+
+Currently configured: `en_US-lessac-medium` (natural US English voice)
+
+Other available voices: 100+ languages at https://github.com/rhasspy/piper/blob/master/voices.json
+
 ---
 
-## ⚙️ System Requirements
-
-| Component | Minimum | Recommended |
-|-----------|---------|-------------|
-| RAM | 4 GB | 8+ GB |
-| Disk | 10 GB | 20 GB |
-| OS | Windows 10+ / macOS 10.13+ / Linux | Any |
-| GPU | Optional | NVIDIA / AMD for faster models |
-
----
-
-## 📊 Architecture
+## Architecture
 
 ```
 AI Commander
-├── Ollama Models (LLM brains)
-│   ├── mistral (4.1 GB)
-│   ├── neural-chat (4.1 GB)
-│   └── other models
+├── Game Engine (0 A.D.)
+│   ├── RL Interface (port 6000)
+│   └── Game state updates per tick
 │
-├── Match Execution
-│   ├── Player 1 observes & decides
-│   ├── Player 2 observes & decides
-│   └── Game state updates each tick
+├── AI Brains (Ollama)
+│   ├── Player 1 decisions
+│   └── Player 2 decisions
 │
-└── Output & Analysis
-    ├── replay.json (complete match state)
-    ├── logs.txt (match summary)
-    └── Statistics (scores, health, etc)
+├── Trash Talk Generator
+│   ├── Generate text messages
+│   └── Piper TTS synthesis to voice
+│
+└── Tournament Controller
+    ├── ELO ratings
+    ├── Match rotation
+    ├── Auto-recovery
+    └── Statistics tracking
 ```
 
 ---
 
-## 🆘 Troubleshooting
-
-### "Cannot connect to Ollama"
-```bash
-# Start Ollama in a terminal
-ollama serve
-
-# Verify it's running
-curl http://localhost:11434/api/tags
-```
-
-### "Model not found"
-```bash
-# Download the model
-ollama pull mistral
-
-# List downloaded models
-ollama list
-```
-
-### Out of Memory
-```bash
-# Use a smaller model
-MAX_TICKS=100 PLAYER1_MODEL=tinyllama PLAYER2_MODEL=tinyllama npm run demo
-```
-
-For more help, see [INSTALLATION.md](INSTALLATION.md).
-
----
-
-## 🏗️ Project Structure
+## File Structure
 
 ```
 ai-commander/
-├── demo/                           # Demo executable
-│   ├── simple-demo.js              # Main demo script
-│   └── README.md                   # Demo documentation
-├── packages/
-│   ├── zeroad-adapter/             # Game integration
-│   ├── match-runner/               # Match execution engine
-│   ├── brain/                      # AI decision-making
-│   ├── brain-ollama/               # Ollama integration
-│   └── ...
-├── INSTALLATION.md                 # Installation guide
-├── README.md                        # This file
-├── package.json                    # Project configuration
-└── tsconfig.json                   # TypeScript settings
+├── packages/zeroad-adapter/
+│   ├── src/arena/              # Tournament loop
+│   ├── src/rl-interface/       # Game communication
+│   ├── src/tournament/         # ELO ratings
+│   ├── src/match/              # TTS & trash talk
+│   └── src/resilience/         # Recovery logic
+│
+├── apps/web/                   # (Future) Web UI
+│
+├── INSTALLATION.md             # Setup guide
+├── README.md                   # This file
+├── SECURITY.md                 # Security policies
+└── package.json
 ```
 
 ---
 
-## 🎓 Getting Help
+## System Requirements
 
-1. **First-time setup?** → [INSTALLATION.md](INSTALLATION.md)
-2. **Demo questions?** → [demo/README.md](demo/README.md)
-3. **Contributing?** → [CONTRIBUTING.md](CONTRIBUTING.md)
-4. **Security concern?** → [SECURITY.md](SECURITY.md)
-5. **Issues or bugs?** → [GitHub Issues](https://github.com/anthropics/ai-commander/issues)
-
----
-
-## 📄 License
-
-MIT License — See LICENSE file for details.
+| Component | Minimum | Recommended |
+|-----------|---------|-------------|
+| OS | Windows 10+ / macOS 10.13+ / Linux | Any modern OS |
+| RAM | 8 GB | 16+ GB |
+| Disk | 15 GB | 25+ GB |
+| CPU | Intel i5 / M1 | i7 / M2+ |
+| GPU | Optional | NVIDIA / AMD (for faster models) |
 
 ---
 
-## 🙏 Attribution
+## Troubleshooting
 
-AI Commander is built on:
-- **Ollama** — Free local LLM inference
-- **0 A.D.** — Open-source RTS game
-- **TypeScript** — Type-safe JavaScript
-- **Node.js** — JavaScript runtime
+### Setup Issues
+See [INSTALLATION.md](INSTALLATION.md) for detailed troubleshooting
 
----
+### Common Problems
 
-## 🚀 What's Next?
+**"Game process exited"**
+- Check 0 A.D. is installed at: `C:\Program Files (x86)\0 A.D. Empires Ascendant\binaries\system\pyrogenesis.exe`
 
-After running the demo:
+**"Ollama API error"**
+- Verify Ollama is running: `ollama serve` in a separate terminal
+- Check models downloaded: `ollama list`
 
-1. **Experiment with different models:**
-   ```bash
-   PLAYER1_MODEL=llama2 PLAYER2_MODEL=mistral npm run demo
-   ```
-
-2. **Check the replay:**
-   ```bash
-   npm run replay
-   cat demo-output/logs.txt
-   ```
-
-3. **Read the contribution guide:**
-   ```bash
-   cat CONTRIBUTING.md
-   ```
-
-4. **Build your own tournament:**
-   See `packages/match-runner/README.md` for API details.
+**"piper: command not found"**
+- Install Piper: `pip install piper-tts`
+- Download voice model (see INSTALLATION.md Step 7)
 
 ---
 
-**Ready to get started?** → [INSTALLATION.md](INSTALLATION.md)
+## Development
+
+### Build
+```bash
+npm run build
+```
+
+### Project Structure
+- **zeroad-adapter** — 0 A.D. integration layer
+- **rl-interface** — Game communication protocol
+- **tournament** — ELO and match management
+- **match** — TTS and trash talk
+- **resilience** — Recovery and monitoring
+
+---
+
+## Documentation
+
+| Guide | Purpose |
+|-------|---------|
+| **[INSTALLATION.md](INSTALLATION.md)** | Complete setup with Python, Ollama, Piper TTS |
+| **[SECURITY.md](SECURITY.md)** | Security policies and considerations |
+| **[README.md](README.md)** | This file |
+
+---
+
+## What's Working
+
+✅ Continuous AI tournament with auto-restart  
+✅ Ollama decision-making per tick  
+✅ ELO rating system with persistent storage  
+✅ Trash talk generation and voice synthesis  
+✅ Automatic crash detection and recovery  
+✅ Map and civilization rotation  
+✅ Real-time game state monitoring  
+
+---
+
+## Known Limitations
+
+- Voice synthesis requires internet for model download
+- Matches run sequentially (not parallel)
+- Single-threaded AI decision-making
+- No web UI yet (terminal only)
+
+---
+
+## Performance
+
+Example match timings (2K screen, Ollama on CPU):
+- tinyllama @ freq=10: 30-40 seconds per match
+- mistral @ freq=2: 60-90 seconds per match
+- neural-chat @ freq=1: 180-240 seconds per match
+
+---
+
+## Contributing
+
+To contribute:
+1. Fork the repository
+2. Create a feature branch
+3. Make your changes
+4. Submit a pull request
+
+See [SECURITY.md](SECURITY.md) for security guidelines.
+
+---
+
+## License
+
+MIT License — See LICENSE file for details
+
+---
+
+## Support
+
+**Questions or issues?**
+1. Check [INSTALLATION.md](INSTALLATION.md) troubleshooting section
+2. Review [SECURITY.md](SECURITY.md) for security guidance
+3. Check console logs for error details
+
+---
+
+## Getting Started
+
+1. **Install everything**: Follow [INSTALLATION.md](INSTALLATION.md)
+2. **Run first tournament**: `npx tsx packages/zeroad-adapter/src/arena/run-arena-loop.ts --matches 3`
+3. **Watch the matches**: Real 0 A.D. gameplay with AI decisions
+4. **Check results**: ELO ratings and match stats in console
+
+**Let's go!** 🎮

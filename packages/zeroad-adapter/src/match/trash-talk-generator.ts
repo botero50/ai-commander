@@ -38,13 +38,20 @@ export class TrashTalkGenerator {
   private ollama_url: string = 'http://localhost:11434';
   private model: string = 'tinyllama:latest';
   private lastTalkTick: number = 0;
-  private talkFrequency: number = 100; // Generate trash talk every N ticks (3.3 seconds)
+  private talkFrequency: number = 800; // Generate trash talk every N ticks (~26 seconds at 30 FPS)
   private useOllama: boolean = true;
   private chatCallback?: (message: string) => Promise<void>;
   private lastMessage: TrashTalk | null = null; // Track last message for response generation
 
   // More natural, varied taunts covering different game aspects
   private readonly DEFAULT_TAUNTS = [
+    // Early game greetings (for first message at tick ~1-100)
+    'Let\'s go! Prepare yourself!',
+    'You\'re in for a tough match!',
+    'Game on! Let\'s see what you got!',
+    'Time to show my skill!',
+    'This is gonna be fun!',
+
     // Unit/Military focused
     'My units are shredding through your defenses!',
     'Your army can\'t match mine!',
@@ -108,9 +115,16 @@ export class TrashTalkGenerator {
   async generateTrashTalk(context: GameContext): Promise<TrashTalk | null> {
     try {
       // Generate more frequently (every 100 ticks = 3.3 seconds)
-      if (context.tick - this.lastTalkTick < this.talkFrequency) {
+      // Allow first message at tick 1 or 100
+      if (context.tick > 1 && context.tick - this.lastTalkTick < this.talkFrequency) {
         return null;
       }
+
+      this.logger.info('🗣️ Attempting to generate trash talk', {
+        tick: context.tick,
+        lastTalkTick: this.lastTalkTick,
+        frequency: this.talkFrequency,
+      });
 
       // Randomly decide who speaks
       const speaker = Math.random() > 0.5 ? 'player1' : 'player2';
@@ -171,6 +185,12 @@ export class TrashTalkGenerator {
       }
 
       if (message && message.length > 0) {
+        // ✅ NEW: Filter out messages with placeholder underscores (____) from broken LLM outputs
+        if (message.includes('____') || message.includes('__')) {
+          this.logger.debug('Filtered out message with underscores (broken LLM output)', { message });
+          return null;
+        }
+
         this.lastTalkTick = context.tick;
         const speakerName = speaker === 'player1' ? 'Ollama' : 'Petra';
         const badge = isResponse ? '🔄' : '🗣️';

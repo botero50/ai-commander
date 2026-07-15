@@ -1,0 +1,554 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Commander - Dashboard</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: transparent;
+            font-family: 'Arial', sans-serif;
+            color: #ffffff;
+            padding: 12px;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+
+        .dashboard {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            height: 100%;
+        }
+
+        .section {
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: glow 2s ease-in-out infinite;
+            min-height: 0;
+            flex-grow: 1;
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 15px rgba(78, 205, 196, 0.3); }
+            50% { box-shadow: 0 0 25px rgba(78, 205, 196, 0.5); }
+        }
+
+        /* MATCH HISTORY SECTION */
+        .match-history {
+            border: 2px solid #4ecdc4;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 30, 30, 0.85) 100%);
+            box-shadow: 0 0 15px rgba(78, 205, 196, 0.3), inset 0 0 10px rgba(78, 205, 196, 0.1);
+        }
+
+        .match-history .title {
+            color: #4ecdc4;
+            text-shadow: 0 0 10px rgba(78, 205, 196, 0.8);
+        }
+
+        /* RANKINGS SECTION */
+        .rankings {
+            border: 2px solid #00ff00;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.85) 0%, rgba(0, 20, 0, 0.85) 100%);
+            box-shadow: 0 0 15px rgba(0, 255, 0, 0.3), inset 0 0 10px rgba(0, 255, 0, 0.1);
+        }
+
+        .rankings .title {
+            color: #00ff00;
+            text-shadow: 0 0 10px rgba(0, 255, 0, 0.8);
+        }
+
+        /* AI TALK SECTION */
+        .ai-talk {
+            border: 2px solid #ff6b6b;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.85) 0%, rgba(30, 0, 0, 0.85) 100%);
+            box-shadow: 0 0 15px rgba(255, 107, 107, 0.3), inset 0 0 10px rgba(255, 107, 107, 0.1);
+        }
+
+        .ai-talk .title {
+            color: #ff6b6b;
+            text-shadow: 0 0 10px rgba(255, 107, 107, 0.8);
+        }
+
+        .title {
+            font-size: clamp(14px, 2.5vw, 16px);
+            font-weight: bold;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            flex-shrink: 0;
+        }
+
+        /* MATCH HISTORY CONTENT */
+        .matches-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+
+        .matches-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .matches-list::-webkit-scrollbar-track {
+            background: rgba(78, 205, 196, 0.1);
+        }
+
+        .matches-list::-webkit-scrollbar-thumb {
+            background: rgba(78, 205, 196, 0.5);
+            border-radius: 2px;
+        }
+
+        .match {
+            background: rgba(0, 0, 0, 0.5);
+            border: 1px solid rgba(78, 205, 196, 0.2);
+            border-left: 3px solid #4ecdc4;
+            padding: 8px;
+            border-radius: 4px;
+            font-size: clamp(11px, 1.8vw, 13px);
+        }
+
+        .match-text {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 5px;
+        }
+
+        .player-name {
+            font-weight: bold;
+            color: #ffffff;
+            font-size: clamp(10px, 1.5vw, 12px);
+            flex: 1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .vs-text {
+            color: #888;
+            font-size: clamp(9px, 1.3vw, 11px);
+        }
+
+        .rating {
+            font-size: clamp(10px, 1.5vw, 12px);
+            padding: 3px 6px;
+            border-radius: 2px;
+            background: rgba(255, 255, 255, 0.1);
+        }
+
+        .rating.positive {
+            color: #00ff00;
+        }
+
+        .rating.negative {
+            color: #ff6b6b;
+        }
+
+        .result {
+            font-weight: bold;
+            font-size: clamp(10px, 1.5vw, 12px);
+        }
+
+        .winner {
+            color: #00ff00;
+        }
+
+        .loser {
+            color: #ff6b6b;
+        }
+
+        /* RANKINGS CONTENT */
+        .rankings-list {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            overflow-y: auto;
+        }
+
+        .rankings-list::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .rankings-list::-webkit-scrollbar-track {
+            background: rgba(0, 255, 0, 0.1);
+        }
+
+        .rankings-list::-webkit-scrollbar-thumb {
+            background: rgba(0, 255, 0, 0.5);
+            border-radius: 2px;
+        }
+
+        .ranking-item {
+            background: rgba(0, 0, 0, 0.5);
+            border-radius: 4px;
+            padding: 8px;
+            border-left: 3px solid #00ff00;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+
+        .rank-number {
+            font-weight: bold;
+            font-size: clamp(14px, 2vw, 16px);
+            color: #00ff00;
+            min-width: 30px;
+            text-align: center;
+        }
+
+        .rank-info {
+            flex: 1;
+            min-width: 0;
+        }
+
+        .brain-name {
+            font-weight: bold;
+            font-size: clamp(11px, 1.6vw, 13px);
+            color: #ffffff;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .rank-stats {
+            display: flex;
+            gap: 12px;
+            font-size: clamp(9px, 1.3vw, 11px);
+            color: #aaaaaa;
+            margin-top: 3px;
+        }
+
+        .rank-stat {
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .rank-stat-label {
+            font-size: clamp(8px, 1vw, 10px);
+            color: #888888;
+            text-transform: uppercase;
+        }
+
+        .rank-stat-value {
+            color: #00ff00;
+            font-weight: bold;
+            font-size: clamp(10px, 1.4vw, 12px);
+        }
+
+        .trend-up {
+            color: #00ff00;
+        }
+
+        .trend-down {
+            color: #ff6b6b;
+        }
+
+        /* AI TALK CONTENT */
+        .messages {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column-reverse;
+            gap: 8px;
+        }
+
+        .messages::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .messages::-webkit-scrollbar-track {
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .messages::-webkit-scrollbar-thumb {
+            background: rgba(255, 107, 107, 0.5);
+            border-radius: 2px;
+        }
+
+        .message {
+            background: rgba(255, 255, 255, 0.08);
+            border-left: 3px solid;
+            padding: 10px;
+            border-radius: 4px;
+            animation: slideIn 0.3s ease-out;
+            font-size: clamp(11px, 1.8vw, 13px);
+            flex-shrink: 0;
+            min-height: 50px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.ollama {
+            border-left-color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .message.petra {
+            border-left-color: #4ecdc4;
+            background: rgba(78, 205, 196, 0.1);
+        }
+
+        .speaker {
+            font-weight: bold;
+            font-size: clamp(10px, 1.5vw, 12px);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .message.ollama .speaker {
+            color: #ff6b6b;
+        }
+
+        .message.petra .speaker {
+            color: #4ecdc4;
+        }
+
+        .text {
+            font-size: clamp(10px, 1.4vw, 12px);
+            color: #ffffff;
+            line-height: 1.3;
+        }
+
+        .empty, .loading {
+            text-align: center;
+            color: #888888;
+            padding: 15px;
+            font-size: clamp(11px, 1.6vw, 13px);
+            flex-shrink: 0;
+        }
+
+        .loading {
+            color: #00ff00;
+        }
+
+        @media (max-width: 768px) {
+            body {
+                padding: 8px;
+            }
+            .section {
+                padding: 6px;
+            }
+        }
+
+        @media (max-width: 480px) {
+            body {
+                padding: 6px;
+            }
+            .section {
+                padding: 4px;
+                border-radius: 6px;
+            }
+            .match {
+                padding: 4px;
+            }
+            .player-stats {
+                padding: 4px;
+            }
+            .message {
+                padding: 4px;
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="dashboard">
+        <!-- MATCH HISTORY -->
+        <div class="section match-history">
+            <div class="title">🏆 LAST 5 MATCHES</div>
+            <div class="matches-list" id="matches">
+                <div class="loading">Loading matches...</div>
+            </div>
+        </div>
+
+        <!-- RANKINGS -->
+        <div class="section rankings">
+            <div class="title">🏅 RANKINGS</div>
+            <div class="rankings-list" id="rankings">
+                <div class="loading">Loading rankings...</div>
+            </div>
+        </div>
+
+        <!-- AI TALK -->
+        <div class="section ai-talk">
+            <div class="title">💬 AI TALK</div>
+            <div class="messages" id="messages">
+                <div class="loading">Loading AI talk...</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const MATCH_API = 'http://localhost:8080/api/match-history';
+        const RANKINGS_API = 'http://localhost:8080/api/rankings';
+        const CHAT_API = 'http://localhost:8080/api/broadcast/chat';
+
+        function updateMatches() {
+            fetch(MATCH_API)
+                .then(r => r.json())
+                .then(data => {
+                    if (!data.recentMatches || data.recentMatches.length === 0) {
+                        document.getElementById('matches').innerHTML =
+                            '<div class="empty">No matches yet...</div>';
+                        return;
+                    }
+
+                    const matches = data.recentMatches.slice(-5).reverse();
+                    const html = matches.map((match, idx) => {
+                        const p1 = match.player1;
+                        const p2 = match.player2;
+                        const p1Won = match.winner === 'player1';
+                        const p1Name = p1.brainId.split(':')[1] || p1.brainId;
+                        const p2Name = p2.brainId.split(':')[1] || p2.brainId;
+
+                        return `
+                            <div class="match">
+                                <div class="match-text">
+                                    <div class="player-name">${p1Name}</div>
+                                    <div class="rating ${p1.ratingChange >= 0 ? 'positive' : 'negative'}">
+                                        ${p1.ratingChange >= 0 ? '+' : ''}${p1.ratingChange}
+                                    </div>
+                                    <div class="result ${p1Won ? 'winner' : 'loser'}">
+                                        ${p1Won ? '✓' : '✗'}
+                                    </div>
+                                </div>
+                                <div class="match-text">
+                                    <div class="player-name">${p2Name}</div>
+                                    <div class="rating ${p2.ratingChange >= 0 ? 'positive' : 'negative'}">
+                                        ${p2.ratingChange >= 0 ? '+' : ''}${p2.ratingChange}
+                                    </div>
+                                    <div class="result ${!p1Won ? 'winner' : 'loser'}">
+                                        ${!p1Won ? '✓' : '✗'}
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+
+                    document.getElementById('matches').innerHTML = html;
+                })
+                .catch(() => {
+                    document.getElementById('matches').innerHTML =
+                        '<div class="loading">Connecting...</div>';
+                });
+        }
+
+        function updateRankings() {
+            fetch(RANKINGS_API)
+                .then(r => r.json())
+                .then(data => {
+                    if (!data || data.length === 0) {
+                        document.getElementById('rankings').innerHTML =
+                            '<div class="loading">No rankings yet...</div>';
+                        return;
+                    }
+
+                    const html = data.slice(0, 5).map(brain => {
+                        const trendEmoji = brain.trend === 'up' ? '📈' : '📉';
+                        const trendClass = brain.trend === 'up' ? 'trend-up' : 'trend-down';
+                        const brainLabel = brain.brainId.split(':')[1] || brain.brainId;
+
+                        return `
+                            <div class="ranking-item">
+                                <div class="rank-number">#${brain.rank}</div>
+                                <div class="rank-info">
+                                    <div class="brain-name">${brainLabel}</div>
+                                    <div class="rank-stats">
+                                        <div class="rank-stat">
+                                            <span class="rank-stat-label">Rating</span>
+                                            <span class="rank-stat-value">${brain.rating}</span>
+                                        </div>
+                                        <div class="rank-stat">
+                                            <span class="rank-stat-label">Matches</span>
+                                            <span class="rank-stat-value">${brain.matches}</span>
+                                        </div>
+                                        <div class="rank-stat">
+                                            <span class="rank-stat-label">Best</span>
+                                            <span class="rank-stat-value">${brain.highestRating}</span>
+                                        </div>
+                                        <div class="rank-stat">
+                                            <span class="rank-stat-label" style="margin-bottom: 5px;">Trend</span>
+                                            <span class="rank-stat-value ${trendClass}">${trendEmoji}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        `;
+                    }).join('');
+
+                    document.getElementById('rankings').innerHTML = html;
+                })
+                .catch(() => {
+                    document.getElementById('rankings').innerHTML =
+                        '<div class="loading">Connecting...</div>';
+                });
+        }
+
+        function updateChat() {
+            fetch(CHAT_API)
+                .then(r => r.json())
+                .then(data => {
+                    if (!data.recentMessages || data.recentMessages.length === 0) {
+                        document.getElementById('messages').innerHTML =
+                            '<div class="empty">Waiting for AI talk...</div>';
+                        return;
+                    }
+
+                    const messages = data.recentMessages.slice(-6);
+                    const html = messages.map(msg => {
+                        const className = msg.speaker === 'Ollama' ? 'ollama' : 'petra';
+                        return `
+                            <div class="message ${className}">
+                                <div class="speaker">🎤 ${msg.speaker}</div>
+                                <div class="text">${msg.message}</div>
+                            </div>
+                        `;
+                    }).join('');
+
+                    document.getElementById('messages').innerHTML = html;
+                })
+                .catch(() => {
+                    document.getElementById('messages').innerHTML =
+                        '<div class="loading">Connecting...</div>';
+                });
+        }
+
+        // Update all sections
+        setInterval(updateMatches, 2000);
+        setInterval(updateRankings, 2000);
+        setInterval(updateChat, 10000);
+
+        updateMatches();
+        updateRankings();
+        updateChat();
+    </script>
+</body>
+</html>

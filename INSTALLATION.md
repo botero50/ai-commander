@@ -1,8 +1,8 @@
 # AI Commander — Installation Guide
 
-Complete setup guide for running **AI vs AI tournaments** with real 0 A.D. gameplay.
+Complete setup for **AI vs AI tournaments** with real 0 A.D. gameplay, Ollama AI decisions, and Piper TTS voice synthesis.
 
-**Estimated time: 20-40 minutes** (mostly waiting for downloads)
+**Estimated time: 30-50 minutes** (mostly downloads)
 
 ---
 
@@ -10,14 +10,45 @@ Complete setup guide for running **AI vs AI tournaments** with real 0 A.D. gamep
 
 - **Node.js 18+** — [Download from nodejs.org](https://nodejs.org)
 - **Git** — [Download from git-scm.com](https://git-scm.com)
+- **Python 3.8+** — [Download from python.org](https://www.python.org/downloads/)
 - **0 A.D.** — [Download from play0ad.com](https://play0ad.com) or Steam
 - **Ollama** — [Download from ollama.ai](https://ollama.ai)
-- **4+ GB free disk space** for AI models
-- **8+ GB RAM** (recommended for smooth gameplay)
+- **8+ GB free disk space** for AI models and voice models
+- **8+ GB RAM** (recommended)
 
 ---
 
-## Step 1: Install Node.js
+## Step 1: Install Python
+
+### Windows
+
+1. Download Python from [python.org](https://www.python.org/downloads/) (3.8 or newer)
+2. Run installer
+3. **Important**: Check ✅ "Add Python to PATH"
+4. Click "Install Now"
+
+### macOS
+
+```bash
+brew install python3
+```
+
+### Linux
+
+```bash
+sudo apt-get install python3 python3-pip
+```
+
+### Verify Installation
+
+```bash
+python --version      # Expected: Python 3.8 or higher
+pip --version         # Expected: pip 20.0 or higher
+```
+
+---
+
+## Step 2: Install Node.js
 
 ### Verify Installation
 ```bash
@@ -29,7 +60,7 @@ If not installed, download from [nodejs.org](https://nodejs.org) (LTS version re
 
 ---
 
-## Step 2: Install 0 A.D.
+## Step 3: Install 0 A.D.
 
 ### Windows / macOS / Linux
 1. Download from [play0ad.com](https://play0ad.com) or [Steam](https://store.steampowered.com/app/1680220/0_AD_Empires_Ascendant)
@@ -49,7 +80,7 @@ which pyrogenesis
 
 ---
 
-## Step 3: Install Ollama
+## Step 4: Install Ollama
 
 ### Download & Install
 
@@ -78,21 +109,25 @@ ollama --version
 
 ---
 
-## Step 4: Download & Start Ollama Models
+## Step 5: Download & Start Ollama Models
 
-### Option A: Fast Setup (Recommended for Speed)
+### Start Ollama Server (keep this running)
 ```bash
-# Start Ollama server first (keep this running)
 ollama serve
+```
 
-# In another terminal, download fastest model (637 MB):
+### In Another Terminal: Download Models
+
+**Option A: Fast Setup (Recommended for Speed)**
+```bash
+# Download fastest model (637 MB)
 ollama pull tinyllama
 
 # Optional: Also download a balanced model
 ollama pull mistral
 ```
 
-### Option B: Higher Quality
+**Option B: Higher Quality**
 ```bash
 # Download neural-chat (4.1 GB, high quality)
 ollama pull neural-chat
@@ -111,16 +146,87 @@ You should see:
 NAME                  ID              SIZE      MODIFIED
 tinyllama:latest      2644915ede35    637 MB    10 minutes ago
 mistral:latest        6577803aa9a0    4.4 GB    2 hours ago
-neural-chat:latest    89fa737d3b85    4.1 GB    1 day ago
 ```
 
 **Keep the `ollama serve` command running in the background!**
 
 ---
 
-## Step 5: Clone & Setup AI Commander
+## Step 6: Install Piper TTS (Voice Synthesis)
 
-### Terminal (new window): Clone Repository
+Piper TTS converts trash talk text to voice during matches.
+
+### Install Piper via pip
+
+```bash
+pip install piper-tts
+```
+
+### Verify Installation
+
+```bash
+piper --help
+```
+
+---
+
+## Step 7: Download Piper Voice Model (Into Project)
+
+Voice models are stored in the project for easy deployment. Download `en_US-lessac-medium` into the project:
+
+### Python Script (Recommended)
+
+Run this from the project root:
+
+```bash
+python -c "
+import urllib.request
+import os
+
+voices_dir = 'packages/zeroad-adapter/voices'
+os.makedirs(voices_dir, exist_ok=True)
+print(f'Voices directory: {voices_dir}')
+
+# Download voice model (63 MB)
+print('[*] Downloading en_US-lessac-medium.onnx...')
+url = 'https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx'
+filepath = os.path.join(voices_dir, 'en_US-lessac-medium.onnx')
+urllib.request.urlretrieve(url, filepath)
+print(f'[OK] Model downloaded')
+
+# Download config (5 KB)
+print('[*] Downloading voice config...')
+config_url = 'https://huggingface.co/rhasspy/piper-voices/resolve/main/en/en_US/lessac/medium/en_US-lessac-medium.onnx.json'
+config_filepath = os.path.join(voices_dir, 'en_US-lessac-medium.onnx.json')
+urllib.request.urlretrieve(config_url, config_filepath)
+print(f'[OK] Config downloaded')
+
+print(f'[OK] Voice installed successfully!')
+print(f'Location: {os.path.abspath(voices_dir)}')
+"
+```
+
+### Verify Voice Installation
+
+The voice model should be in:
+```
+packages/zeroad-adapter/voices/
+├── en_US-lessac-medium.onnx (63 MB)
+└── en_US-lessac-medium.onnx.json (5 KB)
+```
+
+Test it works:
+```bash
+echo "Hello world" | piper --model en_US-lessac-medium --data-dir packages/zeroad-adapter/voices --output-file test.wav
+```
+
+If successful, `test.wav` will be created (30-60 KB).
+
+---
+
+## Step 8: Clone & Setup AI Commander
+
+### Clone Repository
 ```bash
 cd /your/projects/directory
 git clone https://github.com/anthropics/ai-commander.git
@@ -141,13 +247,11 @@ npm run build
 
 ---
 
-## Step 6: Run the Automated Arena Loop
-
-This is the main feature - **continuous AI vs AI matches with auto-restart**.
+## Step 9: Run Matches
 
 ### Basic Usage (Fastest)
 ```bash
-# Run 10 matches with tinyllama (fastest)
+# Run 10 matches with tinyllama
 npx tsx packages/zeroad-adapter/src/arena/run-arena-loop.ts --matches 10
 
 # Run forever until you stop (Ctrl+C)
@@ -166,9 +270,8 @@ OLLAMA_MODEL=mistral:latest npx tsx packages/zeroad-adapter/src/arena/run-arena-
 OLLAMA_MODEL=neural-chat:latest npx tsx packages/zeroad-adapter/src/arena/run-arena-loop.ts --matches 2
 ```
 
-### Using the Batch File (Windows)
+### Using Batch File (Windows)
 ```bash
-# Copy this for easy running:
 arena-loop.bat 10        # Run 10 matches
 arena-loop.bat           # Run forever
 ```
@@ -201,26 +304,6 @@ OLLAMA_MODEL=mistral:latest        # Balanced (4.1 GB)
 OLLAMA_MODEL=neural-chat:latest    # High quality (4.1 GB)
 ```
 
-### `STARTUP_WAIT` Environment Variable
-Customize game startup wait time (milliseconds).
-```bash
-STARTUP_WAIT=3000   # 3 seconds (very fast machines)
-STARTUP_WAIT=5000   # 5 seconds (default, balanced)
-STARTUP_WAIT=10000  # 10 seconds (slower machines)
-```
-
----
-
-## Speed Comparison
-
-| Configuration | Speed | Per Match |
-|---|---|---|
-| tinyllama, freq=10 | 🚀 Fastest | ~30-40s |
-| tinyllama, freq=5 | 🚀 Very fast | ~40-60s |
-| mistral, freq=2 | ⚡ Fast | ~60-90s |
-| mistral, freq=1 | 🟡 Normal | ~120-150s |
-| neural-chat, freq=1 | 🐢 Slow | ~180-240s |
-
 ---
 
 ## What Happens During Arena Loop
@@ -230,23 +313,44 @@ For each match:
 2. **Start** fresh 0 A.D. with RL Interface (port 6000)
 3. **Wait** for game to load (~5 seconds)
 4. **Run** match: Ollama AI vs Petra AI
-5. **Monitor** until one AI wins or timeout
-6. **Close** the game
-7. **Repeat** next match
+5. **Capture** trash talk and synthesize to voice (Piper TTS)
+6. **Monitor** until one AI wins or timeout
+7. **Close** the game
+8. **Repeat** next match
 
-**Automated - no manual intervention needed!**
+**Fully automated - no manual intervention needed!**
 
 ---
 
 ## Troubleshooting
 
-### "Error: Cannot find module"
-```bash
-# Rebuild project
-npm run build
-```
+### Python Issues
 
-### "Ollama API error: 404" (Model not found)
+**"python: command not found"**
+- Python not installed or not in PATH
+- Solution: Download from [python.org](https://www.python.org/downloads/) and check "Add Python to PATH"
+
+**"pip: command not found"**
+- Python installed but pip not available
+- Solution: `python -m pip install --upgrade pip`
+
+### Piper TTS Issues
+
+**"piper: command not found"**
+- Piper not installed
+- Solution: `pip install piper-tts`
+
+**"Unable to find voice: en_US-lessac-medium"**
+- Voice model not downloaded
+- Solution: Run the Python script in Step 7 to download the voice
+
+**Voice synthesis is slow on first run**
+- Voice model being downloaded/initialized
+- Solution: Subsequent runs will be faster (~50ms per message)
+
+### Ollama Issues
+
+**"Ollama API error: 404" (Model not found)**
 ```bash
 # Check what models you have
 ollama list
@@ -256,28 +360,22 @@ ollama pull tinyllama
 ollama pull mistral
 ```
 
-### "Game process exited with code 1"
+### Game Issues
+
+**"Game process exited with code 1"**
+- 0 A.D. not installed at expected location
+- Solution: Verify path: `C:\Program Files (x86)\0 A.D. Empires Ascendant\binaries\system\pyrogenesis.exe`
+
+**"Failed to connect to RL Interface"**
+- Game didn't start properly
+- Solution: Try increasing startup wait: `STARTUP_WAIT=8000 npx tsx ...`
+
+### Build Issues
+
+**"Error: Cannot find module"**
 ```bash
-# Make sure 0 A.D. is installed at the expected location:
-# Windows: C:\Program Files (x86)\0 A.D. Empires Ascendant\binaries\system\pyrogenesis.exe
-
-# Or set custom path:
-ZEROAD_PATH="C:\your\path\pyrogenesis.exe" npx tsx ...
+npm run build
 ```
-
-### "Failed to connect to RL Interface"
-```bash
-# Game didn't start properly
-# Check: Is 0 A.D. closing unexpectedly?
-# Try: STARTUP_WAIT=8000 to give it more time
-```
-
-### "All player units lost" or Match Timeout
-This is normal! The AI vs Petra match runs until:
-- One side loses all units (winner determined)
-- Match timeout reached (configurable)
-
-The script will automatically start the next match.
 
 ---
 
@@ -285,21 +383,12 @@ The script will automatically start the next match.
 
 ### For Maximum Speed
 ```bash
-# Use fastest model + minimal decisions
 OLLAMA_MODEL=tinyllama:latest npx tsx packages/zeroad-adapter/src/arena/run-arena-loop.ts --matches 10 --freq 10
 ```
 
 ### For Better Quality
 ```bash
-# Use higher quality model + more decisions
 OLLAMA_MODEL=mistral:latest npx tsx packages/zeroad-adapter/src/arena/run-arena-loop.ts --matches 5 --freq 1
-```
-
-### Monitor Performance
-```bash
-# Watch Ollama resource usage (open new terminal)
-ollama list                  # See loaded models
-ps aux | grep ollama        # Check process
 ```
 
 ---
@@ -310,24 +399,17 @@ ps aux | grep ollama        # Check process
 |---|---|---|
 | OS | Windows 10, macOS 10.13, Linux | Any |
 | CPU | Intel i5 / M1 | i7 / M2+ |
-| RAM | 4 GB | 8+ GB |
-| Disk | 12 GB | 20+ GB |
+| RAM | 8 GB | 16+ GB |
+| Disk | 15 GB | 25+ GB |
 | GPU | Optional | NVIDIA / AMD |
 | Network | Internet (initial setup) | N/A |
 
-**Memory by model:**
-- tinyllama: 2-3 GB
-- mistral: 5-8 GB  
-- neural-chat: 5-8 GB
-
----
-
-## Getting Help
-
-1. **Check the output logs** — they show exactly what's happening
-2. **Verify Ollama is running:** `ollama list` should show models
-3. **Verify 0 A.D. installation** — check the path
-4. **Try simplest config first:** `npx tsx packages/zeroad-adapter/src/arena/run-arena-loop.ts --matches 1`
+**Disk space breakdown:**
+- Node.js dependencies: 500 MB
+- 0 A.D.: 3-5 GB
+- Ollama models (tinyllama): 2-3 GB
+- Piper voice models: ~100 MB
+- Game assets & outputs: 1-2 GB
 
 ---
 
@@ -340,7 +422,12 @@ After installation:
    npx tsx packages/zeroad-adapter/src/arena/run-arena-loop.ts --matches 3
    ```
 
-2. **Experiment with different speeds:**
+2. **Check the output:**
+   - Trash talk will be captured and synthesized to voice
+   - Audio files saved to `.data/audio/trash_talk/`
+   - Match results logged to console
+
+3. **Experiment with different speeds:**
    ```bash
    # Fast
    npx tsx packages/zeroad-adapter/src/arena/run-arena-loop.ts --matches 2 --freq 5
@@ -349,9 +436,9 @@ After installation:
    OLLAMA_MODEL=mistral:latest npx tsx packages/zeroad-adapter/src/arena/run-arena-loop.ts --matches 2
    ```
 
-3. **Read the documentation:**
+4. **Read the documentation:**
    - [README.md](README.md) — Project overview
-   - [CONTRIBUTING.md](CONTRIBUTING.md) — How to contribute
+   - [PIPER-TTS-SETUP.md](PIPER-TTS-SETUP.md) — Voice synthesis configuration
    - [SECURITY.md](SECURITY.md) — Security guidelines
 
 ---
@@ -360,15 +447,16 @@ After installation:
 
 You now have:
 
+✅ Python installed  
 ✅ Node.js installed  
 ✅ 0 A.D. installed  
 ✅ Ollama running with models  
+✅ Piper TTS installed with voice model  
 ✅ AI Commander cloned and built  
-✅ Arena loop ready to run  
 
 **Run your first tournament:**
 ```bash
 npx tsx packages/zeroad-adapter/src/arena/run-arena-loop.ts --matches 10
 ```
 
-**Enjoy!** 🎮🚀
+**Enjoy!** 🎮

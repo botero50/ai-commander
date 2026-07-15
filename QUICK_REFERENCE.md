@@ -3,152 +3,205 @@
 ## 🚀 Quick Start (3 Commands)
 
 ```bash
-# 1. Install
+# 1. Install (see INSTALLATION.md for full setup)
 npm install
 
 # 2. Build
 npm run build
 
-# 3. Run
-npx tsx packages/zeroad-adapter/src/arena/run-arena-loop.ts --matches 1
-```
-
-## 📁 Where to Find Things
-
-| What | Where | File |
-|------|-------|------|
-| **First Time Setup** | Root | `README.md` |
-| **Installation Steps** | Root | `INSTALLATION.md` |
-| **Setup Guide** | Root | `START-HERE.md` |
-| **Project Roadmap** | Root | `ROADMAP.md` |
-| **Documentation Guide** | Root | `DOCUMENTATION_STRUCTURE.md` |
-| **API Reference** | docs/ | `API_REFERENCE.md` |
-| **Architecture** | docs/ | `ARCHITECTURE.md` |
-| **Map Rotation** | docs/ | `MAP-ROTATION-GUIDE.md` |
-| **Broadcast Setup** | docs/ | `SETUP-OBS.md` |
-| **Keyboard Shortcuts** | docs/ | `KEYBOARD-SHORTCUTS.md` |
-| **Manual Tests** | tests/manual/ | `test-*.ts` |
-| **Old Docs** | archived folders | See DOCUMENTATION_STRUCTURE.md |
-
-## 🎯 Available Commands
-
-```bash
-# Development
-npm run build              # Build TypeScript
-npm run test               # Run all tests
-npm run test -- path/file # Run specific test
-
-# Arena Operations
-npx tsx packages/zeroad-adapter/src/arena/run-arena-loop.ts --matches 1
+# 3. Run matches
 npx tsx packages/zeroad-adapter/src/arena/run-arena-loop.ts --matches 10
-
-# Map Discovery
-npx tsx packages/zeroad-adapter/src/arena/test-all-maps.ts
-
-# Manual Tests
-npx tsx tests/manual/test-real-match.ts
-npx tsx tests/manual/stability-test.ts
-npx tsx tests/manual/test-cinematic-camera.ts
 ```
-
-## 📊 System Overview
-
-```
-AI Commander = Continuous AI vs AI Strategy Game Streaming
-
-┌─────────────────────────────────────────┐
-│   0 A.D. Game (Real Gameplay)          │
-│   - 55 Maps (auto-rotating)             │
-│   - 15 Civilizations (fair rotation)    │
-│   - AI Players (Petra, Custom Models)   │
-└──────────────────────────┬──────────────┘
-                           │ RL Interface
-                           ↓
-        ┌──────────────────────────────────┐
-        │   ZeroAD Adapter (Game Bridge)  │
-        │   - State Extraction             │
-        │   - Decision Logging             │
-        │   - Cinematic Camera             │
-        └──────────────────────────────────┘
-                           │
-        ┌──────────────────┴──────────────────┐
-        ↓                                     ↓
-   ┌──────────────┐              ┌──────────────────┐
-   │   Backend    │              │   Web Frontend   │
-   │  - Commentary │              │  - Live Stats    │
-   │  - Analytics │              │  - Broadcast     │
-   │  - Storage   │              │  - Replay View   │
-   └──────────────┘              └──────────────────┘
-```
-
-## 🧪 What Tests Are Available
-
-| Test | Command | What It Does |
-|------|---------|--------------|
-| **Unit Tests** | `npm run test` | 4000+ tests across all packages |
-| **Map Discovery** | Via npm test | 55 verified maps |
-| **Civilization Rotation** | Via npm test | 15 civilizations |
-| **Match Randomizer** | Via npm test | Match generation |
-| **Real Match** | `tests/manual/test-real-match.ts` | Launches real 0 A.D. match |
-| **Cinematic Camera** | `tests/manual/test-cinematic-camera.ts` | Camera system |
-| **Stability** | `tests/manual/stability-test.ts` | Stress test |
-| **RL Interface** | `tests/manual/test-r2-*.ts` | Protocol tests |
-
-## 📈 Current System Status
-
-✅ **Maps:** 55 verified working maps (2p-8p)
-✅ **Civilizations:** 15 available (Athenians, Romans, Spartans, etc.)
-✅ **Features:** Complete (streaming, commentary, replay, analytics)
-✅ **Tests:** 4000+ passing tests
-✅ **Documentation:** Organized & navigable
-
-## 🔧 Troubleshooting Quick Links
-
-| Issue | Solution |
-|-------|----------|
-| Tests failing | Check `docs/TESTING.md` |
-| Map problems | Check `docs/MAP-ROTATION-STATUS.md` |
-| OBS setup | Check `docs/SETUP-OBS.md` |
-| API questions | Check `docs/API_REFERENCE.md` |
-| Architecture | Check `docs/ARCHITECTURE.md` |
-
-## 📚 File Organization Summary
-
-```
-Root (5 files)        → Essential info only
-docs/ (13 files)      → Active feature documentation  
-tests/manual/         → 12 manual test scripts
-documentation/        → Source code packages
-archived/ (2 folders) → Old docs for reference
-```
-
-## 🎬 How to Run Arena
-
-```bash
-# Single match (auto)
-npx tsx packages/zeroad-adapter/src/arena/run-arena-loop.ts --matches 1
-
-# Multiple matches (continuous)
-npx tsx packages/zeroad-adapter/src/arena/run-arena-loop.ts --matches 10
-
-# Infinite (until stop signal)
-npx tsx packages/zeroad-adapter/src/arena/run-arena-loop.ts --matches 0
-
-# With custom settings (if supported)
-npx tsx packages/zeroad-adapter/src/arena/run-arena-loop.ts --matches 1 --map-rotation true
-```
-
-## 🎨 Broadcast Features
-
-- **Live HUD:** Real-time game metrics (economy, military, tech)
-- **AI Status:** Decision-making display
-- **Commentary:** Esports-style narration
-- **Replay:** Instant replay clips
-- **Analytics:** Match statistics & trends
-- **Streaming:** OBS integration on port 8765
 
 ---
 
-**Quick Setup:** `npm install && npm run build && npx tsx packages/zeroad-adapter/src/arena/run-arena-loop.ts --matches 1`
+## 📁 Essential Documentation
 
-**Need Help?** Read `DOCUMENTATION_STRUCTURE.md` to find any documentation.
+| What | Where |
+|------|-------|
+| **First Time?** | Read [INSTALLATION.md](INSTALLATION.md) |
+| **Project Overview** | Read [README.md](README.md) |
+| **Quick Commands** | This file (QUICK_REFERENCE.md) |
+| **Security** | Read [SECURITY.md](SECURITY.md) |
+| **OBS Streaming** | Read [SETUP-OBS-STREAMING.md](SETUP-OBS-STREAMING.md) |
+
+---
+
+## 🎯 Available Commands
+
+### Arena (Matches)
+```bash
+# Run 1 match
+npx tsx packages/zeroad-adapter/src/arena/run-arena-loop.ts --matches 1
+
+# Run 10 matches
+npx tsx packages/zeroad-adapter/src/arena/run-arena-loop.ts --matches 10
+
+# Run infinite (until Ctrl+C)
+npx tsx packages/zeroad-adapter/src/arena/run-arena-loop.ts
+
+# Run with custom settings
+npx tsx packages/zeroad-adapter/src/arena/run-arena-loop.ts --matches 5 --freq 2
+```
+
+### Development
+```bash
+# Build TypeScript
+npm run build
+
+# Run all tests
+npm run test
+
+# Run specific test
+npm run test -- path/to/test.ts
+```
+
+---
+
+## ⚙️ Configuration
+
+### Environment Variables
+
+```bash
+# Change AI model
+OLLAMA_MODEL=mistral:latest npx tsx ...
+OLLAMA_MODEL=neural-chat:latest npx tsx ...
+OLLAMA_MODEL=tinyllama:latest npx tsx ...
+
+# Change game startup wait time (ms)
+STARTUP_WAIT=8000 npx tsx ...
+```
+
+### Match Options
+
+```bash
+# --matches N    = Run N matches (default: infinite)
+# --freq N       = AI decision every N ticks (default: 1)
+
+# Example: Fast matches (decisions every 5 ticks)
+npx tsx packages/zeroad-adapter/src/arena/run-arena-loop.ts --matches 5 --freq 5
+```
+
+---
+
+## 📊 Features
+
+✅ Real 0 A.D. gameplay  
+✅ Ollama AI decision-making  
+✅ AI-generated trash talk  
+✅ Piper TTS voice synthesis  
+✅ Automatic game recovery  
+✅ ELO rating system  
+✅ Map and civilization rotation  
+✅ Real-time metrics  
+
+---
+
+## 🔧 Troubleshooting
+
+### Setup Issues
+- See [INSTALLATION.md](INSTALLATION.md) Section "Troubleshooting"
+
+### Python Not Found
+```bash
+# Install Python: https://www.python.org/downloads/
+# Verify: python --version
+```
+
+### Ollama Issues
+```bash
+# Check Ollama is running
+ollama list
+
+# Download model
+ollama pull tinyllama
+```
+
+### Piper TTS Issues
+```bash
+# Install Piper
+pip install piper-tts
+
+# Download voice (see INSTALLATION.md Step 7)
+```
+
+### Build Errors
+```bash
+# Clean and rebuild
+npm run build
+```
+
+---
+
+## 📈 Performance Guide
+
+| Config | Speed | Per Match |
+|--------|-------|-----------|
+| tinyllama, freq=10 | 🚀 Fastest | 30-40s |
+| tinyllama, freq=5 | 🚀 Very fast | 40-60s |
+| mistral, freq=2 | ⚡ Fast | 60-90s |
+| mistral, freq=1 | 🟡 Normal | 120-150s |
+| neural-chat, freq=1 | 🐢 Slow | 180-240s |
+
+---
+
+## 🎬 What Happens During Arena Loop
+
+1. **Kill** any running 0 A.D.
+2. **Start** fresh game with RL Interface
+3. **Wait** for game to load (~5 sec)
+4. **Run** match until winner (2-4 min)
+5. **Capture** trash talk & synthesize voice
+6. **Save** ELO ratings and results
+7. **Repeat** for next match
+8. **Auto-recover** on any crash
+
+---
+
+## 📁 Project Structure
+
+```
+ai-commander/
+├── packages/zeroad-adapter/
+│   ├── src/arena/              # Tournament controller
+│   ├── src/rl-interface/       # Game communication
+│   ├── src/tournament/         # ELO ratings
+│   ├── src/match/              # TTS & trash talk
+│   └── src/resilience/         # Recovery logic
+├── INSTALLATION.md             # Setup guide
+├── README.md                   # Project overview
+├── SECURITY.md                 # Security policies
+├── QUICK_REFERENCE.md          # This file
+├── SETUP-OBS-STREAMING.md      # OBS integration guide
+└── package.json
+```
+
+---
+
+## 🆘 Getting Help
+
+1. **Setup problems?** → [INSTALLATION.md](INSTALLATION.md)
+2. **Project questions?** → [README.md](README.md)
+3. **Security concerns?** → [SECURITY.md](SECURITY.md)
+4. **Want to stream?** → [SETUP-OBS-STREAMING.md](SETUP-OBS-STREAMING.md)
+
+---
+
+## ✅ System Checklist
+
+Before running matches, verify:
+
+- [ ] Python 3.8+ installed (`python --version`)
+- [ ] Node.js 18+ installed (`node --version`)
+- [ ] 0 A.D. installed at default location
+- [ ] Ollama running (`ollama serve`)
+- [ ] AI model downloaded (`ollama list`)
+- [ ] Piper TTS installed (`piper --help`)
+- [ ] Voice model downloaded (see INSTALLATION.md Step 7)
+- [ ] Project built (`npm run build`)
+
+---
+
+**Ready?** Run: `npx tsx packages/zeroad-adapter/src/arena/run-arena-loop.ts --matches 3`
+
+**Let's go!** 🎮

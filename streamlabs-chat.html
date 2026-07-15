@@ -1,0 +1,230 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AI Commander - Chat</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: transparent;
+            font-family: 'Arial', sans-serif;
+            color: #ffffff;
+            padding: 12px;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+        }
+
+        .section {
+            border-radius: 8px;
+            padding: 10px;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: glow 2s ease-in-out infinite;
+            min-height: 0;
+            height: 100%;
+            border: 2px solid #ff6b6b;
+            background: linear-gradient(135deg, rgba(0, 0, 0, 0.85) 0%, rgba(30, 0, 0, 0.85) 100%);
+            box-shadow: 0 0 15px rgba(255, 107, 107, 0.3), inset 0 0 10px rgba(255, 107, 107, 0.1);
+        }
+
+        @keyframes glow {
+            0%, 100% { box-shadow: 0 0 15px rgba(255, 107, 107, 0.3), inset 0 0 10px rgba(255, 107, 107, 0.1); }
+            50% { box-shadow: 0 0 25px rgba(255, 107, 107, 0.5), inset 0 0 15px rgba(255, 107, 107, 0.2); }
+        }
+
+        .title {
+            font-size: clamp(14px, 2.5vw, 16px);
+            font-weight: bold;
+            margin-bottom: 10px;
+            letter-spacing: 1px;
+            text-transform: uppercase;
+            flex-shrink: 0;
+            color: #ff6b6b;
+            text-shadow: 0 0 10px rgba(255, 107, 107, 0.8);
+        }
+
+        .messages {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+            justify-content: flex-end;
+        }
+
+        .messages::-webkit-scrollbar {
+            width: 4px;
+        }
+
+        .messages::-webkit-scrollbar-track {
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .messages::-webkit-scrollbar-thumb {
+            background: rgba(255, 107, 107, 0.5);
+            border-radius: 2px;
+        }
+
+        .message {
+            background: rgba(255, 255, 255, 0.08);
+            border-left: 3px solid;
+            padding: 10px;
+            border-radius: 4px;
+            animation: slideIn 0.3s ease-out;
+            font-size: clamp(11px, 1.8vw, 13px);
+            flex-shrink: 0;
+            height: calc((100% - 50px - 8px * 3) / 4);
+            min-height: 85px;
+            max-height: 105px;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            overflow: hidden;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(5px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .message.player1 {
+            border-left-color: #ff6b6b;
+            background: rgba(255, 107, 107, 0.1);
+        }
+
+        .message.player2 {
+            border-left-color: #4ecdc4;
+            background: rgba(78, 205, 196, 0.1);
+        }
+
+        .message.placeholder {
+            border-left-color: #666666;
+            background: rgba(100, 100, 100, 0.1);
+        }
+
+        .speaker {
+            font-weight: bold;
+            font-size: clamp(10px, 1.5vw, 12px);
+            text-transform: uppercase;
+            margin-bottom: 4px;
+            letter-spacing: 0.5px;
+        }
+
+        .message.player1 .speaker {
+            color: #ff6b6b;
+        }
+
+        .message.player2 .speaker {
+            color: #4ecdc4;
+        }
+
+        .message.placeholder .speaker {
+            color: #888888;
+        }
+
+        .text {
+            font-size: clamp(10px, 1.4vw, 12px);
+            color: #ffffff;
+            line-height: 1.3;
+        }
+
+        .empty, .loading {
+            text-align: center;
+            color: #888888;
+            padding: 15px;
+            font-size: clamp(11px, 1.6vw, 13px);
+            flex-shrink: 0;
+        }
+
+        .loading {
+            color: #00ff00;
+        }
+    </style>
+</head>
+<body>
+    <div class="section">
+        <div class="title">💬 AI TALK</div>
+        <div class="messages" id="messages">
+            <div class="message player1">
+                <div class="speaker">🎤 Waiting...</div>
+                <div class="text">&nbsp;</div>
+            </div>
+            <div class="message player2">
+                <div class="speaker">🎤 Waiting...</div>
+                <div class="text">&nbsp;</div>
+            </div>
+            <div class="message player1">
+                <div class="speaker">🎤 Waiting...</div>
+                <div class="text">&nbsp;</div>
+            </div>
+            <div class="message player2">
+                <div class="speaker">🎤 Waiting...</div>
+                <div class="text">&nbsp;</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const CHAT_API = 'http://localhost:8080/api/broadcast/chat';
+
+        function updateChat() {
+            fetch(CHAT_API)
+                .then(r => r.json())
+                .then(data => {
+                    if (!data.recentMessages || data.recentMessages.length === 0) {
+                        document.getElementById('messages').innerHTML =
+                            '<div class="empty">Waiting for AI talk...</div>';
+                        return;
+                    }
+
+                    const messages = data.recentMessages.slice(-4);
+                    const html = messages.map(msg => {
+                        let className = 'player1';
+                        let displaySpeaker = 'Waiting...';
+
+                        if (msg.speaker === 'player1') {
+                            className = 'player1';
+                            displaySpeaker = 'Ollama';
+                        } else if (msg.speaker === 'player2') {
+                            className = 'player2';
+                            displaySpeaker = 'Petra';
+                        } else if (msg.speaker === 'placeholder') {
+                            className = 'placeholder';
+                            displaySpeaker = 'Waiting...';
+                        }
+
+                        return `
+                            <div class="message ${className}">
+                                <div class="speaker">🎤 ${displaySpeaker}</div>
+                                <div class="text">${msg.message}</div>
+                            </div>
+                        `;
+                    }).join('');
+
+                    document.getElementById('messages').innerHTML = html;
+                })
+                .catch(() => {
+                    document.getElementById('messages').innerHTML =
+                        '<div class="loading">Connecting...</div>';
+                });
+        }
+
+        setInterval(updateChat, 10000);
+        updateChat();
+    </script>
+</body>
+</html>
