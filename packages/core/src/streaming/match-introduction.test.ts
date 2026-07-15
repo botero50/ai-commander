@@ -91,19 +91,27 @@ describe('Match Introduction (Story 57.2)', { timeout: 10000 }, () => {
         intro.onIntroduction((event) => {
           if (event.type === 'countdown') {
             countdowns.push(event.data.count);
+            // Resolve as soon as we get all 3 countdown events
+            if (countdowns.length === 3) {
+              expect(countdowns).toContain(3);
+              expect(countdowns).toContain(2);
+              expect(countdowns).toContain(1);
+              resolve();
+            }
           }
         });
 
         intro.runIntroduction(testMatch);
 
+        // Fallback timeout in case something goes wrong
         setTimeout(() => {
           expect(countdowns).toContain(3);
           expect(countdowns).toContain(2);
           expect(countdowns).toContain(1);
           resolve();
-        }, 6000);
+        }, 8000);
       });
-    }, 15000);
+    });
 
     it('should emit battle-begins event', () => {
       return new Promise<void>((resolve) => {

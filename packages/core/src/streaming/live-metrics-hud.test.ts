@@ -196,7 +196,7 @@ describe('Live Metrics HUD (Story 57.4)', { timeout: 10000 }, () => {
     it('should calculate resource lead', () => {
       hud.updateMetrics(createObservation(1, 'Player1'));
       hud.updateMetrics({
-        tick: 100,
+        tick: 101, // Different tick
         playerId: 2,
         playerName: 'Player2',
         observation: {
