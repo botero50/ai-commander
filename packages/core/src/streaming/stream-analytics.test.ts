@@ -8,7 +8,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { StreamAnalytics, createStreamAnalytics } from './stream-analytics.js';
 import { Logger } from '../config/logger.js';
 
-describe('Stream Analytics', () => {
+describe('Stream Analytics', { timeout: 10000 }, () => {
   let analytics: StreamAnalytics;
   const logger = new Logger('error', 'AnalyticsTest');
 

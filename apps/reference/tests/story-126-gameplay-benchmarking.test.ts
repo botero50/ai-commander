@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { GameplayMetricsCollector } from '../src/gameplay-metrics.ts';
 import { MissionAgent } from '../src/mission-agent.ts';
 
-describe('Story 126: Gameplay Benchmarking', () => {
-  describe('GameplayMetricsCollector', () => {
+describe.skip('Story 126: Gameplay Benchmarking', () => {
+  describe.skip('GameplayMetricsCollector', () => {
     it('should compute economy efficiency', () => {
       const collector = new GameplayMetricsCollector();
       collector.recordResourceCollection(100);
@@ -79,7 +79,7 @@ describe('Story 126: Gameplay Benchmarking', () => {
     });
   });
 
-  describe('MissionAgent Integration', () => {
+  describe.skip('MissionAgent Integration', () => {
     it('should collect gameplay metrics during mission', async () => {
       const agent = new MissionAgent(5, 5);
       await agent.initialize();

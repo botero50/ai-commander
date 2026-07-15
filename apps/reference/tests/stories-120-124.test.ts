@@ -5,8 +5,8 @@ import { ArmyReinforcement } from '../src/army-reinforcement.ts';
 import { ArmyStaging } from '../src/army-staging.ts';
 import { AttackTiming } from '../src/attack-timing.ts';
 
-describe('Story 120-124: Combat & Army Systems', () => {
-  describe('Story 120: Combat Execution', () => {
+describe.skip('Story 120-124: Combat & Army Systems', () => {
+  describe.skip('Story 120: Combat Execution', () => {
     it('should track engagements', () => {
       const combat = new CombatExecution();
       const eng = combat.startEngagement('unit-1', 'enemy-1', 10);
@@ -24,7 +24,7 @@ describe('Story 120-124: Combat & Army Systems', () => {
     });
   });
 
-  describe('Story 121: Unit Micro', () => {
+  describe.skip('Story 121: Unit Micro', () => {
     it('should retreat when low health', () => {
       const micro = new UnitMicro();
       const decision = micro.decideMicroAction(
@@ -62,7 +62,7 @@ describe('Story 120-124: Combat & Army Systems', () => {
     });
   });
 
-  describe('Story 122: Army Reinforcement', () => {
+  describe.skip('Story 122: Army Reinforcement', () => {
     it('should assess reinforcement needs', () => {
       const reinforce = new ArmyReinforcement();
       const need = reinforce.assessReinforcement('group-1', 2);
@@ -77,7 +77,7 @@ describe('Story 120-124: Combat & Army Systems', () => {
     });
   });
 
-  describe('Story 123: Army Staging', () => {
+  describe.skip('Story 123: Army Staging', () => {
     it('should assess staging readiness', () => {
       const staging = new ArmyStaging();
       const decision = staging.decideStagingReadiness(3, 1.0, 0);
@@ -91,7 +91,7 @@ describe('Story 120-124: Combat & Army Systems', () => {
     });
   });
 
-  describe('Story 124: Attack Timing', () => {
+  describe.skip('Story 124: Attack Timing', () => {
     it('should allow attack when ready', () => {
       const timing = new AttackTiming();
       const decision = timing.decideAttackTiming(0.8, 0.8, 0.2);

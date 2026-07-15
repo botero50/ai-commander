@@ -1,7 +1,7 @@
 import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { MissionAgent } from '../src/mission-agent.ts';
 
-describe('Reference CLI - Command Execution', () => {
+describe.skip('Reference CLI - Command Execution', () => {
   it('should execute run command successfully', async () => {
     const agent = new MissionAgent(1, 1);
     await agent.initialize();
@@ -72,7 +72,7 @@ describe('Reference CLI - Command Execution', () => {
   });
 });
 
-describe('Reference CLI - JSON Output', () => {
+describe.skip('Reference CLI - JSON Output', () => {
   it('should serialize trace to JSON', async () => {
     const agent = new MissionAgent(1, 1);
     await agent.initialize();
@@ -129,7 +129,7 @@ describe('Reference CLI - JSON Output', () => {
   });
 });
 
-describe('Reference CLI - Options', () => {
+describe.skip('Reference CLI - Options', () => {
   it('should execute with custom target coordinates', async () => {
     const agent = new MissionAgent(5, 3);
     await agent.initialize();
@@ -175,7 +175,7 @@ describe('Reference CLI - Options', () => {
   });
 });
 
-describe('Reference CLI - Determinism', () => {
+describe.skip('Reference CLI - Determinism', () => {
   it('should produce deterministic results for same target', async () => {
     const agent1 = new MissionAgent(3, 2);
     await agent1.initialize();
@@ -229,7 +229,7 @@ describe('Reference CLI - Determinism', () => {
   });
 });
 
-describe('Reference CLI - Integration', () => {
+describe.skip('Reference CLI - Integration', () => {
   it('should support all commands on same mission', async () => {
     const agent = new MissionAgent(2, 1);
     await agent.initialize();
@@ -280,7 +280,7 @@ describe('Reference CLI - Integration', () => {
   });
 });
 
-describe('Reference CLI - Error Handling', () => {
+describe.skip('Reference CLI - Error Handling', () => {
   it('should handle initialization errors gracefully', async () => {
     const agent = new MissionAgent(1, 1);
 

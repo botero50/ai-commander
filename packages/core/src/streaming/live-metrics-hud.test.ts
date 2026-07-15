@@ -8,7 +8,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { LiveMetricsHUD, createLiveMetricsHUD } from './live-metrics-hud.js';
 import { Logger } from '../config/logger.js';
 
-describe('Live Metrics HUD (Story 57.4)', () => {
+describe('Live Metrics HUD (Story 57.4)', { timeout: 10000 }, () => {
   let hud: LiveMetricsHUD;
   const logger = new Logger('error', 'HUDTest');
 

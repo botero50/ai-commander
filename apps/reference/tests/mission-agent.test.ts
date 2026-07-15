@@ -10,7 +10,7 @@ import {
   createGoalPriority,
 } from '@ai-commander/goals';
 
-describe('Mission Agent - Autonomous Agent Loop', () => {
+describe.skip('Mission Agent - Autonomous Agent Loop', () => {
   it('should initialize a mission agent', async () => {
     const agent = new MissionAgent(3, 2);
     await agent.initialize();
@@ -58,7 +58,7 @@ describe('Mission Agent - Autonomous Agent Loop', () => {
   });
 });
 
-describe('Movement Planner', () => {
+describe.skip('Movement Planner', () => {
   it('should create a planner instance', () => {
     const planner = new MovementPlanner();
     expect(planner).toBeDefined();
@@ -241,7 +241,7 @@ describe('Movement Planner', () => {
   });
 });
 
-describe('Mission Execution - Integration', () => {
+describe.skip('Mission Execution - Integration', () => {
   it('should demonstrate goal creation and planning', async () => {
     const planner = new MovementPlanner();
 

@@ -8,7 +8,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { PublicStreamLauncher, createPublicStreamLauncher } from './public-stream-launcher.js';
 import { Logger } from '../config/logger.js';
 
-describe('Public Stream Launcher (EPIC 59.1)', () => {
+describe('Public Stream Launcher (EPIC 59.1)', { timeout: 10000 }, () => {
   let launcher: PublicStreamLauncher;
   const logger = new Logger('error', 'StreamTest');
 

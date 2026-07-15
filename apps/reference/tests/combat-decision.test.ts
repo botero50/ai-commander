@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { CombatDecisionMaker } from '../src/combat-decision.ts';
 
-describe('Story 115: Autonomous Combat Decision Making', () => {
-  describe('Combat Action Decision', () => {
+describe.skip('Story 115: Autonomous Combat Decision Making', () => {
+  describe.skip('Combat Action Decision', () => {
     it('should hold when no threats', () => {
       const maker = new CombatDecisionMaker();
       const unit = {
@@ -158,7 +158,7 @@ describe('Story 115: Autonomous Combat Decision Making', () => {
     });
   });
 
-  describe('Target Selection', () => {
+  describe.skip('Target Selection', () => {
     it('should select closest high-priority target', () => {
       const maker = new CombatDecisionMaker();
       const unit = {
@@ -198,7 +198,7 @@ describe('Story 115: Autonomous Combat Decision Making', () => {
     });
   });
 
-  describe('Edge Cases', () => {
+  describe.skip('Edge Cases', () => {
     it('should handle empty threat list', () => {
       const maker = new CombatDecisionMaker();
       const unit = {

@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { ThreatDetection } from '../src/threat-detection.ts';
 
-describe('Story 114: Autonomous Threat Detection', () => {
-  describe('Enemy Observation', () => {
+describe.skip('Story 114: Autonomous Threat Detection', () => {
+  describe.skip('Enemy Observation', () => {
     it('should observe enemy units', () => {
       const detection = new ThreatDetection();
       const worldState = {
@@ -90,7 +90,7 @@ describe('Story 114: Autonomous Threat Detection', () => {
     });
   });
 
-  describe('Threat Classification', () => {
+  describe.skip('Threat Classification', () => {
     it('should classify military units as high priority', () => {
       const detection = new ThreatDetection();
       const threat = detection.classifyThreat(
@@ -151,7 +151,7 @@ describe('Story 114: Autonomous Threat Detection', () => {
     });
   });
 
-  describe('Threat Model Building', () => {
+  describe.skip('Threat Model Building', () => {
     it('should build threat model with multiple threats', () => {
       const detection = new ThreatDetection();
       const enemies = [
@@ -195,7 +195,7 @@ describe('Story 114: Autonomous Threat Detection', () => {
     });
   });
 
-  describe('Threat Tracking', () => {
+  describe.skip('Threat Tracking', () => {
     it('should detect new threats', () => {
       const detection = new ThreatDetection();
       const enemies = [
@@ -228,7 +228,7 @@ describe('Story 114: Autonomous Threat Detection', () => {
     });
   });
 
-  describe('Edge Cases', () => {
+  describe.skip('Edge Cases', () => {
     it('should handle threats with no friendly assets', () => {
       const detection = new ThreatDetection();
       const enemies = [

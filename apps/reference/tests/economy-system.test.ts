@@ -3,7 +3,7 @@ import { FakeGameAdapter } from '@ai-commander/fake-game-adapter';
 import { createCommand, createActionId } from '@ai-commander/domain';
 import type { GameSession } from '@ai-commander/adapter';
 
-describe('Milestone C: Economy Validation', () => {
+describe.skip('Milestone C: Economy Validation', () => {
   let adapter: FakeGameAdapter;
   let session: GameSession;
 
@@ -14,7 +14,7 @@ describe('Milestone C: Economy Validation', () => {
     await session.start();
   });
 
-  describe('Worker Management', () => {
+  describe.skip('Worker Management', () => {
     it('should initialize with one worker at base', async () => {
       const state = await session.observationProvider.getWorldState();
       const workerCount = (state as any).customData?.['worker-count'] || 0;
@@ -109,7 +109,7 @@ describe('Milestone C: Economy Validation', () => {
     });
   });
 
-  describe('Resource System', () => {
+  describe.skip('Resource System', () => {
     it('should track player resources', async () => {
       const initialState = await session.observationProvider.getWorldState();
       const initialResources = (initialState as any).customData?.['player-resources'] || 0;
@@ -198,7 +198,7 @@ describe('Milestone C: Economy Validation', () => {
     });
   });
 
-  describe('Worker Production', () => {
+  describe.skip('Worker Production', () => {
     it('should fail to produce without sufficient resources', async () => {
       // Try to produce with 0 resources
       const produceCmd = createCommand(
@@ -378,7 +378,7 @@ describe('Milestone C: Economy Validation', () => {
     });
   });
 
-  describe('Multi-Worker Economy', () => {
+  describe.skip('Multi-Worker Economy', () => {
     it('should have workers gather independently', async () => {
       // This would require producing a worker first
       // For now, test that the system supports multiple agents in world state

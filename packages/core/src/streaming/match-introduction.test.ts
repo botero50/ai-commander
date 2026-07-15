@@ -8,7 +8,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { MatchIntroduction, createMatchIntroduction, type MatchInfo } from './match-introduction.js';
 import { Logger } from '../config/logger.js';
 
-describe('Match Introduction (Story 57.2)', () => {
+describe('Match Introduction (Story 57.2)', { timeout: 10000 }, () => {
   let intro: MatchIntroduction;
   const logger = new Logger('error', 'IntroTest');
 

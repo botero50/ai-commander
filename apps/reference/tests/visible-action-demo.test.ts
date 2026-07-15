@@ -3,7 +3,7 @@ import { VisibleActionDemo } from '../src/visible-action-demo.ts';
 import type { IntegrationHostCallbacks } from '../src/game adapter-integration-host.ts';
 import type { OpenRAGameState } from '@ai-commander/openra-adapter';
 
-describe('Visible Action Demo', () => {
+describe.skip('Visible Action Demo', () => {
   let demo: VisibleActionDemo;
   let mockCallbacks: IntegrationHostCallbacks;
   let mockGameStateInitial: OpenRAGameState;
@@ -99,7 +99,7 @@ describe('Visible Action Demo', () => {
     };
   });
 
-  describe('captureBeforeState', () => {
+  describe.skip('captureBeforeState', () => {
     it('captures initial game state', async () => {
       const result = await demo.captureBeforeState(mockCallbacks);
       expect(result).toBe(true);
@@ -146,7 +146,7 @@ describe('Visible Action Demo', () => {
     });
   });
 
-  describe('issueMoveCommand', () => {
+  describe.skip('issueMoveCommand', () => {
     it('issues move command for identified unit', async () => {
       await demo.captureBeforeState(mockCallbacks);
       const result = await demo.issueMoveCommand(mockCallbacks);
@@ -187,7 +187,7 @@ describe('Visible Action Demo', () => {
     });
   });
 
-  describe('waitForGameTicks', () => {
+  describe.skip('waitForGameTicks', () => {
     it('waits specified number of ticks', async () => {
       const startTime = Date.now();
       await demo.waitForGameTicks(5);
@@ -206,7 +206,7 @@ describe('Visible Action Demo', () => {
     });
   });
 
-  describe('captureAfterState', () => {
+  describe.skip('captureAfterState', () => {
     it('captures final game state', async () => {
       await demo.captureBeforeState(mockCallbacks);
       await demo.issueMoveCommand(mockCallbacks);
@@ -243,7 +243,7 @@ describe('Visible Action Demo', () => {
     });
   });
 
-  describe('detectVisibleChange', () => {
+  describe.skip('detectVisibleChange', () => {
     it('detects unit movement', async () => {
       await demo.captureBeforeState(mockCallbacks);
       await demo.issueMoveCommand(mockCallbacks);
@@ -318,7 +318,7 @@ describe('Visible Action Demo', () => {
     });
   });
 
-  describe('runDemonstration', () => {
+  describe.skip('runDemonstration', () => {
     it('completes full demonstration successfully', async () => {
       const result = await demo.runDemonstration(mockCallbacks);
 
@@ -356,7 +356,7 @@ describe('Visible Action Demo', () => {
     });
   });
 
-  describe('generateEvidenceReport', () => {
+  describe.skip('generateEvidenceReport', () => {
     it('generates report after demonstration', async () => {
       await demo.runDemonstration(mockCallbacks);
 

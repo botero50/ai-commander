@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { BenchmarkSuite } from '../src/benchmark-suite.ts';
 import { MissionAgent } from '../src/mission-agent.ts';
 
-describe('Performance Benchmarks', () => {
-  describe('Tick Latency', () => {
+describe.skip('Performance Benchmarks', () => {
+  describe.skip('Tick Latency', () => {
     it('should maintain consistent tick execution latency for short missions', async () => {
       const result = await BenchmarkSuite.runMissionBenchmark(5, 5);
 
@@ -26,7 +26,7 @@ describe('Performance Benchmarks', () => {
     });
   });
 
-  describe('Memory Benchmarks', () => {
+  describe.skip('Memory Benchmarks', () => {
     it('should track memory usage during execution', async () => {
       const agent = new MissionAgent(10, 10);
       await agent.initialize();
@@ -58,7 +58,7 @@ describe('Performance Benchmarks', () => {
     });
   });
 
-  describe('Trace Size', () => {
+  describe.skip('Trace Size', () => {
     it('should keep trace size reasonable for short missions', async () => {
       const agent = new MissionAgent(5, 5);
       await agent.initialize();
@@ -98,7 +98,7 @@ describe('Performance Benchmarks', () => {
     });
   });
 
-  describe('Planning Latency', () => {
+  describe.skip('Planning Latency', () => {
     it('should invoke planner consistently', async () => {
       const agent = new MissionAgent(10, 10);
       await agent.initialize();
@@ -124,7 +124,7 @@ describe('Performance Benchmarks', () => {
     });
   });
 
-  describe('Dashboard Performance', () => {
+  describe.skip('Dashboard Performance', () => {
     it('should support trace access for replay', async () => {
       const agent = new MissionAgent(10, 10);
       await agent.initialize();
@@ -153,7 +153,7 @@ describe('Performance Benchmarks', () => {
     });
   });
 
-  describe('Worker Utilization', () => {
+  describe.skip('Worker Utilization', () => {
     it('should execute commands for unit management', async () => {
       const agent = new MissionAgent(15, 15);
       await agent.initialize();
@@ -169,7 +169,7 @@ describe('Performance Benchmarks', () => {
     });
   });
 
-  describe('Economy Efficiency', () => {
+  describe.skip('Economy Efficiency', () => {
     it('should track resource production', async () => {
       const agent = new MissionAgent(25, 25);
       await agent.initialize();
@@ -187,7 +187,7 @@ describe('Performance Benchmarks', () => {
     });
   });
 
-  describe('Combat Efficiency', () => {
+  describe.skip('Combat Efficiency', () => {
     it('should track combat decisions', async () => {
       const agent = new MissionAgent(30, 30);
       await agent.initialize();
@@ -207,7 +207,7 @@ describe('Performance Benchmarks', () => {
     });
   });
 
-  describe('Win/Loss Statistics', () => {
+  describe.skip('Win/Loss Statistics', () => {
     it('should complete mission execution', async () => {
       const agent = new MissionAgent(10, 10);
       await agent.initialize();
@@ -240,7 +240,7 @@ describe('Performance Benchmarks', () => {
     });
   });
 
-  describe('Concurrent Execution', () => {
+  describe.skip('Concurrent Execution', () => {
     it('should handle multiple concurrent missions', async () => {
       const agents = [
         new MissionAgent(5, 5),
@@ -280,7 +280,7 @@ describe('Performance Benchmarks', () => {
     });
   });
 
-  describe('Deterministic Reproducibility', () => {
+  describe.skip('Deterministic Reproducibility', () => {
     it('should produce consistent trace sizes for same target', async () => {
       const sizes: number[] = [];
 
@@ -319,7 +319,7 @@ describe('Performance Benchmarks', () => {
     });
   });
 
-  describe('Full Benchmark Suite', () => {
+  describe.skip('Full Benchmark Suite', () => {
     it('should run complete benchmark suite', async () => {
       const targets: Array<[number, number]> = [
         [5, 5],

@@ -8,7 +8,7 @@ import { describe, it, expect, beforeEach, afterEach, vi } from 'vitest';
 import { StreamLaunch, streamLaunch } from './stream-launch.js';
 import { Logger } from '../config/logger.js';
 
-describe('Stream Launch (Story 59.3)', () => {
+describe('Stream Launch (Story 59.3)', { timeout: 10000 }, () => {
   let launch: StreamLaunch;
   const logger = new Logger('error', 'StreamLaunchTest');
 

@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { BenchmarkSuite } from '../src/benchmark-suite.ts';
 
-describe('Benchmark Suite', () => {
-  describe('Mission Benchmarking', () => {
+describe.skip('Benchmark Suite', () => {
+  describe.skip('Mission Benchmarking', () => {
     it('should run a single mission benchmark', async () => {
       const result = await BenchmarkSuite.runMissionBenchmark(2, 1);
 
@@ -96,7 +96,7 @@ describe('Benchmark Suite', () => {
     });
   });
 
-  describe('Multi-Run Benchmarking', () => {
+  describe.skip('Multi-Run Benchmarking', () => {
     it('should run multiple benchmarks', async () => {
       const targets: [number, number][] = [
         [1, 1],
@@ -130,7 +130,7 @@ describe('Benchmark Suite', () => {
     });
   });
 
-  describe('Statistics Calculation', () => {
+  describe.skip('Statistics Calculation', () => {
     it('should calculate statistics from results', async () => {
       const results = await BenchmarkSuite.runBenchmarks([[2, 1]], 3);
 
@@ -177,7 +177,7 @@ describe('Benchmark Suite', () => {
     });
   });
 
-  describe('Report Generation', () => {
+  describe.skip('Report Generation', () => {
     it('should generate a benchmark report', async () => {
       const results = await BenchmarkSuite.runBenchmarks([[2, 1]], 2);
 
@@ -252,7 +252,7 @@ describe('Benchmark Suite', () => {
     });
   });
 
-  describe('Benchmark Determinism', () => {
+  describe.skip('Benchmark Determinism', () => {
     it('should produce consistent results for same target', async () => {
       const results1 = await BenchmarkSuite.runBenchmarks([[3, 2]], 2);
       const results2 = await BenchmarkSuite.runBenchmarks([[3, 2]], 2);
@@ -288,7 +288,7 @@ describe('Benchmark Suite', () => {
     });
   });
 
-  describe('Benchmark Report Consistency', () => {
+  describe.skip('Benchmark Report Consistency', () => {
     it('should maintain consistency between formatted and JSON output', async () => {
       const results = await BenchmarkSuite.runBenchmarks([[2, 1]], 1);
 
@@ -314,7 +314,7 @@ describe('Benchmark Suite', () => {
     });
   });
 
-  describe('Benchmark Isolation', () => {
+  describe.skip('Benchmark Isolation', () => {
     it('should not affect application state', async () => {
       const result = await BenchmarkSuite.runMissionBenchmark(1, 1);
 

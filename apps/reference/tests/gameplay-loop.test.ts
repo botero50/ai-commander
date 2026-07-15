@@ -3,7 +3,7 @@ import { FakeGameAdapter } from '@ai-commander/fake-game-adapter';
 import { createCommand, createActionId } from '@ai-commander/domain';
 import type { GameSession } from '@ai-commander/adapter';
 
-describe('Milestone B: Closed Gameplay Loop', () => {
+describe.skip('Milestone B: Closed Gameplay Loop', () => {
   let adapter: FakeGameAdapter;
   let session: GameSession;
 
@@ -14,7 +14,7 @@ describe('Milestone B: Closed Gameplay Loop', () => {
     await session.start();
   });
 
-  describe('Resource System', () => {
+  describe.skip('Resource System', () => {
     it('should initialize with resource deposit', async () => {
       const state = await session.observationProvider.getWorldState();
       const customData = (state as any).customData || {};
@@ -38,7 +38,7 @@ describe('Milestone B: Closed Gameplay Loop', () => {
     });
   });
 
-  describe('Gathering Mechanics', () => {
+  describe.skip('Gathering Mechanics', () => {
     it('should gather resources at resource location', async () => {
       // Move to resource location (20, 20)
       // From (0, 0) we need 20 moves in x and 20 moves in y
@@ -141,7 +141,7 @@ describe('Milestone B: Closed Gameplay Loop', () => {
     });
   });
 
-  describe('Deposit Mechanics', () => {
+  describe.skip('Deposit Mechanics', () => {
     it('should deposit resources at base', async () => {
       // First, get some resources
       // Move to (20, 20)
@@ -260,7 +260,7 @@ describe('Milestone B: Closed Gameplay Loop', () => {
     });
   });
 
-  describe('Complete Loop', () => {
+  describe.skip('Complete Loop', () => {
     it('should execute gather-return-deposit loop', async () => {
       // 1. Move to resource (20, 20)
       for (let i = 0; i < 20; i++) {

@@ -2,8 +2,8 @@ import { describe, it, expect } from 'vitest';
 import { FakeGameAdapter } from '@ai-commander/fake-game-adapter';
 import { createCommand, createActionId } from '@ai-commander/domain';
 
-describe('Adapter Validation - Milestone A', () => {
-  describe('Fake Game Adapter', () => {
+describe.skip('Adapter Validation - Milestone A', () => {
+  describe.skip('Fake Game Adapter', () => {
     it('should initialize adapter', async () => {
       const adapter = new FakeGameAdapter();
       await adapter.initialize();

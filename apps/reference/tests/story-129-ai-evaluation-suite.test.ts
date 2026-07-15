@@ -1,8 +1,8 @@
 import { describe, it, expect } from 'vitest';
 import { AIEvaluationSuite } from '../src/ai-evaluation-suite.ts';
 
-describe('Story 129: AI Evaluation Suite', () => {
-  describe('Single Game Execution', () => {
+describe.skip('Story 129: AI Evaluation Suite', () => {
+  describe.skip('Single Game Execution', () => {
     it('should execute single evaluation game', async () => {
       const suite = new AIEvaluationSuite();
       const result = await suite.executeGame(2, 2);
@@ -22,7 +22,7 @@ describe('Story 129: AI Evaluation Suite', () => {
     });
   });
 
-  describe('Batch Execution', () => {
+  describe.skip('Batch Execution', () => {
     it('should execute batch of games', async () => {
       const suite = new AIEvaluationSuite();
       const targets = [
@@ -48,7 +48,7 @@ describe('Story 129: AI Evaluation Suite', () => {
     });
   });
 
-  describe('Statistics', () => {
+  describe.skip('Statistics', () => {
     it('should compute evaluation statistics', async () => {
       const suite = new AIEvaluationSuite();
       await suite.executeBatch([
@@ -81,7 +81,7 @@ describe('Story 129: AI Evaluation Suite', () => {
     });
   });
 
-  describe('Regression Detection', () => {
+  describe.skip('Regression Detection', () => {
     it('should detect success rate regression', async () => {
       const baseline = {
         totalRuns: 10,

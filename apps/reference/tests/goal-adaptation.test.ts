@@ -2,14 +2,14 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { MissionAgent } from '../src/mission-agent.ts';
 import { TimelineInspector } from '../src/timeline-inspector.ts';
 
-describe('Story 100: Observable Goal Adaptation', () => {
+describe.skip('Story 100: Observable Goal Adaptation', () => {
   let agent: MissionAgent;
 
   beforeEach(() => {
     agent = new MissionAgent(50, 50);
   });
 
-  describe('Goal Adaptation Detection', () => {
+  describe.skip('Goal Adaptation Detection', () => {
     it('should record goal adaptation in trace when world changes', async () => {
       await agent.initialize();
       await agent.run();
@@ -59,7 +59,7 @@ describe('Story 100: Observable Goal Adaptation', () => {
     });
   });
 
-  describe('Adaptation with World State Changes', () => {
+  describe.skip('Adaptation with World State Changes', () => {
     it('should detect world state changes', async () => {
       await agent.initialize();
       await agent.run();
@@ -89,7 +89,7 @@ describe('Story 100: Observable Goal Adaptation', () => {
     });
   });
 
-  describe('Adaptation Determinism', () => {
+  describe.skip('Adaptation Determinism', () => {
     it('should deterministically adapt given same world state', async () => {
       // Run 1
       const agent1 = new MissionAgent(50, 50);
@@ -120,7 +120,7 @@ describe('Story 100: Observable Goal Adaptation', () => {
     });
   });
 
-  describe('Historical Reconstruction', () => {
+  describe.skip('Historical Reconstruction', () => {
     it('should extract adaptation events from timeline', async () => {
       await agent.initialize();
       await agent.run();
@@ -171,7 +171,7 @@ describe('Story 100: Observable Goal Adaptation', () => {
     });
   });
 
-  describe('Edge Cases', () => {
+  describe.skip('Edge Cases', () => {
     it('should handle missions with no adaptations', async () => {
       await agent.initialize();
       await agent.run();

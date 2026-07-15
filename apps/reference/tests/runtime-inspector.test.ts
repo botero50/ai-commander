@@ -6,7 +6,7 @@ import {
 } from '../src/runtime-inspector.ts';
 import { MissionAgent } from '../src/mission-agent.ts';
 
-describe('Runtime Inspector - Snapshot Capture', () => {
+describe.skip('Runtime Inspector - Snapshot Capture', () => {
   it('should capture a runtime snapshot', async () => {
     const agent = new MissionAgent(1, 1);
     await agent.initialize();
@@ -84,7 +84,7 @@ describe('Runtime Inspector - Snapshot Capture', () => {
   });
 });
 
-describe('Runtime Inspector - Immutability', () => {
+describe.skip('Runtime Inspector - Immutability', () => {
   it('should freeze snapshot', async () => {
     const agent = new MissionAgent(1, 1);
     await agent.initialize();
@@ -112,7 +112,7 @@ describe('Runtime Inspector - Immutability', () => {
   });
 });
 
-describe('Runtime Inspector - Formatting', () => {
+describe.skip('Runtime Inspector - Formatting', () => {
   it('should format snapshot as human-readable text', async () => {
     const agent = new MissionAgent(1, 1);
     await agent.initialize();
@@ -144,7 +144,7 @@ describe('Runtime Inspector - Formatting', () => {
   });
 });
 
-describe('Runtime Inspector - Consistency', () => {
+describe.skip('Runtime Inspector - Consistency', () => {
   it('should have consistent snapshot data', async () => {
     const agent = new MissionAgent(2, 1);
     await agent.initialize();

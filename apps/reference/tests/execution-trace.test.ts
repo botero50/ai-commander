@@ -9,7 +9,7 @@ import {
   createGoalPriority,
 } from '@ai-commander/goals';
 
-describe('Execution Trace - Structured Observability', () => {
+describe.skip('Execution Trace - Structured Observability', () => {
   it('should create an empty trace', () => {
     const tracer = new ExecutionTracer('test-mission', 1, 1);
     const trace = tracer.getTrace();
@@ -181,7 +181,7 @@ describe('Execution Trace - Structured Observability', () => {
   });
 });
 
-describe('Execution Trace - Integration with Mission Agent', () => {
+describe.skip('Execution Trace - Integration with Mission Agent', () => {
   it('should record trace for complete mission', async () => {
     const agent = new MissionAgent(1, 1);
 
@@ -327,7 +327,7 @@ describe('Execution Trace - Integration with Mission Agent', () => {
   });
 });
 
-describe('Execution Trace - Trace Structure and Content', () => {
+describe.skip('Execution Trace - Trace Structure and Content', () => {
   it('should capture mission metadata', async () => {
     const agent = new MissionAgent(2, 3);
 

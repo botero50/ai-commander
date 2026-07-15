@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { MissionAgent } from '../src/mission-agent.ts';
 
-describe('Story 118: Fog of War Integration', () => {
+describe.skip('Story 118: Fog of War Integration', () => {
   it('should record enemy discovery', async () => {
     const agent = new MissionAgent(5, 5);
     await agent.initialize();

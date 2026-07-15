@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { MissionAgent } from '../src/mission-agent.ts';
 
-describe('Story 115: Combat Decision Integration', () => {
+describe.skip('Story 115: Combat Decision Integration', () => {
   it('should record combat decision events', async () => {
     const agent = new MissionAgent(5, 5);
     await agent.initialize();

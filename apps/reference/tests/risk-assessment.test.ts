@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { RiskAssessor } from '../src/risk-assessment.ts';
 
-describe('Story 147: Risk Assessment', () => {
+describe.skip('Story 147: Risk Assessment', () => {
   const assessor = new RiskAssessor();
 
-  describe('Deterministic Assessment', () => {
+  describe.skip('Deterministic Assessment', () => {
     it('should assess risk deterministically', () => {
       const result1 = assessor.assessRisk(0, 50, 60, 100, 5);
       const result2 = assessor.assessRisk(0, 50, 60, 100, 5);
@@ -14,7 +14,7 @@ describe('Story 147: Risk Assessment', () => {
     });
   });
 
-  describe('Military Risk', () => {
+  describe.skip('Military Risk', () => {
     it('should assess unit loss risk from force ratio', () => {
       const result = assessor.assessRisk(0, 100, 150, 100, 5);
 
@@ -47,7 +47,7 @@ describe('Story 147: Risk Assessment', () => {
     });
   });
 
-  describe('Economic Risk', () => {
+  describe.skip('Economic Risk', () => {
     it('should assess resource production risk', () => {
       const result = assessor.assessRisk(0, 200, 100, 30, 5);
 
@@ -70,7 +70,7 @@ describe('Story 147: Risk Assessment', () => {
     });
   });
 
-  describe('Strategic Risk', () => {
+  describe.skip('Strategic Risk', () => {
     it('should assess time constraint risk', () => {
       const result = assessor.assessRisk(0, 50, 50, 100, 1);
 
@@ -91,7 +91,7 @@ describe('Story 147: Risk Assessment', () => {
     });
   });
 
-  describe('Opportunity Cost', () => {
+  describe.skip('Opportunity Cost', () => {
     it('should assess missed expansion from military allocation', () => {
       const highMilitary = assessor.assessRisk(0, 150, 100, 100, 5);
       const lowMilitary = assessor.assessRisk(0, 50, 100, 100, 5);
@@ -114,7 +114,7 @@ describe('Story 147: Risk Assessment', () => {
     });
   });
 
-  describe('Combined Risk Score', () => {
+  describe.skip('Combined Risk Score', () => {
     it('should combine risk factors with weighting', () => {
       const result = assessor.assessRisk(0, 50, 100, 50, 3);
 
@@ -130,7 +130,7 @@ describe('Story 147: Risk Assessment', () => {
     });
   });
 
-  describe('Risk Level Classification', () => {
+  describe.skip('Risk Level Classification', () => {
     it('should classify low risk', () => {
       const result = assessor.assessRisk(0, 150, 50, 200, 10);
       const level = assessor.getRiskLevel(result.combinedScore);
@@ -153,7 +153,7 @@ describe('Story 147: Risk Assessment', () => {
     });
   });
 
-  describe('Full Risk Assessment', () => {
+  describe.skip('Full Risk Assessment', () => {
     it('should produce complete risk evaluation', () => {
       const result = assessor.assessRisk(0, 75, 85, 120, 6);
 

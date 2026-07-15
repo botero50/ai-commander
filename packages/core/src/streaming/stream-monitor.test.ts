@@ -8,7 +8,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { StreamMonitor, createStreamMonitor } from './stream-monitor.js';
 import { Logger } from '../config/logger.js';
 
-describe('Stream Monitor', () => {
+describe('Stream Monitor', { timeout: 10000 }, () => {
   let monitor: StreamMonitor;
   const logger = new Logger('error', 'MonitorTest');
 

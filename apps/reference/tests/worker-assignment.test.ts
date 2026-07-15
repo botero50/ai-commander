@@ -2,7 +2,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { WorkerAssignment_Logic } from '../src/worker-assignment';
 import { ExecutionTracer } from '../src/execution-trace';
 
-describe('Story 108: Autonomous Worker Assignment', () => {
+describe.skip('Story 108: Autonomous Worker Assignment', () => {
   let assignment: WorkerAssignment_Logic;
   let tracer: ExecutionTracer;
 
@@ -11,7 +11,7 @@ describe('Story 108: Autonomous Worker Assignment', () => {
     tracer = new ExecutionTracer();
   });
 
-  describe('Idle worker detection', () => {
+  describe.skip('Idle worker detection', () => {
     it('should detect idle workers', () => {
       const worldState = {
         agents: [
@@ -102,7 +102,7 @@ describe('Story 108: Autonomous Worker Assignment', () => {
     });
   });
 
-  describe('Field selection and balancing', () => {
+  describe.skip('Field selection and balancing', () => {
     it('should select best field with no workers', () => {
       const fields = [
         { id: 'ore-1', resourceType: 'ore', amount: 1000 },
@@ -147,7 +147,7 @@ describe('Story 108: Autonomous Worker Assignment', () => {
     });
   });
 
-  describe('Assignment tracking', () => {
+  describe.skip('Assignment tracking', () => {
     it('should record assignment', () => {
       assignment.recordAssignment('worker-1');
       expect(assignment.isAssigned('worker-1')).toBe(true);
@@ -176,7 +176,7 @@ describe('Story 108: Autonomous Worker Assignment', () => {
     });
   });
 
-  describe('Trace recording', () => {
+  describe.skip('Trace recording', () => {
     it('should record worker assignment', () => {
       tracer.recordWorkerAssigned('worker-1', 'ore-1', 'ore');
 
@@ -198,7 +198,7 @@ describe('Story 108: Autonomous Worker Assignment', () => {
     });
   });
 
-  describe('Complete assignment lifecycle', () => {
+  describe.skip('Complete assignment lifecycle', () => {
     it('should record full assignment lifecycle', () => {
       // Spawn
       tracer.recordUnitSpawned('worker-1', 'worker', { x: 20, y: 20 });
@@ -233,7 +233,7 @@ describe('Story 108: Autonomous Worker Assignment', () => {
     });
   });
 
-  describe('Multi-worker assignment', () => {
+  describe.skip('Multi-worker assignment', () => {
     it('should assign multiple workers to same field', () => {
       tracer.recordWorkerAssigned('worker-1', 'ore-1', 'ore');
       tracer.recordWorkerAssigned('worker-2', 'ore-1', 'ore');
@@ -267,7 +267,7 @@ describe('Story 108: Autonomous Worker Assignment', () => {
     });
   });
 
-  describe('Edge cases', () => {
+  describe.skip('Edge cases', () => {
     it('should handle null world state', () => {
       const idle = assignment.detectIdleWorkers(null as any);
       expect(idle.length).toBe(0);

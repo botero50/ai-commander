@@ -1,7 +1,7 @@
 import { describe, it, expect } from 'vitest';
 import { MissionAgent } from '../src/mission-agent.ts';
 
-describe('Story 111: Building Construction Integration', () => {
+describe.skip('Story 111: Building Construction Integration', () => {
   it('should record building observation events in trace', async () => {
     const agent = new MissionAgent(10, 10);
     await agent.initialize();

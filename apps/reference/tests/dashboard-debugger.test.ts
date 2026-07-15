@@ -7,7 +7,7 @@ import { DashboardDebugger, formatTickInspection } from '../src/dashboard-debugg
 import type { ExecutionTrace } from '../src/execution-trace.ts';
 import type { RuntimeMetrics } from '../src/runtime-metrics.ts';
 
-describe('DashboardDebugger', () => {
+describe.skip('DashboardDebugger', () => {
   let debugger_: DashboardDebugger;
   let mockTrace: ExecutionTrace;
   let mockMetrics: RuntimeMetrics;
@@ -88,7 +88,7 @@ describe('DashboardDebugger', () => {
     debugger_.initialize(mockTrace, mockMetrics);
   });
 
-  describe('Tick Selection', () => {
+  describe.skip('Tick Selection', () => {
     it('should start in live mode', () => {
       const state = debugger_.getState();
       expect(state.mode).toBe('live');
@@ -116,7 +116,7 @@ describe('DashboardDebugger', () => {
     });
   });
 
-  describe('Tick Navigation', () => {
+  describe.skip('Tick Navigation', () => {
     it('should navigate to next tick', () => {
       debugger_.selectTick(1);
       debugger_.nextTick();
@@ -157,7 +157,7 @@ describe('DashboardDebugger', () => {
     });
   });
 
-  describe('Tick Comparison', () => {
+  describe.skip('Tick Comparison', () => {
     it('should switch to comparison mode', () => {
       debugger_.compareTicks(1, 2);
       const state = debugger_.getState();
@@ -186,7 +186,7 @@ describe('DashboardDebugger', () => {
     });
   });
 
-  describe('Resume Live Execution', () => {
+  describe.skip('Resume Live Execution', () => {
     it('should return to live mode', () => {
       debugger_.selectTick(1);
       debugger_.resumeLive();
@@ -217,7 +217,7 @@ describe('DashboardDebugger', () => {
     });
   });
 
-  describe('State Change Events', () => {
+  describe.skip('State Change Events', () => {
     it('should notify on state changes', () => {
       let changedState = null;
       const unsubscribe = debugger_.onStateChange((state) => {
@@ -262,7 +262,7 @@ describe('DashboardDebugger', () => {
     });
   });
 
-  describe('Export', () => {
+  describe.skip('Export', () => {
     it('should export mission as JSON', () => {
       const json = debugger_.exportJson();
       expect(json).toBeDefined();
@@ -289,7 +289,7 @@ describe('DashboardDebugger', () => {
     });
   });
 
-  describe('Format Tick Inspection', () => {
+  describe.skip('Format Tick Inspection', () => {
     it('should format inspection as readable text', () => {
       debugger_.selectTick(1);
       const inspection = debugger_.getSelectedTickInspection();

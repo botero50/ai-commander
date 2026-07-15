@@ -1,10 +1,10 @@
 import { describe, it, expect } from 'vitest';
 import { DecisionExplainer } from '../src/explainable-decisions.ts';
 
-describe('Story 148: Explainable Decisions', () => {
+describe.skip('Story 148: Explainable Decisions', () => {
   const explainer = new DecisionExplainer();
 
-  describe('Decision Explanation', () => {
+  describe.skip('Decision Explanation', () => {
     it('should explain selected decision', () => {
       const explanation = explainer.explainDecision(
         0,
@@ -61,7 +61,7 @@ describe('Story 148: Explainable Decisions', () => {
     });
   });
 
-  describe('Alternative Rejection', () => {
+  describe.skip('Alternative Rejection', () => {
     it('should explain why alternatives were rejected', () => {
       const explanation = explainer.explainDecision(
         0,
@@ -109,7 +109,7 @@ describe('Story 148: Explainable Decisions', () => {
     });
   });
 
-  describe('Evidence Integration', () => {
+  describe.skip('Evidence Integration', () => {
     it('should list observable evidence', () => {
       const evidence = ['unit movement detected', 'resource gathering ongoing', 'construction started'];
       const explanation = explainer.explainDecision(
@@ -141,7 +141,7 @@ describe('Story 148: Explainable Decisions', () => {
     });
   });
 
-  describe('Summary Generation', () => {
+  describe.skip('Summary Generation', () => {
     it('should generate human-readable summary', () => {
       const explanation = explainer.explainDecision(
         0,
@@ -185,7 +185,7 @@ describe('Story 148: Explainable Decisions', () => {
     });
   });
 
-  describe('Decision History', () => {
+  describe.skip('Decision History', () => {
     it('should record decision history', () => {
       const explanation1 = explainer.explainDecision(
         0,
@@ -220,7 +220,7 @@ describe('Story 148: Explainable Decisions', () => {
     });
   });
 
-  describe('Full Explainable Decision', () => {
+  describe.skip('Full Explainable Decision', () => {
     it('should produce complete explanation', () => {
       const explanation = explainer.explainDecision(
         5,

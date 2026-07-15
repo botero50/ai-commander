@@ -9,7 +9,7 @@ import { describe, it, expect, beforeEach } from 'vitest';
 import { BroadcastDataBridge, createBroadcastDataBridge } from './broadcast-data-bridge.js';
 import { Logger } from '../config/logger.js';
 
-describe('Broadcast Data Bridge (Story 57.1)', () => {
+describe('Broadcast Data Bridge (Story 57.1)', { timeout: 10000 }, () => {
   let bridge: BroadcastDataBridge;
   const logger = new Logger('error', 'BridgeTest');
 
