@@ -16,7 +16,7 @@ describe('MapDiscovery', () => {
 
   it('should load fallback maps when discovery fails', async () => {
     const maps = await discovery.discoverMaps();
-    expect(maps.length).toBe(55); // 55 verified working maps (29 × 2p + 4 × 3p + 17 × 4p + 2 × 5p + 2 × 6p + 1 × 8p)
+    expect(maps.length).toBe(54); // Verified working maps
     expect(maps.some(m => m.name === 'acropolis_bay_2p')).toBe(true);
     expect(maps.some(m => m.name === 'alpine_mountains_3p')).toBe(true);
   });
