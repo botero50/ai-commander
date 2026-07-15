@@ -1302,10 +1302,12 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
 
               if (decision1.commands && decision1.commands.length > 0) {
                 allCommands.push(...decision1.commands);
-                logger.debug(`P1 decision: ${decision1.commands.length} commands`, {
+                logger.info(`🤖 P1 decision: ${decision1.commands.length} commands`, {
                   tick,
                   commands: decision1.commands.map((c: any) => c.json_cmd?.type || 'unknown'),
                 });
+              } else {
+                logger.info(`⚠️ P1 decision received but NO commands (0 length)`, { tick });
               }
             } catch (err: any) {
               const isAbortError = err instanceof Error && err.name === 'AbortError';
@@ -1332,10 +1334,12 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
 
               if (decision2.commands && decision2.commands.length > 0) {
                 allCommands.push(...decision2.commands);
-                logger.debug(`P2 decision: ${decision2.commands.length} commands`, {
+                logger.info(`🤖 P2 decision: ${decision2.commands.length} commands`, {
                   tick,
                   commands: decision2.commands.map((c: any) => c.json_cmd?.type || 'unknown'),
                 });
+              } else {
+                logger.info(`⚠️ P2 decision received but NO commands (0 length)`, { tick });
               }
             } catch (err: any) {
               const isAbortError = err instanceof Error && err.name === 'AbortError';
@@ -1353,6 +1357,11 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
 
         // ✅ FIXED: Step game with AI commands collected above
         // This ensures AI actually controls the game
+        if (allCommands.length > 0 && tick % 50 === 0) {
+          logger.info(`⏩ Stepping game with ${allCommands.length} total commands at tick ${tick}`);
+        } else if (allCommands.length === 0 && tick % decisionFrequency === 0) {
+          logger.info(`⏩ Stepping game with 0 commands at tick ${tick} (Petra AI takes over)`);
+        }
         gameState = await client.step(allCommands);
 
         tick++;
