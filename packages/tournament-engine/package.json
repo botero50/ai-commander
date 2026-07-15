@@ -1,20 +1,20 @@
 {
   "name": "@ai-commander/tournament-engine",
   "version": "1.0.0",
-  "description": "Tournament orchestration: Round Robin, Swiss, Best of N, Elimination",
-  "private": true,
+  "description": "Package for AI Commander framework",
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest"
   },
-  "files": ["dist"],
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@vitest/ui": "^0.34.0",
+    "vitest": "^0.34.0"
+  },
   "dependencies": {
-    "@ai-commander/brain": "workspace:*",
-    "@ai-commander/match-runner": "workspace:*"
+    "@ai-commander/contracts": "workspace:*"
   }
 }
