@@ -958,6 +958,11 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
       }
     });
 
+    // ✅ NEW: Command buffer for async AI decisions
+    // Collects commands from previous tick's decisions to send in current tick
+    let pendingP1Commands: any[] = [];
+    let pendingP2Commands: any[] = [];
+
     // Get initial state
     let gameState: any = await client.step([]);
     let tick = 0;
@@ -1288,17 +1293,28 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
           break;
         }
 
-        // Request decisions from AI brains (fire-and-forget, non-blocking)
-        // ✅ FAST: Don't wait for responses - step game immediately
-        // Collect commands from pending decisions asynchronously
+        // Collect pending commands from previous tick decisions
+        const allCommands: any[] = [...pendingP1Commands, ...pendingP2Commands];
+        pendingP1Commands = [];
+        pendingP2Commands = [];
+
+        // ✅ STEP GAME WITH COMMANDS from previous tick's decisions
+        // This ensures commands are actually executed
+        if (allCommands.length > 0 && tick % 50 === 0) {
+          logger.info(`⏩ Stepping game with ${allCommands.length} pending commands at tick ${tick}`);
+        }
+        gameState = await client.step(allCommands);
+
+        // Request NEW decisions (fire-and-forget, non-blocking)
+        // ✅ FAST: Request in background while game steps
         if (tick % decisionFrequency === 0) {
           if (brainP1) {
             brainP1.decide(worldState)
               .then((decision1: any) => {
                 if (decision1.commands && decision1.commands.length > 0) {
-                  // Send commands immediately to game
-                  client.step(decision1.commands).catch(() => {});
-                  logger.info(`🤖 P1 commands: ${decision1.commands.length}`, {
+                  // Store in buffer for next tick
+                  pendingP1Commands = decision1.commands;
+                  logger.info(`🤖 P1 decision buffered: ${decision1.commands.length}`, {
                     tick,
                     types: decision1.commands.map((c: any) => c.json_cmd?.type || 'unknown'),
                   });
@@ -1320,9 +1336,9 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
             brainP2.decide(worldState)
               .then((decision2: any) => {
                 if (decision2.commands && decision2.commands.length > 0) {
-                  // Send commands immediately to game
-                  client.step(decision2.commands).catch(() => {});
-                  logger.info(`🤖 P2 commands: ${decision2.commands.length}`, {
+                  // Store in buffer for next tick
+                  pendingP2Commands = decision2.commands;
+                  logger.info(`🤖 P2 decision buffered: ${decision2.commands.length}`, {
                     tick,
                     types: decision2.commands.map((c: any) => c.json_cmd?.type || 'unknown'),
                   });
@@ -1340,10 +1356,6 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
               });
           }
         }
-
-        // ✅ OPTIMIZED: Step game immediately (AI commands sent asynchronously)
-        // Game loop runs at full speed while Ollama thinks in background
-        gameState = await client.step([]);
 
         tick++;
 
