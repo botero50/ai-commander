@@ -6,7 +6,13 @@
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
-    "build": "tsc"
+    "build": "tsc",
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@vitest/ui": "^0.34.0",
+    "vitest": "^0.34.0"
   },
   "dependencies": {
     "@ai-commander/brain": "workspace:*",
