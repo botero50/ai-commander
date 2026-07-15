@@ -1,5 +1,5 @@
 {
-  "name": "@ai-commander/behavior-tree",
+  "name": "@ai-commander/cache",
   "version": "1.0.0",
   "description": "Package for AI Commander framework",
   "type": "module",
