@@ -13,7 +13,6 @@
     "verbatimModuleSyntax": false,
     "isolatedModules": true,
     "noUncheckedSideEffectImports": false,
-    "noImplicitAny": false,
     "exactOptionalPropertyTypes": false,
     "noUncheckedIndexedAccess": false,
     "baseUrl": ".",

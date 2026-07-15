@@ -14,7 +14,6 @@
     { "path": "packages/planner" },
     { "path": "packages/agent-runtime" },
     { "path": "packages/fake-game-adapter" },
-    { "path": "packages/behavior-tree" },
-    { "path": "packages/zeroad-adapter" }
+    { "path": "packages/behavior-tree" }
   ]
 }
