@@ -616,8 +616,12 @@ async function startGame(matchNumber: number): Promise<{ process: ChildProcess; 
     '--mod=camera_commander',  // Enable remote camera control
     // '--mod=bigger-minimap',  // TODO: Mod compatibility issue - disabled for now
     `-autostart=${selectedMap}`,
-    '-autostart-ai=1:petra',  // Petra fallback for P1 (Ollama commands override when sent)
-    '-autostart-ai=2:petra',  // Petra fallback for P2 (Ollama commands override when sent)
+    // ✅ IMPORTANT: Do NOT start with Petra AI fallback!
+    // Only Ollama controls the players via RL Interface commands
+    // If we start with Petra, it runs in parallel even when Ollama sends no commands
+    // This would mean Petra continues playing if Ollama crashes
+    '-autostart-ai=1:null',  // No AI - Ollama controls via RL Interface
+    '-autostart-ai=2:null',  // No AI - Ollama controls via RL Interface
     '-xres=2560',           // Resolution width (2K)
     '-yres=1440',           // Resolution height (2K)
   ]);
