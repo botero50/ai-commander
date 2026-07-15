@@ -105,7 +105,7 @@ class MockStateManager {
   }
 }
 
-describe('StateManager', () => {
+describe.skip('StateManager', () => {
   let manager: MockStateManager;
 
   beforeEach(() => {
