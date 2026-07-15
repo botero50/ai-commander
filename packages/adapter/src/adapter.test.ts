@@ -37,7 +37,7 @@ interface AdapterConfig {
 
 class MockGameAdapter {
   private config: AdapterConfig;
-  private isRunning = false;
+  private running = false;
   private gameState: GameStateSnapshot;
 
   constructor(config: AdapterConfig) {
@@ -54,16 +54,16 @@ class MockGameAdapter {
   }
 
   async launchGame(): Promise<void> {
-    this.isRunning = true;
+    this.running = true;
     this.gameState.tick = 0;
   }
 
   async shutdown(): Promise<void> {
-    this.isRunning = false;
+    this.running = false;
   }
 
   async executeCommands(commands: GameCommand[]): Promise<void> {
-    if (!this.isRunning) throw new Error('Game not running');
+    if (!this.running) throw new Error('Game not running');
 
     for (const cmd of commands) {
       const player = this.gameState.players.find(p => p.id === cmd.playerId);
@@ -109,7 +109,7 @@ class MockGameAdapter {
   }
 
   isRunning(): boolean {
-    return this.isRunning;
+    return this.running;
   }
 
   getTick(): number {
@@ -117,7 +117,7 @@ class MockGameAdapter {
   }
 
   validateCommand(cmd: GameCommand): boolean {
-    if (!this.isRunning) return false;
+    if (!this.running) return false;
     if (cmd.playerId < 1 || cmd.playerId > this.config.maxPlayers) return false;
     if (!cmd.type) return false;
     return true;
