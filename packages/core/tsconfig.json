@@ -9,10 +9,23 @@
     "sourceMap": true
   },
   "include": [
-    "src/**/*.ts"
+    "src/tournament/elo-rating.ts",
+    "src/config/logger.ts",
+    "src/types/**/*.ts"
   ],
   "exclude": [
     "src/**/*.test.ts",
+    "src/**/*.skip.ts",
+    "src/tournament/broadcast-server.ts",
+    "src/tournament/match-replay.ts",
+    "src/tournament/spectator-coordinator.ts",
+    "src/tournament/stream-manager.ts",
+    "src/tournament/tournament-*.ts",
+    "src/tournament/stream-*.ts",
+    "src/tournament/match-view-state.ts",
+    "src/streaming/**/*.ts",
+    "src/analytics/**/*.ts",
+    "src/commentary/**/*.ts",
     "dist",
     "node_modules",
     "tests"

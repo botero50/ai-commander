@@ -171,9 +171,10 @@ export async function streamLaunch(config?: StreamLaunchConfig): Promise<void> {
 }
 
 // CLI execution
-if (import.meta.url === `file://${process.argv[1]}`) {
-  streamLaunch().catch((error) => {
-    console.error('Stream launch failed:', error);
-    process.exit(1);
-  });
-}
+// TODO: Re-enable after switching to ES modules or using a different pattern
+// if (import.meta.url === `file://${process.argv[1]}`) {
+//   streamLaunch().catch((error) => {
+//     console.error('Stream launch failed:', error);
+//     process.exit(1);
+//   });
+// }

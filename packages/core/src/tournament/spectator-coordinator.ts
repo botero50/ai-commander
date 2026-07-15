@@ -1,9 +1,16 @@
 /**
  * Spectator Coordinator
  * Manages multiple spectators, state synchronization, and viewing experience
+ *
+ * TODO: state-types.js module needs to be extracted/created
  */
 
-import { GameState } from '../state/state-types.js';
+// TODO: Import GameState from proper location when module is available
+// import { GameState } from '../state/state-types.js';
+interface GameState {
+  tick: number;
+  [key: string]: any;
+}
 
 export interface SpectatorSession {
   spectatorId: string;

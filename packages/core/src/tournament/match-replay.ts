@@ -5,11 +5,34 @@
  * - Playback of match events
  * - Decision timeline with correlation
  * - State progression analysis
+ *
+ * TODO: Missing module imports - need to extract/create:
+ * - ../web/match-view-state.js
+ * - ../match/decision-overlay.js
+ * - ../match/match-timeline.js
  */
 
-import type { MatchViewState } from '../web/match-view-state.js';
-import type { DecisionEvent } from '../match/decision-overlay.js';
-import type { TimelineSnapshot } from '../match/match-timeline.js';
+// Placeholder types - TODO: replace with actual imports when modules are available
+interface MatchViewState {
+  matchId: string;
+  [key: string]: any;
+}
+
+interface DecisionEvent {
+  tick: number;
+  playerId: number;
+  [key: string]: any;
+}
+
+interface TimelineSnapshot {
+  tick: number;
+  [key: string]: any;
+}
+
+// Commented out broken imports:
+// import type { MatchViewState } from '../web/match-view-state.js';
+// import type { DecisionEvent } from '../match/decision-overlay.js';
+// import type { TimelineSnapshot } from '../match/match-timeline.js';
 
 /**
  * Replay event at a specific tick

@@ -13,7 +13,14 @@
  */
 
 import { Logger } from '../config/logger.js';
-import type { WorldState } from '@ai-commander/domain';
+// import type { WorldState } from '@ai-commander/domain';
+// TODO: WorldState needs to be imported from domain or defined locally
+interface WorldState {
+  tick: { number: number };
+  players: Array<{ id: number; name: string; [key: string]: any }>;
+  [key: string]: any;
+}
+
 import type { AIBrain, BrainDecision } from './ai-loop-orchestrator.js';
 import type { GameCommand } from './http-client.js';
 import { DecisionLogger } from './decision-logger.js';

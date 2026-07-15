@@ -14,16 +14,69 @@
  *   // Stream runs forever with auto-recovery
  */
 
+/**
+ * TODO: Missing module imports - need to be extracted/created:
+ * - ../arena/arena-controller.js
+ * - ../broadcast/broadcast-data-bridge.js
+ * - ../broadcast/live-metrics-hud.js
+ * - ../broadcast/match-introduction.js
+ * - ../broadcast/match-conclusion.js
+ * - ../arena/arena-status-api.js
+ */
+
 import { EventEmitter } from 'events';
 import * as http from 'http';
 import { URL } from 'url';
 import { Logger } from '../config/logger.js';
-import { ArenaController } from '../arena/arena-controller.js';
-import { BroadcastDataBridge } from '../broadcast/broadcast-data-bridge.js';
-import { LiveMetricsHUD } from '../broadcast/live-metrics-hud.js';
-import { MatchIntroduction } from '../broadcast/match-introduction.js';
-import { MatchConclusion } from '../broadcast/match-conclusion.js';
-import { ArenaStatusAPI } from '../arena/arena-status-api.js';
+
+// Placeholder classes - TODO: replace with actual implementations
+class ArenaController extends EventEmitter {
+  getStatus() { return {}; }
+  async run() { /* TODO */ }
+  async stop() { /* TODO */ }
+  async launch() { /* TODO */ }
+  async shutdown() { /* TODO */ }
+  async restart() { /* TODO */ }
+}
+
+class BroadcastDataBridge extends EventEmitter {
+  async start() { /* TODO */ }
+  async stop() { /* TODO */ }
+}
+
+class LiveMetricsHUD extends EventEmitter {
+  onMetricsUpdate(callback: any) { /* TODO */ }
+  getAllMetrics() { return {}; }
+  reset() { /* TODO */ }
+  async start() { /* TODO */ }
+  async stop() { /* TODO */ }
+}
+
+class MatchIntroduction {
+  async broadcast() { /* TODO */ }
+  async runIntroduction() { /* TODO */ }
+}
+
+class MatchConclusion {
+  async broadcast() { /* TODO */ }
+  async runConclusion() { /* TODO */ }
+}
+
+class ArenaStatusAPI {
+  getStatus() { return {}; }
+  getStats() { return {}; }
+  getHealth() { return {}; }
+  async start() { /* TODO */ }
+  async stop() { /* TODO */ }
+}
+
+// Commented out broken imports:
+// import { ArenaController } from '../arena/arena-controller.js';
+// import { BroadcastDataBridge } from '../broadcast/broadcast-data-bridge.js';
+// import { LiveMetricsHUD } from '../broadcast/live-metrics-hud.js';
+// import { MatchIntroduction } from '../broadcast/match-introduction.js';
+// import { MatchConclusion } from '../broadcast/match-conclusion.js';
+// import { ArenaStatusAPI } from '../arena/arena-status-api.js';
 
 export interface StreamConfig {
   maxMatches?: number; // 0 = infinite

@@ -1,9 +1,16 @@
 /**
  * Stream Manager
  * Multi-format streaming and codec management for broadcast delivery
+ *
+ * TODO: state-types.js module needs to be extracted/created
  */
 
-import { GameState } from '../state/state-types.js';
+// TODO: Import GameState from proper location when module is available
+// import { GameState } from '../state/state-types.js';
+interface GameState {
+  tick: number;
+  [key: string]: any;
+}
 
 export type StreamFormat = 'hls' | 'dash' | 'rtmp' | 'webrtc';
 export type VideoCodec = 'h264' | 'h265' | 'vp9' | 'av1';

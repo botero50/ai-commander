@@ -1,9 +1,16 @@
 /**
  * Broadcast Server
  * HTTP/WebSocket server for live broadcasting and real-time synchronization
+ *
+ * TODO: state-types.js module needs to be extracted/created
  */
 
-import { GameState } from '../state/state-types.js';
+// TODO: Import GameState from proper location when module is available
+// import { GameState } from '../state/state-types.js';
+interface GameState {
+  tick: number;
+  [key: string]: any;
+}
 
 export interface ClientConnection {
   clientId: string;

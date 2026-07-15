@@ -18,6 +18,7 @@
     "baseUrl": ".",
     "paths": {
       "@ai-commander/core": ["packages/core/src/index.ts"],
+      "@ai-commander/domain": ["packages/domain/src/index.ts"],
       "@ai-commander/brain": ["packages/brain/src/index.ts"],
       "@ai-commander/brain-claude": ["packages/brain-claude/src/index.ts"],
       "@ai-commander/brain-openai": ["packages/brain-openai/src/index.ts"],
