@@ -1,53 +1,42 @@
-// Core module - Framework infrastructure and abstractions
+/**
+ * @ai-commander/core
+ * 
+ * Game-agnostic AI tournament framework
+ * Reusable across any game with a GameAdapter implementation
+ */
 
-// Lifecycle types and functions
-export type { StartupResult, ShutdownResult, Lifecycle } from './types/lifecycle.js';
-export {
-  createStartupSuccess,
-  createStartupFailure,
-  createShutdownSuccess,
-  createShutdownFailure,
-} from './types/lifecycle.js';
+// Tournament System
+export * from './tournament/elo-rating';
+export * from './tournament/broadcast-server';
 
-// Error types and codes
-export { ErrorCode, FrameworkError, isFrameworkError } from './types/error.js';
+// Brain Framework
+export * from './brain/ollama-brain';
+export * from './brain/ai-loop-orchestrator';
+export * from './brain/brain-factory';
+export * from './brain/ollama-request-throttler';
+export * from './brain/decision-logger';
 
-// Disposable types and utilities
-export type { Disposable, AsyncDisposable } from './types/disposable.js';
-export { isDisposable, isAsyncDisposable, disposeAll } from './types/disposable.js';
+// Streaming
+export * from './streaming/broadcast-state';
 
-// Factory types and utilities
-export type { Factory, AsyncFactory } from './types/factory.js';
-export { isFactory, isAsyncFactory } from './types/factory.js';
+// Analytics
+export * from './analytics/statistics-analyzer';
+export * from './analytics/match-comparison';
+export * from './analytics/prediction-system';
 
-// Context types and functions
-export type { Context, RequestContext } from './types/context.js';
-export { createContext, createRequestContext } from './types/context.js';
+// Commentary
+export * from './commentary/trash-talk-generator';
 
-// Event types and functions
-export type { EventListener, EventBus } from './types/event.js';
-export { createEventBus } from './types/event.js';
+// Config
+export * from './config/logger';
 
-// Clock types and functions
-export type { Clock } from './types/clock.js';
-export { createRealtimeClock, createGameClock } from './types/clock.js';
+// Types
+export * from './types';
 
-// Scheduler types and functions
-export type { ScheduledTaskConfig, ScheduledTask, Scheduler } from './types/scheduler.js';
-export { createScheduler } from './types/scheduler.js';
-
-// Service types and functions
-export type { Service, ServiceRegistry } from './types/service.js';
-export { createServiceRegistry } from './types/service.js';
-
-// Module types and functions
-export type { Module, ModuleRegistry } from './types/module.js';
-export { createModuleRegistry } from './types/module.js';
-
-// Plugin types and functions
-export type { Plugin, PluginRegistry } from './types/plugin.js';
-export { createPluginRegistry } from './types/plugin.js';
-
-// Configuration types and functions
-export type { ConfigManager, ConfigSchema, ConfigValue } from './types/config.js';
-export { createConfigManager } from './types/config.js';
+/**
+ * To integrate a new game:
+ * 1. Create a GameAdapter implementation
+ * 2. Use BrainFactory to create AI brains
+ * 3. Use EloRating for tournament rankings
+ * 4. Use BroadcastServer for streaming
+ */

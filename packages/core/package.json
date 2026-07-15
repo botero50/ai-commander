@@ -1,34 +1,56 @@
 {
   "name": "@ai-commander/core",
   "version": "1.0.0",
-  "description": "Core framework infrastructure and abstractions for AI Commander",
-  "type": "module",
-  "main": "./dist/index.js",
-  "types": "./dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
-  },
-  "files": [
-    "dist",
-    "README.md"
-  ],
+  "description": "Game-agnostic AI tournament framework - reusable across any game",
+  "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "typecheck": "tsc --noEmit",
-    "clean": "rm -rf dist"
+    "test": "jest",
+    "lint": "eslint src/**/*.ts"
   },
   "keywords": [
+    "ai",
+    "tournament",
     "framework",
-    "core",
-    "infrastructure",
-    "dependency-injection",
-    "event-bus",
-    "lifecycle",
-    "plugin"
+    "game-agnostic",
+    "elo-rating",
+    "llm",
+    "ollama"
   ],
-  "author": "AI Commander Contributors",
-  "license": "MIT"
+  "author": "",
+  "license": "MIT",
+  "dependencies": {
+    "@ai-commander/domain": "workspace:*"
+  },
+  "devDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "exports": {
+    ".": {
+      "import": "./dist/index.js",
+      "require": "./dist/index.js",
+      "types": "./dist/index.d.ts"
+    },
+    "./tournament": {
+      "import": "./dist/tournament/index.js",
+      "types": "./dist/tournament/index.d.ts"
+    },
+    "./brain": {
+      "import": "./dist/brain/index.js",
+      "types": "./dist/brain/index.d.ts"
+    },
+    "./streaming": {
+      "import": "./dist/streaming/index.js",
+      "types": "./dist/streaming/index.d.ts"
+    },
+    "./analytics": {
+      "import": "./dist/analytics/index.js",
+      "types": "./dist/analytics/index.d.ts"
+    },
+    "./commentary": {
+      "import": "./dist/commentary/index.js",
+      "types": "./dist/commentary/index.d.ts"
+    }
+  }
 }
