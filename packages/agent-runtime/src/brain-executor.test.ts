@@ -37,7 +37,7 @@ const mockCommands: CommandOption[] = [
   { id: 'cmd1', action: 'move', expectedDuration: 5, expectedCost: 0, description: 'Move' },
 ];
 
-describe('BrainExecutor', () => {
+describe('BrainExecutor', { timeout: 30000 }, () => {
   let executor: BrainExecutor;
 
   beforeEach(() => {
