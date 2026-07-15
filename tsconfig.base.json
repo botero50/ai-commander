@@ -17,6 +17,7 @@
     "noUncheckedIndexedAccess": false,
     "baseUrl": ".",
     "paths": {
+      "@ai-commander/contracts": ["packages/contracts/src/index.ts"],
       "@ai-commander/core": ["packages/core/src/index.ts"],
       "@ai-commander/domain": ["packages/domain/src/index.ts"],
       "@ai-commander/brain": ["packages/brain/src/index.ts"],

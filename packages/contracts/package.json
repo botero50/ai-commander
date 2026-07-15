@@ -1,0 +1,25 @@
+{
+  "name": "@ai-commander/contracts",
+  "version": "1.0.0",
+  "description": "Core interfaces and contracts for the AI Commander framework",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "build": "tsc",
+    "test": "vitest",
+    "clean": "rm -rf dist"
+  },
+  "keywords": [
+    "ai",
+    "tournament",
+    "game-adapter",
+    "contracts",
+    "interfaces"
+  ],
+  "author": "AI Commander Contributors",
+  "license": "MIT"
+}
