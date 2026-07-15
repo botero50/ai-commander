@@ -96,7 +96,12 @@ export class OllamaAIBrain implements AIBrain {
         availableModels: availableModels.join(', '),
       });
 
-      if (!availableModels.includes(this.config.modelName)) {
+      // Check if model is available (handle both "model" and "model:latest" formats)
+      const modelWithLatest = `${this.config.modelName}:latest`;
+      const modelAvailable = availableModels.includes(this.config.modelName) ||
+                             availableModels.includes(modelWithLatest);
+
+      if (!modelAvailable) {
         this.logger.warn('Selected model not available', {
           model: this.config.modelName,
           available: availableModels,
@@ -338,38 +343,50 @@ Now output your immediate MOVE orders (be very specific):`;
     // Look for explicit action keywords at line start
     const lines = response.split('\n');
 
+    this.logger.info('Parsing Ollama response for commands', {
+      responsePreview: response.substring(0, 200),
+      totalLines: lines.length,
+    });
+
     for (const line of lines) {
       const trimmed = line.trim().toUpperCase();
 
-      // MOVE action
-      if (trimmed.startsWith('MOVE')) {
+      // MOVE action - look for MOVE anywhere in the line, not just start
+      if (trimmed.includes('MOVE') && !trimmed.includes('IMPROVE')) {
         const moveCmd = this.createMoveCommand(worldState);
         if (moveCmd) {
           commands.push(moveCmd);
-          this.logger.debug('Parsed MOVE command from Ollama response');
+          this.logger.info('✓ Parsed MOVE command from Ollama', { line: line.trim() });
         }
       }
 
       // GATHER action
-      if (trimmed.startsWith('GATHER')) {
+      if (trimmed.includes('GATHER') || trimmed.includes('RESOURCE')) {
         const gatherCmd = this.createGatherCommand(worldState);
         if (gatherCmd) {
           commands.push(gatherCmd);
-          this.logger.debug('Parsed GATHER command from Ollama response');
+          this.logger.info('✓ Parsed GATHER command from Ollama', { line: line.trim() });
         }
       }
 
       // ATTACK action
-      if (trimmed.startsWith('ATTACK')) {
+      if (trimmed.includes('ATTACK') || trimmed.includes('FIGHT') || trimmed.includes('COMBAT')) {
         const attackCmd = this.createAttackCommand(worldState);
         if (attackCmd) {
           commands.push(attackCmd);
-          this.logger.debug('Parsed ATTACK command from Ollama response');
+          this.logger.info('✓ Parsed ATTACK command from Ollama', { line: line.trim() });
         }
       }
 
       // Limit to 2 commands per tick (reasonable for RTS AI)
       if (commands.length >= 2) break;
+    }
+
+    if (commands.length === 0) {
+      this.logger.warn('⚠️ No commands parsed from Ollama response', {
+        responseLength: response.length,
+        firstWords: response.split(' ').slice(0, 20).join(' '),
+      });
     }
 
     return commands;
