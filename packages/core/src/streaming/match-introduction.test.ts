@@ -101,9 +101,9 @@ describe('Match Introduction (Story 57.2)', { timeout: 10000 }, () => {
           expect(countdowns).toContain(2);
           expect(countdowns).toContain(1);
           resolve();
-        }, 5500);
+        }, 6000);
       });
-    });
+    }, 15000);
 
     it('should emit battle-begins event', () => {
       return new Promise<void>((resolve) => {

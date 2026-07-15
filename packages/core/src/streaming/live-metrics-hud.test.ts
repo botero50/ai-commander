@@ -76,8 +76,12 @@ describe('Live Metrics HUD (Story 57.4)', { timeout: 10000 }, () => {
       return new Promise<void>((resolve) => {
         hud.onMetricsUpdate(() => {});
 
-        hud.updateMetrics(createObservation(1, 'Player1'));
-        hud.updateMetrics(createObservation(2, 'Player2'));
+        const obs1 = createObservation(1, 'Player1');
+        const obs2 = createObservation(2, 'Player2');
+        obs2.tick = 101; // Different tick for second player
+
+        hud.updateMetrics(obs1);
+        hud.updateMetrics(obs2);
 
         const all = hud.getAllMetrics();
         expect(all.length).toBe(2);
@@ -174,10 +178,12 @@ describe('Live Metrics HUD (Story 57.4)', { timeout: 10000 }, () => {
 
   describe('competitive comparison', () => {
     it('should compare two players', () => {
-      hud.updateMetrics(createObservation(1, 'Player1'));
-      hud.updateMetrics(
-        createObservation(2, 'Player2')
-      );
+      const obs1 = createObservation(1, 'Player1');
+      const obs2 = createObservation(2, 'Player2');
+      obs2.tick = 101; // Different tick
+
+      hud.updateMetrics(obs1);
+      hud.updateMetrics(obs2);
 
       const comparison = hud.compareMetrics(1, 2);
 
@@ -294,8 +300,12 @@ describe('Live Metrics HUD (Story 57.4)', { timeout: 10000 }, () => {
     });
 
     it('should provide data for HUD overlay', () => {
-      hud.updateMetrics(createObservation(1, 'AI Player 1'));
-      hud.updateMetrics(createObservation(2, 'AI Player 2'));
+      const obs1 = createObservation(1, 'AI Player 1');
+      const obs2 = createObservation(2, 'AI Player 2');
+      obs2.tick = 101; // Different tick
+
+      hud.updateMetrics(obs1);
+      hud.updateMetrics(obs2);
 
       const metrics = hud.getAllMetrics();
       const comparison = hud.compareMetrics(1, 2);
@@ -344,8 +354,12 @@ describe('Live Metrics HUD (Story 57.4)', { timeout: 10000 }, () => {
 
     it('should support multi-player HUD display', () => {
       // Simulate 2-player match
-      hud.updateMetrics(createObservation(1, 'Ollama AI'));
-      hud.updateMetrics(createObservation(2, 'Claude AI'));
+      const obs1 = createObservation(1, 'Ollama AI');
+      const obs2 = createObservation(2, 'Claude AI');
+      obs2.tick = 101; // Different tick
+
+      hud.updateMetrics(obs1);
+      hud.updateMetrics(obs2);
 
       const all = hud.getAllMetrics();
       expect(all.length).toBe(2);

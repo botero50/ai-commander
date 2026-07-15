@@ -26,6 +26,15 @@ export interface BroadcastPlayer {
   civilization: string;
   faction?: string;
 
+  // Resources and Population
+  resources?: {
+    wood: number;
+    stone: number;
+    food: number;
+    metal?: number;
+  };
+  population?: number;
+
   // Military & Economy
   units: number;
   buildings: number;
@@ -196,6 +205,15 @@ export class BroadcastState {
       name: playerContext.name,
       civilization: playerContext.civilization || 'Unknown',
       faction: this.getFaction(playerContext.civilization),
+
+      // Resources and Population
+      resources: customData.resources || {
+        wood: 0,
+        stone: 0,
+        food: 0,
+        metal: 0,
+      },
+      population: customData.population || 0,
 
       // Military & Economy
       units,

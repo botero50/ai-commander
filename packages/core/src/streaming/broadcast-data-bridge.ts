@@ -86,6 +86,13 @@ export class BroadcastDataBridge extends EventEmitter {
   constructor(logger?: Logger) {
     super();
     this.logger = logger || new Logger('info', 'BroadcastDataBridge');
+
+    // Set up internal event handlers (for both direct emit and event bus)
+    this.on('match:started', (event: any) => this.handleMatchStart(event));
+    this.on('observation:received', (event: any) => this.handleObservation(event));
+    this.on('decision:completed', (event: any) => this.handleDecision(event));
+    this.on('command:executed', (event: any) => this.handleCommand(event));
+    this.on('match:ended', (event: any) => this.handleMatchEnd(event));
   }
 
   /**
@@ -101,29 +108,25 @@ export class BroadcastDataBridge extends EventEmitter {
       playerCount,
     });
 
-    // Listen to match start
+    // Forward events from external event bus to this bridge
     eventBus.on('match:started', (event: any) => {
-      this.handleMatchStart(event);
+      this.emit('match:started', event);
     });
 
-    // Listen to observations
     eventBus.on('observation:received', (event: any) => {
-      this.handleObservation(event);
+      this.emit('observation:received', event);
     });
 
-    // Listen to decisions
     eventBus.on('decision:completed', (event: any) => {
-      this.handleDecision(event);
+      this.emit('decision:completed', event);
     });
 
-    // Listen to commands
     eventBus.on('command:executed', (event: any) => {
-      this.handleCommand(event);
+      this.emit('command:executed', event);
     });
 
-    // Listen to match end
     eventBus.on('match:ended', (event: any) => {
-      this.handleMatchEnd(event);
+      this.emit('match:ended', event);
     });
   }
 
