@@ -5,15 +5,6 @@
   },
   "files": [],
   "references": [
-    { "path": "packages/core" },
-    { "path": "packages/domain" },
-    { "path": "packages/engine" },
-    { "path": "packages/adapter" },
-    { "path": "packages/decision" },
-    { "path": "packages/goals" },
-    { "path": "packages/planner" },
-    { "path": "packages/agent-runtime" },
-    { "path": "packages/fake-game-adapter" },
-    { "path": "packages/behavior-tree" }
+    { "path": "packages/core" }
   ]
 }

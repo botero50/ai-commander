@@ -10,7 +10,7 @@
     "skipLibCheck": true,
     "outDir": "./dist",
     "rootDir": "./src",
-    "composite": false
+    "composite": true
   },
   "include": [
     "src/**/*.ts"
