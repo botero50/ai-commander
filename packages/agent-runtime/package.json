@@ -1,34 +1,20 @@
 {
   "name": "@ai-commander/agent-runtime",
   "version": "1.0.0",
-  "description": "Generic autonomous agent runtime orchestrating perception, planning, and decision-making",
+  "description": "Package for AI Commander framework",
   "type": "module",
-  "main": "dist/index.js",
-  "types": "dist/index.d.ts",
-  "exports": {
-    ".": {
-      "types": "./dist/index.d.ts",
-      "import": "./dist/index.js"
-    }
-  },
-  "files": [
-    "dist",
-    "README.md"
-  ],
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "vitest",
-    "lint": "eslint src tests",
-    "typecheck": "tsc --noEmit"
+    "test": "vitest"
+  },
+  "devDependencies": {
+    "@types/node": "^20.0.0",
+    "@vitest/ui": "^0.34.0",
+    "vitest": "^0.34.0"
   },
   "dependencies": {
-    "@ai-commander/adapter": "workspace:*",
-    "@ai-commander/brain": "workspace:*",
-    "@ai-commander/core": "workspace:*",
-    "@ai-commander/decision": "workspace:*",
-    "@ai-commander/domain": "workspace:*",
-    "@ai-commander/engine": "workspace:*",
-    "@ai-commander/goals": "workspace:*",
-    "@ai-commander/planner": "workspace:*"
+    "@ai-commander/contracts": "workspace:*"
   }
 }
