@@ -1,32 +1,20 @@
 {
   "name": "@ai-commander/decision",
   "version": "1.0.0",
-  "description": "Decision layer contracts and pipeline integration",
+  "description": "Package for AI Commander framework",
   "type": "module",
-  "exports": {
-    ".": {
-      "import": "./dist/index.js",
-      "types": "./dist/index.d.ts"
-    }
-  },
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
   "scripts": {
     "build": "tsc",
-    "test": "vitest",
-    "lint": "eslint src tests",
-    "format": "prettier --write ."
-  },
-  "dependencies": {
-    "@ai-commander/core": "workspace:*",
-    "@ai-commander/domain": "workspace:*",
-    "@ai-commander/engine": "workspace:*",
-    "@ai-commander/goals": "workspace:*",
-    "@ai-commander/planner": "workspace:*"
+    "test": "vitest"
   },
   "devDependencies": {
-    "@types/node": "^22.0.0",
-    "typescript": "^5.5.4",
-    "vitest": "^2.1.9"
+    "@types/node": "^20.0.0",
+    "@vitest/ui": "^0.34.0",
+    "vitest": "^0.34.0"
+  },
+  "dependencies": {
+    "@ai-commander/contracts": "workspace:*"
   }
 }
