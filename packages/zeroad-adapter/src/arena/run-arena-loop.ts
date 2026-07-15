@@ -204,8 +204,8 @@ const liveMetricsHUD = createLiveMetricsHUD(logger);
 // Match history for display
 const matchHistory: Array<{
   matchId: string;
-  player1: string;
-  player2: string;
+  player1: { brainId: string; ratingChange: number };
+  player2: { brainId: string; ratingChange: number };
   winner: string;
   duration: number; // ticks
   timestamp: number;
@@ -261,7 +261,16 @@ function startHttpServer(): void {
       }
     } else if (req.url === '/api/broadcast/chat') {
       res.writeHead(200);
-      res.end(JSON.stringify(streamingCache.recentTrashTalk.slice(-20)));
+      // Ensure we return at least 4 messages (pad with placeholders if needed)
+      const messages = streamingCache.recentTrashTalk.slice(-20);
+      while (messages.length < 4) {
+        messages.unshift({
+          speaker: 'placeholder',
+          message: 'Waiting for chat...',
+          tick: 0,
+        });
+      }
+      res.end(JSON.stringify({ recentMessages: messages }));
     } else if (req.url?.startsWith('/api/broadcast/audio/')) {
       // ✅ NEW: Serve audio files for trash talk
       const filename = req.url.split('/').pop();
@@ -280,21 +289,37 @@ function startHttpServer(): void {
         res.end(JSON.stringify({ error: 'Audio file not found' }));
       }
     } else if (req.url === '/api/rankings') {
-      // ✅ NEW: Get all brain rankings (ELO)
-      res.writeHead(200);
-      const rankings = eloRating.getAllRatings();
-      const formatted = rankings.map((r, idx) => ({
-        rank: idx + 1,
-        brainId: r.brainId,
-        name: r.brainId,
-        rating: r.rating,
-        highestRating: Math.max(...r.ratingHistory),
-        lowestRating: Math.min(...r.ratingHistory),
-        averageRating: Math.round(r.ratingHistory.reduce((a, b) => a + b, 0) / r.ratingHistory.length),
-        matches: r.ratingHistory.length - 1,
-        trend: r.ratingHistory.length >= 2 && r.rating > r.ratingHistory[r.ratingHistory.length - 2] ? 'up' : 'down',
-      }));
-      res.end(JSON.stringify(formatted));
+      // ✅ NEW: Get all brain rankings (ELO) — reload from file to reflect resets
+      try {
+        const rankingsPath = path.join(process.cwd(), '.data', 'rankings.json');
+        const rankingsData = JSON.parse(fs.readFileSync(rankingsPath, 'utf-8'));
+        const rankings = rankingsData.ratings || [];
+
+        const formatted = rankings.map((r: any, idx: number) => {
+          const highestRating = r.ratingHistory?.length > 0 ? Math.max(...r.ratingHistory) : r.rating;
+          const lowestRating = r.ratingHistory?.length > 0 ? Math.min(...r.ratingHistory) : r.rating;
+          const averageRating = r.ratingHistory?.length > 0 ? Math.round(r.ratingHistory.reduce((a: number, b: number) => a + b, 0) / r.ratingHistory.length) : r.rating;
+
+          return {
+            rank: idx + 1,
+            brainId: r.brainId,
+            name: r.brainId,
+            rating: r.rating,
+            highestRating,
+            lowestRating,
+            averageRating,
+            matches: r.ratingHistory?.length || 0,
+            trend: r.ratingHistory?.length >= 2 && r.rating > r.ratingHistory[r.ratingHistory.length - 2] ? 'up' : 'down',
+          };
+        });
+
+        res.writeHead(200);
+        res.end(JSON.stringify(formatted));
+      } catch (error) {
+        logger.warn('Failed to read rankings', { error });
+        res.writeHead(200);
+        res.end(JSON.stringify([]));
+      }
     } else if (req.url?.startsWith('/api/rankings/')) {
       // ✅ NEW: Get individual brain ranking
       const brainId = req.url.split('/').pop();
@@ -329,7 +354,10 @@ function startHttpServer(): void {
     } else if (req.url === '/api/match-history') {
       // ✅ NEW: Get recent match history
       res.writeHead(200);
-      res.end(JSON.stringify(matchHistory.slice(-20)));
+      res.end(JSON.stringify({
+        recentMatches: matchHistory.slice(-20),
+        totalMatches: matchHistory.length,
+      }));
     } else if (req.url === '/api/dashboard') {
       // ✅ NEW: Get complete dashboard state
       res.writeHead(200);
@@ -940,6 +968,37 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
 
     logger.info(`🎮 Match started - Initial game tick: ${gameState.tick || 0}`);
 
+    // ✅ NEW: Add initial greeting messages at match start
+    (async () => {
+      const greetings = [
+        { speaker: 'player1', message: 'Let\'s go! Prepare yourself!', name: 'Ollama' },
+        { speaker: 'player2', message: 'You\'re in for a tough match!', name: 'Petra' },
+      ];
+
+      for (const greeting of greetings) {
+        streamingCache.recentTrashTalk.push({
+          speaker: greeting.speaker,
+          message: greeting.message,
+          tick: 0,
+        });
+
+        logger.info(`🗣️ ${greeting.name}: ${greeting.message}`);
+
+        // Synthesize voice for greeting (fire and forget)
+        try {
+          const audioPath = await piperTTS.synthesize(greeting.message);
+          if (audioPath) {
+            const httpAudioPath = piperTTS.getHttpPath(audioPath);
+            logger.info(`🔊 Greeting voice synthesized`, { speaker: greeting.name, audioFile: httpAudioPath });
+          }
+        } catch (ttsError) {
+          logger.debug('Failed to synthesize greeting voice', {
+            error: ttsError instanceof Error ? ttsError.message : String(ttsError),
+          });
+        }
+      }
+    })().catch(err => logger.debug('Greeting initialization error', { err: String(err) }));
+
     // Auto-zoom out at start of match - send minus key after slight delay for initialization
     logger.info('⏳ Waiting for game initialization before zooming...');
     setTimeout(() => {
@@ -1532,7 +1591,8 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
           }
 
           // Generate trash talk every 150 ticks (5 seconds at 30 FPS)
-          if (tick % 150 === 0) {
+          // Allow first message at tick 150, 300, 450, etc. OR force at tick 100 if not generated
+          if (tick % 150 === 0 || (tick === 100 && streamingCache.recentTrashTalk.length <= 2)) {
             // Extract real player resources from WorldState
             const player1Resources = (worldState.players[0]?.customData as any)?.resources || { food: 0, wood: 0, stone: 0, metal: 0 };
             const player2Resources = (worldState.players[1]?.customData as any)?.resources || { food: 0, wood: 0, stone: 0, metal: 0 };
@@ -1582,24 +1642,31 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
                   // ✅ NEW: Generate voice for trash talk using Piper TTS
                   try {
                     const audioPath = await piperTTS.synthesize(trashTalk.message);
-                    const httpAudioPath = piperTTS.getHttpPath(audioPath);
-                    logger.info('🔊 Trash talk voice synthesized', {
-                      speaker: playerName,
-                      audioFile: httpAudioPath,
-                    });
 
-                    // Broadcast trash talk with audio
-                    broadcastServer.broadcastMessage({
-                      type: 'event',
-                      timestamp: Date.now(),
-                      payload: {
-                        eventType: 'trash_talk_audio',
+                    if (audioPath) {
+                      const httpAudioPath = piperTTS.getHttpPath(audioPath);
+                      logger.info('🔊 Trash talk voice synthesized', {
                         speaker: playerName,
-                        message: trashTalk.message,
                         audioFile: httpAudioPath,
-                        tick: trashTalk.tick,
-                      },
-                    });
+                      });
+
+                      // Broadcast trash talk with audio
+                      broadcastServer.broadcastMessage({
+                        type: 'event',
+                        timestamp: Date.now(),
+                        payload: {
+                          eventType: 'trash_talk_audio',
+                          speaker: playerName,
+                          message: trashTalk.message,
+                          audioFile: httpAudioPath,
+                          tick: trashTalk.tick,
+                        },
+                      });
+                    } else {
+                      logger.warn('Trash talk synthesis skipped (voice unavailable)', {
+                        message: trashTalk.message.substring(0, 60),
+                      });
+                    }
                   } catch (ttsError) {
                     logger.warn('Failed to synthesize trash talk voice', {
                       error: ttsError instanceof Error ? ttsError.message : String(ttsError),
@@ -1693,12 +1760,21 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
 
       matchHistory.push({
         matchId: `match-${matchNumber}`,
-        player1: p1BrainName,
-        player2: p2BrainName,
-        winner: winnerName,
+        player1: {
+          brainId: p1BrainName,
+          ratingChange: ratingChanges[0]?.change || 0,
+        },
+        player2: {
+          brainId: p2BrainName,
+          ratingChange: ratingChanges[1]?.change || 0,
+        },
+        winner: matchWinner === p1BrainName ? 'player1' : 'player2',
         duration: tick,
         timestamp: Date.now(),
       });
+
+      // Cleanup old trash talk audio files — keep only the last 2
+      await piperTTS.cleanup(2);
 
       const rotationStats = matchRotation.getStats();
       const completeMsg = matchWinner
@@ -1717,7 +1793,7 @@ async function runMatch(gameProcess: ChildProcess, matchNumber: number, mapUsed:
           rank: idx + 1,
           brain: r.brainId,
           rating: r.rating,
-          matches: r.ratingHistory.length - 1,
+          matches: r.matchCount,
         })),
       });
 
@@ -1766,6 +1842,15 @@ async function main() {
     logger.info('📊 Starting with fresh rankings (no previous data)');
   }
 
+  // Load metrics from file
+  const metricsFile = path.join(process.cwd(), '.data', 'metrics.json');
+  const metricsLoaded = await liveMetricsHUD.loadFromFile(metricsFile);
+  if (metricsLoaded) {
+    logger.info('📈 Loaded existing metrics from file');
+  } else {
+    logger.info('📈 Starting with fresh metrics (no previous data)');
+  }
+
   let matchNumber = 1;
 
   try {
@@ -1801,6 +1886,14 @@ async function main() {
         logger.info('💾 Rankings saved to file');
       } catch (error) {
         logger.warn('⚠️ Failed to save rankings', { error });
+      }
+
+      // Save metrics to file
+      try {
+        await liveMetricsHUD.saveToFile(metricsFile);
+        logger.info('💾 Metrics saved to file');
+      } catch (error) {
+        logger.warn('⚠️ Failed to save metrics', { error });
       }
 
       // Wait before next match

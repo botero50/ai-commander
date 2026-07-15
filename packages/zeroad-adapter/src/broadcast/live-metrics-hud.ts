@@ -14,6 +14,8 @@
  */
 
 import { EventEmitter } from 'events';
+import { promises as fs } from 'fs';
+import path from 'path';
 import { Logger } from '../config/logger.js';
 
 export interface PlayerMetrics {
@@ -266,6 +268,59 @@ export class LiveMetricsHUD extends EventEmitter {
       historySize: this.metricsHistory.length,
       players: this.getAllMetrics(),
     };
+  }
+
+  /**
+   * Save metrics to disk for persistence
+   */
+  async saveToFile(filePath: string): Promise<void> {
+    try {
+      const data = {
+        timestamp: new Date().toISOString(),
+        lastTick: this.lastUpdateTick,
+        metrics: Array.from(this.lastMetrics.values()),
+        history: this.metricsHistory,
+      };
+
+      await fs.mkdir(path.dirname(filePath), { recursive: true });
+      await fs.writeFile(filePath, JSON.stringify(data, null, 2), 'utf8');
+      this.logger.debug('Metrics saved to file', { filePath });
+    } catch (error) {
+      this.logger.warn('Failed to save metrics', {
+        error: error instanceof Error ? error.message : String(error),
+      });
+    }
+  }
+
+  /**
+   * Load metrics from disk
+   */
+  async loadFromFile(filePath: string): Promise<boolean> {
+    try {
+      const content = await fs.readFile(filePath, 'utf8');
+      const data = JSON.parse(content);
+
+      // Restore metrics
+      this.lastMetrics.clear();
+      if (data.metrics && Array.isArray(data.metrics)) {
+        for (const metric of data.metrics) {
+          this.lastMetrics.set(metric.playerId, metric);
+        }
+      }
+
+      // Restore history
+      this.metricsHistory = data.history || [];
+      this.lastUpdateTick = data.lastTick || 0;
+
+      this.logger.debug('Metrics loaded from file', {
+        filePath,
+        playerCount: this.lastMetrics.size,
+      });
+      return true;
+    } catch (error) {
+      // File doesn't exist or is invalid - start fresh
+      return false;
+    }
   }
 }
 
