@@ -545,7 +545,7 @@ NOW OUTPUT 2-3 STRATEGIC ACTIONS FOR THIS TICK (be specific and justify why):`;
    * Create a Build command for new structures (barracks, houses, economic buildings)
    *
    * BUILD is critical for winning - it produces units and infrastructure.
-   * We build near the player's existing town center.
+   * We build near the player's existing town center, trying different building types.
    */
   private createBuildCommand(worldState: WorldState): GameCommand | null {
     // Find our buildings to build near them
@@ -553,7 +553,10 @@ NOW OUTPUT 2-3 STRATEGIC ACTIONS FOR THIS TICK (be specific and justify why):`;
       .filter(a => (a.customData as any)?.type === 'building')
       .filter(a => a.controlledByPlayerId?.toString() === this.playerID.toString());
 
-    if (friendlyBuildings.length === 0) return null;
+    if (friendlyBuildings.length === 0) {
+      this.logger.debug('No friendly buildings found to build near');
+      return null;
+    }
 
     // Build near our first building (town center)
     const existingBuilding = friendlyBuildings[0];
@@ -561,12 +564,27 @@ NOW OUTPUT 2-3 STRATEGIC ACTIONS FOR THIS TICK (be specific and justify why):`;
     const baseZ = (existingBuilding.customData as any)?.positionRaw?.z || 200;
 
     // Pick a random offset from base to avoid overlap
-    const offsetX = (Math.random() - 0.5) * 60;
-    const offsetZ = (Math.random() - 0.5) * 60;
+    const offsetX = (Math.random() - 0.5) * 80;
+    const offsetZ = (Math.random() - 0.5) * 80;
 
-    // Prioritize barracks (produces soldiers) then houses (supports population)
-    const buildingTypes = ['structures/athen_barracks', 'structures/house', 'structures/storage_house'];
+    // Prioritize barracks (produces soldiers) then houses/storage (support economy)
+    // Support multiple civilization building names
+    const buildingTypes = [
+      'structures/athen_barracks',          // Athenian barracks
+      'structures/mace_barracks',           // Macedonian barracks (fallback)
+      'structures/pers_barracks',           // Persian barracks (fallback)
+      'structures/barracks',                // Generic barracks
+      'structures/house',                   // House for population
+      'structures/storage_house',           // Storage house for resources
+      'structures/warehouse',               // Warehouse (fallback)
+    ];
+
     const buildingType = buildingTypes[Math.floor(Math.random() * buildingTypes.length)];
+
+    this.logger.info('Building structure', {
+      type: buildingType,
+      position: { x: Math.round(baseX + offsetX), z: Math.round(baseZ + offsetZ) },
+    });
 
     return {
       playerID: this.playerID,
@@ -585,40 +603,70 @@ NOW OUTPUT 2-3 STRATEGIC ACTIONS FOR THIS TICK (be specific and justify why):`;
    * Create a Train command - order buildings to produce units
    *
    * TRAIN is the primary win condition - more units = victory!
-   * We find our barracks and order it to produce soldiers.
+   * We find ANY production building (barracks, stables, temples) and order unit production.
    */
   private createTrainCommand(worldState: WorldState): GameCommand | null {
-    // Find barracks buildings that can produce units
-    const barracks = worldState.agents
+    // Find all buildings that might produce units
+    const allBuildings = worldState.agents
       .filter(a => (a.customData as any)?.type === 'building')
-      .filter(a => a.controlledByPlayerId?.toString() === this.playerID.toString())
+      .filter(a => a.controlledByPlayerId?.toString() === this.playerID.toString());
+
+    // Log what buildings we have
+    if (allBuildings.length > 0) {
+      const buildingTemplates = allBuildings.map(b => (b.customData as any)?.template || 'unknown');
+      this.logger.debug('Available buildings for training', {
+        count: allBuildings.length,
+        templates: buildingTemplates.join(', '),
+      });
+    }
+
+    // Find production buildings (barracks, stables, temples, ranges)
+    const productionBuildings = allBuildings
       .filter(b => {
         const template = (b.customData as any)?.template || '';
-        return template.includes('barracks') || template.includes('stable') || template.includes('range');
+        return template.includes('barracks') ||
+               template.includes('stable') ||
+               template.includes('range') ||
+               template.includes('temple') ||
+               template.includes('armory');
       });
 
-    if (barracks.length === 0) return null;
+    if (productionBuildings.length === 0) {
+      this.logger.debug('No production buildings found yet', {
+        totalBuildings: allBuildings.length,
+      });
+      return null;
+    }
 
-    // Pick first available barracks
-    const barrackId = (barracks[0].customData as any)?.entityId;
-    if (!barrackId) return null;
+    // Pick first available production building
+    const productionBuilding = productionBuildings[0];
+    const buildingId = (productionBuilding.customData as any)?.entityId;
+    if (!buildingId) return null;
 
-    // Train different unit types (infantry, ranged, cavalry)
+    // Train different unit types - support multiple civilizations
     const unitTypes = [
-      'units/athen_infantry_swordsman_b',
-      'units/athen_cavalry',
-      'units/athen_ranged',
+      'units/athen_infantry_swordsman_b',  // Athenian infantry
+      'units/athen_cavalry',                // Athenian cavalry
+      'units/athen_ranged',                 // Athenian ranged
+      'units/mace_cavalry',                 // Macedonian cavalry (fallback)
+      'units/pers_cavalry',                 // Persian cavalry (fallback)
     ];
 
     const unitType = unitTypes[Math.floor(Math.random() * unitTypes.length)];
+
+    this.logger.info('Queueing unit training', {
+      building: (productionBuilding.customData as any)?.template,
+      buildingId,
+      unit: unitType,
+    });
 
     return {
       playerID: this.playerID,
       json_cmd: {
         type: 'train',
-        building: barrackId,
+        building: buildingId,
         template: unitType,
-        queued: true, // Queue training (allows production to chain)
+        queued: true,
       },
     };
   }
