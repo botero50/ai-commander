@@ -12,13 +12,15 @@ import { ChessEventDetector } from './event-detector.js';
 import { CommentaryGenerator } from './commentary-generator.js';
 import { ReplaySystem } from './replay-system.js';
 import { MatchSummaryGenerator } from './match-summary-generator.js';
+import { YouTubeStreamService } from './youtube-stream-service.js';
 
 export class BroadcastService {
-  constructor() {
+  constructor(config = {}) {
     this.eventDetector = new ChessEventDetector();
     this.commentaryGenerator = new CommentaryGenerator();
     this.replaySystem = new ReplaySystem();
     this.summaryGenerator = new MatchSummaryGenerator();
+    this.streamService = new YouTubeStreamService(config.stream || {});
     this.broadcastLog = [];
     this.matchEvents = [];
     this.recentMoves = [];
@@ -209,6 +211,11 @@ export class BroadcastService {
 
     for (const replay of replays) {
       await this.replaySystem.playReplay(replay);
+
+      // Capture clips for streaming
+      if (this.streamService.streamState.isStreaming) {
+        this.streamService.captureClip(replay.description, 30);
+      }
     }
 
     this.replaySystem.displayReplaySummary();

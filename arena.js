@@ -40,7 +40,13 @@ class ChessArena {
     this.players = [];
     this.lastMatchConfig = null;
     this.ui = new ChessUI();
-    this.broadcast = new BroadcastService();
+    this.broadcast = new BroadcastService({
+      stream: {
+        obsWebSocketUrl: 'ws://localhost:4455',
+        youtubeChannelId: process.env.YOUTUBE_CHANNEL_ID || '',
+        streamTitle: 'AI Chess Tournament - Live',
+      },
+    });
 
     // Personality profiles
     this.personalities = [
@@ -72,6 +78,9 @@ class ChessArena {
       this.initializePlayers();
 
       this.ui.displayArenaStarted();
+
+      // Connect to streaming (optional)
+      await this.broadcast.streamService.connect();
 
       // Main game loop
       let matchNumber = 1;
@@ -328,6 +337,18 @@ class ChessArena {
       moves: result.moves,
       durationMs: result.durationMs,
     });
+  }
+
+  displayStreamDashboard() {
+    if (this.broadcast.streamService.streamState.isConnected) {
+      this.broadcast.streamService.displayDashboard();
+    }
+  }
+
+  displayProductionChecklist() {
+    if (this.broadcast.streamService.streamState.isConnected) {
+      this.broadcast.streamService.displayProductionChecklist();
+    }
   }
 
   updateStats(result) {
