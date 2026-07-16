@@ -92,6 +92,9 @@ class ChessArena {
           // Display replays
           await this.displayReplays();
 
+          // Display match summary
+          this.displayMatchSummary(result, matchConfig.white, matchConfig.black);
+
           // Update stats
           this.updateStats(result);
 
@@ -315,6 +318,16 @@ class ChessArena {
 
   async displayReplays() {
     await this.broadcast.displayReplays();
+  }
+
+  displayMatchSummary(result, white, black) {
+    this.broadcast.displayMatchSummary({
+      white: white.name,
+      black: black.name,
+      result: result.result,
+      moves: result.moves,
+      durationMs: result.durationMs,
+    });
   }
 
   updateStats(result) {

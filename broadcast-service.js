@@ -11,12 +11,14 @@
 import { ChessEventDetector } from './event-detector.js';
 import { CommentaryGenerator } from './commentary-generator.js';
 import { ReplaySystem } from './replay-system.js';
+import { MatchSummaryGenerator } from './match-summary-generator.js';
 
 export class BroadcastService {
   constructor() {
     this.eventDetector = new ChessEventDetector();
     this.commentaryGenerator = new CommentaryGenerator();
     this.replaySystem = new ReplaySystem();
+    this.summaryGenerator = new MatchSummaryGenerator();
     this.broadcastLog = [];
     this.matchEvents = [];
     this.recentMoves = [];
@@ -210,6 +212,25 @@ export class BroadcastService {
     }
 
     this.replaySystem.displayReplaySummary();
+  }
+
+  /**
+   * Generate complete match summary
+   */
+  generateMatchSummary(matchData) {
+    return this.summaryGenerator.generateSummary({
+      ...matchData,
+      replays: this.replaySystem.getReplays(),
+    });
+  }
+
+  /**
+   * Display complete match summary
+   */
+  displayMatchSummary(matchData) {
+    const summary = this.generateMatchSummary(matchData);
+    this.summaryGenerator.displaySummary(summary);
+    return summary;
   }
 
   /**
