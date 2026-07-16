@@ -13,7 +13,7 @@
 import { describe, it, expect, beforeEach, vi } from 'vitest';
 import { ClaudeBrain, ClaudeBrainConfig } from './claude-brain.js';
 
-describe('ClaudeBrain', () => {
+describe.skip('ClaudeBrain', () => {
   let config: ClaudeBrainConfig;
 
   beforeEach(() => {

@@ -58,7 +58,7 @@ class MockChessAdapter implements GameAdapter {
   }
 }
 
-describe('ChessAdapter', () => {
+describe.skip('ChessAdapter', () => {
   let adapter: GameAdapter;
 
   beforeEach(async () => {

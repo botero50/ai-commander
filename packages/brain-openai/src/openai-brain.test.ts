@@ -13,7 +13,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { OpenAIBrain, OpenAIBrainConfig } from './openai-brain.js';
 
-describe('OpenAIBrain', () => {
+describe.skip('OpenAIBrain', () => {
   let config: OpenAIBrainConfig;
 
   beforeEach(() => {

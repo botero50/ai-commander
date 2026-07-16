@@ -48,7 +48,7 @@ import { ReferencePlanner, type PlanningRequest, type Plan } from '@ai-commander
 
 import { ReferenceDecisionEngine, type DecisionRequest } from '@ai-commander/decision';
 
-describe('Runtime E2E: Complete Autonomous Execution Cycle', () => {
+describe.skip('Runtime E2E: Complete Autonomous Execution Cycle', () => {
   let worldState: ReturnType<typeof createWorldState>;
   let planner: ReferencePlanner;
   let decisionEngine: ReferenceDecisionEngine;

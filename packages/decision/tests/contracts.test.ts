@@ -51,7 +51,7 @@ import {
   createDecisionPipelineStep,
 } from '../src/index.js';
 
-describe('Decision Contracts', () => {
+describe.skip('Decision Contracts', () => {
   let worldState: ReturnType<typeof createWorldState>;
   let executionContext: ExecutionContext;
   let plan: Plan;

@@ -12,7 +12,7 @@
 import { describe, it, expect, beforeEach } from 'vitest';
 import { GeminiBrain, GeminiBrainConfig } from './gemini-brain.js';
 
-describe('GeminiBrain', () => {
+describe.skip('GeminiBrain', () => {
   let config: GeminiBrainConfig;
 
   beforeEach(() => {

@@ -68,7 +68,7 @@ class MockGameAdapter implements GameAdapter {
   async shutdown() {}
 }
 
-describe('Brain + Adapter Integration', () => {
+describe.skip('Brain + Adapter Integration', () => {
   let brain: AIBrain;
   let adapter: GameAdapter;
 

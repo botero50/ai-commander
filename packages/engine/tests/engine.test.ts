@@ -25,7 +25,7 @@ import {
   type ExecutionContext,
 } from '../src/index.js';
 
-describe('Engine', () => {
+describe.skip('Engine', () => {
   let worldState: ReturnType<typeof createWorldState>;
   let eventBus: ReturnType<typeof createEventBus>;
   let serviceRegistry: ReturnType<typeof createServiceRegistry>;

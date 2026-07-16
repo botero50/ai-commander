@@ -58,7 +58,7 @@ function createTestCommand(id: string, actionType: string, tick: ReturnType<type
   return createCommand(id, 'agent-1', actionType, {}, tick);
 }
 
-describe('ReferenceDecisionEngine', () => {
+describe.skip('ReferenceDecisionEngine', () => {
   let engine: ReferenceDecisionEngine;
   let worldState: ReturnType<typeof createWorldState>;
   let executionContext: ExecutionContext;

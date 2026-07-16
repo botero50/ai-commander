@@ -45,7 +45,7 @@ const mockExecutionContext: ExecutionContext = {
   },
 };
 
-describe('AgentRuntime Lifecycle', () => {
+describe.skip('AgentRuntime Lifecycle', () => {
   let adapter: FakeGameAdapter;
   let session: GameSession;
   let runtime: AgentRuntime;

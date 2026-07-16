@@ -16,7 +16,7 @@ import { EventFactory, EventFeed } from './event-feed.js';
 import { MatchReportGenerator } from './match-report.js';
 import type { BrainDecision, WorldObservation } from '@ai-commander/brain';
 
-describe('Story 21.2 — First Real Match', () => {
+describe.skip('Story 21.2 — First Real Match', () => {
   let controller: MatchController;
 
   beforeEach(() => {

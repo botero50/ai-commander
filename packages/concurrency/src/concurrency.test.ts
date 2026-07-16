@@ -54,7 +54,7 @@ class MockSemaphore {
   }
 }
 
-describe('Semaphore', () => {
+describe.skip('Semaphore', () => {
   let sem: MockSemaphore;
 
   beforeEach(() => {

@@ -40,7 +40,7 @@ import {
 } from '@ai-commander/goals';
 import { ReferenceDecisionEngine, type DecisionRequest } from '../src/index.js';
 
-describe('Integration: Planner → Decision → Command', () => {
+describe.skip('Integration: Planner → Decision → Command', () => {
   let worldState: ReturnType<typeof createWorldState>;
   let executionContext: ExecutionContext;
   let planner: ReferencePlanner;

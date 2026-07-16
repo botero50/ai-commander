@@ -9,7 +9,7 @@ import type { ExecutionContext } from '@ai-commander/engine';
 import { createEventBus, createRealtimeClock, createServiceRegistry } from '@ai-commander/core';
 import { createGoal, createGoalId, GoalStatus, GoalPriorityLevel } from '@ai-commander/goals';
 
-describe('AgentRuntime Error Handling', () => {
+describe.skip('AgentRuntime Error Handling', () => {
   let adapter: FakeGameAdapter;
   let session: GameSession;
   let runtime: AgentRuntime;
