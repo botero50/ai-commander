@@ -11,6 +11,7 @@ export { ChessGameRecorder } from './chess-game-recorder.js';
 export { ChessMetricsCollector } from './chess-metrics-collector.js';
 export { ChessTournamentManager } from './chess-tournament-manager.js';
 export { ChessTournamentScheduler } from './chess-tournament-scheduler.js';
+export { ChessConcurrentExecutor } from './chess-concurrent-executor.js';
 export type {
   ChessPosition,
   ChessMaterial,
@@ -41,3 +42,8 @@ export type {
   ScheduledMatch,
   TournamentState,
 } from './chess-tournament-scheduler.js';
+export type {
+  MatchExecutionConfig,
+  MatchExecutionResult,
+  ExecutorState,
+} from './chess-concurrent-executor.js';
