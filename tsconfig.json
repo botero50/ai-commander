@@ -7,6 +7,14 @@
   "references": [
     { "path": "packages/contracts" },
     { "path": "packages/core" },
-    { "path": "packages/cli" }
+    { "path": "packages/brain" },
+    { "path": "packages/brain-ollama" },
+    { "path": "packages/agent-runtime" },
+    { "path": "packages/adapter" },
+    { "path": "packages/match-runner" },
+    { "path": "packages/tournament-engine" },
+    { "path": "packages/benchmark-reporter" },
+    { "path": "packages/cli" },
+    { "path": "apps/web" }
   ]
 }

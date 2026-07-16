@@ -1,9 +1,10 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
-        "composite": true,
+    "composite": true,
     "outDir": "./dist",
-    "rootDir": "./src"
+    "rootDir": "./src",
+    "noEmit": false
   },
   "include": [
     "src"
@@ -11,6 +12,15 @@
   "references": [
     {
       "path": "../brain"
+    },
+    {
+      "path": "../brain-ollama"
+    },
+    {
+      "path": "../adapter"
+    },
+    {
+      "path": "../agent-runtime"
     }
   ],
   "exclude": [

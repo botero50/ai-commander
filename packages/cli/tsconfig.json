@@ -1,5 +1,5 @@
 {
-  "extends": "../../tsconfig.json",
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "composite": true,
     "outDir": "./dist",
@@ -21,6 +21,9 @@
   "references": [
     {
       "path": "../brain"
+    },
+    {
+      "path": "../brain-ollama"
     },
     {
       "path": "../tournament-engine"

@@ -1,4 +1,5 @@
 {
+  "extends": "../../tsconfig.base.json",
   "compilerOptions": {
     "target": "ES2022",
     "module": "NodeNext",
@@ -10,12 +11,18 @@
     "skipLibCheck": true,
     "outDir": "./dist",
     "rootDir": "./src",
-    "composite": false
+    "composite": true,
+    "noEmit": false
   },
   "include": [
     "src/**/*.ts"
   ],
   "exclude": [
     "src/**/*.test.ts"
+  ],
+  "references": [
+    {
+      "path": "../brain"
+    }
   ]
 }
