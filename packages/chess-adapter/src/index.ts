@@ -14,6 +14,7 @@ export { ChessTournamentScheduler } from './chess-tournament-scheduler.js';
 export { ChessConcurrentExecutor } from './chess-concurrent-executor.js';
 export { ChessResultsAggregator } from './chess-results-aggregator.js';
 export { ChessSpectatorStreamer } from './chess-spectator-streamer.js';
+export { ChessBroadcastOverlay } from './chess-broadcast-overlay.js';
 export type {
   ChessPosition,
   ChessMaterial,
@@ -62,3 +63,10 @@ export type {
   MatchStatus,
   SpectatorSession,
 } from './chess-spectator-streamer.js';
+export type {
+  PlayerStats,
+  GameClock,
+  OverlayConfig,
+  StreamMetrics,
+  BroadcastEvent,
+} from './chess-broadcast-overlay.js';
