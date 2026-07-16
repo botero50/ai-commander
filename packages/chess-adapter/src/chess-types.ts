@@ -70,3 +70,21 @@ export interface EngineConfig {
   readonly threads: number;
   readonly hash: number;
 }
+
+export interface GameLoopConfig {
+  readonly moveTimeoutMs: number;
+  readonly maxMoves: number;
+  readonly enableLogging: boolean;
+}
+
+export interface GameLoopEvents {
+  onMoveStart?: (turn: number, color: 'white' | 'black') => void;
+  onMoveDecision?: (turn: number, color: 'white' | 'black', move: string) => void;
+  onMoveExecuted?: (turn: number, color: 'white' | 'black', move: string) => void;
+  onCheck?: (turn: number, color: 'white' | 'black') => void;
+  onCheckmate?: (turn: number, winner: 'white' | 'black') => void;
+  onStalemate?: (turn: number) => void;
+  onDraw?: (turn: number, reason: string) => void;
+  onGameOver?: (turn: number, result: 'white-win' | 'black-win' | 'draw') => void;
+  onError?: (error: Error) => void;
+}

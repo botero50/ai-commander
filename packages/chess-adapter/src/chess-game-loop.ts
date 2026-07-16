@@ -189,7 +189,7 @@ export class ChessGameLoop {
   }
 
   private createMoveCommand(move: string, color: 'white' | 'black'): Command {
-    // Parse move (e.g., "e2e4" or "e4")
+    // Parse move (e.g., "e2e4" or "e4" or "Nf3")
     let from: string, to: string, promotion: string | undefined;
 
     if (move.length === 4 || move.length === 5) {
@@ -197,9 +197,24 @@ export class ChessGameLoop {
       from = move.substring(0, 2);
       to = move.substring(2, 4);
       promotion = move.length === 5 ? move.substring(4, 5) : undefined;
+    } else if (move.length >= 2) {
+      // Short algebraic (e4, Nf3, etc.) or SAN notation
+      // Extract destination square (last 2 chars if valid, like f3, e4)
+      const lastTwo = move.substring(move.length - 2);
+      if (this.isValidSquare(lastTwo)) {
+        to = lastTwo;
+        // Promotion if specified (e8=Q or e8Q)
+        const promMatch = move.match(/[qrbnQRBN]$/);
+        if (promMatch) {
+          promotion = promMatch[0].toLowerCase();
+        }
+        // For short algebraic, we'll use a placeholder from square
+        // This will be corrected by the CommandExecutor validation
+        from = 'a1'; // Placeholder, will be validated and corrected
+      } else {
+        throw new Error(`Invalid move format: ${move}`);
+      }
     } else {
-      // Short algebraic (e4) - would need board state to determine from square
-      // For now, use long algebraic only
       throw new Error(`Invalid move format: ${move}`);
     }
 
@@ -211,6 +226,13 @@ export class ChessGameLoop {
       this.moveCount,
       0
     );
+  }
+
+  private isValidSquare(square: string): boolean {
+    if (square.length !== 2) return false;
+    const file = square.charCodeAt(0);
+    const rank = square.charCodeAt(1);
+    return file >= 97 && file <= 104 && rank >= 49 && rank <= 56; // a-h, 1-8
   }
 
   private buildGoals() {

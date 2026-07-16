@@ -4,6 +4,7 @@ export { ChessGameSession } from './chess-game-session.js';
 export { ChessObservationProvider } from './chess-observation.js';
 export { ChessCommandExecutor } from './chess-command.js';
 export { ChessEngine } from './chess-engine.js';
+export { ChessGameLoop } from './chess-game-loop.js';
 export type {
   ChessPosition,
   ChessMaterial,
@@ -12,4 +13,6 @@ export type {
   ChessMove,
   ChessGameState,
   EngineConfig,
+  GameLoopConfig,
+  GameLoopEvents,
 } from './chess-types.js';
