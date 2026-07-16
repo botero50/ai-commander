@@ -33,59 +33,55 @@ export class TournamentScheduler {
   }
 
   private generateRoundRobin(): TournamentSchedule {
-    const players = [...this.config.players];
+    const allPlayers = [...this.config.players];
     const rounds: ScheduledMatch[][] = [];
+    const playedPairs = new Set<string>();
 
-    // Rotate algorithm for round-robin
-    for (let round = 0; round < players.length - 1; round++) {
-      const matches: ScheduledMatch[] = [];
+    // For round-robin, generate all unique pairings
+    for (let i = 0; i < allPlayers.length; i++) {
+      for (let j = i + 1; j < allPlayers.length; j++) {
+        const white = allPlayers[i];
+        const black = allPlayers[j];
+        const pairKey = [white, black].sort().join('|');
 
-      // Create matches for this round
-      for (let i = 0; i < players.length / 2; i++) {
-        const white = players[i];
-        const black = players[players.length - 1 - i];
-
-        if (white !== black) {
-          matches.push({
-            matchId: this.generateMatchId(),
-            round,
-            white,
-            black,
-            scheduledTime: round,
-          });
+        if (!playedPairs.has(pairKey)) {
+          playedPairs.add(pairKey);
         }
-      }
-
-      rounds.push(matches);
-
-      // Rotate players for next round (keep first fixed, rotate others)
-      if (round < players.length - 2) {
-        const last = players.pop()!;
-        players.splice(1, 0, last);
       }
     }
 
-    // If odd number of players, generate matches for the extra round
-    if (players.length % 2 === 1) {
-      const matches: ScheduledMatch[] = [];
-      for (let i = 0; i < players.length / 2; i++) {
-        const white = players[i];
-        const black = players[players.length - 1 - i];
+    // Group pairings into rounds
+    const pairingList = Array.from(playedPairs).map(pair => {
+      const [p1, p2] = pair.split('|');
+      return { white: p1, black: p2 };
+    });
 
-        if (white !== black) {
-          matches.push({
-            matchId: this.generateMatchId(),
-            round: players.length - 1,
-            white,
-            black,
-            scheduledTime: players.length - 1,
-          });
-        }
+    // Distribute into rounds, ensuring no player plays twice per round
+    let roundIdx = 0;
+    const usedThisRound = new Set<string>();
+
+    for (const pairing of pairingList) {
+      if (usedThisRound.has(pairing.white) || usedThisRound.has(pairing.black)) {
+        // Start new round
+        rounds.push([]);
+        roundIdx++;
+        usedThisRound.clear();
       }
 
-      if (matches.length > 0) {
-        rounds.push(matches);
+      if (!rounds[roundIdx]) {
+        rounds.push([]);
       }
+
+      rounds[roundIdx].push({
+        matchId: this.generateMatchId(),
+        round: roundIdx,
+        white: pairing.white,
+        black: pairing.black,
+        scheduledTime: roundIdx,
+      });
+
+      usedThisRound.add(pairing.white);
+      usedThisRound.add(pairing.black);
     }
 
     // Calculate total matches
