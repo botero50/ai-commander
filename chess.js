@@ -156,6 +156,16 @@ class ChessStartup {
 
   async createDefaultConfig() {
     const configPath = path.join(process.cwd(), 'chess-arena-config.json');
+
+    // Parse brain configuration from .env
+    const brainP1 = (process.env.BRAIN_P1 || 'ollama:tinyllama').split(':');
+    const brainP2 = (process.env.BRAIN_P2 || 'ollama:mistral').split(':');
+
+    const p1Provider = brainP1[0] || 'ollama';
+    const p1Model = brainP1[1] || this.results.ollamaModels[0] || 'tinyllama';
+    const p2Provider = brainP2[0] || 'ollama';
+    const p2Model = brainP2[1] || this.results.ollamaModels[1] || 'mistral';
+
     const config = {
       version: '1.0.0',
       game: 'chess',
@@ -167,16 +177,16 @@ class ChessStartup {
       players: [
         {
           id: 'player-1',
-          name: 'Ollama',
-          provider: 'ollama',
-          model: this.results.ollamaModels[0] || this.config.defaultModel,
+          name: p1Provider === 'ollama' ? 'Ollama' : p1Provider.charAt(0).toUpperCase() + p1Provider.slice(1),
+          provider: p1Provider,
+          model: p1Model,
           personality: 'balanced',
         },
         {
           id: 'player-2',
-          name: 'Stockfish',
-          provider: 'stockfish',
-          elo: 1500,
+          name: p2Provider === 'ollama' ? 'Ollama' : p2Provider.charAt(0).toUpperCase() + p2Provider.slice(1),
+          provider: p2Provider,
+          model: p2Model,
           personality: 'competitive',
         },
       ],
@@ -188,6 +198,9 @@ class ChessStartup {
     };
 
     if (!fs.existsSync(configPath)) {
+      fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
+    } else {
+      // Always update with latest env values
       fs.writeFileSync(configPath, JSON.stringify(config, null, 2));
     }
 

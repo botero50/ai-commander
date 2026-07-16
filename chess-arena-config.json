@@ -11,14 +11,14 @@
       "id": "player-1",
       "name": "Ollama",
       "provider": "ollama",
-      "model": "llama2:latest",
+      "model": "tinyllama",
       "personality": "balanced"
     },
     {
       "id": "player-2",
-      "name": "Stockfish",
-      "provider": "stockfish",
-      "elo": 1500,
+      "name": "Ollama",
+      "provider": "ollama",
+      "model": "mistral",
       "personality": "competitive"
     }
   ],
