@@ -47,7 +47,7 @@ export async function validateOllamaRuntime(config: OllamaBrainConfig): Promise<
     console.log(`[Ollama] Testing connectivity to ${config.endpoint}...`);
     const healthResponse = await fetch(`${config.endpoint}/api/tags`, {
       signal: AbortSignal.timeout(5000),
-    }).catch(() => null);
+    }).catch((): null => null);
 
     if (!healthResponse?.ok) {
       throw new Error(`Cannot connect to Ollama at ${config.endpoint}. Is it running?`);

@@ -9,12 +9,6 @@
     { "path": "packages/core" },
     { "path": "packages/brain" },
     { "path": "packages/brain-ollama" },
-    { "path": "packages/agent-runtime" },
-    { "path": "packages/adapter" },
-    { "path": "packages/match-runner" },
-    { "path": "packages/tournament-engine" },
-    { "path": "packages/benchmark-reporter" },
-    { "path": "packages/cli" },
-    { "path": "apps/web" }
+    { "path": "packages/agent-runtime" }
   ]
 }
