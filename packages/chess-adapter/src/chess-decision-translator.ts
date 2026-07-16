@@ -72,10 +72,13 @@ export class ChessDecisionTranslator {
     }
 
     // Success: valid selection and legal move
+    // Normalize move to lowercase (chess notation standard)
+    const normalizedMove = selectedCommand.toLowerCase().replace(/[+#=].*$/, '').trim();
+
     return {
       success: true,
-      move: selectedCommand,
-      reasoning: `Brain selected move: ${selectedCommand}`,
+      move: normalizedMove,
+      reasoning: decision.reasoning || `Brain selected move: ${normalizedMove}`,
       isFallback: false,
     };
   }

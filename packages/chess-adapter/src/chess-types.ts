@@ -95,3 +95,66 @@ export interface DecisionTranslationResult {
   readonly reasoning: string;
   readonly isFallback: boolean;
 }
+
+// Game Recording Types
+export interface GameMetadata {
+  readonly whitePlayer: string;
+  readonly blackPlayer: string;
+  readonly event?: string;
+  readonly site?: string;
+  readonly date: string;
+  readonly round?: string;
+  readonly result: '1-0' | '0-1' | '1/2-1/2' | '*';
+}
+
+export interface MoveRecord {
+  readonly moveNumber: number;
+  readonly color: 'white' | 'black';
+  readonly move: string;
+  readonly timestamp: number;
+  readonly latency: number;
+  readonly fen?: string;
+  readonly evaluation?: number;
+}
+
+export interface GameRecord {
+  readonly metadata: GameMetadata;
+  readonly moves: readonly MoveRecord[];
+  readonly startTime: number;
+  readonly endTime: number;
+  readonly duration: number;
+}
+
+// Metrics Types
+export interface MoveMetrics {
+  readonly moveNumber: number;
+  readonly color: 'white' | 'black';
+  readonly decisionLatency: number;
+  readonly quality?: number;
+  readonly isCapture: boolean;
+  readonly isCheck: boolean;
+  readonly isCheckmate: boolean;
+}
+
+export interface BrainMetrics {
+  readonly brainName: string;
+  readonly color: 'white' | 'black';
+  readonly totalMoves: number;
+  readonly totalDecisionTime: number;
+  readonly avgDecisionTime: number;
+  readonly minDecisionTime: number;
+  readonly maxDecisionTime: number;
+  readonly timeoutCount: number;
+  readonly errorCount: number;
+  readonly successRate: number;
+}
+
+export interface GameMetrics {
+  readonly whiteBrain: BrainMetrics;
+  readonly blackBrain: BrainMetrics;
+  readonly moveMetrics: readonly MoveMetrics[];
+  readonly gameResult: 'white-win' | 'black-win' | 'draw';
+  readonly totalMoves: number;
+  readonly gameDuration: number;
+  readonly avgMoveTime: number;
+}

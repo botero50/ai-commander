@@ -7,6 +7,8 @@ export { ChessEngine } from './chess-engine.js';
 export { ChessGameLoop } from './chess-game-loop.js';
 export { ChessDecisionTranslator } from './chess-decision-translator.js';
 export { ChessObservationAdapter } from './chess-observation-adapter.js';
+export { ChessGameRecorder } from './chess-game-recorder.js';
+export { ChessMetricsCollector } from './chess-metrics-collector.js';
 export type {
   ChessPosition,
   ChessMaterial,
@@ -18,4 +20,10 @@ export type {
   GameLoopConfig,
   GameLoopEvents,
   DecisionTranslationResult,
+  GameMetadata,
+  MoveRecord,
+  GameRecord,
+  MoveMetrics,
+  BrainMetrics,
+  GameMetrics,
 } from './chess-types.js';

@@ -126,7 +126,11 @@ export class ChessGameLoop {
       }
 
       // Determine game result
-      const result = this.session.getGameResult();
+      let result = this.session.getGameResult();
+      if (result === 'ongoing') {
+        // Game stopped due to move limit, declare draw
+        result = 'draw';
+      }
       this.log(`Game Over: ${result}`);
 
       if (result === 'white-win') {
