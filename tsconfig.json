@@ -5,10 +5,10 @@
   },
   "files": [],
   "references": [
+    { "path": "packages/domain" },
     { "path": "packages/contracts" },
     { "path": "packages/core" },
     { "path": "packages/brain" },
-    { "path": "packages/brain-ollama" },
-    { "path": "packages/agent-runtime" }
+    { "path": "packages/brain-ollama" }
   ]
 }

@@ -1,37 +1,15 @@
 /**
  * @ai-commander/core
- * 
+ *
  * Game-agnostic AI tournament framework
  * Reusable across any game with a GameAdapter implementation
  */
 
 // Tournament System
-export * from './tournament/elo-rating';
-export * from './tournament/broadcast-server';
-
-// Brain Framework
-export * from './brain/ollama-brain';
-export * from './brain/ai-loop-orchestrator';
-export * from './brain/brain-factory';
-export * from './brain/ollama-request-throttler';
-export * from './brain/decision-logger';
-
-// Streaming
-export * from './streaming/broadcast-state';
-
-// Analytics
-export * from './analytics/statistics-analyzer';
-export * from './analytics/match-comparison';
-export * from './analytics/prediction-system';
-
-// Commentary
-export * from './commentary/trash-talk-generator';
+export * from './tournament/elo-rating.js';
 
 // Config
-export * from './config/logger';
-
-// Types
-export * from './types';
+export * from './config/logger.js';
 
 /**
  * To integrate a new game:

@@ -31,8 +31,7 @@
     "apps/*"
   ],
   "scripts": {
-    "build": "node -c chess.js && echo '✅ Build OK'",
-    "build:full": "tsc -b",
+    "build": "tsc -b",
     "build:arena": "tsc -b packages/fake-game-adapter",
     "typecheck": "tsc -b --noEmit",
     "lint": "eslint .",

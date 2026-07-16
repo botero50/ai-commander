@@ -5,29 +5,30 @@
     "rootDir": "./src",
     "composite": true,
     "declaration": true,
-    "declarationMap": true,
-    "sourceMap": true
+    "declarationMap": false,
+    "sourceMap": false,
+    "noEmit": false
   },
   "include": [
+    "src/config/**/*.ts",
+    "src/types/**/*.ts",
+    "src/utils/**/*.ts",
     "src/tournament/elo-rating.ts",
-    "src/config/logger.ts",
-    "src/types/**/*.ts"
+    "src/index.ts"
   ],
   "exclude": [
     "src/**/*.test.ts",
     "src/**/*.skip.ts",
-    "src/tournament/broadcast-server.ts",
-    "src/tournament/match-replay.ts",
-    "src/tournament/spectator-coordinator.ts",
-    "src/tournament/stream-manager.ts",
-    "src/tournament/tournament-*.ts",
-    "src/tournament/stream-*.ts",
-    "src/tournament/match-view-state.ts",
-    "src/streaming/**/*.ts",
     "src/analytics/**/*.ts",
+    "src/brain/**/*.ts",
     "src/commentary/**/*.ts",
+    "src/streaming/**/*.ts",
     "dist",
-    "node_modules",
-    "tests"
+    "node_modules"
+  ],
+  "references": [
+    {
+      "path": "../domain"
+    }
   ]
 }
