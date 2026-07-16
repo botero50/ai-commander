@@ -61,6 +61,7 @@
     "vitest": "^2.0.0"
   },
   "dependencies": {
+    "chess.js": "^1.4.0",
     "open": "^10.2.0"
   }
 }

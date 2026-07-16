@@ -14,6 +14,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { ChessUI } from './ui.js';
 import { BroadcastService } from './broadcast-service.js';
+import { RealChessGame } from './real-chess-game.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const execPromise = promisify(exec);
@@ -245,72 +246,28 @@ class ChessArena {
     // Reset broadcast for new game
     this.broadcast.reset();
 
-    // This is a placeholder for actual game execution
-    // In a real implementation, this would:
-    // 1. Create a ChessAdapter session
-    // 2. Create Brain instances for each player
-    // 3. Run ChessGameLoop with personality configs
-    // 4. Process each move through BroadcastService
-    // 5. Return result with moves
+    // Create and execute REAL chess game
+    const gameExecutor = new RealChessGame(matchConfig, this.broadcast, this.ui);
 
-    // For now, simulate a game with random result
-    const moves = this.generateRandomMoves();
-    const results = ['white-win', 'black-win', 'draw'];
-    const result = results[Math.floor(Math.random() * results.length)];
+    console.log('\n🎮 Starting real chess game...');
+    const gameResult = await gameExecutor.play();
 
-    // Simulate move processing with events
-    const isWhiteToMove = (moveIndex) => moveIndex % 2 === 0;
-    for (let i = 0; i < Math.min(moves.length, 3); i++) {
-      // Only process first 3 moves for demo (to keep output manageable)
-      const playerName = isWhiteToMove(i) ? matchConfig.white.name : matchConfig.black.name;
-      const moveData = { move: moves[i], fen: 'simulated' };
-
-      // Process through broadcast service
-      const broadcasts = this.broadcast.processMove(moveData, playerName);
-
-      // Display live commentary
-      for (const broadcast of broadcasts) {
-        this.broadcast.displayBroadcast(broadcast);
-        await this.delay(500); // Brief delay between events
-      }
-    }
-
-    // Simulate game duration
-    const gameDurationMs = Math.random() * 30000 + 5000; // 5-35 seconds
-    await this.delay(Math.min(gameDurationMs, 2000)); // Cap at 2 seconds for demo
-
-    // Get match summary
     const summary = this.broadcast.getMatchSummary();
 
     return {
       matchNumber,
       white: matchConfig.white.name,
       black: matchConfig.black.name,
-      result,
-      moves,
-      movesCount: moves.length,
-      durationMs: gameDurationMs,
+      result: gameResult.result,
+      moves: gameResult.moves,
+      movesCount: gameResult.moves.length,
+      durationMs: gameResult.durationMs,
       events: summary.eventsByType,
+      pgn: gameResult.pgn,
+      fen: gameResult.fen,
     };
   }
 
-  generateRandomMoves() {
-    const moveCount = Math.floor(Math.random() * 60) + 10; // 10-70 moves
-    const moves = [];
-
-    const chessMoves = [
-      'e2-e4', 'e7-e5', 'g1-f3', 'b8-c6',
-      'f1-b5', 'a7-a6', 'b5-a4', 'g8-f6',
-      'e1-g1', 'f8-e7', 'f1-e1', 'b7-b5',
-      'a4-b3', 'd7-d6', 'd2-d3', 'c8-g4',
-    ];
-
-    for (let i = 0; i < moveCount; i++) {
-      moves.push(chessMoves[i % chessMoves.length]);
-    }
-
-    return moves;
-  }
 
   displayResult(result, white, black) {
     const resultText =
