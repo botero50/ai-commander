@@ -14,6 +14,8 @@ export default defineConfig({
     alias: {
       '@ai-commander/contracts': path.resolve(__dirname, '../contracts/src'),
       '@ai-commander/brain': path.resolve(__dirname, '../brain/src'),
+      '@ai-commander/domain': path.resolve(__dirname, '../domain/src'),
+      '@ai-commander/adapter': path.resolve(__dirname, '../adapter/src'),
     },
   },
 });

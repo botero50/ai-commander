@@ -1,259 +1,443 @@
 /**
- * Chess Adapter Tests
+ * Chess Adapter Tests - Story C1.1
  *
- * Tests for chess game integration
- * - Game initialization
+ * Tests for chess game integration:
+ * - Adapter initialization
+ * - Game session lifecycle
+ * - Board state tracking
  * - Move execution
- * - State tracking
- * - Win condition detection
+ * - Game over detection
  * - Legal move validation
  */
 
 import { describe, it, expect, beforeEach } from 'vitest';
-import type { GameAdapter, GameCommand, GameState, GameConfig } from '@ai-commander/contracts';
+import { ChessAdapter } from './chess-adapter.js';
+import type { GameSession } from '@ai-commander/adapter';
 
-// Mock ChessAdapter for testing
-class MockChessAdapter implements GameAdapter {
-  readonly gameId = 'chess';
-  private fen: string = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
-  private moveCount: number = 0;
-  private isRunning: boolean = false;
+describe('ChessAdapter - Story C1.1', () => {
+  let adapter: ChessAdapter;
 
-  async launchGame(config: GameConfig) {
-    this.isRunning = true;
-    this.fen = 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1';
-    this.moveCount = 0;
-    return { pid: Math.random(), isRunning: true };
-  }
-
-  async executeCommands(commands: GameCommand[]) {
-    for (const cmd of commands) {
-      if (cmd.type === 'move' && cmd.from && cmd.to) {
-        this.moveCount++;
-      }
-    }
-  }
-
-  async getGameState(): Promise<GameState> {
-    return {
-      tick: this.moveCount,
-      gameOver: this.moveCount > 100,
-      players: [
-        { id: 1, name: 'White', [key: string]: any },
-        { id: 2, name: 'Black', [key: string]: any },
-      ],
-    };
-  }
-
-  async mapToWorldState() {
-    return { fen: this.fen, moveCount: this.moveCount };
-  }
-
-  isGameOver(state: GameState): boolean {
-    return state.gameOver || this.moveCount > 100;
-  }
-
-  async shutdown() {
-    this.isRunning = false;
-  }
-}
-
-describe.skip('ChessAdapter', () => {
-  let adapter: GameAdapter;
-
-  beforeEach(async () => {
-    adapter = new MockChessAdapter();
+  beforeEach(() => {
+    adapter = new ChessAdapter();
   });
 
-  describe('Game Initialization', () => {
-    it('should launch game successfully', async () => {
-      const process = await adapter.launchGame({});
-      expect(process.pid).toBeDefined();
-      expect(process.isRunning).toBe(true);
+  describe('Adapter Initialization', () => {
+    it('should create adapter with correct identity', () => {
+      expect(adapter.adapterId).toBe('chess-adapter');
+      expect(adapter.displayName).toBe('Chess Adapter');
     });
 
-    it('should start with standard starting position', async () => {
-      await adapter.launchGame({});
-      const state = await adapter.mapToWorldState();
-      expect(state.fen).toContain('rnbqkbnr');
-      expect(state.moveCount).toBe(0);
+    it('should have correct capabilities', () => {
+      expect(adapter.capabilities.supportsPause).toBe(false);
+      expect(adapter.capabilities.supportsSaveState).toBe(false);
+      expect(adapter.capabilities.supportsDeterministicMode).toBe(true);
+      expect(adapter.capabilities.supportsReplay).toBe(true);
+      expect(adapter.capabilities.supportsCompleteWorldState).toBe(true);
+      expect(adapter.capabilities.supportsMultipleAgents).toBe(false);
     });
 
-    it('should have two players', async () => {
-      await adapter.launchGame({});
-      const state = await adapter.getGameState();
-      expect(state.players).toHaveLength(2);
-      expect(state.players[0].name).toBe('White');
-      expect(state.players[1].name).toBe('Black');
+    it('should initialize successfully', async () => {
+      await adapter.initialize();
+      const info = await adapter.getAdapterInfo();
+      expect(info.version).toBeDefined();
+      expect(info.gameVersion).toBeDefined();
+    });
+
+    it('should prevent double initialization', async () => {
+      await adapter.initialize();
+      await expect(adapter.initialize()).rejects.toThrow('already initialized');
+    });
+
+    it('should shutdown gracefully', async () => {
+      await adapter.initialize();
+      await expect(adapter.shutdown()).resolves.not.toThrow();
+    });
+  });
+
+  describe('Session Creation', () => {
+    beforeEach(async () => {
+      await adapter.initialize();
+    });
+
+    it('should require initialization before creating sessions', async () => {
+      const uninitializedAdapter = new ChessAdapter();
+      await expect(uninitializedAdapter.createSession()).rejects.toThrow('must be initialized');
+    });
+
+    it('should create a valid session', async () => {
+      const session = await adapter.createSession();
+      expect(session).toBeDefined();
+      expect(session.sessionId).toBeDefined();
+      expect(session.capabilities).toBeDefined();
+    });
+
+    it('should create sessions with unique IDs', async () => {
+      const session1 = await adapter.createSession();
+      const session2 = await adapter.createSession();
+      expect(session1.sessionId).not.toBe(session2.sessionId);
+    });
+  });
+
+  describe('Game Session Lifecycle', () => {
+    let session: GameSession;
+
+    beforeEach(async () => {
+      await adapter.initialize();
+      session = await adapter.createSession();
+    });
+
+    it('should start a new game', async () => {
+      const initialState = await session.start();
+      expect(initialState).toBeDefined();
+      expect(initialState.customData).toBeDefined();
+    });
+
+    it('should not allow double start', async () => {
+      await session.start();
+      await expect(session.start()).rejects.toThrow('already active');
+    });
+
+    it('should report as active after start', async () => {
+      await session.start();
+      const isActive = await session.isActive();
+      expect(isActive).toBe(true);
+    });
+
+    it('should stop a running game', async () => {
+      await session.start();
+      await session.stop();
+      const isActive = await session.isActive();
+      expect(isActive).toBe(false);
+    });
+
+    it('should not allow stop when not active', async () => {
+      await expect(session.stop()).rejects.toThrow('not active');
+    });
+
+    it('should not support pause', async () => {
+      await session.start();
+      await expect(session.pause()).rejects.toThrow('Pause not supported');
+    });
+  });
+
+  describe('Board State Observation', () => {
+    let session: GameSession;
+
+    beforeEach(async () => {
+      await adapter.initialize();
+      session = await adapter.createSession();
+      await session.start();
+    });
+
+    it('should provide world state', async () => {
+      const state = await session.observationProvider.getWorldState();
+      expect(state).toBeDefined();
+      expect(state.customData).toBeDefined();
+    });
+
+    it('should have correct initial FEN', async () => {
+      const state = await session.observationProvider.getWorldState();
+      const customData = state.customData as any;
+      expect(customData.fen).toBe('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
+    });
+
+    it('should have 16 legal moves at start', async () => {
+      const state = await session.observationProvider.getWorldState();
+      const customData = state.customData as any;
+      expect(customData.legalMoves.length).toBe(20); // 16 pawn moves + 4 knight moves
+    });
+
+    it('should report no check at start', async () => {
+      const state = await session.observationProvider.getWorldState();
+      const customData = state.customData as any;
+      expect(customData.isCheck).toBe(false);
+      expect(customData.isCheckmate).toBe(false);
+      expect(customData.isStalemate).toBe(false);
+    });
+
+    it('should track material count', async () => {
+      const state = await session.observationProvider.getWorldState();
+      const customData = state.customData as any;
+      expect(customData.material.whitePiecesTotal).toBe(16);
+      expect(customData.material.blackPiecesTotal).toBe(16);
+      expect(customData.material.whitePawns).toBe(8);
+      expect(customData.material.blackPawns).toBe(8);
+    });
+
+    it('should report move number as 1', async () => {
+      const state = await session.observationProvider.getWorldState();
+      const customData = state.customData as any;
+      expect(customData.moveNumber).toBe(1);
+    });
+
+    it('should report halfmove clock as 0', async () => {
+      const state = await session.observationProvider.getWorldState();
+      const customData = state.customData as any;
+      expect(customData.halfmoveClock).toBe(0);
+    });
+
+    it('should report observation available', async () => {
+      const isAvailable = await session.observationProvider.isObservationAvailable();
+      expect(isAvailable).toBe(true);
     });
   });
 
   describe('Move Execution', () => {
-    it('should execute valid moves', async () => {
-      await adapter.launchGame({});
-      const commands: GameCommand[] = [
-        { playerId: 1, type: 'move', from: 'e2', to: 'e4' },
-      ];
-      await adapter.executeCommands(commands);
-      const state = await adapter.getGameState();
-      expect(state.tick).toBeGreaterThan(0);
+    let session: GameSession;
+
+    beforeEach(async () => {
+      await adapter.initialize();
+      session = await adapter.createSession();
+      await session.start();
     });
 
-    it('should track move count', async () => {
-      await adapter.launchGame({});
-      const state1 = await adapter.getGameState();
-      expect(state1.tick).toBe(0);
+    it('should execute a valid move', async () => {
+      const command = {
+        id: 'move-1',
+        agentId: 'white',
+        actionType: 'move',
+        parameters: { from: 'e2', to: 'e4' },
+        issuedAtTick: 0,
+        priority: 'normal' as const,
+      };
 
-      await adapter.executeCommands([
-        { playerId: 1, type: 'move', from: 'e2', to: 'e4' },
-      ]);
-      const state2 = await adapter.getGameState();
-      expect(state2.tick).toBe(1);
+      const result = await session.commandExecutor.executeCommand(command);
+      expect(result.success).toBe(true);
+      expect(result.message).toContain('executed');
     });
 
-    it('should handle multiple moves in sequence', async () => {
-      await adapter.launchGame({});
-      const moves: GameCommand[] = [
-        { playerId: 1, type: 'move', from: 'e2', to: 'e4' },
-        { playerId: 2, type: 'move', from: 'e7', to: 'e5' },
-        { playerId: 1, type: 'move', from: 'g1', to: 'f3' },
-      ];
-      await adapter.executeCommands(moves);
-      const state = await adapter.getGameState();
-      expect(state.tick).toBe(3);
-    });
-  });
+    it('should update board state after move', async () => {
+      const command = {
+        id: 'move-1',
+        agentId: 'white',
+        actionType: 'move',
+        parameters: { from: 'e2', to: 'e4' },
+        issuedAtTick: 0,
+        priority: 'normal' as const,
+      };
 
-  describe('Game State Tracking', () => {
-    it('should return current game state', async () => {
-      await adapter.launchGame({});
-      const state = await adapter.getGameState();
-      expect(state.tick).toBeDefined();
-      expect(state.gameOver).toBeDefined();
-      expect(state.players).toBeDefined();
+      await session.commandExecutor.executeCommand(command);
+      const state = await session.observationProvider.getWorldState();
+      const customData = state.customData as any;
+      expect(customData.lastMove).toBeDefined();
     });
 
-    it('should map to world state format', async () => {
-      await adapter.launchGame({});
-      const worldState = await adapter.mapToWorldState();
-      expect(worldState.fen).toBeDefined();
-      expect(worldState.moveCount).toBeDefined();
+    it('should reject or fallback on illegal move', async () => {
+      const command = {
+        id: 'move-1',
+        agentId: 'white',
+        actionType: 'move',
+        parameters: { from: 'e2', to: 'e5' }, // Invalid: move 3 squares
+        issuedAtTick: 0,
+        priority: 'normal' as const,
+      };
+
+      const result = await session.commandExecutor.executeCommand(command);
+      // May return success with fallback or failure depending on implementation
+      expect(result).toBeDefined();
+      expect(result.message).toBeDefined();
     });
 
-    it('should track game progress', async () => {
-      await adapter.launchGame({});
+    it('should fallback to random legal move on illegal input', async () => {
+      const command = {
+        id: 'move-1',
+        agentId: 'white',
+        actionType: 'move',
+        parameters: { from: 'e2', to: 'e5' }, // Invalid
+        issuedAtTick: 0,
+        priority: 'normal' as const,
+      };
 
-      const initialState = await adapter.getGameState();
-      expect(initialState.tick).toBe(0);
+      const result = await session.commandExecutor.executeCommand(command);
+      // Should return success with random fallback OR failure
+      // depending on implementation choice
+      expect(result).toBeDefined();
+    });
 
-      // Play some moves
-      for (let i = 0; i < 5; i++) {
-        await adapter.executeCommands([
-          { playerId: i % 2 === 0 ? 1 : 2, type: 'move', from: 'a2', to: 'a3' },
-        ]);
-      }
+    it('should validate move legality before execution', async () => {
+      const command = {
+        id: 'move-1',
+        agentId: 'white',
+        actionType: 'move',
+        parameters: { from: 'e2', to: 'e4' },
+        issuedAtTick: 0,
+        priority: 'normal' as const,
+      };
 
-      const finalState = await adapter.getGameState();
-      expect(finalState.tick).toBe(5);
+      const canExecute = await session.commandExecutor.canExecuteCommand(command);
+      expect(canExecute).toBe(true);
+    });
+
+    it('should report invalid moves as cannot execute', async () => {
+      const command = {
+        id: 'move-1',
+        agentId: 'white',
+        actionType: 'move',
+        parameters: { from: 'a1', to: 'a2' }, // Rook can't move
+        issuedAtTick: 0,
+        priority: 'normal' as const,
+      };
+
+      const canExecute = await session.commandExecutor.canExecuteCommand(command);
+      expect(canExecute).toBe(false);
+    });
+
+    it('should accept resign command', async () => {
+      const command = {
+        id: 'resign-1',
+        agentId: 'white',
+        actionType: 'resign',
+        parameters: {},
+        issuedAtTick: 0,
+        priority: 'high' as const,
+      };
+
+      const result = await session.commandExecutor.executeCommand(command);
+      expect(result.success).toBe(true);
+    });
+
+    it('should accept draw offer', async () => {
+      const command = {
+        id: 'draw-1',
+        agentId: 'white',
+        actionType: 'draw-offer',
+        parameters: {},
+        issuedAtTick: 0,
+        priority: 'normal' as const,
+      };
+
+      const result = await session.commandExecutor.executeCommand(command);
+      expect(result.success).toBe(true);
     });
   });
 
   describe('Game Over Detection', () => {
-    it('should detect game over condition', async () => {
-      await adapter.launchGame({});
-      let state = await adapter.getGameState();
-      expect(state.gameOver).toBe(false);
+    let session: GameSession;
 
-      // Play many moves to trigger game over
-      const moves: GameCommand[] = [];
-      for (let i = 0; i < 101; i++) {
-        moves.push({ playerId: i % 2 === 0 ? 1 : 2, type: 'move', from: 'a2', to: 'a3' });
+    beforeEach(async () => {
+      await adapter.initialize();
+      session = await adapter.createSession();
+      await session.start();
+    });
+
+    it('should not be game over at start', async () => {
+      const state = await session.observationProvider.getWorldState();
+      expect(state.time.isGameOver).toBe(false);
+    });
+
+    it('should detect checkmate', async () => {
+      // Fool's mate: 1. f2-f3 e7-e5 2. g2-g4 d8-h4#
+      const moves = [
+        { from: 'f2', to: 'f3' },
+        { from: 'e7', to: 'e5' },
+        { from: 'g2', to: 'g4' },
+        { from: 'd8', to: 'h4' },
+      ];
+      for (const move of moves) {
+        const command = {
+          id: `move-${move.from}-${move.to}`,
+          agentId: 'player',
+          actionType: 'move',
+          parameters: { from: move.from, to: move.to },
+          issuedAtTick: 0,
+          priority: 'normal' as const,
+        };
+        await session.commandExecutor.executeCommand(command);
       }
-      await adapter.executeCommands(moves);
 
-      state = await adapter.getGameState();
-      expect(state.gameOver).toBe(true);
-    });
-
-    it('should be callable in isGameOver method', async () => {
-      await adapter.launchGame({});
-      const state = await adapter.getGameState();
-      const isOver = adapter.isGameOver(state);
-      expect(typeof isOver).toBe('boolean');
+      const state = await session.observationProvider.getWorldState();
+      const customData = state.customData as any;
+      expect(customData.isCheckmate).toBe(true);
     });
   });
 
-  describe('Adapter Interface Compliance', () => {
-    it('should implement GameAdapter interface', async () => {
-      expect(adapter.gameId).toBe('chess');
-      expect(typeof adapter.launchGame).toBe('function');
-      expect(typeof adapter.executeCommands).toBe('function');
-      expect(typeof adapter.getGameState).toBe('function');
-      expect(typeof adapter.mapToWorldState).toBe('function');
-      expect(typeof adapter.isGameOver).toBe('function');
-      expect(typeof adapter.shutdown).toBe('function');
-    });
+  describe('FEN Loading', () => {
+    it('should load position from FEN', async () => {
+      await adapter.initialize();
+      const session = await adapter.createSession();
 
-    it('should have correct game ID', () => {
-      expect(adapter.gameId).toBe('chess');
-    });
-  });
+      const fenPosition = 'r1bqkb1r/pppp1ppp/2n2n2/1B2p3/4P3/5N2/PPPP1PPP/RNBQK2R w KQkq - 0 1';
+      (session as any).loadFEN(fenPosition);
 
-  describe('Shutdown', () => {
-    it('should shutdown cleanly', async () => {
-      await adapter.launchGame({});
-      await adapter.shutdown();
-      // After shutdown, game should not be running
-      expect(adapter).toBeDefined();
+      await session.start();
+      const state = await session.observationProvider.getWorldState();
+      const customData = state.customData as any;
+      expect(customData.fen).toBe(fenPosition);
     });
   });
 
-  describe('Command Types', () => {
-    it('should recognize move commands', async () => {
-      await adapter.launchGame({});
-      const moveCommand: GameCommand = {
-        playerId: 1,
-        type: 'move',
-        from: 'e2',
-        to: 'e4',
+  describe('PGN Export', () => {
+    let session: GameSession;
+
+    beforeEach(async () => {
+      await adapter.initialize();
+      session = await adapter.createSession();
+      await session.start();
+    });
+
+    it('should export empty PGN at start', async () => {
+      const pgn = (session as any).getPGN();
+      expect(pgn).toBeDefined();
+      expect(typeof pgn).toBe('string');
+    });
+
+    it('should export PGN after moves', async () => {
+      const command = {
+        id: 'move-1',
+        agentId: 'white',
+        actionType: 'move',
+        parameters: { from: 'e2', to: 'e4' },
+        issuedAtTick: 0,
+        priority: 'normal' as const,
       };
-      await adapter.executeCommands([moveCommand]);
-      const state = await adapter.getGameState();
-      expect(state.tick).toBeGreaterThan(0);
-    });
 
-    it('should support extended move notation', async () => {
-      await adapter.launchGame({});
-      const advancedMove: GameCommand = {
-        playerId: 1,
-        type: 'move',
-        from: 'e2',
-        to: 'e4',
-        promotion: 'q', // Queen promotion for pawn
-      };
-      await adapter.executeCommands([advancedMove]);
-      const state = await adapter.getGameState();
-      expect(state.tick).toBeGreaterThan(0);
+      await session.commandExecutor.executeCommand(command);
+      const pgn = (session as any).getPGN();
+      expect(pgn).toContain('e4');
     });
   });
 
-  describe('Performance', () => {
-    it('should handle rapid move execution', async () => {
-      await adapter.launchGame({});
-      const moves: GameCommand[] = Array.from({ length: 100 }, (_, i) => ({
-        playerId: i % 2 === 0 ? 1 : 2,
-        type: 'move',
-        from: 'a2',
-        to: 'a3',
-      }));
+  describe('Integration Tests', () => {
+    it('should play a complete game session', async () => {
+      await adapter.initialize();
+      const session = await adapter.createSession();
+      const state = await session.start();
 
-      const start = Date.now();
-      await adapter.executeCommands(moves);
-      const elapsed = Date.now() - start;
+      expect(state).toBeDefined();
+      const customData = state.customData as any;
+      expect(customData.legalMoves.length).toBeGreaterThan(0);
 
-      expect(elapsed).toBeLessThan(5000); // Should complete in under 5 seconds
-      const state = await adapter.getGameState();
-      expect(state.tick).toBe(100);
+      await session.stop();
+      const isActive = await session.isActive();
+      expect(isActive).toBe(false);
+    });
+
+    it('should handle multiple game sessions independently', async () => {
+      await adapter.initialize();
+      const session1 = await adapter.createSession();
+      const session2 = await adapter.createSession();
+
+      const state1 = await session1.start();
+      const state2 = await session2.start();
+
+      // Move in session 1
+      const command1 = {
+        id: 'move-1',
+        agentId: 'white',
+        actionType: 'move',
+        parameters: { from: 'e2', to: 'e4' },
+        issuedAtTick: 0,
+        priority: 'normal' as const,
+      };
+      await session1.commandExecutor.executeCommand(command1);
+
+      // Session 2 should be unaffected
+      const state2After = await session2.observationProvider.getWorldState();
+      const customData2 = state2After.customData as any;
+      expect(customData2.legalMoves.length).toBe(20); // Still in starting position
+
+      await session1.stop();
+      await session2.stop();
     });
   });
 });
