@@ -189,24 +189,26 @@ export class ChessGameLoop {
   }
 
   private createMoveCommand(move: string, color: 'white' | 'black'): Command {
-    // Parse move (e.g., "e2e4" or "e4" or "Nf3")
+    // Parse move (e.g., "e2e4" or "e4" or "Nf3" or "e4+" or "Nf3#")
+    // Remove check/checkmate notation
+    const cleanMove = move.replace(/[+#=].*$/, '');
     let from: string, to: string, promotion: string | undefined;
 
-    if (move.length === 4 || move.length === 5) {
+    if (cleanMove.length === 4 || cleanMove.length === 5) {
       // Long algebraic (e2e4 or e2e4q)
-      from = move.substring(0, 2);
-      to = move.substring(2, 4);
-      promotion = move.length === 5 ? move.substring(4, 5) : undefined;
-    } else if (move.length >= 2) {
+      from = cleanMove.substring(0, 2);
+      to = cleanMove.substring(2, 4);
+      promotion = cleanMove.length === 5 ? cleanMove.substring(4, 5) : undefined;
+    } else if (cleanMove.length >= 2) {
       // Short algebraic (e4, Nf3, etc.) or SAN notation
       // Extract destination square (last 2 chars if valid, like f3, e4)
-      const lastTwo = move.substring(move.length - 2);
+      const lastTwo = cleanMove.substring(cleanMove.length - 2);
       if (this.isValidSquare(lastTwo)) {
         to = lastTwo;
         // Promotion if specified (e8=Q or e8Q)
-        const promMatch = move.match(/[qrbnQRBN]$/);
+        const promMatch = move.match(/=?[qrbnQRBN]/);
         if (promMatch) {
-          promotion = promMatch[0].toLowerCase();
+          promotion = promMatch[0].replace('=', '').toLowerCase();
         }
         // For short algebraic, we'll use a placeholder from square
         // This will be corrected by the CommandExecutor validation
