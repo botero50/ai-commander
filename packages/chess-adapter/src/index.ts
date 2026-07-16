@@ -3,6 +3,7 @@ export { ChessAdapter, chessAdapter, CHESS_CAPABILITIES } from './chess-adapter.
 export { ChessGameSession } from './chess-game-session.js';
 export { ChessObservationProvider } from './chess-observation.js';
 export { ChessCommandExecutor } from './chess-command.js';
+export { ChessEngine } from './chess-engine.js';
 export type {
   ChessPosition,
   ChessMaterial,
@@ -10,4 +11,5 @@ export type {
   ChessCustomData,
   ChessMove,
   ChessGameState,
+  EngineConfig,
 } from './chess-types.js';

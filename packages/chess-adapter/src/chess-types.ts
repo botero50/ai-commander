@@ -63,3 +63,10 @@ export interface ChessGameState {
   readonly moveNumber: number;
   readonly halfmoveClock: number;
 }
+
+export interface EngineConfig {
+  readonly enginePath: string;
+  readonly timeout: number;
+  readonly threads: number;
+  readonly hash: number;
+}
