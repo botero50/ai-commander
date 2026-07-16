@@ -36,6 +36,27 @@ class ChessArena {
     };
 
     this.players = [];
+    this.lastMatchConfig = null;
+
+    // Personality profiles
+    this.personalities = [
+      { name: 'Aggressive', temperature: 0.9, depth: 'tactical', riskTolerance: 0.8 },
+      { name: 'Defensive', temperature: 0.3, depth: 'strategic', riskTolerance: 0.2 },
+      { name: 'Positional', temperature: 0.5, depth: 'strategic', riskTolerance: 0.4 },
+      { name: 'Tactical', temperature: 0.7, depth: 'tactical', riskTolerance: 0.6 },
+      { name: 'Balanced', temperature: 0.5, depth: 'balanced', riskTolerance: 0.5 },
+      { name: 'Gambler', temperature: 0.95, depth: 'tactical', riskTolerance: 0.95 },
+      { name: 'Cautious', temperature: 0.2, depth: 'strategic', riskTolerance: 0.1 },
+    ];
+
+    // Time controls
+    this.timeControls = [
+      { name: 'Bullet', seconds: 60 },
+      { name: 'Blitz', seconds: 300 },
+      { name: 'Rapid', seconds: 900 },
+      { name: 'Classical', seconds: 3600 },
+      { name: 'Infinite', seconds: 0 },
+    ];
   }
 
   async run() {
@@ -57,15 +78,15 @@ class ChessArena {
           console.log(`Match #${matchNumber}`);
           console.log('─'.repeat(60));
 
-          // Select random players
-          const { white, black } = this.selectPlayers();
-          console.log(`${white.name} (White) vs ${black.name} (Black)\n`);
+          // Select random players with randomized personalities
+          const matchConfig = this.selectPlayers();
+          this.displayMatchConfig(matchConfig);
 
           // Play game (simplified - just announce for now)
-          const result = await this.simulateGame(white, black, matchNumber);
+          const result = await this.simulateGame(matchConfig, matchNumber);
 
           // Display result
-          this.displayResult(result, white, black);
+          this.displayResult(result, matchConfig.white, matchConfig.black);
 
           // Update stats
           this.updateStats(result);
@@ -126,24 +147,90 @@ class ChessArena {
   }
 
   selectPlayers() {
-    // For now, select first two players
-    // TODO: Randomize in Story 61.3
-    const white = this.players[0];
-    const black = this.players[this.players.length > 1 ? 1 : 0];
-
-    if (!white || !black) {
-      throw new Error('Not enough players configured');
+    if (this.players.length < 2) {
+      throw new Error('Need at least 2 players for randomization');
     }
 
-    return { white, black };
+    let matchConfig = null;
+
+    // Keep generating until we get a different config than last time
+    let attempts = 0;
+    do {
+      const whiteIdx = Math.floor(Math.random() * this.players.length);
+      let blackIdx = Math.floor(Math.random() * this.players.length);
+
+      // Ensure white and black are different
+      while (blackIdx === whiteIdx) {
+        blackIdx = Math.floor(Math.random() * this.players.length);
+      }
+
+      const white = this.players[whiteIdx];
+      const black = this.players[blackIdx];
+
+      // Randomize personalities and settings
+      const whitePers = this.personalities[Math.floor(Math.random() * this.personalities.length)];
+      const blackPers = this.personalities[Math.floor(Math.random() * this.personalities.length)];
+      const timeControl = this.timeControls[Math.floor(Math.random() * this.timeControls.length)];
+
+      matchConfig = {
+        white: {
+          ...white,
+          personality: whitePers.name,
+          temperature: whitePers.temperature,
+          depth: whitePers.depth,
+          riskTolerance: whitePers.riskTolerance,
+        },
+        black: {
+          ...black,
+          personality: blackPers.name,
+          temperature: blackPers.temperature,
+          depth: blackPers.depth,
+          riskTolerance: blackPers.riskTolerance,
+        },
+        timeControl: timeControl.name,
+        seed: Math.random(),
+      };
+
+      // Check if it's different from last config
+      if (!this.lastMatchConfig || this.configsAreDifferent(matchConfig, this.lastMatchConfig)) {
+        break;
+      }
+
+      attempts++;
+    } while (attempts < 100);
+
+    if (!matchConfig) {
+      throw new Error('Failed to generate unique match configuration');
+    }
+
+    this.lastMatchConfig = matchConfig;
+    return matchConfig;
   }
 
-  async simulateGame(white, black, matchNumber) {
+  configsAreDifferent(config1, config2) {
+    return (
+      config1.white.name !== config2.white.name ||
+      config1.white.personality !== config2.white.personality ||
+      config1.black.name !== config2.black.name ||
+      config1.black.personality !== config2.black.personality ||
+      config1.timeControl !== config2.timeControl
+    );
+  }
+
+  displayMatchConfig(config) {
+    console.log(`${config.white.name} (${config.white.personality}) vs ${config.black.name} (${config.black.personality})`);
+    console.log(`Time Control: ${config.timeControl}`);
+    console.log(`White Temperature: ${config.white.temperature.toFixed(2)}`);
+    console.log(`Black Temperature: ${config.black.temperature.toFixed(2)}`);
+    console.log();
+  }
+
+  async simulateGame(matchConfig, matchNumber) {
     // This is a placeholder for actual game execution
     // In a real implementation, this would:
     // 1. Create a ChessAdapter session
     // 2. Create Brain instances for each player
-    // 3. Run ChessGameLoop
+    // 3. Run ChessGameLoop with personality configs
     // 4. Return result with moves
 
     // For now, simulate a game with random result
@@ -157,8 +244,8 @@ class ChessArena {
 
     return {
       matchNumber,
-      white: white.name,
-      black: black.name,
+      white: matchConfig.white.name,
+      black: matchConfig.black.name,
       result,
       moves,
       movesCount: moves.length,
