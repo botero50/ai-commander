@@ -5,6 +5,7 @@ import { promisify } from 'util';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { ChessUI } from './ui.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const execPromise = promisify(exec);
@@ -26,41 +27,32 @@ class ChessStartup {
       stockfishAvailable: false,
       configPath: '',
     };
+
+    this.ui = new ChessUI();
   }
 
   async run() {
     try {
       console.clear?.();
-      this.logBanner();
-      console.log('\n🔍 STARTUP DIAGNOSTICS\n');
-      console.log('=' + '='.repeat(49) + '\n');
+      this.ui.displayBanner();
+      this.ui.displaySectionHeader('Startup Diagnostics');
 
       // Step 1: Verify Node
-      await this.verifyNode();
-      this.logCheck('Node.js version', 'v' + this.results.nodeVersion);
+      await this.ui.displayCheckAnimated('  Node.js version', () => this.verifyNode());
 
       // Step 2: Verify Ollama
-      await this.verifyOllama();
-      this.logCheck('Ollama connection', this.results.ollamaAvailable ? '✓ Connected' : '✗ Failed');
+      await this.ui.displayCheckAnimated('  Ollama connection', () => this.verifyOllama());
 
       // Step 3: Verify Models
       if (this.results.ollamaAvailable) {
-        await this.verifyOllamaModels();
-        const modelCount = this.results.ollamaModels.length > 0
-          ? this.results.ollamaModels.length + ' available'
-          : '✗ None found';
-        this.logCheck('Ollama models', modelCount);
+        await this.ui.displayCheckAnimated('  Ollama models', () => this.verifyOllamaModels());
       }
 
       // Step 4: Verify Stockfish
-      await this.verifyStockfish();
-      this.logCheck('Stockfish engine', this.results.stockfishAvailable ? '✓ Available' : '✗ Not found');
+      await this.ui.displayCheckAnimated('  Stockfish engine', () => this.verifyStockfish());
 
       // Step 5: Create default config
-      await this.createDefaultConfig();
-      this.logCheck('Default config', 'Created: ' + this.results.configPath);
-
-      console.log('\n' + '='.repeat(50) + '\n');
+      await this.ui.displayCheckAnimated('  Default config', () => this.createDefaultConfig());
 
       // Final status
       if (!this.isReadyToLaunch()) {
@@ -68,15 +60,15 @@ class ChessStartup {
         process.exit(1);
       }
 
-      console.log('✅ Arena Ready\n');
-      console.log('🚀 Launching continuous arena...\n');
+      this.ui.displayArenaReady();
+      this.ui.displayLaunchMessage();
 
       // Import and launch the arena
       const { ChessArena } = await import('./arena.js');
       const arena = new ChessArena();
       await arena.run();
     } catch (error) {
-      console.error('\n❌ Startup failed: ' + error.message + '\n');
+      this.ui.displayError('Startup Failed', error.message);
       process.exit(1);
     }
   }
@@ -105,6 +97,8 @@ class ChessStartup {
         'Update Node.js from https://nodejs.org'
       );
     }
+
+    return { success: true, value: 'v' + version };
   }
 
   async verifyOllama() {
@@ -118,14 +112,16 @@ class ChessStartup {
       }
 
       this.results.ollamaAvailable = true;
+      return { success: true, value: 'Connected' };
     } catch (error) {
       this.results.ollamaAvailable = false;
+      return { success: false, error: 'Failed' };
     }
   }
 
   async verifyOllamaModels() {
     if (!this.results.ollamaAvailable) {
-      return;
+      return { success: false, error: 'Ollama unavailable' };
     }
 
     try {
@@ -134,8 +130,10 @@ class ChessStartup {
       });
       const data = await response.json();
       this.results.ollamaModels = (data.models || []).map((m) => m.name);
+      return { success: true, value: this.results.ollamaModels.length + ' available' };
     } catch (error) {
       this.results.ollamaModels = [];
+      return { success: false, error: 'Failed to fetch models' };
     }
   }
 
@@ -145,9 +143,14 @@ class ChessStartup {
 
       if (stdout.includes('Stockfish')) {
         this.results.stockfishAvailable = true;
+        return { success: true, value: 'Available' };
       }
+
+      this.results.stockfishAvailable = false;
+      return { success: false, error: 'Not found' };
     } catch (error) {
       this.results.stockfishAvailable = false;
+      return { success: false, error: 'Not found' };
     }
   }
 
@@ -189,6 +192,7 @@ class ChessStartup {
     }
 
     this.results.configPath = configPath;
+    return { success: true, value: 'Created' };
   }
 
   isReadyToLaunch() {

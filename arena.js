@@ -12,6 +12,7 @@ import { promisify } from 'util';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
+import { ChessUI } from './ui.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const execPromise = promisify(exec);
@@ -37,6 +38,7 @@ class ChessArena {
 
     this.players = [];
     this.lastMatchConfig = null;
+    this.ui = new ChessUI();
 
     // Personality profiles
     this.personalities = [
@@ -67,16 +69,13 @@ class ChessArena {
       // Initialize players
       this.initializePlayers();
 
-      console.log('\n🏛️  Arena Started');
-      console.log('   Press Ctrl+C to stop\n');
+      this.ui.displayArenaStarted();
 
       // Main game loop
       let matchNumber = 1;
       while (true) {
         try {
-          console.log('─'.repeat(60));
-          console.log(`Match #${matchNumber}`);
-          console.log('─'.repeat(60));
+          this.ui.displayMatchHeader(matchNumber);
 
           // Select random players with randomized personalities
           const matchConfig = this.selectPlayers();
