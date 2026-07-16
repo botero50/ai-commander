@@ -17,6 +17,7 @@ export { ChessSpectatorStreamer } from './chess-spectator-streamer.js';
 export { ChessBroadcastOverlay } from './chess-broadcast-overlay.js';
 export { ChessBroadcastManager } from './chess-broadcast-manager.js';
 export { ChessResearchPlatform } from './chess-research-platform.js';
+export { ChessIntegrationHarness } from './chess-integration-harness.js';
 export type {
   ChessPosition,
   ChessMaterial,
@@ -82,3 +83,8 @@ export type {
   MetaGameTrend,
   PerformanceReport,
 } from './chess-research-platform.js';
+export type {
+  HarnessConfig,
+  MatchSimulation,
+  TournamentReport,
+} from './chess-integration-harness.js';
