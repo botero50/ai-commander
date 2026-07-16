@@ -12,6 +12,7 @@ export { ChessMetricsCollector } from './chess-metrics-collector.js';
 export { ChessTournamentManager } from './chess-tournament-manager.js';
 export { ChessTournamentScheduler } from './chess-tournament-scheduler.js';
 export { ChessConcurrentExecutor } from './chess-concurrent-executor.js';
+export { ChessResultsAggregator } from './chess-results-aggregator.js';
 export type {
   ChessPosition,
   ChessMaterial,
@@ -47,3 +48,9 @@ export type {
   MatchExecutionResult,
   ExecutorState,
 } from './chess-concurrent-executor.js';
+export type {
+  BrainPerformance,
+  MatchSummary,
+  TournamentStats,
+  BrainAnalytics,
+} from './chess-results-aggregator.js';
