@@ -273,9 +273,18 @@ importers:
 
   packages/cli:
     dependencies:
-      '@ai-commander/contracts':
+      '@ai-commander/benchmark-reporter':
         specifier: workspace:*
-        version: link:../contracts
+        version: link:../benchmark-reporter
+      '@ai-commander/brain':
+        specifier: workspace:*
+        version: link:../brain
+      '@ai-commander/match-runner':
+        specifier: workspace:*
+        version: link:../match-runner
+      '@ai-commander/tournament-engine':
+        specifier: workspace:*
+        version: link:../tournament-engine
     devDependencies:
       '@types/node':
         specifier: ^20.0.0

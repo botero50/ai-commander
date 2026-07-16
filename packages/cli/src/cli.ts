@@ -1,13 +1,12 @@
 #!/usr/bin/env node
 
 /**
- * AI Commander CLI — Command-line interface for tournaments and analysis
+ * AI Commander CLI — Chess Tournament Platform
  *
  * Usage:
- *   ai-commander tournament --config=config.json
- *   ai-commander match --red=gpt4 --blue=claude --seed=12345
- *   ai-commander experiment --config=experiment.json
- *   ai-commander report --replay=replay.json --format=html
+ *   pnpm chess                          # Launch continuous chess arena
+ *   pnpm chess tournament --config=...  # Run tournament
+ *   pnpm chess match --red=... --blue=...
  */
 
 import { parseArgs } from 'node:util';
@@ -16,6 +15,10 @@ import { TournamentEngine } from '@ai-commander/tournament-engine';
 import { MatchRunner } from '@ai-commander/match-runner';
 import { BenchmarkReporter } from '@ai-commander/benchmark-reporter';
 import fs from 'fs';
+import path from 'path';
+import { fileURLToPath } from 'url';
+
+const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
 interface CLICommand {
   name: string;
@@ -23,6 +26,16 @@ interface CLICommand {
 }
 
 const commands: Record<string, CLICommand> = {
+  chess: {
+    name: 'chess',
+    run: async () => {
+      // Dynamic import to avoid circular dependency
+      const { ChessStartup } = await import('../chess-startup.js');
+      const startup = new ChessStartup();
+      await startup.run();
+    },
+  },
+
   tournament: {
     name: 'tournament',
     run: async (args) => {
@@ -104,16 +117,15 @@ const commands: Record<string, CLICommand> = {
 AI Commander v1.0 — Chess Tournament Platform
 
 USAGE:
-  ai-commander <command> [options]
-
-COMMANDS:
-  tournament    Run a tournament (Round Robin, Swiss, Best of N, Elimination)
-  match         Run a single match between two brains
-  help          Show this message
+  pnpm chess                           # Launch continuous chess arena (default)
+  pnpm chess tournament --config=...   # Run tournament
+  pnpm chess match --red=... --blue=...
+  pnpm chess help
 
 EXAMPLES:
-  ai-commander tournament --config=config.json --format=html --output=report.html
-  ai-commander match --red='{"provider":"ollama","model":"mistral"}' --blue='{"provider":"claude","model":"opus"}' --seed=12345
+  pnpm chess
+  pnpm chess tournament --config=config.json --format=html --output=report.html
+  pnpm chess match --red='{"provider":"ollama","model":"mistral"}' --blue='{"provider":"stockfish"}' --seed=12345
 
 OPTIONS:
   --config       Configuration file (JSON)
@@ -123,11 +135,16 @@ OPTIONS:
   --format       Report format: markdown, html, json, csv (default: markdown)
   --output       Output file path
 
+ENVIRONMENT:
+  OLLAMA_ENDPOINT    Ollama API endpoint (default: http://localhost:11434)
+  CHESS_MODEL        Default Ollama model (default: mistral)
+
 BRAIN PROVIDERS:
-  - ollama: mistral, llama2, neural-chat, etc. (local, requires docker)
-  - openai: gpt-4, gpt-4-turbo, gpt-3.5-turbo
-  - anthropic: claude-3-opus, claude-3-sonnet, claude-3-haiku
-  - google: gemini-pro
+  - ollama: mistral, llama2, neural-chat, etc. (local, requires ollama serve)
+  - stockfish: Chess engine (requires stockfish binary)
+  - openai: gpt-4, gpt-4-turbo (requires OPENAI_API_KEY)
+  - anthropic: claude-opus, claude-sonnet (requires ANTHROPIC_API_KEY)
+  - google: gemini-pro (requires GOOGLE_API_KEY)
       `);
     },
   },
@@ -153,13 +170,17 @@ async function main() {
 
   const [command] = positionals;
 
-  if (!command || !commands[command]) {
+  // Default to 'chess' command if no command specified
+  const targetCommand = command && commands[command] ? command : 'chess';
+
+  if (command && !commands[command]) {
+    console.error(`❌ Unknown command: ${command}\n`);
     await commands.help.run({});
     process.exit(1);
   }
 
   try {
-    await commands[command].run(values);
+    await commands[targetCommand].run(values);
   } catch (error) {
     console.error(`❌ Error: ${(error as Error).message}`);
     process.exit(1);

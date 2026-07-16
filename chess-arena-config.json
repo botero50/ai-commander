@@ -1,0 +1,30 @@
+{
+  "version": "1.0.0",
+  "game": "chess",
+  "arena": {
+    "maxGamesPerSession": 0,
+    "randomizeEachGame": true,
+    "defaultTimeControl": "infinite"
+  },
+  "players": [
+    {
+      "id": "player-1",
+      "name": "Ollama",
+      "provider": "ollama",
+      "model": "llama2:latest",
+      "personality": "balanced"
+    },
+    {
+      "id": "player-2",
+      "name": "Stockfish",
+      "provider": "stockfish",
+      "elo": 1500,
+      "personality": "competitive"
+    }
+  ],
+  "broadcast": {
+    "port": 9000,
+    "enabled": true,
+    "displayName": "AI Chess Arena"
+  }
+}

@@ -1,11 +1,13 @@
 {
   "extends": "../../tsconfig.json",
   "compilerOptions": {
-        "composite": true,
+    "composite": true,
     "outDir": "./dist",
     "rootDir": "./src",
-    "module": "esnext",
-    "target": "esnext"
+    "module": "NodeNext",
+    "moduleResolution": "NodeNext",
+    "target": "ES2022",
+    "noEmit": false
   },
   "include": [
     "src"
@@ -28,18 +30,6 @@
     },
     {
       "path": "../benchmark-reporter"
-    },
-    {
-      "path": "../strategy-analyzer"
-    },
-    {
-      "path": "../replay-player"
-    },
-    {
-      "path": "../experiment-runner"
-    },
-    {
-      "path": "../research-dashboard"
     }
   ]
 }
