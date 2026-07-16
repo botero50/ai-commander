@@ -16,6 +16,7 @@ export { ChessResultsAggregator } from './chess-results-aggregator.js';
 export { ChessSpectatorStreamer } from './chess-spectator-streamer.js';
 export { ChessBroadcastOverlay } from './chess-broadcast-overlay.js';
 export { ChessBroadcastManager } from './chess-broadcast-manager.js';
+export { ChessResearchPlatform } from './chess-research-platform.js';
 export type {
   ChessPosition,
   ChessMaterial,
@@ -75,3 +76,9 @@ export type {
   BroadcastConfig,
   BroadcastState,
 } from './chess-broadcast-manager.js';
+export type {
+  ResearchMetrics,
+  BrainComparison,
+  MetaGameTrend,
+  PerformanceReport,
+} from './chess-research-platform.js';
