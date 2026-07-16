@@ -10,6 +10,7 @@
  */
 
 import { Chess } from 'chess.js';
+import { BoardDisplay } from './board-display.js';
 
 export class RealChessGame {
   constructor(matchConfig, broadcastService, ui) {
@@ -17,6 +18,7 @@ export class RealChessGame {
     this.broadcast = broadcastService;
     this.ui = ui;
     this.game = new Chess();
+    this.boardDisplay = new BoardDisplay();
     this.moves = [];
     this.startTime = Date.now();
     this.playerModels = {
@@ -234,6 +236,9 @@ export class RealChessGame {
 
     // Log move
     console.log(`  ${moveCount + 1}. ${moveNotation} (${color})`);
+
+    // Display board after every move for real-time visualization
+    this.boardDisplay.display(this.game.fen(), moveNotation);
   }
 
   /**
