@@ -15,6 +15,7 @@ export { ChessConcurrentExecutor } from './chess-concurrent-executor.js';
 export { ChessResultsAggregator } from './chess-results-aggregator.js';
 export { ChessSpectatorStreamer } from './chess-spectator-streamer.js';
 export { ChessBroadcastOverlay } from './chess-broadcast-overlay.js';
+export { ChessBroadcastManager } from './chess-broadcast-manager.js';
 export type {
   ChessPosition,
   ChessMaterial,
@@ -70,3 +71,7 @@ export type {
   StreamMetrics,
   BroadcastEvent,
 } from './chess-broadcast-overlay.js';
+export type {
+  BroadcastConfig,
+  BroadcastState,
+} from './chess-broadcast-manager.js';
