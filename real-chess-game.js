@@ -120,12 +120,8 @@ export class RealChessGame {
     const legalMovesStr = legalMoves.map(m => m.san).join(', ');
     const boardState = this.game.fen();
 
-    // Strict prompt that forces just the move
-    const prompt = `TASK: Return ONLY a single chess move. Nothing else.
-
-Legal moves: ${legalMovesStr}
-
-ANSWER (single move only, no words, no explanation):`;
+    // Minimal prompt to avoid chattiness
+    const prompt = `Pick one move: ${legalMovesStr}`;
 
     try {
       const moveStartTime = Date.now();

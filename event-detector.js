@@ -282,9 +282,10 @@ export class ChessEventDetector {
   }
 
   isFork(moveData) {
-    // Heuristic: Knight moves are often forks
-    const move = moveData.move;
-    return move && move.startsWith('N');
+    // Detecting forks requires full board analysis of whether a piece attacks 2+ pieces
+    // Without full board state, we can't reliably detect this
+    // Return false to avoid false positives
+    return false;
   }
 
   isPin(moveData) {
