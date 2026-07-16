@@ -120,13 +120,12 @@ export class RealChessGame {
     const legalMovesStr = legalMoves.map(m => m.san).join(', ');
     const boardState = this.game.fen();
 
-    const prompt = `You are a ${player.name.toLowerCase()} chess player. Based on the current board position and legal moves available, choose the best move.
+    // Strict prompt that forces just the move
+    const prompt = `TASK: Return ONLY a single chess move. Nothing else.
 
-Board FEN: ${boardState}
+Legal moves: ${legalMovesStr}
 
-Legal moves available: ${legalMovesStr}
-
-Respond with ONLY the move in standard algebraic notation (e.g., "e4", "Nf3", "O-O"). Do not include any explanation.`;
+ANSWER (single move only, no words, no explanation):`;
 
     try {
       const moveStartTime = Date.now();
@@ -138,6 +137,7 @@ Respond with ONLY the move in standard algebraic notation (e.g., "e4", "Nf3", "O
           prompt,
           temperature: player.temperature,
           stream: false,
+          num_predict: 4, // Limit to ~4 tokens (single move)
         }),
       });
 
@@ -147,7 +147,27 @@ Respond with ONLY the move in standard algebraic notation (e.g., "e4", "Nf3", "O
 
       const data = await response.json();
       const moveLatency = Date.now() - moveStartTime;
-      const moveText = data.response.trim().split('\n')[0];
+
+      // Extract move from response - try multiple patterns
+      let moveText = '';
+      const response_lower = data.response.toLowerCase();
+
+      // Try to find a legal move in the response
+      for (const move of legalMoves) {
+        const moveLower = move.san.toLowerCase();
+        if (response_lower.includes(moveLower)) {
+          moveText = move.san;
+          break;
+        }
+      }
+
+      // If no legal move found, take first alphanumeric word
+      if (!moveText) {
+        const words = data.response.trim().split(/[\s,;.\-()]+/).filter(w => w.length > 0);
+        if (words.length > 0) {
+          moveText = words[0];
+        }
+      }
 
       // Validate move is legal
       const validMove = legalMoves.find(m => m.san === moveText || m.uci === moveText);
@@ -156,13 +176,18 @@ Respond with ONLY the move in standard algebraic notation (e.g., "e4", "Nf3", "O
         return validMove.san;
       }
 
-      // If extracted move is invalid, pick best legal move
-      console.log(`   ⚠️  ${player.name} returned invalid move "${moveText}", using ${legalMoves[0].san}`);
+      // If still invalid, pick best legal move
+      if (moveText) {
+        console.log(`   ⚠️  Invalid: "${moveText}", using ${legalMoves[0].san}`);
+      } else {
+        console.log(`   ⚠️  No move found, using ${legalMoves[0].san}`);
+      }
       return legalMoves[0].san;
     } catch (error) {
       console.error(`   ❌ Ollama request failed: ${error.message}`);
-      // Fallback to first legal move
-      return legalMoves[0].san;
+      // Fallback to random legal move (better than always first)
+      const randomIdx = Math.floor(Math.random() * legalMoves.length);
+      return legalMoves[randomIdx].san;
     }
   }
 
