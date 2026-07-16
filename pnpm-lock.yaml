@@ -139,38 +139,6 @@ importers:
         specifier: ^0.34.0
         version: 0.34.6(@vitest/ui@0.34.7)
 
-  packages/analytics:
-    dependencies:
-      '@ai-commander/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-    devDependencies:
-      '@types/node':
-        specifier: ^20.0.0
-        version: 20.19.43
-      '@vitest/ui':
-        specifier: ^0.34.0
-        version: 0.34.7(vitest@0.34.6)
-      vitest:
-        specifier: ^0.34.0
-        version: 0.34.6(@vitest/ui@0.34.7)
-
-  packages/behavior-tree:
-    dependencies:
-      '@ai-commander/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-    devDependencies:
-      '@types/node':
-        specifier: ^20.0.0
-        version: 20.19.43
-      '@vitest/ui':
-        specifier: ^0.34.0
-        version: 0.34.7(vitest@0.34.6)
-      vitest:
-        specifier: ^0.34.0
-        version: 0.34.6(@vitest/ui@0.34.7)
-
   packages/benchmark-reporter:
     dependencies:
       '@ai-commander/tournament-engine':
@@ -319,10 +287,6 @@ importers:
         specifier: ^0.34.0
         version: 0.34.6(@vitest/ui@0.34.7)
 
-  packages/community: {}
-
-  packages/compliance: {}
-
   packages/concurrency:
     dependencies:
       '@ai-commander/contracts':
@@ -459,15 +423,6 @@ importers:
         specifier: workspace:*
         version: link:../domain
 
-  packages/fine-tuner:
-    dependencies:
-      '@ai-commander/match-runner':
-        specifier: workspace:*
-        version: link:../match-runner
-      '@ai-commander/replay-player':
-        specifier: workspace:*
-        version: link:../replay-player
-
   packages/goals:
     dependencies:
       '@ai-commander/core':
@@ -531,12 +486,6 @@ importers:
         specifier: workspace:*
         version: link:../profiler
 
-  packages/optimizer:
-    dependencies:
-      '@ai-commander/match-runner':
-        specifier: workspace:*
-        version: link:../match-runner
-
   packages/planner:
     dependencies:
       '@ai-commander/core':
@@ -548,22 +497,6 @@ importers:
       '@ai-commander/goals':
         specifier: workspace:*
         version: link:../goals
-
-  packages/plugins:
-    dependencies:
-      '@ai-commander/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-    devDependencies:
-      '@types/node':
-        specifier: ^20.0.0
-        version: 20.19.43
-      '@vitest/ui':
-        specifier: ^0.34.0
-        version: 0.34.7(vitest@0.34.6)
-      vitest:
-        specifier: ^0.34.0
-        version: 0.34.6(@vitest/ui@0.34.7)
 
   packages/pool:
     dependencies:
@@ -649,25 +582,6 @@ importers:
       '@ai-commander/tournament-engine':
         specifier: workspace:*
         version: link:../tournament-engine
-
-  packages/spring-rts-adapter:
-    dependencies:
-      '@ai-commander/adapter':
-        specifier: workspace:*
-        version: link:../adapter
-      '@ai-commander/brain':
-        specifier: workspace:*
-        version: link:../brain
-    devDependencies:
-      '@types/node':
-        specifier: ^20.0.0
-        version: 20.19.43
-      typescript:
-        specifier: ^5.0.0
-        version: 5.9.3
-      vitest:
-        specifier: ^0.34.0
-        version: 0.34.6(@vitest/ui@0.34.7)
 
   packages/state-manager:
     dependencies:
