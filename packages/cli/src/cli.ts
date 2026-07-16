@@ -15,10 +15,6 @@ import { BrainManager } from '@ai-commander/brain';
 import { TournamentEngine } from '@ai-commander/tournament-engine';
 import { MatchRunner } from '@ai-commander/match-runner';
 import { BenchmarkReporter } from '@ai-commander/benchmark-reporter';
-import { StrategyAnalyzer } from '@ai-commander/strategy-analyzer';
-import { ReplayPlayer } from '@ai-commander/replay-player';
-import { ExperimentRunner } from '@ai-commander/experiment-runner';
-import { ResearchDashboard } from '@ai-commander/research-dashboard';
 import fs from 'fs';
 
 interface CLICommand {
@@ -101,70 +97,11 @@ const commands: Record<string, CLICommand> = {
     },
   },
 
-  experiment: {
-    name: 'experiment',
-    run: async (args) => {
-      console.log('🧪 AI Commander Experiment');
-      const config = JSON.parse(fs.readFileSync(args.config as string, 'utf-8'));
-
-      console.log(`Running experiment: ${config.name}`);
-      const comparison = await ExperimentRunner.runExperiment(config);
-
-      const report = ExperimentRunner.generateReport(comparison);
-      const outfile = Array.isArray(args.output) ? args.output[0] : (args.output as string) || `experiment-${Date.now()}.md`;
-      fs.writeFileSync(outfile, report);
-      console.log(`✅ Report saved to ${outfile}`);
-    },
-  },
-
-  analyze: {
-    name: 'analyze',
-    run: async (args) => {
-      console.log('📊 AI Commander Analysis');
-      const replay = JSON.parse(fs.readFileSync(args.replay as string, 'utf-8'));
-
-      const strategy = StrategyAnalyzer.generateStrategyReport(replay);
-      console.log(`\nStrategy Analysis:`);
-      console.log(`Red: ${strategy.redStrategy.strategy} (confidence: ${(strategy.redStrategy.confidence * 100).toFixed(0)}%)`);
-      console.log(`Blue: ${strategy.blueStrategy.strategy} (confidence: ${(strategy.blueStrategy.confidence * 100).toFixed(0)}%)`);
-      console.log(`Matchup: ${strategy.analysis.matchup}`);
-      console.log(`Advantage: ${strategy.analysis.advantage}`);
-
-      const comparison = ReplayPlayer.analyze(replay);
-      console.log(`\nReplay Analysis:`);
-      console.log(`Divergences: ${comparison.divergences.length}`);
-      console.log(`Key moments: ${comparison.keyMoments.length}`);
-
-      const html = ReplayPlayer.generateHTML(comparison);
-      const outfile = Array.isArray(args.output) ? args.output[0] : (args.output as string) || `replay-${Date.now()}.html`;
-      fs.writeFileSync(outfile, html);
-      console.log(`✅ HTML replay saved to ${outfile}`);
-    },
-  },
-
-  dashboard: {
-    name: 'dashboard',
-    run: async (args) => {
-      console.log('📈 AI Commander Dashboard');
-      const tournaments = (args.tournaments as string[])?.map((f) => JSON.parse(fs.readFileSync(f, 'utf-8'))) || [];
-
-      const html = ResearchDashboard.generateHTML({
-        tournaments,
-        ratingHistory: [],
-        selectedModels: (args.models as string[]) || [],
-      });
-
-      const outfile = Array.isArray(args.output) ? args.output[0] : (args.output as string) || `dashboard-${Date.now()}.html`;
-      fs.writeFileSync(outfile, html);
-      console.log(`✅ Dashboard saved to ${outfile}`);
-    },
-  },
-
   help: {
     name: 'help',
     run: async () => {
       console.log(`
-AI Commander v2.0 — Multi-LLM Benchmarking Platform
+AI Commander v1.0 — Chess Tournament Platform
 
 USAGE:
   ai-commander <command> [options]
@@ -172,43 +109,25 @@ USAGE:
 COMMANDS:
   tournament    Run a tournament (Round Robin, Swiss, Best of N, Elimination)
   match         Run a single match between two brains
-  experiment    Run hyperparameter experiments
-  analyze       Analyze replay: strategies, divergences
-  dashboard     Generate research dashboard
   help          Show this message
 
 EXAMPLES:
   ai-commander tournament --config=config.json --format=html --output=report.html
-  ai-commander match --red='{"provider":"openai","openai":{...}}' --blue='{"provider":"claude",...}' --seed=12345
-  ai-commander experiment --config=experiment.json --output=results.md
-  ai-commander analyze --replay=match.json --output=replay.html
-  ai-commander dashboard --tournaments=t1.json --tournaments=t2.json --output=dashboard.html
+  ai-commander match --red='{"provider":"ollama","model":"mistral"}' --blue='{"provider":"claude","model":"opus"}' --seed=12345
 
 OPTIONS:
   --config       Configuration file (JSON)
-  --replay       Replay file (JSON)
   --red          Red brain config (JSON)
   --blue         Blue brain config (JSON)
-  --seed         Map seed (number)
-  --ticks        Max ticks per match (default: 200)
-  --game         Game adapter ID (default: checkers)
+  --seed         Match seed (number)
   --format       Report format: markdown, html, json, csv (default: markdown)
   --output       Output file path
-  --tournaments  Tournament files (can be repeated)
-  --models       Model names (can be repeated)
 
-PROVIDERS:
+BRAIN PROVIDERS:
+  - ollama: mistral, llama2, neural-chat, etc. (local, requires docker)
   - openai: gpt-4, gpt-4-turbo, gpt-3.5-turbo
-  - claude: claude-3-opus-20240229, claude-3-sonnet-20240229, claude-3-haiku-20240307
-  - gemini: gemini-pro, gemini-pro-vision
-  - ollama: llama2, qwen, deepseek, mistral, gemma (local)
-  - builtin: RTS AI
-
-TOURNAMENT FORMATS:
-  - round-robin
-  - swiss
-  - best-of-n
-  - elimination
+  - anthropic: claude-3-opus, claude-3-sonnet, claude-3-haiku
+  - google: gemini-pro
       `);
     },
   },

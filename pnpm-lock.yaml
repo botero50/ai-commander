@@ -395,22 +395,6 @@ importers:
         specifier: ^0.34.0
         version: 0.34.6(@vitest/ui@0.34.7)
 
-  packages/experiment-runner:
-    dependencies:
-      '@ai-commander/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-    devDependencies:
-      '@types/node':
-        specifier: ^20.0.0
-        version: 20.19.43
-      '@vitest/ui':
-        specifier: ^0.34.0
-        version: 0.34.7(vitest@0.34.6)
-      vitest:
-        specifier: ^0.34.0
-        version: 0.34.6(@vitest/ui@0.34.7)
-
   packages/fake-game-adapter:
     dependencies:
       '@ai-commander/adapter':
@@ -534,21 +518,6 @@ importers:
 
   packages/rating-system: {}
 
-  packages/replay-player:
-    dependencies:
-      '@ai-commander/match-runner':
-        specifier: workspace:*
-        version: link:../match-runner
-
-  packages/research-dashboard:
-    dependencies:
-      '@ai-commander/rating-system':
-        specifier: workspace:*
-        version: link:../rating-system
-      '@ai-commander/tournament-engine':
-        specifier: workspace:*
-        version: link:../tournament-engine
-
   packages/scheduler:
     dependencies:
       '@ai-commander/contracts':
@@ -598,12 +567,6 @@ importers:
       vitest:
         specifier: ^0.34.0
         version: 0.34.6(@vitest/ui@0.34.7)
-
-  packages/strategy-analyzer:
-    dependencies:
-      '@ai-commander/match-runner':
-        specifier: workspace:*
-        version: link:../match-runner
 
   packages/stream:
     dependencies:
