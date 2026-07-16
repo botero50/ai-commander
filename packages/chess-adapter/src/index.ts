@@ -10,6 +10,7 @@ export { ChessObservationAdapter } from './chess-observation-adapter.js';
 export { ChessGameRecorder } from './chess-game-recorder.js';
 export { ChessMetricsCollector } from './chess-metrics-collector.js';
 export { ChessTournamentManager } from './chess-tournament-manager.js';
+export { ChessTournamentScheduler } from './chess-tournament-scheduler.js';
 export type {
   ChessPosition,
   ChessMaterial,
@@ -34,3 +35,9 @@ export type {
   TournamentStandings,
   TournamentRound,
 } from './chess-tournament-manager.js';
+export type {
+  TournamentFormat,
+  TournamentConfig,
+  ScheduledMatch,
+  TournamentState,
+} from './chess-tournament-scheduler.js';
