@@ -294,6 +294,9 @@ class ChessArena {
       moves: result.moves,
       durationMs: result.durationMs,
     });
+
+    // Display runtime monitoring
+    this.broadcast.displayMonitoringSummary();
   }
 
   displayStreamDashboard() {

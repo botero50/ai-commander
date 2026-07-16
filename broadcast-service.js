@@ -13,6 +13,7 @@ import { CommentaryGenerator } from './commentary-generator.js';
 import { ReplaySystem } from './replay-system.js';
 import { MatchSummaryGenerator } from './match-summary-generator.js';
 import { YouTubeStreamService } from './youtube-stream-service.js';
+import { RuntimeEventMonitor } from './runtime-event-monitor.js';
 
 export class BroadcastService {
   constructor(config = {}) {
@@ -21,9 +22,11 @@ export class BroadcastService {
     this.replaySystem = new ReplaySystem();
     this.summaryGenerator = new MatchSummaryGenerator();
     this.streamService = new YouTubeStreamService(config.stream || {});
+    this.monitor = new RuntimeEventMonitor();
     this.broadcastLog = [];
     this.matchEvents = [];
     this.recentMoves = [];
+    this.currentMoveInfo = null;
   }
 
   /**
@@ -33,6 +36,13 @@ export class BroadcastService {
    * @returns {Object} Broadcast content
    */
   processMove(moveData, playerName) {
+    // Start monitoring this move
+    const moveNumber = this.broadcastLog.length;
+    this.currentMoveInfo = this.monitor.startMove(moveNumber, moveData.move, playerName);
+
+    // Record move execution
+    this.monitor.recordMoveExecuted(this.currentMoveInfo);
+
     // Track recent moves for replay
     this.recentMoves.push(moveData.move);
     if (this.recentMoves.length > 10) {
@@ -41,6 +51,7 @@ export class BroadcastService {
 
     // Detect events
     const events = this.eventDetector.detectEvents(moveData, {});
+    this.monitor.recordEventDetected(this.currentMoveInfo, events);
 
     // Generate commentary
     const broadcasts = [];
@@ -58,6 +69,11 @@ export class BroadcastService {
       this.handleCriticalEvent(event, playerName);
     }
 
+    this.monitor.recordCommentaryGenerated(this.currentMoveInfo, broadcasts.length);
+
+    // Record stream broadcasts
+    this.monitor.recordStreamBroadcast(this.currentMoveInfo, broadcasts.length);
+
     // Log for history
     this.matchEvents.push(...events);
     for (const broadcast of broadcasts) {
@@ -67,6 +83,9 @@ export class BroadcastService {
       });
     }
 
+    // Record final archive
+    this.monitor.recordArchived(this.currentMoveInfo);
+
     return broadcasts;
   }
 
@@ -74,19 +93,24 @@ export class BroadcastService {
    * Handle critical events by saving replays
    */
   handleCriticalEvent(event, playerName) {
+    let replayCount = 0;
+
     switch (event.type) {
       case 'checkmate':
         this.replaySystem.generateCheckmateReplay(this.recentMoves, playerName);
+        replayCount = 1;
         break;
 
       case 'queen-sacrifice':
         this.replaySystem.generateSacrificeReplay(this.recentMoves, playerName);
+        replayCount = 1;
         break;
 
       case 'fork':
       case 'pin':
       case 'skewer':
         this.replaySystem.generateTacticalReplay(this.recentMoves, playerName, event.type);
+        replayCount = 1;
         break;
 
       case 'promotion':
@@ -97,7 +121,13 @@ export class BroadcastService {
           description: `Pawn promotion by ${playerName}`,
           player: playerName,
         });
+        replayCount = 1;
         break;
+    }
+
+    // Record replay capture count
+    if (replayCount > 0 && this.currentMoveInfo) {
+      this.monitor.recordReplayCaptured(this.currentMoveInfo, replayCount);
     }
   }
 
@@ -241,15 +271,31 @@ export class BroadcastService {
   }
 
   /**
+   * Get monitoring data
+   */
+  getMonitoringData() {
+    return this.monitor.exportJSON();
+  }
+
+  /**
+   * Display monitoring summary
+   */
+  displayMonitoringSummary() {
+    this.monitor.displaySummary();
+  }
+
+  /**
    * Clear for new game
    */
   reset() {
     this.eventDetector.reset();
     this.commentaryGenerator.reset();
     this.replaySystem.reset();
+    this.monitor = new RuntimeEventMonitor();
     this.broadcastLog = [];
     this.matchEvents = [];
     this.recentMoves = [];
+    this.currentMoveInfo = null;
   }
 }
 
