@@ -88,3 +88,10 @@ export interface GameLoopEvents {
   onGameOver?: (turn: number, result: 'white-win' | 'black-win' | 'draw') => void;
   onError?: (error: Error) => void;
 }
+
+export interface DecisionTranslationResult {
+  readonly success: boolean;
+  readonly move: string | null;
+  readonly reasoning: string;
+  readonly isFallback: boolean;
+}
