@@ -13,6 +13,7 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { ChessUI } from './ui.js';
+import { BroadcastService } from './broadcast-service.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 const execPromise = promisify(exec);
@@ -39,6 +40,7 @@ class ChessArena {
     this.players = [];
     this.lastMatchConfig = null;
     this.ui = new ChessUI();
+    this.broadcast = new BroadcastService();
 
     // Personality profiles
     this.personalities = [
@@ -225,21 +227,45 @@ class ChessArena {
   }
 
   async simulateGame(matchConfig, matchNumber) {
+    // Reset broadcast for new game
+    this.broadcast.reset();
+
     // This is a placeholder for actual game execution
     // In a real implementation, this would:
     // 1. Create a ChessAdapter session
     // 2. Create Brain instances for each player
     // 3. Run ChessGameLoop with personality configs
-    // 4. Return result with moves
+    // 4. Process each move through BroadcastService
+    // 5. Return result with moves
 
     // For now, simulate a game with random result
     const moves = this.generateRandomMoves();
     const results = ['white-win', 'black-win', 'draw'];
     const result = results[Math.floor(Math.random() * results.length)];
 
+    // Simulate move processing with events
+    const isWhiteToMove = (moveIndex) => moveIndex % 2 === 0;
+    for (let i = 0; i < Math.min(moves.length, 3); i++) {
+      // Only process first 3 moves for demo (to keep output manageable)
+      const playerName = isWhiteToMove(i) ? matchConfig.white.name : matchConfig.black.name;
+      const moveData = { move: moves[i], fen: 'simulated' };
+
+      // Process through broadcast service
+      const broadcasts = this.broadcast.processMove(moveData, playerName);
+
+      // Display live commentary
+      for (const broadcast of broadcasts) {
+        this.broadcast.displayBroadcast(broadcast);
+        await this.delay(500); // Brief delay between events
+      }
+    }
+
     // Simulate game duration
     const gameDurationMs = Math.random() * 30000 + 5000; // 5-35 seconds
     await this.delay(Math.min(gameDurationMs, 2000)); // Cap at 2 seconds for demo
+
+    // Get match summary
+    const summary = this.broadcast.getMatchSummary();
 
     return {
       matchNumber,
@@ -249,6 +275,7 @@ class ChessArena {
       moves,
       movesCount: moves.length,
       durationMs: gameDurationMs,
+      events: summary.eventsByType,
     };
   }
 
