@@ -13,6 +13,7 @@ export { ChessTournamentManager } from './chess-tournament-manager.js';
 export { ChessTournamentScheduler } from './chess-tournament-scheduler.js';
 export { ChessConcurrentExecutor } from './chess-concurrent-executor.js';
 export { ChessResultsAggregator } from './chess-results-aggregator.js';
+export { ChessSpectatorStreamer } from './chess-spectator-streamer.js';
 export type {
   ChessPosition,
   ChessMaterial,
@@ -54,3 +55,10 @@ export type {
   TournamentStats,
   BrainAnalytics,
 } from './chess-results-aggregator.js';
+export type {
+  SpectatorMessage,
+  MoveUpdate,
+  BoardState,
+  MatchStatus,
+  SpectatorSession,
+} from './chess-spectator-streamer.js';
