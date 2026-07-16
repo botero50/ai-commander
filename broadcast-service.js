@@ -10,13 +10,16 @@
 
 import { ChessEventDetector } from './event-detector.js';
 import { CommentaryGenerator } from './commentary-generator.js';
+import { ReplaySystem } from './replay-system.js';
 
 export class BroadcastService {
   constructor() {
     this.eventDetector = new ChessEventDetector();
     this.commentaryGenerator = new CommentaryGenerator();
+    this.replaySystem = new ReplaySystem();
     this.broadcastLog = [];
     this.matchEvents = [];
+    this.recentMoves = [];
   }
 
   /**
@@ -26,6 +29,12 @@ export class BroadcastService {
    * @returns {Object} Broadcast content
    */
   processMove(moveData, playerName) {
+    // Track recent moves for replay
+    this.recentMoves.push(moveData.move);
+    if (this.recentMoves.length > 10) {
+      this.recentMoves.shift(); // Keep only last 10 moves
+    }
+
     // Detect events
     const events = this.eventDetector.detectEvents(moveData, {});
 
@@ -40,6 +49,9 @@ export class BroadcastService {
         move: moveData.move,
         player: playerName,
       });
+
+      // Automatically save replays for critical events
+      this.handleCriticalEvent(event, playerName);
     }
 
     // Log for history
@@ -52,6 +64,37 @@ export class BroadcastService {
     }
 
     return broadcasts;
+  }
+
+  /**
+   * Handle critical events by saving replays
+   */
+  handleCriticalEvent(event, playerName) {
+    switch (event.type) {
+      case 'checkmate':
+        this.replaySystem.generateCheckmateReplay(this.recentMoves, playerName);
+        break;
+
+      case 'queen-sacrifice':
+        this.replaySystem.generateSacrificeReplay(this.recentMoves, playerName);
+        break;
+
+      case 'fork':
+      case 'pin':
+      case 'skewer':
+        this.replaySystem.generateTacticalReplay(this.recentMoves, playerName, event.type);
+        break;
+
+      case 'promotion':
+        this.replaySystem.saveReplay({
+          type: 'promotion',
+          movesToReplay: this.recentMoves.slice(-2),
+          criticality: this.recentMoves.length - 1,
+          description: `Pawn promotion by ${playerName}`,
+          player: playerName,
+        });
+        break;
+    }
   }
 
   /**
@@ -151,13 +194,34 @@ export class BroadcastService {
   }
 
   /**
+   * Display all replays for the match
+   */
+  async displayReplays() {
+    const replays = this.replaySystem.getReplays();
+    if (replays.length === 0) {
+      console.log('\n📹 No critical moments to replay.\n');
+      return;
+    }
+
+    console.log(`\n📹 Replaying ${replays.length} critical moment(s):\n`);
+
+    for (const replay of replays) {
+      await this.replaySystem.playReplay(replay);
+    }
+
+    this.replaySystem.displayReplaySummary();
+  }
+
+  /**
    * Clear for new game
    */
   reset() {
     this.eventDetector.reset();
     this.commentaryGenerator.reset();
+    this.replaySystem.reset();
     this.broadcastLog = [];
     this.matchEvents = [];
+    this.recentMoves = [];
   }
 }
 

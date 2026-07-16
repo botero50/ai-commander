@@ -89,6 +89,9 @@ class ChessArena {
           // Display result
           this.displayResult(result, matchConfig.white, matchConfig.black);
 
+          // Display replays
+          await this.displayReplays();
+
           // Update stats
           this.updateStats(result);
 
@@ -308,6 +311,10 @@ class ChessArena {
     console.log(`   Moves: ${result.movesCount}`);
     console.log(`   Duration: ${(result.durationMs / 1000).toFixed(1)}s`);
     console.log();
+  }
+
+  async displayReplays() {
+    await this.broadcast.displayReplays();
   }
 
   updateStats(result) {
