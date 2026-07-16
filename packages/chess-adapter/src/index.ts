@@ -9,6 +9,7 @@ export { ChessDecisionTranslator } from './chess-decision-translator.js';
 export { ChessObservationAdapter } from './chess-observation-adapter.js';
 export { ChessGameRecorder } from './chess-game-recorder.js';
 export { ChessMetricsCollector } from './chess-metrics-collector.js';
+export { ChessTournamentManager } from './chess-tournament-manager.js';
 export type {
   ChessPosition,
   ChessMaterial,
@@ -27,3 +28,9 @@ export type {
   BrainMetrics,
   GameMetrics,
 } from './chess-types.js';
+export type {
+  BrainRating,
+  TournamentMatch,
+  TournamentStandings,
+  TournamentRound,
+} from './chess-tournament-manager.js';
