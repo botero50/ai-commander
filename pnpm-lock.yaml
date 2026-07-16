@@ -284,22 +284,6 @@ importers:
         specifier: ^0.34.0
         version: 0.34.6(@vitest/ui@0.34.7)
 
-  packages/checkers-adapter:
-    dependencies:
-      '@ai-commander/contracts':
-        specifier: workspace:*
-        version: link:../contracts
-    devDependencies:
-      '@types/node':
-        specifier: ^20.0.0
-        version: 20.19.43
-      '@vitest/ui':
-        specifier: ^0.34.0
-        version: 0.34.7(vitest@0.34.6)
-      vitest:
-        specifier: ^0.34.0
-        version: 0.34.6(@vitest/ui@0.34.7)
-
   packages/chess-adapter:
     dependencies:
       '@ai-commander/contracts':
@@ -709,6 +693,28 @@ importers:
 
   packages/stream:
     dependencies:
+      '@ai-commander/contracts':
+        specifier: workspace:*
+        version: link:../contracts
+    devDependencies:
+      '@types/node':
+        specifier: ^20.0.0
+        version: 20.19.43
+      '@vitest/ui':
+        specifier: ^0.34.0
+        version: 0.34.7(vitest@0.34.6)
+      vitest:
+        specifier: ^0.34.0
+        version: 0.34.6(@vitest/ui@0.34.7)
+
+  packages/tournament:
+    dependencies:
+      '@ai-commander/brain':
+        specifier: workspace:*
+        version: link:../brain
+      '@ai-commander/chess-adapter':
+        specifier: workspace:*
+        version: link:../chess-adapter
       '@ai-commander/contracts':
         specifier: workspace:*
         version: link:../contracts
