@@ -37,6 +37,7 @@
 
 import { ChessAdapter } from './chess-adapter.js';
 import { ChessGameLoop } from './chess-game-loop.js';
+import type { ChessGameSession } from './chess-game-session.js';
 import type { Brain } from '@ai-commander/brain';
 
 // Simple mock Brain implementation for testing
@@ -111,12 +112,10 @@ async function playOneGame(): Promise<void> {
     console.log('\n[STARTUP] Initializing Chess Adapter...');
 
     const adapter = new ChessAdapter();
-    console.log('✓ Chess Adapter created');
+    await adapter.initialize();
+    console.log('✓ Chess Adapter initialized');
 
-    const session = await adapter.createSession({
-      maxMoves: 200,
-      enableLogging: false,
-    });
+    const session = await adapter.createSession();
     console.log('✓ Game session created');
 
     metrics.startupTimeMs = Date.now() - startupStart;
@@ -132,7 +131,7 @@ async function playOneGame(): Promise<void> {
     // 3. Create game loop
     console.log('\n[GAME] Starting game loop...');
     const gameLoop = new ChessGameLoop(
-      session as any,
+      session as ChessGameSession,
       whiteBrain,
       blackBrain,
       {
