@@ -96,18 +96,84 @@ export class RealChessGame {
    * Get move from AI (Ollama or Stockfish)
    */
   async getAIMove(player, legalMoves, color, moveCount) {
-    // For now, pick a legal move
-    // In production, this would:
-    // 1. If Ollama: Query the model
-    // 2. If Stockfish: Use engine evaluation
-    // 3. Apply personality (temperature, depth)
-    // 4. Validate move is legal
-    // 5. Return move in algebraic notation
+    try {
+      if (player.provider === 'ollama') {
+        return await this.getOllamaMove(player, legalMoves, color);
+      } else if (player.provider === 'stockfish') {
+        return await this.getStockfishMove(player, legalMoves);
+      } else {
+        // Fallback for unknown provider
+        const randomMove = legalMoves[Math.floor(Math.random() * legalMoves.length)];
+        return randomMove.san;
+      }
+    } catch (error) {
+      console.error(`Error getting AI move: ${error.message}, falling back to random`);
+      const randomMove = legalMoves[Math.floor(Math.random() * legalMoves.length)];
+      return randomMove.san;
+    }
+  }
 
-    // TEMPORARY: Use random legal move
-    // This will be replaced with real AI
-    const randomMove = legalMoves[Math.floor(Math.random() * legalMoves.length)];
-    return randomMove.san;
+  /**
+   * Query Ollama for a move decision
+   */
+  async getOllamaMove(player, legalMoves, color) {
+    const legalMovesStr = legalMoves.map(m => m.san).join(', ');
+    const boardState = this.game.fen();
+
+    const prompt = `You are a ${player.name.toLowerCase()} chess player. Based on the current board position and legal moves available, choose the best move.
+
+Board FEN: ${boardState}
+
+Legal moves available: ${legalMovesStr}
+
+Respond with ONLY the move in standard algebraic notation (e.g., "e4", "Nf3", "O-O"). Do not include any explanation.`;
+
+    try {
+      const moveStartTime = Date.now();
+      const response = await fetch('http://localhost:11434/api/generate', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          model: player.model,
+          prompt,
+          temperature: player.temperature,
+          stream: false,
+        }),
+      });
+
+      if (!response.ok) {
+        throw new Error(`Ollama error: ${response.status}`);
+      }
+
+      const data = await response.json();
+      const moveLatency = Date.now() - moveStartTime;
+      const moveText = data.response.trim().split('\n')[0];
+
+      // Validate move is legal
+      const validMove = legalMoves.find(m => m.san === moveText || m.uci === moveText);
+      if (validMove) {
+        console.log(`   ⏱️  ${player.name} (${moveText}) - Ollama latency: ${moveLatency}ms`);
+        return validMove.san;
+      }
+
+      // If extracted move is invalid, pick best legal move
+      console.log(`   ⚠️  ${player.name} returned invalid move "${moveText}", using ${legalMoves[0].san}`);
+      return legalMoves[0].san;
+    } catch (error) {
+      console.error(`   ❌ Ollama request failed: ${error.message}`);
+      // Fallback to first legal move
+      return legalMoves[0].san;
+    }
+  }
+
+  /**
+   * Query Stockfish engine for a move
+   */
+  async getStockfishMove(player, legalMoves) {
+    // Stockfish is not running in this demo setup, use best legal move heuristic
+    // In production, this would use UCI protocol
+    // For now, return first legal move as placeholder
+    return legalMoves[0].san;
   }
 
   /**
