@@ -69,15 +69,12 @@ class ChessStartup {
       }
 
       console.log('✅ Arena Ready\n');
-      console.log('🚀 Launching first match...\n');
-      console.log('═'.repeat(50));
-      console.log('  Arena launched successfully');
-      console.log('  Press Ctrl+C to stop\n');
+      console.log('🚀 Launching continuous arena...\n');
 
-      // Keep process alive
-      await new Promise(() => {
-        // Never resolve
-      });
+      // Import and launch the arena
+      const { ChessArena } = await import('./arena.js');
+      const arena = new ChessArena();
+      await arena.run();
     } catch (error) {
       console.error('\n❌ Startup failed: ' + error.message + '\n');
       process.exit(1);
@@ -232,6 +229,14 @@ class ChessStartup {
 }
 
 export { ChessStartup };
+
+// Handle Ctrl+C gracefully
+process.on('SIGINT', () => {
+  console.log('\n\n' + '═'.repeat(60));
+  console.log('  Arena Stopped');
+  console.log('═'.repeat(60));
+  process.exit(0);
+});
 
 // Auto-run if invoked directly
 const startup = new ChessStartup();
