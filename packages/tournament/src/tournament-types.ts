@@ -72,3 +72,25 @@ export interface TournamentSchedule {
   readonly rounds: readonly (readonly ScheduledMatch[])[];
   readonly totalMatches: number;
 }
+
+export interface ExecutionConfig {
+  readonly maxRetries: number;
+  readonly skipOnError: boolean;
+  readonly recordPgn: boolean;
+}
+
+export interface ExecutorCallbacks {
+  readonly onMatchStart?: (match: ScheduledMatch) => void;
+  readonly onMatchComplete?: (match: CompletedMatch) => void;
+  readonly onMatchError?: (match: ScheduledMatch, error: Error) => void;
+  readonly onProgress?: (completed: number, total: number) => void;
+}
+
+export interface MatchExecutor {
+  executeMatch(white: string, black: string): Promise<{
+    result: 'white-win' | 'black-win' | 'draw';
+    moveCount: number;
+    duration: number;
+    pgn?: string;
+  }>;
+}
