@@ -1,0 +1,488 @@
+.chess-spectator {
+  width: 100%;
+  height: 100vh;
+  display: flex;
+  flex-direction: column;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  color: #fff;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+}
+
+/* Connection Status */
+.connection-status {
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background: rgba(0, 0, 0, 0.3);
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+  font-size: 12px;
+}
+
+.status-indicator {
+  width: 8px;
+  height: 8px;
+  border-radius: 50%;
+  animation: pulse 2s infinite;
+}
+
+.status-indicator.connected {
+  background: #4ade80;
+}
+
+.status-indicator.disconnected {
+  background: #ef4444;
+  animation: none;
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.5;
+  }
+}
+
+.error-message {
+  margin-left: auto;
+  color: #ef4444;
+}
+
+/* Main Spectator Container */
+.spectator-container {
+  display: flex;
+  flex: 1;
+  gap: 20px;
+  padding: 20px;
+  overflow: hidden;
+}
+
+/* Board Section */
+.board-section {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  max-width: 600px;
+}
+
+.board-ribbon {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 4px;
+  margin-bottom: 12px;
+  gap: 12px;
+}
+
+.ribbon-player {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  flex: 1;
+}
+
+.ribbon-name {
+  font-size: 14px;
+  font-weight: 700;
+  color: #fff;
+  letter-spacing: 0.5px;
+}
+
+.ribbon-details {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+}
+
+.ribbon-model {
+  font-size: 11px;
+  background: rgba(59, 130, 246, 0.3);
+  border: 1px solid rgba(59, 130, 246, 0.5);
+  padding: 2px 6px;
+  border-radius: 2px;
+  color: #93c5fd;
+}
+
+.ribbon-temp {
+  font-size: 11px;
+  background: rgba(168, 85, 247, 0.3);
+  border: 1px solid rgba(168, 85, 247, 0.5);
+  padding: 2px 6px;
+  border-radius: 2px;
+  color: #d8b4fe;
+}
+
+.chessboard-container {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgba(255, 255, 255, 0.02);
+  border: 2px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 12px;
+}
+
+/* Info Section */
+.info-section {
+  width: 320px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  overflow-y: auto;
+}
+
+.game-stats,
+.captured-pieces,
+.move-history,
+.commentary-section {
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  border-radius: 8px;
+  padding: 14px;
+}
+
+.game-stats h3,
+.captured-pieces h4,
+.move-history h4,
+.commentary-section h4 {
+  margin: 0 0 12px 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #fff;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+
+.stat-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 6px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+  font-size: 13px;
+}
+
+.stat-row:last-child {
+  border-bottom: none;
+}
+
+.stat-label {
+  color: rgba(255, 255, 255, 0.6);
+  font-weight: 500;
+}
+
+.stat-value {
+  font-weight: 600;
+}
+
+.live-badge {
+  color: #ef4444;
+  animation: blink 1s infinite;
+}
+
+@keyframes blink {
+  0%, 50%, 100% {
+    opacity: 1;
+  }
+  25%, 75% {
+    opacity: 0.7;
+  }
+}
+
+.finished-badge {
+  color: #4ade80;
+}
+
+.idle-badge {
+  color: #94a3b8;
+}
+
+/* Captured Pieces */
+.captures-row {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+  padding: 6px 0;
+  font-size: 12px;
+}
+
+.capture-label {
+  font-weight: 600;
+  color: rgba(255, 255, 255, 0.6);
+  min-width: 50px;
+}
+
+.pieces {
+  font-size: 16px;
+  font-family: 'Arial Unicode MS', Arial;
+  letter-spacing: 2px;
+}
+
+/* Move History */
+.moves-list {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 150px;
+  overflow-y: auto;
+}
+
+.move-item {
+  display: flex;
+  gap: 6px;
+  align-items: center;
+  padding: 4px;
+  font-size: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border-radius: 2px;
+}
+
+.move-number {
+  color: rgba(255, 255, 255, 0.4);
+  font-weight: 600;
+  min-width: 30px;
+}
+
+.move-text {
+  font-weight: 600;
+  font-family: 'Courier New', monospace;
+  color: #fff;
+  flex: 1;
+}
+
+.move-latency {
+  color: rgba(255, 255, 255, 0.4);
+  font-size: 10px;
+}
+
+/* Commentary */
+.commentary-list {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  max-height: 120px;
+  overflow-y: auto;
+}
+
+.commentary-item {
+  padding: 6px;
+  border-radius: 3px;
+  font-size: 11px;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.commentary-item.severity-low {
+  background: rgba(148, 163, 184, 0.1);
+  border-left: 2px solid rgba(148, 163, 184, 0.3);
+}
+
+.commentary-item.severity-medium {
+  background: rgba(59, 130, 246, 0.1);
+  border-left: 2px solid rgba(59, 130, 246, 0.3);
+}
+
+.commentary-item.severity-high {
+  background: rgba(249, 115, 22, 0.1);
+  border-left: 2px solid rgba(249, 115, 22, 0.3);
+}
+
+.commentary-item.severity-critical {
+  background: rgba(239, 68, 68, 0.1);
+  border-left: 2px solid rgba(239, 68, 68, 0.5);
+  font-weight: 600;
+}
+
+.event-type {
+  text-transform: uppercase;
+  font-size: 10px;
+  font-weight: 700;
+  color: rgba(255, 255, 255, 0.7);
+  letter-spacing: 0.5px;
+}
+
+.event-text {
+  color: rgba(255, 255, 255, 0.85);
+  line-height: 1.4;
+}
+
+/* Scrollbar Styling */
+.info-section::-webkit-scrollbar,
+.moves-list::-webkit-scrollbar,
+.commentary-list::-webkit-scrollbar {
+  width: 6px;
+}
+
+.info-section::-webkit-scrollbar-track,
+.moves-list::-webkit-scrollbar-track,
+.commentary-list::-webkit-scrollbar-track {
+  background: rgba(255, 255, 255, 0.05);
+}
+
+.info-section::-webkit-scrollbar-thumb,
+.moves-list::-webkit-scrollbar-thumb,
+.commentary-list::-webkit-scrollbar-thumb {
+  background: rgba(255, 255, 255, 0.2);
+  border-radius: 3px;
+}
+
+.info-section::-webkit-scrollbar-thumb:hover,
+.moves-list::-webkit-scrollbar-thumb:hover,
+.commentary-list::-webkit-scrollbar-thumb:hover {
+  background: rgba(255, 255, 255, 0.3);
+}
+
+/* Responsive */
+@media (max-width: 1200px) {
+  .spectator-container {
+    flex-direction: column;
+  }
+
+  .board-section {
+    max-width: none;
+  }
+
+  .info-section {
+    width: 100%;
+    max-height: 300px;
+    flex-direction: row;
+    overflow-x: auto;
+    overflow-y: hidden;
+  }
+
+  .game-stats,
+  .captured-pieces,
+  .move-history,
+  .commentary-section,
+  .health-status,
+  .match-restart-countdown,
+  .arena-statistics {
+    flex-shrink: 0;
+    width: 250px;
+  }
+}
+
+/* EPIC 73: Health Status */
+.health-status {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 10px 15px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  margin-bottom: 12px;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.health-indicator {
+  font-size: 16px;
+  animation: pulse-health 2s infinite;
+}
+
+.health-indicator.health-healthy {
+  color: #4ade80;
+}
+
+.health-indicator.health-unhealthy {
+  color: #ef4444;
+  animation: pulse-error 1s infinite;
+}
+
+.health-indicator.health-unknown {
+  color: #9ca3af;
+}
+
+@keyframes pulse-health {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.6;
+  }
+}
+
+@keyframes pulse-error {
+  0%, 100% {
+    opacity: 1;
+  }
+  50% {
+    opacity: 0.3;
+  }
+}
+
+.health-text {
+  color: #d1d5db;
+}
+
+/* EPIC 73: Match Restart Countdown */
+.match-restart-countdown {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 15px;
+  background: linear-gradient(135deg, rgba(59, 130, 246, 0.1), rgba(99, 102, 241, 0.1));
+  border: 1px solid rgba(59, 130, 246, 0.3);
+  border-radius: 8px;
+  margin-bottom: 12px;
+  text-align: center;
+}
+
+.countdown-label {
+  font-size: 11px;
+  color: #9ca3af;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+
+.countdown-time {
+  font-size: 28px;
+  font-weight: 700;
+  color: #3b82f6;
+  font-variant-numeric: tabular-nums;
+}
+
+/* EPIC 73: Arena Statistics */
+.arena-statistics {
+  padding: 12px;
+  background: rgba(255, 255, 255, 0.02);
+  border: 1px solid rgba(255, 255, 255, 0.05);
+  border-radius: 6px;
+  font-size: 12px;
+}
+
+.arena-statistics h4 {
+  margin: 0 0 8px 0;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #9ca3af;
+}
+
+.arena-statistics .stat-row {
+  display: flex;
+  justify-content: space-between;
+  padding: 4px 0;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+}
+
+.arena-statistics .stat-row:last-child {
+  border-bottom: none;
+}
+
+.arena-statistics .stat-label {
+  color: #9ca3af;
+}
+
+.arena-statistics .stat-value {
+  color: #e5e7eb;
+  font-weight: 500;
+}
