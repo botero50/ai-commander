@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess Ribbon Overlay</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+        }
+
+        .board-ribbon {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 12px;
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 4px;
+            gap: 12px;
+            width: 600px;
+        }
+
+        .ribbon-player {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+            flex: 1;
+        }
+
+        .ribbon-name {
+            font-size: 14px;
+            font-weight: 700;
+            color: #fff;
+            letter-spacing: 0.5px;
+        }
+
+        .ribbon-details {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+        }
+
+        .ribbon-model {
+            font-size: 11px;
+            background: rgba(59, 130, 246, 0.3);
+            border: 1px solid rgba(59, 130, 246, 0.5);
+            padding: 2px 6px;
+            border-radius: 2px;
+            color: #93c5fd;
+        }
+
+        .ribbon-temp {
+            font-size: 11px;
+            background: rgba(168, 85, 247, 0.3);
+            border: 1px solid rgba(168, 85, 247, 0.5);
+            padding: 2px 6px;
+            border-radius: 2px;
+            color: #d8b4fe;
+        }
+    </style>
+</head>
+<body>
+    <div class="board-ribbon">
+        <div class="ribbon-player">
+            <div class="ribbon-name">Ollama</div>
+            <div class="ribbon-details">
+                <div class="ribbon-model">mistral</div>
+                <div class="ribbon-temp">T: 0.50</div>
+            </div>
+        </div>
+        <div class="ribbon-player">
+            <div class="ribbon-name">Ollama</div>
+            <div class="ribbon-details">
+                <div class="ribbon-model">tinyllama</div>
+                <div class="ribbon-temp">T: 0.20</div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // WebSocket connection for live updates
+        const ws = new WebSocket('ws://localhost:9000');
+
+        ws.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+
+            if (message.type === 'GameStarted') {
+                updateRibbon(message.whitePlayer, message.blackPlayer);
+            }
+        };
+
+        function updateRibbon(whitePlayer, blackPlayer) {
+            const ribbon = document.querySelector('.board-ribbon');
+
+            ribbon.innerHTML = `
+                <div class="ribbon-player">
+                    <div class="ribbon-name">Ollama</div>
+                    <div class="ribbon-details">
+                        <div class="ribbon-model">${whitePlayer.model}</div>
+                        <div class="ribbon-temp">T: ${whitePlayer.temperature.toFixed(2)}</div>
+                    </div>
+                </div>
+                <div class="ribbon-player">
+                    <div class="ribbon-name">Ollama</div>
+                    <div class="ribbon-details">
+                        <div class="ribbon-model">${blackPlayer.model}</div>
+                        <div class="ribbon-temp">T: ${blackPlayer.temperature.toFixed(2)}</div>
+                    </div>
+                </div>
+            `;
+        }
+    </script>
+</body>
+</html>

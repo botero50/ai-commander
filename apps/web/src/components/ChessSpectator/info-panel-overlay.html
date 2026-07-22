@@ -1,0 +1,385 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chess Info Panel Overlay</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background: transparent;
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Oxygen, Ubuntu, Cantarell, sans-serif;
+            color: #fff;
+        }
+
+        .info-section {
+            width: 320px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+            overflow-y: auto;
+            max-height: 90vh;
+        }
+
+        .game-stats,
+        .captured-pieces,
+        .move-history,
+        .commentary-section {
+            background: rgba(255, 255, 255, 0.05);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+            border-radius: 8px;
+            padding: 14px;
+        }
+
+        .game-stats h3,
+        .captured-pieces h4,
+        .move-history h4,
+        .commentary-section h4 {
+            margin: 0 0 12px 0;
+            font-size: 14px;
+            font-weight: 600;
+            color: #fff;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .stat-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 6px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+            font-size: 13px;
+        }
+
+        .stat-row:last-child {
+            border-bottom: none;
+        }
+
+        .stat-label {
+            color: rgba(255, 255, 255, 0.6);
+            font-weight: 500;
+        }
+
+        .stat-value {
+            font-weight: 600;
+        }
+
+        .live-badge {
+            color: #ef4444;
+            animation: blink 1s infinite;
+        }
+
+        @keyframes blink {
+            0%, 50%, 100% {
+                opacity: 1;
+            }
+            25%, 75% {
+                opacity: 0.7;
+            }
+        }
+
+        .finished-badge {
+            color: #4ade80;
+        }
+
+        .idle-badge {
+            color: #94a3b8;
+        }
+
+        /* Captured Pieces */
+        .captures-row {
+            display: flex;
+            gap: 8px;
+            align-items: center;
+            padding: 6px 0;
+            font-size: 12px;
+        }
+
+        .capture-label {
+            font-weight: 600;
+            color: rgba(255, 255, 255, 0.6);
+            min-width: 50px;
+        }
+
+        .pieces {
+            font-size: 16px;
+            font-family: 'Arial Unicode MS', Arial;
+            letter-spacing: 2px;
+        }
+
+        /* Move History */
+        .moves-list {
+            display: flex;
+            flex-direction: column;
+            gap: 4px;
+            max-height: 150px;
+            overflow-y: auto;
+        }
+
+        .move-item {
+            display: flex;
+            gap: 6px;
+            align-items: center;
+            padding: 4px;
+            font-size: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border-radius: 2px;
+        }
+
+        .move-number {
+            color: rgba(255, 255, 255, 0.4);
+            font-weight: 600;
+            min-width: 30px;
+        }
+
+        .move-text {
+            font-weight: 600;
+            font-family: 'Courier New', monospace;
+            color: #fff;
+            flex: 1;
+        }
+
+        .move-latency {
+            color: rgba(255, 255, 255, 0.4);
+            font-size: 10px;
+        }
+
+        /* Commentary */
+        .commentary-list {
+            display: flex;
+            flex-direction: column;
+            gap: 6px;
+            max-height: 120px;
+            overflow-y: auto;
+        }
+
+        .commentary-item {
+            padding: 6px;
+            border-radius: 3px;
+            font-size: 11px;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+        }
+
+        .commentary-item.severity-low {
+            background: rgba(148, 163, 184, 0.1);
+            border-left: 2px solid rgba(148, 163, 184, 0.3);
+        }
+
+        .commentary-item.severity-medium {
+            background: rgba(59, 130, 246, 0.1);
+            border-left: 2px solid rgba(59, 130, 246, 0.3);
+        }
+
+        .commentary-item.severity-high {
+            background: rgba(249, 115, 22, 0.1);
+            border-left: 2px solid rgba(249, 115, 22, 0.3);
+        }
+
+        .commentary-item.severity-critical {
+            background: rgba(239, 68, 68, 0.1);
+            border-left: 2px solid rgba(239, 68, 68, 0.5);
+            font-weight: 600;
+        }
+
+        .event-type {
+            text-transform: uppercase;
+            font-size: 10px;
+            font-weight: 700;
+            color: rgba(255, 255, 255, 0.7);
+            letter-spacing: 0.5px;
+        }
+
+        .event-text {
+            color: rgba(255, 255, 255, 0.85);
+            line-height: 1.4;
+        }
+
+        /* Scrollbar Styling */
+        .info-section::-webkit-scrollbar,
+        .moves-list::-webkit-scrollbar,
+        .commentary-list::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        .info-section::-webkit-scrollbar-track,
+        .moves-list::-webkit-scrollbar-track,
+        .commentary-list::-webkit-scrollbar-track {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .info-section::-webkit-scrollbar-thumb,
+        .moves-list::-webkit-scrollbar-thumb,
+        .commentary-list::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 3px;
+        }
+
+        .info-section::-webkit-scrollbar-thumb:hover,
+        .moves-list::-webkit-scrollbar-thumb:hover,
+        .commentary-list::-webkit-scrollbar-thumb:hover {
+            background: rgba(255, 255, 255, 0.3);
+        }
+    </style>
+</head>
+<body>
+    <div class="info-section">
+        {/* Game Stats */}
+        <div class="game-stats">
+            <h3>Game 1</h3>
+            <div class="stat-row">
+                <span class="stat-label">Status:</span>
+                <span class="stat-value">
+                    <span class="live-badge">🔴 LIVE</span>
+                </span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Moves:</span>
+                <span class="stat-value">0</span>
+            </div>
+            <div class="stat-row">
+                <span class="stat-label">Duration:</span>
+                <span class="stat-value">0s</span>
+            </div>
+        </div>
+
+        {/* Captured Pieces */}
+        <div class="captured-pieces">
+            <h4>Captured Pieces</h4>
+            <div class="captures-row white-captures">
+                <span class="capture-label">White:</span>
+                <span class="pieces">-</span>
+            </div>
+            <div class="captures-row black-captures">
+                <span class="capture-label">Black:</span>
+                <span class="pieces">-</span>
+            </div>
+        </div>
+
+        {/* Move History */}
+        <div class="move-history">
+            <h4>Recent Moves</h4>
+            <div class="moves-list">
+                <div class="move-item">
+                    <span class="move-number">1.</span>
+                    <span class="move-text">Waiting for moves...</span>
+                </div>
+            </div>
+        </div>
+
+        {/* Commentary */}
+        <div class="commentary-section">
+            <h4>Commentary</h4>
+            <div class="commentary-list">
+                <div class="commentary-item severity-medium">
+                    <span class="event-type">GAME START</span>
+                    <span class="event-text">Game initialized</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // WebSocket connection for live updates
+        const ws = new WebSocket('ws://localhost:9000');
+        let gameState = {
+            currentGameNumber: 1,
+            isLive: false,
+            isGameOver: false,
+            moveCount: 0,
+            startTime: null,
+            fen: 'rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1',
+            capturedPieces: { white: [], black: [] },
+            moves: [],
+            messages: []
+        };
+
+        ws.onmessage = (event) => {
+            const message = JSON.parse(event.data);
+
+            switch (message.type) {
+                case 'GameStarted':
+                    gameState.startTime = Date.now();
+                    gameState.isLive = true;
+                    gameState.isGameOver = false;
+                    gameState.moveCount = 0;
+                    break;
+                case 'MovePlayed':
+                    gameState.moveCount++;
+                    gameState.moves.push(message);
+                    break;
+                case 'CommentaryGenerated':
+                    gameState.messages.push(message);
+                    break;
+                case 'GameFinished':
+                    gameState.isLive = false;
+                    gameState.isGameOver = true;
+                    break;
+            }
+
+            updatePanel();
+        };
+
+        function updatePanel() {
+            const gameDurationSeconds = gameState.startTime ? Math.floor((Date.now() - gameState.startTime) / 1000) : 0;
+
+            // Update status
+            const statusEl = document.querySelector('.stat-row:nth-child(2) .stat-value');
+            if (statusEl) {
+                if (gameState.isLive) {
+                    statusEl.innerHTML = '<span class="live-badge">🔴 LIVE</span>';
+                } else if (gameState.isGameOver) {
+                    statusEl.innerHTML = '<span class="finished-badge">✅ FINISHED</span>';
+                } else {
+                    statusEl.innerHTML = '<span class="idle-badge">⏸️ IDLE</span>';
+                }
+            }
+
+            // Update move count
+            const moveCountEl = document.querySelector('.stat-row:nth-child(3) .stat-value');
+            if (moveCountEl) moveCountEl.textContent = gameState.moveCount;
+
+            // Update duration
+            const durationEl = document.querySelector('.stat-row:nth-child(4) .stat-value');
+            if (durationEl) durationEl.textContent = gameDurationSeconds + 's';
+
+            // Update moves list
+            const movesList = document.querySelector('.moves-list');
+            if (movesList) {
+                movesList.innerHTML = gameState.moves.slice(0, 10).map((m, idx) => `
+                    <div class="move-item">
+                        <span class="move-number">${m.moveNumber}.</span>
+                        <span class="move-text">${m.move}</span>
+                        <span class="move-latency">(${m.latencyMs}ms)</span>
+                    </div>
+                `).join('');
+            }
+
+            // Update commentary
+            const commentaryList = document.querySelector('.commentary-list');
+            if (commentaryList) {
+                commentaryList.innerHTML = gameState.messages.slice(0, 5).map(m => `
+                    <div class="commentary-item severity-${m.severity}">
+                        <span class="event-type">${m.event}</span>
+                        <span class="event-text">${m.commentary}</span>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Update duration every second
+        setInterval(() => {
+            if (gameState.isLive) {
+                updatePanel();
+            }
+        }, 1000);
+    </script>
+</body>
+</html>

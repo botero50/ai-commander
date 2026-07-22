@@ -139,17 +139,18 @@ export class BroadcastService {
       return;
     }
 
-    // Color-code by severity
-    let prefix = '📢';
-    if (broadcast.severity === 'critical') {
-      prefix = '🚨';
-    } else if (broadcast.severity === 'high') {
-      prefix = '⚠️';
-    } else if (broadcast.severity === 'medium') {
-      prefix = '📣';
-    }
+    // Suppress console output - events are sent via WebSocket instead
+    // Color-code by severity (kept for reference)
+    // let prefix = '📢';
+    // if (broadcast.severity === 'critical') {
+    //   prefix = '🚨';
+    // } else if (broadcast.severity === 'high') {
+    //   prefix = '⚠️';
+    // } else if (broadcast.severity === 'medium') {
+    //   prefix = '📣';
+    // }
 
-    console.log(`\n${prefix} ${broadcast.commentary}`);
+    // console.log(`\n${prefix} ${broadcast.commentary}`);
   }
 
   /**

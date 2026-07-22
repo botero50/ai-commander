@@ -31,8 +31,8 @@ export class BoardDisplay {
     const boardPart = fen.split(' ')[0];
     const board = this.fenToBoard(boardPart);
 
-    // Display the board
-    console.log('\n' + this.renderBoard(board, lastMove) + '\n');
+    // Display the board (disabled - removed for clean console)
+    // console.log('\n' + this.renderBoard(board, lastMove) + '\n');
   }
 
   /**

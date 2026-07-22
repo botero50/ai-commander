@@ -122,7 +122,9 @@ export class ChessUI {
    */
   displayLaunchMessage() {
     const c = this.colors;
-    console.log('\n' + c.bright + c.cyan + '🚀  Launching continuous arena...' + c.reset + '\n');
+    console.log('\n' + c.bright + c.cyan + '🚀  Launching continuous arena...' + c.reset);
+    console.log(c.green + '📡  WebSocket Server: ws://localhost:9000' + c.reset);
+    console.log(c.blue + '🌐  Spectator UI: http://localhost:5173' + c.reset + '\n');
   }
 
   /**
