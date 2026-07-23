@@ -39,6 +39,9 @@ export function broadcastMove(moveData) {
   currentGameState.moves.push(moveData.san);
   currentGameState.moveCount = moveData.moveNumber;
 
+  // Determine which player made the move
+  const playerName = moveData.color === 'white' ? currentGameState.white.model : currentGameState.black.model;
+
   // Broadcast to all clients (use MovePlayed type that web app expects)
   const message = JSON.stringify({
     type: 'MovePlayed',
@@ -46,11 +49,16 @@ export function broadcastMove(moveData) {
     moveNumber: moveData.moveNumber,
     color: moveData.color,
     san: moveData.san,
+    move: moveData.san, // Alias for compatibility
     uci: moveData.uci,
     fen: moveData.fenAfter,
     fenBefore: moveData.fenBefore,
     latency: moveData.latencyMs,
+    latencyMs: moveData.latencyMs, // Both forms for compatibility
     confidence: moveData.confidence,
+    description: moveData.description || '', // Opening name if available
+    brainName: playerName, // Player name for recent moves display
+    player: playerName,
   });
 
   for (const client of clients) {
