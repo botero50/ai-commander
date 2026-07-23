@@ -8,7 +8,7 @@ interface CapturedPieces {
 }
 
 export const GameInformation: React.FC = () => {
-  const { gameState, messages, isConnected } = useWebSocket('ws://localhost:9001');
+  const { gameState, messages, isConnected } = useWebSocket('ws://localhost:9002');
   const [gameStarted, setGameStarted] = useState(false);
   const [allTimesCommentary, setAllTimesCommentary] = useState<any[]>([]);
 

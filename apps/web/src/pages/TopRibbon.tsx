@@ -11,7 +11,7 @@ export const TopRibbon: React.FC = () => {
   const [blackPlayer, setBlackPlayer] = useState<Player | null>(null);
 
   useEffect(() => {
-    const ws = new WebSocket('ws://localhost:9001');
+    const ws = new WebSocket('ws://localhost:9002');
 
     ws.onmessage = (event) => {
       const message = JSON.parse(event.data);

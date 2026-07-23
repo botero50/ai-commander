@@ -3,7 +3,7 @@ import useWebSocket from '../hooks/useWebSocket';
 import '../styles/overlay.css';
 
 export const RecentMoves: React.FC = () => {
-  const { messages, isConnected } = useWebSocket('ws://localhost:9001');
+  const { messages, isConnected } = useWebSocket('ws://localhost:9002');
   const [allTimesMoves, setAllTimesMoves] = useState<any[]>([]);
 
   // Reset on new game start

@@ -8,7 +8,7 @@
 import { WebSocketServer } from 'ws';
 import http from 'http';
 
-const PORT = 9001;
+const PORT = 9002;
 let server = null;
 let wss = null;
 let isRunning = false;
@@ -91,11 +91,13 @@ export function broadcastGameStart(gameData) {
       name: gameData.whiteModel,
       provider: 'ollama',
       model: gameData.whiteModel,
+      temperature: 0.7, // Default ollama temperature
     },
     black: {
       name: gameData.blackModel,
       provider: 'ollama',
       model: gameData.blackModel,
+      temperature: 0.7, // Default ollama temperature
     },
   });
 
@@ -156,6 +158,42 @@ export function startBroadcastServer() {
             payload: currentGameState,
           })
         );
+
+        // Handle messages from clients
+        ws.on('message', (data) => {
+          try {
+            const message = JSON.parse(data.toString());
+
+            if (message.type === 'requestState') {
+              // Client is requesting current game state
+              ws.send(
+                JSON.stringify({
+                  type: 'stateUpdate',
+                  gameState: {
+                    isLive: currentGameState.moveCount > 0,
+                    currentGameNumber: 1,
+                    whitePlayer: {
+                      name: 'White',
+                      provider: 'ollama',
+                      model: currentGameState.white.model,
+                    },
+                    blackPlayer: {
+                      name: 'Black',
+                      provider: 'ollama',
+                      model: currentGameState.black.model,
+                    },
+                    fen: currentGameState.board,
+                    moveCount: currentGameState.moveCount,
+                    startTime: Date.now() - (currentGameState.moveCount * 5000), // Estimate
+                    isGameOver: false,
+                  },
+                })
+              );
+            }
+          } catch (error) {
+            console.error('Error handling client message:', error.message);
+          }
+        });
 
         // Handle client disconnection
         ws.on('close', () => {

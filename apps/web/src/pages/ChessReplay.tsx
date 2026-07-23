@@ -6,7 +6,7 @@ import { generatePGN, downloadPGN } from '../services/pgn-exporter';
 import '../styles/replay.css';
 
 export const ChessReplay: React.FC = () => {
-  const { gameState, messages, isConnected } = useWebSocket('ws://localhost:9001');
+  const { gameState, messages, isConnected } = useWebSocket('ws://localhost:9002');
   const [currentMoveIndex, setCurrentMoveIndex] = useState<number>(0);
   const [boardFEN, setBoardFEN] = useState<string>('rnbqkbnr/pppppppp/8/8/8/8/PPPPPPPP/RNBQKBNR w KQkq - 0 1');
 
