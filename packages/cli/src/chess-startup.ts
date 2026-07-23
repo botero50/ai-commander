@@ -21,6 +21,7 @@ import { existsSync } from 'fs';
 import { readFile } from 'fs/promises';
 import path from 'path';
 import { ArenaResearchWrapper } from '../zeroad-adapter/src/research-store-wrapper.js';
+import { ArenaLoop } from './arena-loop.js';
 
 const execPromise = promisify(exec);
 
@@ -292,11 +293,29 @@ export class ChessStartup {
       console.log('═'.repeat(50));
       console.log('  Press Ctrl+C to stop\n');
 
-      // TODO: Implement actual arena game loop here (EPIC 61.2)
-      // For now, await forever
-      await new Promise(() => {
-        // Never resolve - keep running
-      });
+      // Launch arena loop with mock games (TODO: EPIC 61.2 real games)
+      const loop = new ArenaLoop(
+        {
+          maxGames: 5, // Quick test with 5 games
+          whiteName: this.results.ollamaModels[0] || 'Ollama',
+          whiteModel: this.results.ollamaModels[0] || this.config.defaultModel,
+          blackName: 'Stockfish',
+          blackModel: 'stockfish',
+        },
+        this.research
+      );
+
+      await loop.run();
+
+      // After loop completes, get statistics
+      const stats = loop.getStats();
+
+      // Finish run and experiment
+      await this.research.finishRun('completed', stats.gamesPlayed);
+      await this.research.finishExperiment('completed', stats.gamesPlayed);
+
+      console.log('\n✅ Research data persisted to research.db');
+      console.log('   Ready for EPICS 15+ to subscribe to events\n');
     } catch (error) {
       console.error(
         '❌ Failed to launch arena:',
