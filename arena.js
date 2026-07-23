@@ -15,6 +15,7 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { RealChessGame } from './real-chess-game.js';
 import { listPrompts } from './chess-prompts.js';
+import { OpeningTracker } from './opening-tracker.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -63,6 +64,9 @@ class ChessArena {
     ];
 
     this.lastMatchConfig = null;
+
+    // Story 73.2: Opening Diversity tracking
+    this.openingTracker = new OpeningTracker();
   }
 
   /**
@@ -209,6 +213,19 @@ class ChessArena {
     this.state.totalDurationMs += result.durationMs;
     this.state.illegalMoveRetries += result.illegalMoveRetries || 0;
 
+    // Story 73.2: Track opening diversity
+    const opening = this.openingTracker.recordGame(
+      result.pgn,
+      result.moves,
+      result.result
+    );
+
+    // Check for repetition
+    const repetition = this.openingTracker.detectRepetition();
+    if (repetition.isRepetitive) {
+      console.log(`   ⚠️  Opening repetition: ${(repetition.frequency * 100).toFixed(0)}% same (${repetition.dominantOpening})`);
+    }
+
     // Add to history
     const gameRecord = {
       gameNumber: this.state.totalGames,
@@ -333,6 +350,12 @@ class ChessArena {
 
     console.log(`\n✅ Game finished: ${resultText}`);
     console.log(`   Moves: ${result.moveCount} | Duration: ${(result.durationMs / 1000).toFixed(1)}s`);
+
+    // Story 73.2: Display opening info
+    const opening = this.openingTracker.gameSequences[this.openingTracker.gameSequences.length - 1];
+    if (opening) {
+      console.log(`   Opening: ${opening.opening}`);
+    }
   }
 
   displayStatistics() {
@@ -345,6 +368,11 @@ class ChessArena {
     console.log(`   Total Games: ${this.state.totalGames}`);
     console.log(`   Results: W:${this.state.whiteWins} B:${this.state.blackWins} D:${this.state.draws}`);
     console.log(`   Avg Moves: ${avgMoves} | Avg Duration: ${avgDurationSec}s | Rate: ${gamesPerHour}/hour`);
+
+    // Story 73.2: Show opening diversity
+    const stats = this.openingTracker.getStatistics();
+    const diversityIndex = stats.gamesPlayed > 0 ? (stats.totalOpenings / stats.gamesPlayed * 100).toFixed(1) : 0;
+    console.log(`   Openings: ${stats.totalOpenings} unique | Diversity: ${diversityIndex}%`);
   }
 
   async countdownToNextMatch() {
