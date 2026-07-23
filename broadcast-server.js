@@ -176,11 +176,13 @@ export function startBroadcastServer() {
                       name: 'White',
                       provider: 'ollama',
                       model: currentGameState.white.model,
+                      temperature: 0.7,
                     },
                     blackPlayer: {
                       name: 'Black',
                       provider: 'ollama',
                       model: currentGameState.black.model,
+                      temperature: 0.7,
                     },
                     fen: currentGameState.board,
                     moveCount: currentGameState.moveCount,
