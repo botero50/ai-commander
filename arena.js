@@ -44,6 +44,13 @@ class ChessArena {
       totalDurationMs: 0,
       illegalMoveRetries: 0,
       resignations: 0,
+      // Story 72.2: Recovery tracking
+      ollamaTimeouts: 0,
+      ollamaCrashes: 0,
+      recoveryAttempts: 0,
+      successfulRecoveries: 0,
+      avgDecisionLatency: 0,
+      totalDecisionLatency: 0,
     };
 
     // AI players
@@ -113,9 +120,32 @@ class ChessArena {
 
           matchNumber++;
         } catch (error) {
+          // Story 72.2: Enhanced recovery
+          this.state.recoveryAttempts++;
           console.error(`\n❌ Match ${this.state.matchCount} error: ${error.message}`);
-          console.log('   Retrying in 10 seconds...\n');
-          await this.delay(10000);
+
+          // Categorize error
+          if (error.message.includes('timeout') || error.message.includes('Timeout')) {
+            this.state.ollamaTimeouts++;
+            console.log('   ⏱️  Timeout detected - waiting longer before retry (15s)\n');
+            await this.delay(15000);
+          } else if (error.message.includes('unavailable') || error.message.includes('ECONNREFUSED')) {
+            this.state.ollamaCrashes++;
+            console.log('   💥 Ollama crash/disconnect detected - attempting recovery (20s)\n');
+            await this.delay(20000);
+          } else {
+            console.log('   🔄 Retrying in 5 seconds...\n');
+            await this.delay(5000);
+          }
+
+          // Attempt recovery
+          try {
+            await this.ensureOllamaAvailable();
+            this.state.successfulRecoveries++;
+            console.log('   ✅ Arena recovered - resuming play\n');
+          } catch (recoveryError) {
+            console.error(`   ❌ Recovery failed: ${recoveryError.message}`);
+          }
         }
       }
     } catch (error) {
@@ -276,24 +306,33 @@ class ChessArena {
       const avgDurationSec = this.state.totalGames > 0 ? Math.round(this.state.totalDurationMs / this.state.totalGames / 1000) : 0;
       const gamesPerHour = uptimeHours > 0 ? Math.round((this.state.totalGames / uptimeHours) * 100) / 100 : 0;
 
+      // Story 72.2: Calculate average decision latency
+      const avgDecisionLatency = this.state.totalGames > 0
+        ? Math.round(this.state.totalDecisionLatency / (this.state.totalGames * 20)) // ~20 moves per game average
+        : 0;
+
       const stats = {
         timestamp: new Date().toISOString(),
-        // Story 72.3 acceptance criteria
+        // Story 72.3: Expanded statistics
         gamesPlayed: this.state.totalGames,
-        wins: this.state.whiteWins + this.state.blackWins,
-        losses: this.state.whiteWins + this.state.blackWins,
+        whiteWins: this.state.whiteWins,
+        blackWins: this.state.blackWins,
         draws: this.state.draws,
         averageMoves: avgMoves,
         averageDurationSec: avgDurationSec,
+        averageDecisionLatencyMs: avgDecisionLatency,
         gamesPerHour,
-        resignations: this.state.resignations,
         illegalMoveRetries: this.state.illegalMoveRetries,
-        // Breakdown
-        whiteWins: this.state.whiteWins,
-        blackWins: this.state.blackWins,
+        timeoutCount: this.state.ollamaTimeouts,
+        recoveryCount: this.state.successfulRecoveries,
+        resignations: this.state.resignations,
         uptime,
         uptimeHours: Math.round(uptimeHours * 100) / 100,
-        // Recent games for debugging
+        // Story 72.2: Recovery statistics
+        totalRecoveryAttempts: this.state.recoveryAttempts,
+        ollamaCrashes: this.state.ollamaCrashes,
+        ollamaTimeouts: this.state.ollamaTimeouts,
+        // Recent games for analysis
         recentGames: this.state.gameHistory.slice(-20),
       };
 
@@ -344,16 +383,32 @@ class ChessArena {
     const gamesPerHour = totalTime > 0 ? Math.round((this.state.totalGames / totalTime) * 3600) : 0;
     const avgMoves = this.state.totalGames > 0 ? Math.round(this.state.totalMoves / this.state.totalGames) : 0;
     const avgDurationSec = this.state.totalGames > 0 ? Math.round(this.state.totalDurationMs / this.state.totalGames / 1000) : 0;
+    const avgDecisionLatency = this.state.totalGames > 0
+      ? Math.round(this.state.totalDecisionLatency / (this.state.totalGames * 20))
+      : 0;
 
     console.log(`\n📊 Arena Statistics`);
-    console.log(`   Total Games: ${this.state.totalGames}`);
+    console.log(`   Total Games: ${this.state.totalGames} | Rate: ${gamesPerHour}/h | Uptime: ${(totalTime / 60).toFixed(1)}m`);
     console.log(`   Results: W:${this.state.whiteWins} B:${this.state.blackWins} D:${this.state.draws}`);
-    console.log(`   Avg Moves: ${avgMoves} | Avg Duration: ${avgDurationSec}s | Rate: ${gamesPerHour}/hour`);
+    console.log(`   Avg Moves: ${avgMoves} | Avg Duration: ${avgDurationSec}s | Avg Latency: ${avgDecisionLatency}ms`);
 
-    // Story 73.2: Show opening diversity
-    const stats = this.openingTracker.getStatistics();
-    const diversityIndex = stats.gamesPlayed > 0 ? (stats.totalOpenings / stats.gamesPlayed * 100).toFixed(1) : 0;
-    console.log(`   Openings: ${stats.totalOpenings} unique | Diversity: ${diversityIndex}%`);
+    // Story 72.2: Show reliability metrics
+    if (this.state.recoveryAttempts > 0) {
+      const recoveryRate = this.state.successfulRecoveries > 0
+        ? (this.state.successfulRecoveries / this.state.recoveryAttempts * 100).toFixed(1)
+        : 0;
+      console.log(`   Reliability: ${this.state.successfulRecoveries}/${this.state.recoveryAttempts} recoveries (${recoveryRate}%)`);
+    }
+
+    // Story 72.3: Show error counts
+    if (this.state.illegalMoveRetries > 0 || this.state.ollamaTimeouts > 0) {
+      console.log(`   Errors: ${this.state.illegalMoveRetries} illegal moves | ${this.state.ollamaTimeouts} timeouts`);
+    }
+
+    // Story 72.4: Show opening diversity
+    const openingStats = this.openingTracker.getStatistics();
+    const diversityIndex = openingStats.gamesPlayed > 0 ? (openingStats.totalOpenings / openingStats.gamesPlayed * 100).toFixed(1) : 0;
+    console.log(`   Openings: ${openingStats.totalOpenings} unique | Diversity: ${diversityIndex}%`);
   }
 
   async countdownToNextMatch() {
