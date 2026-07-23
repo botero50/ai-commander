@@ -10,6 +10,7 @@
  * Story 72.1: Continuous Match Loop
  */
 
+import 'dotenv/config.js'; // Load .env file
 import fs from 'fs';
 import path from 'path';
 import os from 'os';
