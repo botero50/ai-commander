@@ -1,164 +1,112 @@
 #!/usr/bin/env node
 
 /**
- * Chess Arena Manager — Continuous match execution
+ * Chess Arena — AI Research Platform
  *
- * Plays chess games forever until user interrupts (Ctrl+C)
- * Randomizes players and waits between matches
+ * Autonomous continuous chess tournament system.
+ * Plays real games forever, tracks statistics, enables experimentation.
+ *
+ * EPIC 72: Continuous Arena
+ * Story 72.1: Continuous Match Loop
  */
 
-import { exec } from 'child_process';
-import { promisify } from 'util';
 import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
-import { ChessUI } from './ui.js';
-import { BroadcastService } from './broadcast-service.js';
 import { RealChessGame } from './real-chess-game.js';
-import { WebSocketServer } from './websocket-server.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
-const execPromise = promisify(exec);
 
 class ChessArena {
   constructor() {
+    // Configuration
     this.config = {
       maxMovesPerGame: 500,
       moveTimeoutMs: 30000,
-      matchDelayMs: parseInt(process.env.MATCH_RESTART_DELAY_MS) || 5000,
-      healthCheckIntervalMs: parseInt(process.env.HEALTH_CHECK_INTERVAL_MS) || 30000,
+      matchDelayMs: parseInt(process.env.MATCH_RESTART_DELAY_MS) || 2000,
       ollamaRetryCount: parseInt(process.env.OLLAMA_RETRY_COUNT) || 5,
-      ollamaRetryDelayMs: parseInt(process.env.OLLAMA_RETRY_DELAY_MS) || 5000,
+      ollamaRetryDelayMs: parseInt(process.env.OLLAMA_RETRY_DELAY_MS) || 2000,
       statsFile: process.env.STATISTICS_PERSIST_FILE || 'arena-statistics.json',
-      configPath: path.join(process.cwd(), 'chess-arena-config.json'),
     };
 
-    this.arenaState = {
+    // Arena state
+    this.state = {
       matchCount: 0,
       totalGames: 0,
       whiteWins: 0,
       blackWins: 0,
       draws: 0,
-      currentMatch: null,
       startTime: Date.now(),
-      gameHistory: [],  // Last 100 games for statistics
+      gameHistory: [],
       maxHistorySize: 100,
     };
 
-    this.players = [];
-    this.lastMatchConfig = null;
-    this.ui = new ChessUI();
-    this.broadcast = new BroadcastService({
-      stream: {
-        obsWebSocketUrl: 'ws://localhost:4455',
-        youtubeChannelId: process.env.YOUTUBE_CHANNEL_ID || '',
-        streamTitle: 'AI Chess Tournament - Live',
+    // AI players
+    this.players = [
+      {
+        id: 'p1',
+        name: process.env.BRAIN_P1 || 'ollama:tinyllama',
+        provider: 'ollama',
+        model: (process.env.BRAIN_P1 || 'ollama:tinyllama').split(':')[1],
       },
-    });
-    this.wsServer = new WebSocketServer(9000);
-
-    // Personality profiles
-    this.personalities = [
-      { name: 'Aggressive', temperature: 0.9, depth: 'tactical', riskTolerance: 0.8 },
-      { name: 'Defensive', temperature: 0.3, depth: 'strategic', riskTolerance: 0.2 },
-      { name: 'Positional', temperature: 0.5, depth: 'strategic', riskTolerance: 0.4 },
-      { name: 'Tactical', temperature: 0.7, depth: 'tactical', riskTolerance: 0.6 },
-      { name: 'Balanced', temperature: 0.5, depth: 'balanced', riskTolerance: 0.5 },
-      { name: 'Gambler', temperature: 0.95, depth: 'tactical', riskTolerance: 0.95 },
-      { name: 'Cautious', temperature: 0.2, depth: 'strategic', riskTolerance: 0.1 },
+      {
+        id: 'p2',
+        name: process.env.BRAIN_P2 || 'ollama:mistral',
+        provider: 'ollama',
+        model: (process.env.BRAIN_P2 || 'ollama:mistral').split(':')[1],
+      },
     ];
 
-    // Time controls
-    this.timeControls = [
-      { name: 'Bullet', seconds: 60 },
-      { name: 'Blitz', seconds: 300 },
-      { name: 'Rapid', seconds: 900 },
-      { name: 'Classical', seconds: 3600 },
-      { name: 'Infinite', seconds: 0 },
-    ];
+    this.lastMatchConfig = null;
   }
 
+  /**
+   * Main arena loop — runs forever
+   */
   async run() {
     try {
-      // Load configuration
-      this.loadConfig();
+      this.displayStartup();
 
-      // Initialize players
-      this.initializePlayers();
-
-      this.ui.displayArenaStarted();
-
-      // Start WebSocket server for spectators
-      await this.wsServer.start();
-
-      // Connect to streaming (optional)
-      await this.broadcast.streamService.connect();
-
-      // Start health monitoring (EPIC 73)
-      this.startHealthMonitor();
-
-      // Setup graceful shutdown (EPIC 73)
+      // Graceful shutdown
       process.on('SIGINT', () => this.shutdown());
 
-      // Main game loop
+      // Main loop
       let matchNumber = 1;
       while (true) {
         try {
-          this.arenaState.matchCount = matchNumber;
-          this.arenaState.totalGames++;
+          this.state.matchCount = matchNumber;
+          this.state.totalGames++;
 
-          this.ui.displayMatchHeader(matchNumber);
-
-          // Ensure Ollama is available (EPIC 73)
+          // Verify Ollama is available
           await this.ensureOllamaAvailable();
 
-          // Select random players with randomized personalities
+          // Select random players
           const matchConfig = this.selectPlayers();
-          this.displayMatchConfig(matchConfig);
 
-          // Notify spectators game is starting
-          this.wsServer.emitGameStarted(matchConfig.white, matchConfig.black, matchNumber);
+          // Display match header
+          this.displayMatchHeader(matchNumber, matchConfig);
 
           // Play game
-          const result = await this.simulateGame(matchConfig, matchNumber);
+          const result = await this.playGame(matchConfig);
+
+          // Record result
+          this.recordGameResult(result, matchConfig);
 
           // Display result
-          this.displayResult(result, matchConfig.white, matchConfig.black);
+          this.displayResult(result, matchConfig);
 
-          // Record game result and broadcast statistics (EPIC 73)
-          this.recordGameResult(result.result, matchConfig, result.durationMs, result.movesCount);
+          // Display current statistics
+          this.displayStatistics();
 
-          // Notify spectators game finished
-          this.wsServer.emitGameFinished(
-            result.result,
-            matchConfig.white.name,
-            matchConfig.black.name,
-            result.movesCount,
-            result.durationMs
-          );
-
-          // Display replays
-          await this.displayReplays();
-
-          // Display match summary
-          this.displayMatchSummary(result, matchConfig.white, matchConfig.black);
-
-          // Update stats
-          this.updateStats(result);
-
-          // Countdown to next match (EPIC 73)
+          // Countdown to next match
           if (matchNumber < 999) {
-            await this.countdownToNextMatch(this.config.matchDelayMs);
+            await this.countdownToNextMatch();
           }
 
           matchNumber++;
         } catch (error) {
-          console.error(`\n❌ Match error: ${error.message}`);
-          this.wsServer.emitGameError({
-            error: error.message,
-            matchNumber,
-          });
-          console.log('   Resuming in 10 seconds...\n');
+          console.error(`\n❌ Match ${this.state.matchCount} error: ${error.message}`);
+          console.log('   Retrying in 10 seconds...\n');
           await this.delay(10000);
         }
       }
@@ -168,319 +116,104 @@ class ChessArena {
     }
   }
 
-  loadConfig() {
-    try {
-      if (!fs.existsSync(this.config.configPath)) {
-        throw new Error(`Config file not found: ${this.config.configPath}`);
-      }
-
-      const content = fs.readFileSync(this.config.configPath, 'utf-8');
-      const config = JSON.parse(content);
-
-      if (!config.players || config.players.length < 2) {
-        throw new Error('Config must have at least 2 players');
-      }
-
-      this.config = { ...this.config, ...config };
-    } catch (error) {
-      throw new Error(`Failed to load config: ${error.message}`);
-    }
-  }
-
-  initializePlayers() {
-    if (!this.config.players) {
-      throw new Error('No players configured');
-    }
-
-    this.players = this.config.players.map((p) => ({
-      id: p.id,
-      name: p.name,
-      provider: p.provider,
-      model: p.model,
-      elo: p.elo || 1500,
-      wins: 0,
-      losses: 0,
-      draws: 0,
-    }));
-  }
-
+  /**
+   * Select random player pair
+   * Story 72.2: Random Player Assignment
+   */
   selectPlayers() {
-    if (this.players.length < 2) {
-      throw new Error('Need at least 2 players for randomization');
-    }
-
     let matchConfig = null;
-
-    // Keep generating until we get a different config than last time
     let attempts = 0;
+
+    // Ensure different players than last match
     do {
       const whiteIdx = Math.floor(Math.random() * this.players.length);
-      let blackIdx = Math.floor(Math.random() * this.players.length);
-
-      // Ensure white and black are different
-      while (blackIdx === whiteIdx) {
-        blackIdx = Math.floor(Math.random() * this.players.length);
-      }
-
-      const white = this.players[whiteIdx];
-      const black = this.players[blackIdx];
-
-      // Randomize personalities and settings
-      const whitePers = this.personalities[Math.floor(Math.random() * this.personalities.length)];
-      const blackPers = this.personalities[Math.floor(Math.random() * this.personalities.length)];
-      const timeControl = this.timeControls[Math.floor(Math.random() * this.timeControls.length)];
+      const blackIdx = Math.floor(Math.random() * this.players.length);
 
       matchConfig = {
         white: {
-          ...white,
-          personality: whitePers.name,
-          temperature: whitePers.temperature,
-          depth: whitePers.depth,
-          riskTolerance: whitePers.riskTolerance,
+          ...this.players[whiteIdx],
+          side: 'white',
         },
         black: {
-          ...black,
-          personality: blackPers.name,
-          temperature: blackPers.temperature,
-          depth: blackPers.depth,
-          riskTolerance: blackPers.riskTolerance,
+          ...this.players[blackIdx],
+          side: 'black',
         },
-        timeControl: timeControl.name,
-        seed: Math.random(),
       };
 
-      // Check if it's different from last config
-      if (!this.lastMatchConfig || this.configsAreDifferent(matchConfig, this.lastMatchConfig)) {
-        break;
-      }
-
       attempts++;
-    } while (attempts < 100);
-
-    if (!matchConfig) {
-      throw new Error('Failed to generate unique match configuration');
-    }
+    } while (
+      this.lastMatchConfig &&
+      attempts < 10 &&
+      this.configSame(matchConfig, this.lastMatchConfig)
+    );
 
     this.lastMatchConfig = matchConfig;
     return matchConfig;
   }
 
-  configsAreDifferent(config1, config2) {
+  configSame(config1, config2) {
     return (
-      config1.white.name !== config2.white.name ||
-      config1.white.personality !== config2.white.personality ||
-      config1.black.name !== config2.black.name ||
-      config1.black.personality !== config2.black.personality ||
-      config1.timeControl !== config2.timeControl
+      config1.white.model === config2.white.model &&
+      config1.black.model === config2.black.model
     );
   }
 
-  displayMatchConfig(config) {
-    console.log(`${config.white.name} (${config.white.personality}) vs ${config.black.name} (${config.black.personality})`);
-    console.log(`Time Control: ${config.timeControl}`);
-    console.log(`White Temperature: ${config.white.temperature.toFixed(2)}`);
-    console.log(`Black Temperature: ${config.black.temperature.toFixed(2)}`);
-    console.log();
-  }
+  /**
+   * Play a complete chess game
+   */
+  async playGame(matchConfig) {
+    const game = new RealChessGame(matchConfig);
+    const startTime = Date.now();
 
-  async simulateGame(matchConfig, matchNumber) {
-    // Reset broadcast for new game
-    this.broadcast.reset();
-
-    // Create and execute REAL chess game (with WebSocket server for spectators)
-    const gameExecutor = new RealChessGame(matchConfig, this.broadcast, this.ui, this.wsServer);
-
-    console.log('\n🎮 Starting real chess game...');
-    const gameResult = await gameExecutor.play();
-
-    const summary = this.broadcast.getMatchSummary();
+    console.log('');
+    const result = await game.play();
 
     return {
-      matchNumber,
-      white: matchConfig.white.name,
-      black: matchConfig.black.name,
-      result: gameResult.result,
-      moves: gameResult.moves,
-      movesCount: gameResult.moves.length,
-      durationMs: gameResult.durationMs,
-      events: summary.eventsByType,
-      pgn: gameResult.pgn,
-      fen: gameResult.fen,
+      ...result,
+      durationMs: Date.now() - startTime,
+      whiteModel: matchConfig.white.model,
+      blackModel: matchConfig.black.model,
     };
   }
 
-
-  displayResult(result, white, black) {
-    const resultText =
-      result.result === 'white-win' ? `${white.name} wins` :
-      result.result === 'black-win' ? `${black.name} wins` :
-      'Draw';
-
-    console.log(`\n✅ Game Over`);
-    console.log(`   Result: ${resultText}`);
-    console.log(`   Moves: ${result.movesCount}`);
-    console.log(`   Duration: ${(result.durationMs / 1000).toFixed(1)}s`);
-    console.log();
-  }
-
-  async displayReplays() {
-    await this.broadcast.displayReplays();
-  }
-
-  displayMatchSummary(result, white, black) {
-    this.broadcast.displayMatchSummary({
-      white: white.name,
-      black: black.name,
-      result: result.result,
-      moves: result.moves,
-      durationMs: result.durationMs,
-    });
-
-    // Display runtime monitoring
-    this.broadcast.displayMonitoringSummary();
-  }
-
-  displayStreamDashboard() {
-    if (this.broadcast.streamService.streamState.isConnected) {
-      this.broadcast.streamService.displayDashboard();
-    }
-  }
-
-  displayProductionChecklist() {
-    if (this.broadcast.streamService.streamState.isConnected) {
-      this.broadcast.streamService.displayProductionChecklist();
-    }
-  }
-
-  updateStats(result) {
-    this.arenaState.totalGames++;
-
+  /**
+   * Record game result for statistics
+   * Story 72.3: Arena Statistics
+   */
+  recordGameResult(result, matchConfig) {
+    // Update counters
     if (result.result === 'white-win') {
-      this.arenaState.whiteWins++;
+      this.state.whiteWins++;
     } else if (result.result === 'black-win') {
-      this.arenaState.blackWins++;
+      this.state.blackWins++;
     } else {
-      this.arenaState.draws++;
+      this.state.draws++;
     }
 
-    // Update player records
-    const white = this.players.find((p) => p.name === result.white);
-    const black = this.players.find((p) => p.name === result.black);
-
-    if (white && black) {
-      if (result.result === 'white-win') {
-        white.wins++;
-        black.losses++;
-      } else if (result.result === 'black-win') {
-        black.wins++;
-        white.losses++;
-      } else {
-        white.draws++;
-        black.draws++;
-      }
-    }
-  }
-
-  displayStats() {
-    console.log('\n📊 Arena Statistics');
-    console.log('─'.repeat(40));
-    console.log(`Total Games: ${this.arenaState.totalGames}`);
-    console.log(`White Wins: ${this.arenaState.whiteWins}`);
-    console.log(`Black Wins: ${this.arenaState.blackWins}`);
-    console.log(`Draws: ${this.arenaState.draws}`);
-
-    const elapsed = Date.now() - this.arenaState.startTime;
-    console.log(`Elapsed Time: ${(elapsed / 1000 / 60).toFixed(1)} minutes`);
-
-    console.log('\nPlayer Records:');
-    for (const player of this.players) {
-      const record = `${player.wins}-${player.losses}-${player.draws}`;
-      console.log(`  ${player.name}: ${record}`);
-    }
-  }
-
-  async waitForNextMatch() {
-    const delaySeconds = this.config.matchDelayMs / 1000;
-
-    for (let i = delaySeconds; i > 0; i--) {
-      process.stdout.write(`\r⏳ Next match in ${i}s    `);
-      await this.delay(1000);
-    }
-
-    process.stdout.write('\r' + ' '.repeat(35) + '\n');
-  }
-
-  async countdownToNextMatch(delayMs) {
-    const delaySeconds = Math.ceil(delayMs / 1000);
-    for (let i = delaySeconds; i > 0; i--) {
-      this.wsServer.emitMatchRestartIn(i, this.arenaState.matchCount + 1);
-      process.stdout.write(`\r⏳ Next match in ${i}s    `);
-      await this.delay(1000);
-    }
-    process.stdout.write('\r' + ' '.repeat(35) + '\r');
-  }
-
-  recordGameResult(result, matchConfig, durationMs, moveCount) {
-    // Update win/loss/draw counts
-    if (result === 'white-win') {
-      this.arenaState.whiteWins++;
-    } else if (result === 'black-win') {
-      this.arenaState.blackWins++;
-    } else {
-      this.arenaState.draws++;
-    }
-
-    // Add to game history
+    // Add to history
     const gameRecord = {
-      matchNumber: this.arenaState.matchCount,
-      white: matchConfig.white.name,
-      black: matchConfig.black.name,
-      result,
-      moveCount,
-      durationMs,
-      whiteTemp: matchConfig.white.temperature,
-      blackTemp: matchConfig.black.temperature,
-      personality: {
-        white: matchConfig.white.personality,
-        black: matchConfig.black.personality,
-      },
-      timeControl: matchConfig.timeControl,
+      gameNumber: this.state.totalGames,
+      white: matchConfig.white.model,
+      black: matchConfig.black.model,
+      result: result.result,
+      moves: result.moveCount,
+      durationSec: Math.round(result.durationMs / 1000),
       timestamp: Date.now(),
     };
 
-    this.arenaState.gameHistory.push(gameRecord);
-    if (this.arenaState.gameHistory.length > this.arenaState.maxHistorySize) {
-      this.arenaState.gameHistory.shift();
+    this.state.gameHistory.push(gameRecord);
+    if (this.state.gameHistory.length > this.state.maxHistorySize) {
+      this.state.gameHistory.shift();
     }
 
-    // Broadcast updated statistics
-    this.broadcastStatistics();
+    // Persist statistics
+    this.persistStatistics();
   }
 
-  broadcastStatistics() {
-    const uptime = Date.now() - this.arenaState.startTime;
-    const hours = uptime / (1000 * 60 * 60);
-    const gamesPerHour = hours > 0 ? this.arenaState.totalGames / hours : 0;
-
-    const avgMoveCount = this.arenaState.gameHistory.length > 0
-      ? Math.round(
-          this.arenaState.gameHistory.reduce((sum, g) => sum + g.moveCount, 0) /
-          this.arenaState.gameHistory.length
-        )
-      : 0;
-
-    this.wsServer.emitArenaStatisticsUpdated({
-      totalGames: this.arenaState.totalGames,
-      whiteWins: this.arenaState.whiteWins,
-      blackWins: this.arenaState.blackWins,
-      draws: this.arenaState.draws,
-      uptime: Math.floor(uptime / 1000),
-      gamesPerHour: Math.round(gamesPerHour * 100) / 100,
-      avgMoveCount,
-      recentGames: this.arenaState.gameHistory.slice(-10),
-    });
-  }
-
+  /**
+   * Verify Ollama is running
+   * Story 72.4: Fault Recovery
+   */
   async ensureOllamaAvailable() {
     const maxRetries = this.config.ollamaRetryCount;
     const retryDelayMs = this.config.ollamaRetryDelayMs;
@@ -489,69 +222,99 @@ class ChessArena {
       try {
         const response = await fetch('http://localhost:11434/api/version');
         if (response.ok) {
-          console.log('✅ Ollama available');
-          this.wsServer.emitHealthStatus({ ollama: 'healthy' });
-          return;
+          return; // Available
         }
       } catch (error) {
-        console.warn(`⚠️  Ollama unavailable (attempt ${attempt}/${maxRetries})`);
-        this.wsServer.emitHealthStatus({
-          ollama: 'unhealthy',
-          error: error.message,
-        });
-        if (attempt < maxRetries) {
-          await this.delay(retryDelayMs);
-        }
+        // Not available yet
+      }
+
+      if (attempt < maxRetries) {
+        console.log(`⚠️  Ollama unavailable (retry ${attempt}/${maxRetries})`);
+        await this.delay(retryDelayMs);
       }
     }
 
     throw new Error('Ollama unavailable after retries');
   }
 
-  startHealthMonitor() {
-    setInterval(async () => {
-      try {
-        const response = await fetch('http://localhost:11434/api/version');
-        const data = await response.json();
-        this.wsServer.emitHealthStatus({
-          ollama: 'healthy',
-          version: data.version,
-        });
-      } catch (error) {
-        this.wsServer.emitHealthStatus({
-          ollama: 'unhealthy',
-          error: error.message,
-        });
-      }
-    }, this.config.healthCheckIntervalMs);
-  }
-
+  /**
+   * Persist statistics to JSON
+   */
   persistStatistics() {
     try {
-      const statsPath = path.join(process.cwd(), this.config.statsFile);
+      const stats = {
+        timestamp: new Date().toISOString(),
+        totalGames: this.state.totalGames,
+        whiteWins: this.state.whiteWins,
+        blackWins: this.state.blackWins,
+        draws: this.state.draws,
+        uptime: Math.floor((Date.now() - this.state.startTime) / 1000),
+        recentGames: this.state.gameHistory.slice(-20),
+      };
+
       fs.writeFileSync(
-        statsPath,
-        JSON.stringify({
-          timestamp: new Date().toISOString(),
-          totalGames: this.arenaState.totalGames,
-          whiteWins: this.arenaState.whiteWins,
-          blackWins: this.arenaState.blackWins,
-          draws: this.arenaState.draws,
-          uptime: Date.now() - this.arenaState.startTime,
-          gameHistory: this.arenaState.gameHistory,
-        }, null, 2)
+        this.config.statsFile,
+        JSON.stringify(stats, null, 2)
       );
-      console.log(`📊 Statistics saved to ${this.config.statsFile}`);
     } catch (error) {
-      console.error(`❌ Failed to save statistics: ${error.message}`);
+      console.error(`Failed to save stats: ${error.message}`);
     }
+  }
+
+  /**
+   * Display methods
+   */
+
+  displayStartup() {
+    console.clear();
+    console.log('╔════════════════════════════════════════╗');
+    console.log('║   AI Commander Chess Arena            ║');
+    console.log('║   Research & Experimentation Platform  ║');
+    console.log('╚════════════════════════════════════════╝\n');
+    console.log(`White (Player 1): ${this.players[0].model}`);
+    console.log(`Black (Player 2): ${this.players[1].model}`);
+    console.log(`Match restart delay: ${this.config.matchDelayMs}ms`);
+    console.log('');
+    console.log('Arena starting... press Ctrl+C to stop\n');
+  }
+
+  displayMatchHeader(matchNumber, matchConfig) {
+    console.log(`\n${'═'.repeat(50)}`);
+    console.log(`Match ${matchNumber}: ${matchConfig.white.model} vs ${matchConfig.black.model}`);
+    console.log(`${'═'.repeat(50)}`);
+  }
+
+  displayResult(result, matchConfig) {
+    const resultText =
+      result.result === 'white-win' ? `${matchConfig.white.model} wins` :
+      result.result === 'black-win' ? `${matchConfig.black.model} wins` :
+      'Draw';
+
+    console.log(`\n✅ Game finished: ${resultText}`);
+    console.log(`   Moves: ${result.moveCount} | Duration: ${(result.durationMs / 1000).toFixed(1)}s`);
+  }
+
+  displayStatistics() {
+    const totalTime = (Date.now() - this.state.startTime) / 1000;
+    const gamesPerHour = totalTime > 0 ? Math.round((this.state.totalGames / totalTime) * 3600) : 0;
+
+    console.log(`\n📊 Arena Stats: ${this.state.totalGames} games | W:${this.state.whiteWins} B:${this.state.blackWins} D:${this.state.draws} | ${gamesPerHour}/h`);
+  }
+
+  async countdownToNextMatch() {
+    const delaySeconds = Math.ceil(this.config.matchDelayMs / 1000);
+    for (let i = delaySeconds; i > 0; i--) {
+      process.stdout.write(`\r⏳ Next match in ${i}s   `);
+      await this.delay(1000);
+    }
+    process.stdout.write('\r' + ' '.repeat(30) + '\r');
   }
 
   async shutdown() {
     console.log('\n\n🛑 Shutting down gracefully...');
     this.persistStatistics();
-    await this.wsServer.stop();
-    console.log('✅ Arena shutdown complete');
+    console.log(`📊 Final stats saved to ${this.config.statsFile}`);
+    console.log('✅ Arena shutdown complete\n');
     process.exit(0);
   }
 
@@ -560,4 +323,9 @@ class ChessArena {
   }
 }
 
-export { ChessArena };
+// Run the arena
+const arena = new ChessArena();
+arena.run().catch(error => {
+  console.error(`Fatal error: ${error.message}`);
+  process.exit(1);
+});

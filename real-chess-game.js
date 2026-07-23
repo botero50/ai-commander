@@ -13,7 +13,7 @@ import { Chess } from 'chess.js';
 import { BoardDisplay } from './board-display.js';
 
 export class RealChessGame {
-  constructor(matchConfig, broadcastService, ui, wsServer = null) {
+  constructor(matchConfig, broadcastService = null, ui = null, wsServer = null) {
     this.matchConfig = matchConfig;
     this.broadcast = broadcastService;
     this.ui = ui;
@@ -24,16 +24,16 @@ export class RealChessGame {
     this.startTime = Date.now();
     this.playerModels = {
       white: {
-        name: matchConfig.white.name,
-        provider: matchConfig.white.provider,
+        name: matchConfig.white.name || matchConfig.white.model,
+        provider: matchConfig.white.provider || 'ollama',
         model: matchConfig.white.model,
-        temperature: matchConfig.white.temperature,
+        temperature: matchConfig.white.temperature || 0.5,
       },
       black: {
-        name: matchConfig.black.name,
-        provider: matchConfig.black.provider,
+        name: matchConfig.black.name || matchConfig.black.model,
+        provider: matchConfig.black.provider || 'ollama',
         model: matchConfig.black.model,
-        temperature: matchConfig.black.temperature,
+        temperature: matchConfig.black.temperature || 0.5,
       },
     };
   }
