@@ -45,6 +45,7 @@ export class RealChessGame {
     let moveCount = 0;
     const maxMoves = 500;
     const startTime = Date.now();
+    let illegalMoveRetries = 0;
 
     while (!this.game.isGameOver() && moveCount < maxMoves) {
       const isWhiteToMove = moveCount % 2 === 0;
@@ -66,9 +67,15 @@ export class RealChessGame {
 
         if (!moveResult) {
           // Fallback: pick random legal move
+          illegalMoveRetries++;
           const randomMove = legalMoves[Math.floor(Math.random() * legalMoves.length)];
           this.executeMove(randomMove.san, color, moveCount, 0, 0, positionDescription);
         } else {
+          // Validate move is legal
+          const isLegal = legalMoves.some(m => m.san === moveResult.move);
+          if (!isLegal) {
+            illegalMoveRetries++;
+          }
           // Use position description from BEFORE the move decision
           this.executeMove(moveResult.move, color, moveCount, moveResult.latency, moveResult.confidence || 0, positionDescription);
         }
@@ -97,6 +104,7 @@ export class RealChessGame {
       moveCount: this.moves.length,
       pgn: this.game.pgn(),
       fen: this.game.fen(),
+      illegalMoveRetries,
     };
   }
 

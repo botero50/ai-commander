@@ -197,6 +197,7 @@ class ChessArena {
     // Update aggregate metrics
     this.state.totalMoves += result.moveCount;
     this.state.totalDurationMs += result.durationMs;
+    this.state.illegalMoveRetries += result.illegalMoveRetries || 0;
 
     // Add to history
     const gameRecord = {
