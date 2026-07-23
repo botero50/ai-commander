@@ -1,0 +1,21 @@
+{
+  "timestamp": "2026-07-23T15:03:28.959Z",
+  "gamesPlayed": 1,
+  "whiteWins": 0,
+  "blackWins": 0,
+  "draws": 0,
+  "averageMoves": 0,
+  "averageDurationSec": 0,
+  "averageDecisionLatencyMs": 0,
+  "gamesPerHour": 14.46,
+  "illegalMoveRetries": 0,
+  "timeoutCount": 0,
+  "recoveryCount": 0,
+  "resignations": 0,
+  "uptime": 249,
+  "uptimeHours": 0.07,
+  "totalRecoveryAttempts": 0,
+  "ollamaCrashes": 0,
+  "ollamaTimeouts": 0,
+  "recentGames": []
+}

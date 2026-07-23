@@ -73,17 +73,19 @@ function getGamePhase(game) {
 function extractMoveFromResponse(responseText, legalMoves) {
   if (!responseText) return null;
 
-  // Priority 1: Explicit structured markers
+  const clean = responseText.trim();
+
+  // Priority 1: Explicit move markers
   const structuredPatterns = [
+    /Move:\s*([a-zA-Z0-9#=+\-]+)/i,
     /Best move:\s*([a-zA-Z0-9#=+\-]+)/i,
     /BEST MOVE:\s*([a-zA-Z0-9#=+\-]+)/i,
     /Final choice:\s*([a-zA-Z0-9#=+\-]+)/i,
-    /Final answer:\s*([a-zA-Z0-9#=+\-]+)/i,
-    /\[\s*([a-zA-Z0-9#=+\-]+)\s*\]\s*$/im, // [MOVE] at end
+    /\[\s*([a-zA-Z0-9#=+\-]+)\s*\]/i,
   ];
 
   for (const pattern of structuredPatterns) {
-    const match = responseText.match(pattern);
+    const match = clean.match(pattern);
     if (match) {
       const moveText = match[1].trim();
       const legalMatch = legalMoves.find(m => m.san.toLowerCase() === moveText.toLowerCase());
@@ -93,31 +95,33 @@ function extractMoveFromResponse(responseText, legalMoves) {
     }
   }
 
-  // Priority 2: Last paragraph (if multiple moves mentioned)
-  const paragraphs = responseText.split(/\n\n+/);
-  if (paragraphs.length > 1) {
-    const lastParagraph = paragraphs[paragraphs.length - 1];
-    const allMovesInLast = lastParagraph.match(/\b([NBRQK]?[a-h]?[1-8]?[x@]?[a-h][1-8](?:=[NBRQ])?[+#]?)\b/g) || [];
-
-    if (allMovesInLast.length > 0) {
-      for (const moveText of allMovesInLast.reverse()) {
-        const legalMatch = legalMoves.find(m => m.san.toLowerCase() === moveText.toLowerCase());
-        if (legalMatch) {
-          return { move: legalMatch.san, quality: 'paragraph_end', confidence: 0.8 };
-        }
-      }
+  // Priority 2: First non-empty line/word that's a valid move
+  const tokens = clean.split(/[\s\n,;.!?()]+/).filter(t => t.length > 0);
+  for (const token of tokens) {
+    const legalMatch = legalMoves.find(m => m.san.toLowerCase() === token.toLowerCase());
+    if (legalMatch) {
+      return { move: legalMatch.san, quality: 'token', confidence: 0.85 };
     }
   }
 
-  // Priority 3: All moves mentioned (validate and return first legal)
-  const allMentioned = responseText.match(/\b([NBRQK]?[a-h]?[1-8]?[x@]?[a-h][1-8](?:=[NBRQ])?[+#]?)\b/g) || [];
+  // Priority 3: First line alone
+  const firstLine = clean.split('\n')[0].trim();
+  const firstLineMove = firstLine.match(/^([NBRQK]?[a-h]?[1-8]?[x@]?[a-h][1-8](?:=[NBRQ])?[+#]?)$/);
+  if (firstLineMove) {
+    const legalMatch = legalMoves.find(m => m.san.toLowerCase() === firstLineMove[1].toLowerCase());
+    if (legalMatch) {
+      return { move: legalMatch.san, quality: 'direct', confidence: 0.9 };
+    }
+  }
+
+  // Priority 4: Regex extraction (last resort)
+  const allMentioned = clean.match(/\b([NBRQK]?[a-h]?[1-8]?[x@]?[a-h][1-8](?:=[NBRQ])?[+#]?)\b/g) || [];
 
   if (allMentioned.length > 0) {
-    // Try last-to-first to favor most recently mentioned
     for (const moveText of allMentioned.reverse()) {
       const legalMatch = legalMoves.find(m => m.san.toLowerCase() === moveText.toLowerCase());
       if (legalMatch) {
-        return { move: legalMatch.san, quality: 'extracted', confidence: 0.6 };
+        return { move: legalMatch.san, quality: 'regex', confidence: 0.6 };
       }
     }
   }
@@ -306,30 +310,13 @@ export class RealChessGame {
     // Choose prompt tier based on model size (can be enhanced with model detection)
     let prompt;
 
-    // Tier 2: Structured reasoning (best for 7B models like Mistral)
-    // This tier balances reasoning quality with model capability
-    prompt = `Chess Position Analysis
+    // Minimal prompt - just give position and ask for move
+    // Ollama responds better to very direct requests
+    prompt = `${boardASCII}
 
-Player: ${playerColor} | Phase: ${gamePhase} (move ${moveCount})
+${playerColor} moves: ${legalMoves.map(m => m.san).join(' ')}
 
-Current Position:
-${boardASCII}
-
-FEN: ${boardState}
-${moveHistory ? `Recent moves: ${moveHistory}` : ''}
-
-Legal moves available: ${legalMoves.map(m => m.san).join(', ')}
-
-Analyze this position:
-1. Material assessment: Count pieces and evaluate material balance
-2. Piece activity: Which pieces are well-placed? Which are passive?
-3. King safety: Is either king under threat? Safe or exposed?
-4. Tactics: Look for any pins, forks, skewers, or forcing moves
-5. Strategic goal: What's the best plan for ${playerColor}?
-
-Based on this analysis, select the BEST MOVE from the legal moves list above.
-
-Best move: `;
+Choose: `;
 
     // Alternative Tier 1 (ultra-simple for tinyllama):
     // if (player.model.includes('tiny') || player.model.includes('1.1b')) {

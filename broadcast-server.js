@@ -229,6 +229,10 @@ export function startBroadcastServer() {
 
       server.once('error', onError);
       server.once('listening', onListening);
+
+      // Also handle error on wss (WebSocketServer)
+      wss.once('error', onError);
+
       server.listen(PORT);
     } catch (error) {
       reject(error);
