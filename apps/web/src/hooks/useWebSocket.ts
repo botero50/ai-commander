@@ -25,7 +25,7 @@ export interface UseWebSocketReturn {
   sendMessage: (message: Partial<WebSocketMessage>) => void;
 }
 
-export function useWebSocket(url = 'ws://localhost:9000'): UseWebSocketReturn {
+export function useWebSocket(url = 'ws://localhost:9001'): UseWebSocketReturn {
   const [gameState, setGameState] = useState<GameState>({
     isLive: false,
     currentGameNumber: 0,
