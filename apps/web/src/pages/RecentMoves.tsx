@@ -6,10 +6,11 @@ export const RecentMoves: React.FC = () => {
   const { messages, isConnected } = useWebSocket('ws://localhost:9002');
   const [allTimesMoves, setAllTimesMoves] = useState<any[]>([]);
 
-  // Reset on new game start
+  // Reset on new game start - but only when a NEW game is detected
   useEffect(() => {
     const gameStartEvent = messages.find((m) => m.type === 'GameStarted');
-    if (gameStartEvent) {
+    if (gameStartEvent && allTimesMoves.length > 0) {
+      // Only reset if we already have moves (means new game started)
       setAllTimesMoves([]);
     }
   }, [messages]);
@@ -54,10 +55,10 @@ export const RecentMoves: React.FC = () => {
       <div className="moves-container">
         <h2 className="moves-title">Recent Moves ({allTimesMoves.length})</h2>
         <div className="moves-list-full">
-          {/* Sort moves in ascending order by moveNumber */}
+          {/* Sort moves in DESCENDING order (newest first) by moveNumber */}
           {allTimesMoves
-            .slice(-33)
-            .sort((a, b) => a.moveNumber - b.moveNumber)
+            .slice(-100)
+            .sort((a, b) => b.moveNumber - a.moveNumber)
             .map((event, idx) => (
               <div key={`${event.moveNumber}-${event.move}-${idx}`} className="move-item-full">
                 <span className="move-number">{event.moveNumber}.</span>
