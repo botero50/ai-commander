@@ -14,7 +14,6 @@ import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { RealChessGame } from './real-chess-game.js';
-import { listPrompts } from './chess-prompts.js';
 import { OpeningTracker } from './opening-tracker.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
@@ -128,33 +127,24 @@ class ChessArena {
   /**
    * Select random player pair
    * Story 72.2: Random Player Assignment
-   * Story 73.1: Prompt Optimization
    */
   selectPlayers() {
     let matchConfig = null;
     let attempts = 0;
-
-    const promptNames = listPrompts();
 
     // Ensure different players than last match
     do {
       const whiteIdx = Math.floor(Math.random() * this.players.length);
       const blackIdx = Math.floor(Math.random() * this.players.length);
 
-      // Story 73.1: Randomly assign prompts for experimentation
-      const whitePrompt = promptNames[Math.floor(Math.random() * promptNames.length)];
-      const blackPrompt = promptNames[Math.floor(Math.random() * promptNames.length)];
-
       matchConfig = {
         white: {
           ...this.players[whiteIdx],
           side: 'white',
-          promptName: whitePrompt,
         },
         black: {
           ...this.players[blackIdx],
           side: 'black',
-          promptName: blackPrompt,
         },
       };
 
@@ -231,8 +221,6 @@ class ChessArena {
       gameNumber: this.state.totalGames,
       white: matchConfig.white.model,
       black: matchConfig.black.model,
-      whitePrompt: matchConfig.white.promptName,
-      blackPrompt: matchConfig.black.promptName,
       result: result.result,
       moves: result.moveCount,
       durationSec: Math.round(result.durationMs / 1000),
@@ -336,10 +324,9 @@ class ChessArena {
   }
 
   displayMatchHeader(matchNumber, matchConfig) {
-    console.log(`\n${'═'.repeat(60)}`);
+    console.log(`\n${'═'.repeat(50)}`);
     console.log(`Match ${matchNumber}: ${matchConfig.white.model} vs ${matchConfig.black.model}`);
-    console.log(`Prompts: ${matchConfig.white.promptName} vs ${matchConfig.black.promptName}`);
-    console.log(`${'═'.repeat(60)}`);
+    console.log(`${'═'.repeat(50)}`);
   }
 
   displayResult(result, matchConfig) {
@@ -350,12 +337,6 @@ class ChessArena {
 
     console.log(`\n✅ Game finished: ${resultText}`);
     console.log(`   Moves: ${result.moveCount} | Duration: ${(result.durationMs / 1000).toFixed(1)}s`);
-
-    // Story 73.2: Display opening info
-    const opening = this.openingTracker.gameSequences[this.openingTracker.gameSequences.length - 1];
-    if (opening) {
-      console.log(`   Opening: ${opening.opening}`);
-    }
   }
 
   displayStatistics() {
