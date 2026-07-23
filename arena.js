@@ -86,8 +86,6 @@ class ChessArena {
       },
     ];
 
-    this.lastMatchConfig = null;
-
     // Story 73.2: Opening Diversity tracking
     this.openingTracker = new OpeningTracker();
 
@@ -272,41 +270,20 @@ class ChessArena {
    * Story 72.2: Random Player Assignment
    */
   selectPlayers() {
-    let matchConfig = null;
-    let attempts = 0;
+    // Use configured players in order (BRAIN_P1 vs BRAIN_P2)
+    // Don't randomize - user configured specific matchups
+    const matchConfig = {
+      white: {
+        ...this.players[0],
+        side: 'white',
+      },
+      black: {
+        ...this.players[1],
+        side: 'black',
+      },
+    };
 
-    // Ensure different players than last match
-    do {
-      const whiteIdx = Math.floor(Math.random() * this.players.length);
-      const blackIdx = Math.floor(Math.random() * this.players.length);
-
-      matchConfig = {
-        white: {
-          ...this.players[whiteIdx],
-          side: 'white',
-        },
-        black: {
-          ...this.players[blackIdx],
-          side: 'black',
-        },
-      };
-
-      attempts++;
-    } while (
-      this.lastMatchConfig &&
-      attempts < 10 &&
-      this.configSame(matchConfig, this.lastMatchConfig)
-    );
-
-    this.lastMatchConfig = matchConfig;
     return matchConfig;
-  }
-
-  configSame(config1, config2) {
-    return (
-      config1.white.model === config2.white.model &&
-      config1.black.model === config2.black.model
-    );
   }
 
   /**
