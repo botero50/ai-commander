@@ -18,6 +18,14 @@ import { RealChessGame } from './real-chess-game.js';
 import { OpeningTracker } from './opening-tracker.js';
 import { getGameEventBus } from './game-event-bus.js';
 import { ArenaResearchIntegration } from './arena-research-integration.js';
+import {
+  startBroadcastServer,
+  stopBroadcastServer,
+  broadcastGameStart,
+  broadcastMove,
+  broadcastGameFinish,
+  getClientCount,
+} from './broadcast-server.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -110,6 +118,28 @@ class ChessArena {
         console.warn('   Arena will continue without research data collection\n');
         this.research = null;
       }
+
+      // Start broadcast server for live game viewing
+      try {
+        await startBroadcastServer();
+        console.log('✅ Broadcast server started\n');
+      } catch (broadcastError) {
+        console.warn(`⚠️  Broadcast server failed: ${broadcastError.message}`);
+        console.warn('   Arena will continue without live broadcasting\n');
+      }
+
+      // Subscribe to game events for broadcasting
+      this.eventBus.subscribe('game.started', (event) => {
+        broadcastGameStart(event);
+      });
+
+      this.eventBus.subscribe('move.made', (event) => {
+        broadcastMove(event);
+      });
+
+      this.eventBus.subscribe('game.finished', (event) => {
+        broadcastGameFinish(event);
+      });
 
       // Graceful shutdown
       process.on('SIGINT', () => this.shutdown());
@@ -499,6 +529,13 @@ class ChessArena {
 
   async shutdown() {
     console.log('\n\n🛑 Shutting down gracefully...');
+
+    // Stop broadcast server
+    try {
+      await stopBroadcastServer();
+    } catch (error) {
+      console.warn(`⚠️  Broadcast server shutdown failed: ${error.message}`);
+    }
 
     // EPIC 14: Finalize research
     if (this.research) {
