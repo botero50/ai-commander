@@ -186,61 +186,17 @@ export class RealChessGame {
   async getOllamaMove(player, legalMoves, color) {
     const boardState = this.game.fen();
     const gameHistory = this.game.history({ verbose: false }).join(' ');
-    const candidateMoves = legalMoves.map(m => m.san).slice(0, 8);
+    const candidateMoves = legalMoves.map(m => m.san).slice(0, 10);
 
-    const prompt = `You are a world-class grandmaster chess player analyzing a critical tournament position.
+    // Simpler, faster prompt for better reliability with smaller models
+    const prompt = `Chess position (${color}):
+FEN: ${boardState}
+${gameHistory.length > 0 ? `Moves: ${gameHistory}\n` : ''}
+Legal moves: ${candidateMoves.join(', ')}
 
-${gameHistory.length > 0 ? `Game moves so far: ${gameHistory}\n` : ''}
-Current position (FEN): ${boardState}
-Your side to move: ${color === 'white' ? 'White' : 'Black'}
+Analyze briefly and choose the best move.
 
-Analyze this position systematically:
-
-STEP 1 - MATERIAL COUNT:
-Count all pieces for both sides. Q=9pts, R=5pts, B/N=3pts, P=1pt.
-Who has material advantage?
-
-STEP 2 - PAWN STRUCTURE:
-Identify doubled, isolated, backward, or passed pawns.
-Which side has better pawn structure? Are there weaknesses to exploit?
-
-STEP 3 - PIECE ACTIVITY & COORDINATION:
-Which of my pieces are optimally placed?
-Which of opponent's pieces are poorly placed?
-Who controls the center (d4, e4, d5, e5)?
-Are any pieces hanging (undefended)?
-
-STEP 4 - KING SAFETY:
-Is either king under immediate threat?
-Who has safer king position?
-Are there escape squares if under attack?
-
-STEP 5 - TACTICAL OPPORTUNITIES:
-Look for pins, forks, skewers, discovered attacks, back-rank threats.
-Can I win material or create immediate threats?
-Can I deliver checkmate in 2-3 moves?
-
-STEP 6 - STRATEGIC GOALS:
-What is my main objective in this position?
-Should I attack, defend, improve piece placement, or exploit weaknesses?
-
-STEP 7 - CANDIDATE MOVES (3-5 options):
-List your best candidate moves in standard notation.
-For each: explain why it's strong and what opponent's best response is.
-
-STEP 8 - BEST MOVE SELECTION:
-Considering all factors, which single move is objectively best?
-Can I calculate a clear advantage after this move?
-
----FINAL ANSWER---
-
-Best move: [Move in standard algebraic notation - examples: Nf3, e4, Bxc5, Qh5+, O-O, cxd5, Nxe5]
-Confidence: [0-100]%
-Main reason: [One sentence explaining this move's strength]
-
----END---
-
-Possible moves to consider: ${candidateMoves.join(', ')}`;
+Best move:`;
 
     try {
       const moveStartTime = Date.now();
@@ -250,12 +206,12 @@ Possible moves to consider: ${candidateMoves.join(', ')}`;
         body: JSON.stringify({
           model: player.model,
           prompt,
-          temperature: player.temperature, // Allow higher temp for reasoning (CoT helps)
+          temperature: Math.max(0.1, player.temperature - 0.3), // Lower temp for better move selection
           stream: false,
-          num_predict: 512, // Allow full reasoning output before move extraction
-          top_p: 1.0, // Use full probability distribution
-          top_k: 40, // Standard top-k sampling
-          stop: ['---END---'], // Stop at end marker
+          num_predict: 256, // Shorter output for faster responses
+          top_p: 0.9, // Slightly more focused
+          top_k: 40,
+          stop: ['\n'], // Stop at newline
         }),
       });
 
