@@ -11,17 +11,23 @@
 
 import { Chess } from 'chess.js';
 import { BoardDisplay } from './board-display.js';
+import { getGameEventBus } from './game-event-bus.js';
 
 export class RealChessGame {
   constructor(matchConfig, broadcastService = null, ui = null, wsServer = null) {
     this.matchConfig = matchConfig;
+    // Legacy parameters kept for backward compatibility but no longer used
     this.broadcast = broadcastService;
     this.ui = ui;
     this.wsServer = wsServer;
+    // Use event bus for all event emission
+    this.eventBus = getGameEventBus();
     this.game = new Chess();
     this.boardDisplay = new BoardDisplay();
     this.moves = [];
+    this.moveDetails = [];  // Store complete move data
     this.startTime = Date.now();
+    this.gameId = `game-${Date.now()}-${Math.random()}`;
     this.playerModels = {
       white: {
         name: matchConfig.white.name || matchConfig.white.model,
@@ -47,6 +53,13 @@ export class RealChessGame {
     const startTime = Date.now();
     let illegalMoveRetries = 0;
 
+    // Emit game started event
+    this.eventBus.emit('game.started', {
+      gameId: this.gameId,
+      whiteModel: this.playerModels.white.model,
+      blackModel: this.playerModels.black.model,
+    });
+
     while (!this.game.isGameOver() && moveCount < maxMoves) {
       const isWhiteToMove = moveCount % 2 === 0;
       const color = isWhiteToMove ? 'white' : 'black';
@@ -59,6 +72,10 @@ export class RealChessGame {
           break; // No legal moves available
         }
 
+        // Capture position BEFORE the move (for immutable artifact)
+        const fenBefore = this.game.fen();
+        this.lastPositionBeforeMove = fenBefore;
+
         // Get position description BEFORE making the move (current position)
         const positionDescription = this.getPositionDescription();
 
@@ -69,15 +86,31 @@ export class RealChessGame {
           // Fallback: pick random legal move
           illegalMoveRetries++;
           const randomMove = legalMoves[Math.floor(Math.random() * legalMoves.length)];
-          this.executeMove(randomMove.san, color, moveCount, 0, 0, positionDescription);
+          this.executeMove(
+            randomMove.san,
+            color,
+            moveCount,
+            0,
+            0,
+            positionDescription,
+            {}  // No decision data for fallback
+          );
         } else {
           // Validate move is legal
           const isLegal = legalMoves.some(m => m.san === moveResult.move);
           if (!isLegal) {
             illegalMoveRetries++;
           }
-          // Use position description from BEFORE the move decision
-          this.executeMove(moveResult.move, color, moveCount, moveResult.latency, moveResult.confidence || 0, positionDescription);
+          // Pass complete decision data
+          this.executeMove(
+            moveResult.move,
+            color,
+            moveCount,
+            moveResult.latency,
+            moveResult.confidence || 0,
+            positionDescription,
+            moveResult.decision || {}  // Include full LLM decision
+          );
         }
 
         moveCount++;
@@ -96,10 +129,26 @@ export class RealChessGame {
       }
     }
 
+    // Emit game finished event (NEW: After game completes)
+    const gameResult = this.getGameResult();
+    this.eventBus.emit('game.finished', {
+      gameId: this.gameId,
+      whiteModel: this.playerModels.white.model,
+      blackModel: this.playerModels.black.model,
+      result: gameResult,
+      pgn: this.game.pgn(),
+      finalFen: this.game.fen(),
+      moveCount: this.moves.length,
+      durationMs: Date.now() - startTime,
+      illegalMoveRetries,
+    });
+
     // Return game result
     return {
+      gameId: this.gameId,
       moves: this.moves,
-      result: this.getGameResult(),
+      moveDetails: this.moveDetails,  // NEW: Complete move data
+      result: gameResult,
       durationMs: Date.now() - startTime,
       moveCount: this.moves.length,
       pgn: this.game.pgn(),
@@ -262,7 +311,19 @@ Possible moves to consider: ${candidateMoves.join(', ')}`;
             ? `   ⏱️  ${player.name} (${sanMatch.san}) - Ollama latency: ${moveLatency}ms (confidence: ${Math.round(confidence * 100)}%)`
             : `   ⏱️  ${player.name} (${sanMatch.san}) - Ollama latency: ${moveLatency}ms`;
           console.log(logMessage);
-          return { move: sanMatch.san, latency: moveLatency, confidence };
+          // NEW: Return complete decision data (immutable artifact)
+          return {
+            move: sanMatch.san,
+            latency: moveLatency,
+            confidence,
+            decision: {
+              prompt,
+              response: responseText,
+              parsingStatus: 'success',
+              tokensIn: data.prompt_eval_count || 0,
+              tokensOut: data.eval_count || 0,
+            },
+          };
         }
 
         // Try LAN (long algebraic) match
@@ -577,9 +638,9 @@ Possible moves to consider: ${candidateMoves.join(', ')}`;
   }
 
   /**
-   * Execute a move and broadcast
+   * Execute a move and emit event
    */
-  executeMove(moveNotation, color, moveCount, latencyMs = 0, confidence = 0, description = '') {
+  executeMove(moveNotation, color, moveCount, latencyMs = 0, confidence = 0, description = '', decision = {}) {
     // Execute move in chess.js
     const move = this.game.move(moveNotation);
 
@@ -587,40 +648,63 @@ Possible moves to consider: ${candidateMoves.join(', ')}`;
       throw new Error(`Invalid move: ${moveNotation}`);
     }
 
-    // Store move
+    // Get position before move (captured earlier, passed via caller context)
+    const fenBefore = this.lastPositionBeforeMove || '';
+
+    // Store move notation (for backward compatibility)
     this.moves.push(moveNotation);
 
-    // Create move data for broadcast
-    const moveData = {
-      move: moveNotation,
-      fen: this.game.fen(),
+    // Store complete move data (NEW: Full immutable artifact)
+    const moveDetails = {
+      gameId: this.gameId,
+      moveNumber: moveCount + 1,
       color,
-      moveCount,
       san: move.san,
       uci: move.uci,
       piece: move.piece,
       flags: move.flags,
-      latency: latencyMs,
+      fenBefore,
+      fenAfter: this.game.fen(),
+      latencyMs,
       confidence,
-      description,
+      description,  // Opening name
+      decision: {
+        prompt: decision.prompt || '',
+        response: decision.response || '',
+        parsingStatus: decision.parsingStatus || 'unknown',
+        tokensIn: decision.tokensIn || 0,
+        tokensOut: decision.tokensOut || 0,
+      },
     };
 
-    // Emit to WebSocket spectators immediately
-    if (this.wsServer) {
-      this.wsServer.emitMovePlayed(moveData, this.playerModels[color].name, latencyMs);
+    this.moveDetails.push(moveDetails);
+
+    // Emit move.made event (NEW: Decoupled from broadcast)
+    this.eventBus.emit('move.made', moveDetails);
+
+    // Legacy broadcast support (for backward compatibility with UI)
+    // Only if broadcast service is provided
+    if (this.broadcast) {
+      try {
+        const broadcasts = this.broadcast.processMove(moveDetails, this.playerModels[color].name);
+        for (const broadcast of broadcasts) {
+          this.broadcast.displayBroadcast(broadcast);
+          if (this.wsServer) {
+            this.wsServer.emitCommentaryGenerated(broadcast, moveNotation, this.playerModels[color].name, broadcast.severity);
+          }
+        }
+      } catch (error) {
+        // Log but don't crash if broadcast fails - it's optional
+        console.debug('Broadcast service error (optional):', error.message);
+      }
     }
 
-    // Process through broadcast service
-    // This triggers: event detection → commentary → replay capture → stream broadcast
-    const broadcasts = this.broadcast.processMove(moveData, this.playerModels[color].name);
-
-    // Display broadcasts to user
-    for (const broadcast of broadcasts) {
-      this.broadcast.displayBroadcast(broadcast);
-
-      // Emit commentary to WebSocket spectators
-      if (this.wsServer) {
-        this.wsServer.emitCommentaryGenerated(broadcast, moveNotation, this.playerModels[color].name, broadcast.severity);
+    // Legacy WebSocket support (for backward compatibility with spectators)
+    if (this.wsServer) {
+      try {
+        this.wsServer.emitMovePlayed(moveDetails, this.playerModels[color].name, latencyMs);
+      } catch (error) {
+        console.debug('WebSocket error (optional):', error.message);
       }
     }
 

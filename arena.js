@@ -15,6 +15,8 @@ import path from 'path';
 import { fileURLToPath } from 'url';
 import { RealChessGame } from './real-chess-game.js';
 import { OpeningTracker } from './opening-tracker.js';
+import { getGameEventBus } from './game-event-bus.js';
+import { ArenaResearchIntegration } from './arena-research-integration.js';
 
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
 
@@ -73,6 +75,10 @@ class ChessArena {
 
     // Story 73.2: Opening Diversity tracking
     this.openingTracker = new OpeningTracker();
+
+    // EPIC 14: Research integration
+    this.eventBus = getGameEventBus();
+    this.research = null;  // Initialized in run()
   }
 
   /**
@@ -81,6 +87,28 @@ class ChessArena {
   async run() {
     try {
       this.displayStartup();
+
+      // EPIC 14: Initialize research integration
+      try {
+        const dbPath = path.join(process.cwd(), 'research.db');
+        const schemaPath = path.join(process.cwd(), 'schema.sql');
+        this.research = new ArenaResearchIntegration();
+        await this.research.initialize(dbPath, schemaPath);
+
+        // Start experiment (entire arena session)
+        await this.research.startExperiment({
+          name: `Arena Run ${new Date().toISOString()}`,
+          hypothesis: 'Continuous autonomous chess research',
+          git_commit: process.env.GIT_COMMIT || 'unknown',
+          application_version: '1.0.0',
+        });
+
+        console.log('✅ Research integration started\n');
+      } catch (researchError) {
+        console.warn(`⚠️  Research integration failed: ${researchError.message}`);
+        console.warn('   Arena will continue without research data collection\n');
+        this.research = null;
+      }
 
       // Graceful shutdown
       process.on('SIGINT', () => this.shutdown());
@@ -101,10 +129,34 @@ class ChessArena {
           // Display match header
           this.displayMatchHeader(matchNumber, matchConfig);
 
+          // EPIC 14: Start run (for research)
+          if (this.research) {
+            try {
+              await this.research.startRun({
+                run_number: matchNumber,
+                config_snapshot: JSON.stringify(matchConfig),
+                git_commit: process.env.GIT_COMMIT || 'unknown',
+                application_version: '1.0.0',
+                execution_start: Date.now(),
+              }, this.getCaptureEnvironment());
+            } catch (runError) {
+              console.warn(`⚠️  Research run start failed: ${runError.message}`);
+            }
+          }
+
           // Play game
           const result = await this.playGame(matchConfig);
 
-          // Record result
+          // EPIC 14: Record game result (for research)
+          if (this.research && result) {
+            try {
+              await this.research.recordGameResult(result, matchConfig);
+            } catch (recordError) {
+              console.warn(`⚠️  Research game recording failed: ${recordError.message}`);
+            }
+          }
+
+          // Record result (existing statistics)
           this.recordGameResult(result, matchConfig);
 
           // Display result
@@ -112,6 +164,15 @@ class ChessArena {
 
           // Display current statistics
           this.displayStatistics();
+
+          // EPIC 14: Finish run (for research)
+          if (this.research) {
+            try {
+              await this.research.finishRun('completed', 1);
+            } catch (finishError) {
+              console.warn(`⚠️  Research run finish failed: ${finishError.message}`);
+            }
+          }
 
           // Countdown to next match
           if (matchNumber < 999) {
@@ -152,6 +213,22 @@ class ChessArena {
       console.error(`\n❌ Arena fatal error: ${error.message}\n`);
       await this.shutdown();
     }
+  }
+
+  /**
+   * Capture environment for research
+   */
+  getCaptureEnvironment() {
+    const os = require('os');
+    return {
+      os: process.platform,
+      osVersion: os.release(),
+      nodeVersion: process.version,
+      cpuCores: os.cpus().length,
+      ramGb: Math.round(os.totalmem() / 1024 / 1024 / 1024),
+      storageAvailableGb: 0,
+      ollamaVersion: process.env.OLLAMA_VERSION || 'unknown',
+    };
   }
 
   /**
@@ -422,6 +499,18 @@ class ChessArena {
 
   async shutdown() {
     console.log('\n\n🛑 Shutting down gracefully...');
+
+    // EPIC 14: Finalize research
+    if (this.research) {
+      try {
+        await this.research.finishExperiment('completed', this.state.totalGames);
+        await this.research.stop();
+        console.log('✅ Research data flushed and closed');
+      } catch (error) {
+        console.warn(`⚠️  Research shutdown failed: ${error.message}`);
+      }
+    }
+
     this.persistStatistics();
     console.log(`📊 Final stats saved to ${this.config.statsFile}`);
     console.log('✅ Arena shutdown complete\n');
