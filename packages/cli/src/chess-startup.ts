@@ -20,6 +20,7 @@ import { promisify } from 'util';
 import { existsSync } from 'fs';
 import { readFile } from 'fs/promises';
 import path from 'path';
+import { ArenaResearchWrapper } from '../zeroad-adapter/src/research-store-wrapper.js';
 
 const execPromise = promisify(exec);
 
@@ -49,9 +50,27 @@ export class ChessStartup {
     configPath: '',
   };
 
+  private research: ArenaResearchWrapper | null = null;
+
   async run(): Promise<void> {
     console.clear();
     this.logBanner();
+
+    // Set up graceful shutdown handler
+    process.on('SIGINT', async () => {
+      console.log('\n\n⏹️  Shutting down...');
+      if (this.research) {
+        try {
+          await this.research.finishRun('completed', 0);
+          await this.research.finishExperiment('completed', 0);
+          await this.research.stop();
+          console.log('✅ Research data flushed and closed');
+        } catch (error) {
+          console.error('Error closing research:', error instanceof Error ? error.message : String(error));
+        }
+      }
+      process.exit(0);
+    });
 
     try {
       console.log('\n🔍 STARTUP DIAGNOSTICS\n');
@@ -244,19 +263,52 @@ export class ChessStartup {
   }
 
   private async launchArena(): Promise<void> {
-    // Import and launch the arena
-    // This will be implemented in EPIC 61.2
-    // For now, just show that startup succeeded
+    // Initialize research integration for data collection
+    this.research = new ArenaResearchWrapper();
 
-    console.log('═'.repeat(50));
-    console.log('  Arena launched successfully');
-    console.log('  Press Ctrl+C to stop\n');
+    try {
+      const dbPath = path.join(process.cwd(), 'research.db');
+      const schemaPath = path.join(process.cwd(), 'schema.sql');
 
-    // TODO: Implement arena loop in EPIC 61.2
-    // For now, just keep the process running
-    await new Promise(() => {
-      // Never resolve - keep running
-    });
+      await this.research.initialize(dbPath, schemaPath);
+
+      // Start experiment
+      await this.research.startExperiment(
+        `Arena Run - ${new Date().toISOString()}`,
+        'Continuous autonomous chess research'
+      );
+
+      // Start run with arena configuration
+      await this.research.startRun({
+        version: this.config.nodeMinVersion,
+        ollamaEndpoint: this.config.ollamaEndpoint,
+        defaultModel: this.config.defaultModel,
+        timestamp: new Date().toISOString(),
+      });
+
+      console.log('═'.repeat(50));
+      console.log('  Research-Integrated Arena Launching');
+      console.log('  Data: research.db');
+      console.log('═'.repeat(50));
+      console.log('  Press Ctrl+C to stop\n');
+
+      // TODO: Implement actual arena game loop here (EPIC 61.2)
+      // For now, await forever
+      await new Promise(() => {
+        // Never resolve - keep running
+      });
+    } catch (error) {
+      console.error(
+        '❌ Failed to launch arena:',
+        error instanceof Error ? error.message : String(error)
+      );
+      if (this.research) {
+        await this.research.finishRun('failed', 0);
+        await this.research.finishExperiment('failed', 0);
+        await this.research.stop();
+      }
+      throw error;
+    }
   }
 }
 
