@@ -5,7 +5,7 @@ import useWebSocket, { WebSocketMessage } from '../../hooks/useWebSocket';
 import './ChessSpectator.css';
 
 export const ChessSpectator: React.FC = () => {
-  const { gameState, messages, isConnected, connectionError } = useWebSocket('ws://localhost:9000');
+  const { gameState, messages, isConnected, connectionError } = useWebSocket('ws://localhost:9001');
   const [selectedSquare, setSelectedSquare] = useState<string | null>(null);
 
   // Parse FEN to validate it

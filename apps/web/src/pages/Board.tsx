@@ -5,7 +5,7 @@ import useWebSocket from '../hooks/useWebSocket';
 import '../styles/overlay.css';
 
 export const Board: React.FC = () => {
-  const { gameState, isConnected, connectionError } = useWebSocket('ws://localhost:9000');
+  const { gameState, isConnected, connectionError } = useWebSocket('ws://localhost:9001');
   const [selectedSquare, setSelectedSquare] = useState<string | null>(null);
 
   const chess = useMemo(() => {
