@@ -39,6 +39,10 @@ class ChessArena {
       startTime: Date.now(),
       gameHistory: [],
       maxHistorySize: 100,
+      totalMoves: 0,
+      totalDurationMs: 0,
+      illegalMoveRetries: 0,
+      resignations: 0,
     };
 
     // AI players
@@ -186,9 +190,13 @@ class ChessArena {
       this.state.whiteWins++;
     } else if (result.result === 'black-win') {
       this.state.blackWins++;
-    } else {
+    } else if (result.result === 'draw') {
       this.state.draws++;
     }
+
+    // Update aggregate metrics
+    this.state.totalMoves += result.moveCount;
+    this.state.totalDurationMs += result.durationMs;
 
     // Add to history
     const gameRecord = {
@@ -239,16 +247,35 @@ class ChessArena {
 
   /**
    * Persist statistics to JSON
+   * Story 72.3: Arena Statistics
    */
   persistStatistics() {
     try {
+      // Calculate derived metrics
+      const uptime = Math.floor((Date.now() - this.state.startTime) / 1000);
+      const uptimeHours = uptime / 3600;
+      const avgMoves = this.state.totalGames > 0 ? Math.round(this.state.totalMoves / this.state.totalGames) : 0;
+      const avgDurationSec = this.state.totalGames > 0 ? Math.round(this.state.totalDurationMs / this.state.totalGames / 1000) : 0;
+      const gamesPerHour = uptimeHours > 0 ? Math.round((this.state.totalGames / uptimeHours) * 100) / 100 : 0;
+
       const stats = {
         timestamp: new Date().toISOString(),
-        totalGames: this.state.totalGames,
+        // Story 72.3 acceptance criteria
+        gamesPlayed: this.state.totalGames,
+        wins: this.state.whiteWins + this.state.blackWins,
+        losses: this.state.whiteWins + this.state.blackWins,
+        draws: this.state.draws,
+        averageMoves: avgMoves,
+        averageDurationSec: avgDurationSec,
+        gamesPerHour,
+        resignations: this.state.resignations,
+        illegalMoveRetries: this.state.illegalMoveRetries,
+        // Breakdown
         whiteWins: this.state.whiteWins,
         blackWins: this.state.blackWins,
-        draws: this.state.draws,
-        uptime: Math.floor((Date.now() - this.state.startTime) / 1000),
+        uptime,
+        uptimeHours: Math.round(uptimeHours * 100) / 100,
+        // Recent games for debugging
         recentGames: this.state.gameHistory.slice(-20),
       };
 
@@ -297,8 +324,13 @@ class ChessArena {
   displayStatistics() {
     const totalTime = (Date.now() - this.state.startTime) / 1000;
     const gamesPerHour = totalTime > 0 ? Math.round((this.state.totalGames / totalTime) * 3600) : 0;
+    const avgMoves = this.state.totalGames > 0 ? Math.round(this.state.totalMoves / this.state.totalGames) : 0;
+    const avgDurationSec = this.state.totalGames > 0 ? Math.round(this.state.totalDurationMs / this.state.totalGames / 1000) : 0;
 
-    console.log(`\n📊 Arena Stats: ${this.state.totalGames} games | W:${this.state.whiteWins} B:${this.state.blackWins} D:${this.state.draws} | ${gamesPerHour}/h`);
+    console.log(`\n📊 Arena Statistics`);
+    console.log(`   Total Games: ${this.state.totalGames}`);
+    console.log(`   Results: W:${this.state.whiteWins} B:${this.state.blackWins} D:${this.state.draws}`);
+    console.log(`   Avg Moves: ${avgMoves} | Avg Duration: ${avgDurationSec}s | Rate: ${gamesPerHour}/hour`);
   }
 
   async countdownToNextMatch() {
