@@ -148,7 +148,6 @@ export function startBroadcastServer() {
 
       // Handle new connections
       wss.on('connection', (ws) => {
-        console.log('✅ Client connected to broadcast');
         clients.add(ws);
 
         // Send current game state immediately
@@ -199,7 +198,6 @@ export function startBroadcastServer() {
 
         // Handle client disconnection
         ws.on('close', () => {
-          console.log('❌ Client disconnected');
           clients.delete(ws);
         });
 
