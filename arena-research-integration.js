@@ -1,78 +1,128 @@
 /**
  * Arena Research Integration
  *
- * Bridges the autonomous chess arena (arena.js) with the Research Data Store.
- * Subscribes to game events and persists complete research artifacts.
+ * Bridges the autonomous chess arena (arena.js) with the Research Data Store via GameEventBus.
+ * Subscribes to game events and persists them to a SQLite database.
  *
- * Key principle: Arena publishes events, Research Store subscribes.
- * No tight coupling, fully decoupled architecture.
+ * Key principle: Arena publishes events to GameEventBus.
+ * This integration subscribes and routes events to persistence layer.
+ * Fully decoupled, event-driven architecture.
  */
 
+import Database from 'better-sqlite3';
+import fs from 'fs';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import { getGameEventBus } from './game-event-bus.js';
 
-// This will be imported from the research-store package
-// For now, we'll load it dynamically to handle the monorepo structure
-let ResearchDataAccessLayer = null;
-let ResearchEventBus = null;
-let ResearchDatabase = null;
-
 const __dirname = path.dirname(fileURLToPath(import.meta.url));
+
+/**
+ * SQL schema for research database
+ */
+const SCHEMA = `
+CREATE TABLE IF NOT EXISTS experiments (
+  id TEXT PRIMARY KEY,
+  name TEXT NOT NULL,
+  hypothesis TEXT,
+  created_at INTEGER NOT NULL,
+  status TEXT DEFAULT 'active'
+);
+
+CREATE TABLE IF NOT EXISTS runs (
+  id TEXT PRIMARY KEY,
+  experiment_id TEXT NOT NULL,
+  run_number INTEGER,
+  created_at INTEGER NOT NULL,
+  status TEXT DEFAULT 'active',
+  game_count INTEGER DEFAULT 0,
+  FOREIGN KEY (experiment_id) REFERENCES experiments(id)
+);
+
+CREATE TABLE IF NOT EXISTS games (
+  id TEXT PRIMARY KEY,
+  run_id TEXT NOT NULL,
+  white_model TEXT,
+  black_model TEXT,
+  result TEXT,
+  move_count INTEGER,
+  duration_ms INTEGER,
+  pgn TEXT,
+  final_fen TEXT,
+  created_at INTEGER NOT NULL,
+  FOREIGN KEY (run_id) REFERENCES runs(id)
+);
+
+CREATE TABLE IF NOT EXISTS moves (
+  id TEXT PRIMARY KEY,
+  game_id TEXT NOT NULL,
+  move_number INTEGER,
+  color TEXT,
+  san TEXT,
+  uci TEXT,
+  fen_before TEXT,
+  fen_after TEXT,
+  latency_ms INTEGER,
+  confidence REAL,
+  created_at INTEGER NOT NULL,
+  FOREIGN KEY (game_id) REFERENCES games(id)
+);
+
+CREATE TABLE IF NOT EXISTS llm_decisions (
+  id TEXT PRIMARY KEY,
+  move_id TEXT,
+  game_id TEXT NOT NULL,
+  move_number INTEGER,
+  prompt TEXT,
+  response TEXT,
+  parsing_status TEXT,
+  tokens_in INTEGER,
+  tokens_out INTEGER,
+  created_at INTEGER NOT NULL,
+  FOREIGN KEY (game_id) REFERENCES games(id),
+  FOREIGN KEY (move_id) REFERENCES moves(id)
+);
+
+CREATE INDEX IF NOT EXISTS idx_runs_experiment ON runs(experiment_id);
+CREATE INDEX IF NOT EXISTS idx_games_run ON games(run_id);
+CREATE INDEX IF NOT EXISTS idx_moves_game ON moves(game_id);
+CREATE INDEX IF NOT EXISTS idx_decisions_game ON llm_decisions(game_id);
+`;
 
 export class ArenaResearchIntegration {
   constructor() {
     this.gameEventBus = getGameEventBus();
-    this.research = null;
-    this.database = null;
+    this.db = null;
+    this.dbPath = null;
     this.experimentId = null;
     this.runId = null;
     this.gameCount = 0;
+    this.moveCount = 0;
+    this.isInitialized = false;
   }
 
   /**
-   * Initialize research integration
-   * Sets up database and event subscriptions
+   * Initialize research integration with SQLite database
    */
-  async initialize(dbPath, schemaPath) {
+  async initialize(dbPath) {
     try {
-      // Dynamically import research store modules
-      const researchStoreModule = await import(
-        path.join(__dirname, 'packages/zeroad-adapter/src/research-store/index.js')
-      ).catch(async () => {
-        // Fallback: try alternate path
-        return await import(
-          path.join(__dirname, 'packages/zeroad-adapter/dist/research-store/index.js')
-        );
-      });
+      this.dbPath = dbPath;
 
-      // Extract classes from module
-      ResearchDatabase = researchStoreModule.ResearchDatabase;
-      ResearchEventBus = researchStoreModule.ResearchEventBus;
-      ResearchDataAccessLayer = researchStoreModule.ResearchDataAccessLayer;
+      // Open database
+      this.db = new Database(dbPath);
+      this.db.pragma('journal_mode = WAL');
+      this.db.pragma('synchronous = NORMAL');
 
-      if (!ResearchDatabase || !ResearchDataAccessLayer) {
-        throw new Error('Research Store modules not found');
-      }
-
-      // Initialize database
-      this.database = new ResearchDatabase({
-        dbPath,
-        schemaPath,
-      });
-      await this.database.initialize();
-
-      // Create research event bus (separate from game event bus)
-      const researchEventBus = new ResearchEventBus();
-
-      // Create data access layer
-      this.research = new ResearchDataAccessLayer(this.database, researchEventBus);
+      // Create schema
+      this.db.exec(SCHEMA);
 
       // Subscribe to game events
       this.subscribeToGameEvents();
+      this.isInitialized = true;
 
       console.log('✅ Research integration initialized');
       console.log(`   Database: ${dbPath}`);
+      console.log(`   Events: game.started, move.made, game.finished`);
     } catch (error) {
       console.error('❌ Failed to initialize research integration:', error.message);
       throw error;
@@ -80,85 +130,122 @@ export class ArenaResearchIntegration {
   }
 
   /**
-   * Subscribe to game events from the arena
+   * Subscribe to game events and persist them
    */
   subscribeToGameEvents() {
     // Subscribe to game.started
-    this.gameEventBus.subscribe('game.started', async (event) => {
+    this.gameEventBus.subscribe('game.started', (event) => {
       try {
-        // Note: Game is already recorded when game.finished is emitted
-        // This is just for reference/logging
+        if (!this.db) return;
+
+        // Create game record early (so moves can reference it via FK)
+        const gameStmt = this.db.prepare(`
+          INSERT OR IGNORE INTO games
+          (id, run_id, white_model, black_model, created_at)
+          VALUES (?, ?, ?, ?, ?)
+        `);
+
+        gameStmt.run(
+          event.gameId,
+          this.runId,
+          event.whiteModel,
+          event.blackModel,
+          event.timestamp
+        );
       } catch (error) {
         console.error('Error handling game.started event:', error.message);
       }
     });
 
     // Subscribe to move.made
-    this.gameEventBus.subscribe('move.made', async (event) => {
+    this.gameEventBus.subscribe('move.made', (event) => {
       try {
-        if (!this.research) return;
+        if (!this.db) return;
 
-        // Record move
-        await this.research.recordMove({
-          gameId: event.gameId,
-          number: event.moveNumber,
-          color: event.color,
-          san: event.san,
-          fenBefore: event.fenBefore,
-          fenAfter: event.fenAfter,
-          latencyMs: event.latencyMs,
-          confidence: event.confidence,
-          modelName: event.color === 'white' ? 'unknown' : 'unknown', // Set by caller
-          configId: 'default',
-          illegalRetries: 0,
-        });
+        // Generate IDs
+        const moveId = `${event.gameId}-move-${event.moveNumber}`;
+        const decisionId = `${event.gameId}-decision-${event.moveNumber}`;
 
-        // Record LLM decision
+        // Insert move record
+        const moveStmt = this.db.prepare(`
+          INSERT OR REPLACE INTO moves
+          (id, game_id, move_number, color, san, uci, fen_before, fen_after, latency_ms, confidence, created_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `);
+
+        moveStmt.run(
+          moveId,
+          event.gameId,
+          event.moveNumber,
+          event.color,
+          event.san,
+          event.uci,
+          event.fenBefore,
+          event.fenAfter,
+          event.latencyMs,
+          event.confidence,
+          event.timestamp
+        );
+
+        // Insert decision record if available
         if (event.decision) {
-          await this.research.recordDecision({
-            moveId: event.moveNumber,
-            modelIdentifier: 'ollama:unknown', // Set by caller
-            configId: 'default',
-            prompt: event.decision.prompt,
-            response: event.decision.response,
-            parsingStatus: event.decision.parsingStatus,
-            parsedMove: event.san,
-            reasoning: '',
-            confidence: event.confidence,
-            tokensIn: event.decision.tokensIn,
-            tokensOut: event.decision.tokensOut,
-          });
+          const decisionStmt = this.db.prepare(`
+            INSERT OR REPLACE INTO llm_decisions
+            (id, move_id, game_id, move_number, prompt, response, parsing_status, tokens_in, tokens_out, created_at)
+            VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+          `);
+
+          decisionStmt.run(
+            decisionId,
+            moveId,
+            event.gameId,
+            event.moveNumber,
+            event.decision.prompt,
+            event.decision.response,
+            event.decision.parsingStatus,
+            event.decision.tokensIn,
+            event.decision.tokensOut,
+            event.timestamp
+          );
         }
 
-        // Record position
-        await this.research.recordPosition(event.fenAfter);
+        this.moveCount++;
       } catch (error) {
         console.error('Error handling move.made event:', error.message);
       }
     });
 
     // Subscribe to game.finished
-    this.gameEventBus.subscribe('game.finished', async (event) => {
+    this.gameEventBus.subscribe('game.finished', (event) => {
       try {
-        if (!this.research) return;
+        if (!this.db) return;
 
-        // Record game
-        await this.research.recordGame({
-          gameId: event.gameId,
-          runId: this.runId,
-          whiteModel: event.whiteModel,
-          blackModel: event.blackModel,
-          result: event.result,
-          pgn: event.pgn,
-          finalFen: event.finalFen,
-          moveCount: event.moveCount,
-          durationMs: event.durationMs,
-          termination: 'normal',
-          openingEco: 'unknown',
-          openingName: 'unknown',
-        });
+        // Insert game record
+        const gameStmt = this.db.prepare(`
+          INSERT OR REPLACE INTO games
+          (id, run_id, white_model, black_model, result, move_count, duration_ms, pgn, final_fen, created_at)
+          VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+        `);
+
+        gameStmt.run(
+          event.gameId,
+          this.runId,
+          event.whiteModel,
+          event.blackModel,
+          event.result,
+          event.moveCount,
+          event.durationMs,
+          event.pgn,
+          event.finalFen,
+          event.timestamp
+        );
 
         this.gameCount++;
+
+        // Log progress
+        if (this.gameCount % 5 === 0) {
+          console.log(`   📊 Recorded ${this.gameCount} games, ${this.moveCount} moves`);
+        }
       } catch (error) {
         console.error('Error handling game.finished event:', error.message);
       }
@@ -170,12 +257,25 @@ export class ArenaResearchIntegration {
    */
   async startExperiment(input) {
     try {
-      if (!this.research) {
+      if (!this.isInitialized) {
         throw new Error('Research not initialized');
       }
 
-      const result = await this.research.createExperiment(input);
-      this.experimentId = result;
+      this.experimentId = `exp-${Date.now()}`;
+
+      const stmt = this.db.prepare(`
+        INSERT INTO experiments (id, name, hypothesis, created_at, status)
+        VALUES (?, ?, ?, ?, ?)
+      `);
+
+      stmt.run(
+        this.experimentId,
+        input.name,
+        input.hypothesis || null,
+        Date.now(),
+        'active'
+      );
+
       console.log(`✅ Experiment started: ${this.experimentId}`);
       return this.experimentId;
     } catch (error) {
@@ -189,13 +289,27 @@ export class ArenaResearchIntegration {
    */
   async startRun(input, environment) {
     try {
-      if (!this.research) {
+      if (!this.isInitialized) {
         throw new Error('Research not initialized');
       }
 
-      const result = await this.research.startRun(input, environment);
-      this.runId = result;
+      this.runId = `run-${Date.now()}`;
       this.gameCount = 0;
+      this.moveCount = 0;
+
+      const stmt = this.db.prepare(`
+        INSERT INTO runs (id, experiment_id, run_number, created_at, status)
+        VALUES (?, ?, ?, ?, ?)
+      `);
+
+      stmt.run(
+        this.runId,
+        this.experimentId,
+        input.run_number || 1,
+        Date.now(),
+        'active'
+      );
+
       console.log(`✅ Run started: ${this.runId}`);
       return this.runId;
     } catch (error) {
@@ -205,31 +319,19 @@ export class ArenaResearchIntegration {
   }
 
   /**
-   * Record a game result
-   * Note: Actual game recording happens via game.finished event subscription
-   */
-  async recordGameResult(result, matchConfig) {
-    try {
-      if (!this.research) return;
-
-      // Game is already recorded via event subscription
-      // This is a no-op - kept for backward compatibility
-    } catch (error) {
-      console.error('❌ Failed to record game:', error.message);
-      throw error;
-    }
-  }
-
-  /**
    * Finish the current run
    */
-  async finishRun(status, gameCount) {
+  async finishRun() {
     try {
-      if (!this.research) return;
+      if (!this.isInitialized || !this.runId) return;
 
-      // Note: In the current architecture, runs are finished after each game
-      // This is for explicit cleanup at session end
-      console.log(`✅ Run finished: ${status} (${this.gameCount} games recorded)`);
+      const stmt = this.db.prepare(`
+        UPDATE runs SET status = ?, game_count = ? WHERE id = ?
+      `);
+
+      stmt.run('completed', this.gameCount, this.runId);
+
+      console.log(`✅ Run finished: ${this.gameCount} games recorded`);
     } catch (error) {
       console.error('❌ Failed to finish run:', error.message);
       throw error;
@@ -239,11 +341,17 @@ export class ArenaResearchIntegration {
   /**
    * Finish the experiment
    */
-  async finishExperiment(status, gameCount) {
+  async finishExperiment() {
     try {
-      if (!this.research) return;
+      if (!this.isInitialized || !this.experimentId) return;
 
-      console.log(`✅ Experiment finished: ${status} (${this.gameCount} games recorded)`);
+      const stmt = this.db.prepare(`
+        UPDATE experiments SET status = ? WHERE id = ?
+      `);
+
+      stmt.run('completed', this.experimentId);
+
+      console.log(`✅ Experiment finished: ${this.gameCount} games recorded`);
     } catch (error) {
       console.error('❌ Failed to finish experiment:', error.message);
       throw error;
@@ -251,20 +359,16 @@ export class ArenaResearchIntegration {
   }
 
   /**
-   * Flush and close the research store
+   * Close the research database
    */
   async stop() {
     try {
-      if (this.research) {
-        // Flush any pending writes
-        await this.research.stop();
+      if (this.db) {
+        this.db.close();
       }
 
-      if (this.database) {
-        this.database.close();
-      }
-
-      console.log('✅ Research store closed');
+      console.log('✅ Research database closed');
+      this.isInitialized = false;
     } catch (error) {
       console.error('❌ Failed to stop research:', error.message);
       throw error;
@@ -279,6 +383,7 @@ export class ArenaResearchIntegration {
       experimentId: this.experimentId,
       runId: this.runId,
       gamesRecorded: this.gameCount,
+      movesRecorded: this.moveCount,
     };
   }
 }

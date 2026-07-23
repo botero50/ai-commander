@@ -12,6 +12,7 @@
 
 import fs from 'fs';
 import path from 'path';
+import os from 'os';
 import { fileURLToPath } from 'url';
 import { RealChessGame } from './real-chess-game.js';
 import { OpeningTracker } from './opening-tracker.js';
@@ -219,7 +220,6 @@ class ChessArena {
    * Capture environment for research
    */
   getCaptureEnvironment() {
-    const os = require('os');
     return {
       os: process.platform,
       osVersion: os.release(),
