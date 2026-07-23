@@ -64,19 +64,24 @@ class ChessArena {
       totalDecisionLatency: 0,
     };
 
-    // AI players
+    // AI players - Extract model correctly (handles colons in model names like dolphin-mixtral:8x7b)
+    const extractModel = (brainString) => {
+      const parts = brainString.split(':');
+      return parts.slice(1).join(':'); // Join all parts after 'ollama:', handles colons in model name
+    };
+
     this.players = [
       {
         id: 'p1',
         name: process.env.BRAIN_P1 || 'ollama:dolphin-mixtral:8x7b',
         provider: 'ollama',
-        model: (process.env.BRAIN_P1 || 'ollama:dolphin-mixtral:8x7b').split(':')[1],
+        model: extractModel(process.env.BRAIN_P1 || 'ollama:dolphin-mixtral:8x7b'),
       },
       {
         id: 'p2',
-        name: process.env.BRAIN_P2 || 'ollama:mistral',
+        name: process.env.BRAIN_P2 || 'ollama:mistral:latest',
         provider: 'ollama',
-        model: (process.env.BRAIN_P2 || 'ollama:mistral').split(':')[1],
+        model: extractModel(process.env.BRAIN_P2 || 'ollama:mistral:latest'),
       },
     ];
 
