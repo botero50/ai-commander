@@ -65,3 +65,9 @@ export {
 
 // Phase 2: Data access layer
 export { ResearchDataAccessLayer } from './data-access';
+
+// Phase 2: Arena integration
+export {
+  ArenaResearchIntegration,
+  createArenaIntegration,
+} from './arena-integration';
