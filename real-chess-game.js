@@ -13,6 +13,118 @@ import { Chess } from 'chess.js';
 import { BoardDisplay } from './board-display.js';
 import { getGameEventBus } from './game-event-bus.js';
 
+/**
+ * Convert chess board to ASCII representation for better LLM understanding
+ */
+function getBoardASCII(game) {
+  const board = game.board();
+  let ascii = '  a b c d e f g h\n';
+
+  for (let rank = 7; rank >= 0; rank--) {
+    ascii += (rank + 1) + ' ';
+    for (let file = 0; file < 8; file++) {
+      const piece = board[rank][file];
+      if (piece) {
+        // White pieces uppercase, Black pieces lowercase
+        const symbol = piece.color === 'w' ? piece.type.toUpperCase() : piece.type.toLowerCase();
+        ascii += symbol + ' ';
+      } else {
+        ascii += '· ';
+      }
+    }
+    ascii += (rank + 1) + '\n';
+  }
+  ascii += '  a b c d e f g h';
+  return ascii;
+}
+
+/**
+ * Get relevant move history: opening moves + recent moves (avoid sending full game)
+ */
+function getRelevantMoveHistory(game, maxRecentMoves = 12) {
+  const allMoves = game.history({ verbose: false });
+
+  if (allMoves.length <= 8) {
+    return allMoves.join(' ');  // Early game, keep everything
+  }
+
+  // Strategy: opening context (first 3-4 moves) + recent moves (last N)
+  const opening = allMoves.slice(0, 3).join(' ');
+  const recentCount = Math.min(maxRecentMoves, allMoves.length - 3);
+  const recent = allMoves.slice(allMoves.length - recentCount).join(' ');
+
+  return opening.length > 0 ? `${opening} ... ${recent}` : recent;
+}
+
+/**
+ * Get current game phase based on move count and material
+ */
+function getGamePhase(game) {
+  const moveCount = game.history().length;
+
+  if (moveCount <= 12) return 'Opening';
+  if (moveCount <= 40) return 'Middlegame';
+  return 'Endgame';
+}
+
+/**
+ * Extract move from response with multiple pattern matching strategies
+ */
+function extractMoveFromResponse(responseText, legalMoves) {
+  if (!responseText) return null;
+
+  // Priority 1: Explicit structured markers
+  const structuredPatterns = [
+    /Best move:\s*([a-zA-Z0-9#=+\-]+)/i,
+    /BEST MOVE:\s*([a-zA-Z0-9#=+\-]+)/i,
+    /Final choice:\s*([a-zA-Z0-9#=+\-]+)/i,
+    /Final answer:\s*([a-zA-Z0-9#=+\-]+)/i,
+    /\[\s*([a-zA-Z0-9#=+\-]+)\s*\]\s*$/im, // [MOVE] at end
+  ];
+
+  for (const pattern of structuredPatterns) {
+    const match = responseText.match(pattern);
+    if (match) {
+      const moveText = match[1].trim();
+      const legalMatch = legalMoves.find(m => m.san.toLowerCase() === moveText.toLowerCase());
+      if (legalMatch) {
+        return { move: legalMatch.san, quality: 'structured', confidence: 0.95 };
+      }
+    }
+  }
+
+  // Priority 2: Last paragraph (if multiple moves mentioned)
+  const paragraphs = responseText.split(/\n\n+/);
+  if (paragraphs.length > 1) {
+    const lastParagraph = paragraphs[paragraphs.length - 1];
+    const allMovesInLast = lastParagraph.match(/\b([NBRQK]?[a-h]?[1-8]?[x@]?[a-h][1-8](?:=[NBRQ])?[+#]?)\b/g) || [];
+
+    if (allMovesInLast.length > 0) {
+      for (const moveText of allMovesInLast.reverse()) {
+        const legalMatch = legalMoves.find(m => m.san.toLowerCase() === moveText.toLowerCase());
+        if (legalMatch) {
+          return { move: legalMatch.san, quality: 'paragraph_end', confidence: 0.8 };
+        }
+      }
+    }
+  }
+
+  // Priority 3: All moves mentioned (validate and return first legal)
+  const allMentioned = responseText.match(/\b([NBRQK]?[a-h]?[1-8]?[x@]?[a-h][1-8](?:=[NBRQ])?[+#]?)\b/g) || [];
+
+  if (allMentioned.length > 0) {
+    // Try last-to-first to favor most recently mentioned
+    for (const moveText of allMentioned.reverse()) {
+      const legalMatch = legalMoves.find(m => m.san.toLowerCase() === moveText.toLowerCase());
+      if (legalMatch) {
+        return { move: legalMatch.san, quality: 'extracted', confidence: 0.6 };
+      }
+    }
+  }
+
+  return null;
+}
+
 export class RealChessGame {
   constructor(matchConfig, broadcastService = null, ui = null, wsServer = null) {
     this.matchConfig = matchConfig;
@@ -185,33 +297,79 @@ export class RealChessGame {
    */
   async getOllamaMove(player, legalMoves, color) {
     const boardState = this.game.fen();
-    const gameHistory = this.game.history({ verbose: false }).join(' ');
-    const candidateMoves = legalMoves.map(m => m.san).slice(0, 10);
+    const boardASCII = getBoardASCII(this.game);
+    const moveHistory = getRelevantMoveHistory(this.game);
+    const gamePhase = getGamePhase(this.game);
+    const moveCount = this.game.history().length;
+    const playerColor = color === 'white' ? 'White' : 'Black';
 
-    // Simpler, faster prompt for better reliability with smaller models
-    const prompt = `Chess position (${color}):
+    // Choose prompt tier based on model size (can be enhanced with model detection)
+    let prompt;
+
+    // Tier 2: Structured reasoning (best for 7B models like Mistral)
+    // This tier balances reasoning quality with model capability
+    prompt = `Chess Position Analysis
+
+Player: ${playerColor} | Phase: ${gamePhase} (move ${moveCount})
+
+Current Position:
+${boardASCII}
+
 FEN: ${boardState}
-${gameHistory.length > 0 ? `Moves: ${gameHistory}\n` : ''}
-Legal moves: ${candidateMoves.join(', ')}
+${moveHistory ? `Recent moves: ${moveHistory}` : ''}
 
-Analyze briefly and choose the best move.
+Legal moves available: ${legalMoves.map(m => m.san).join(', ')}
 
-Best move:`;
+Analyze this position:
+1. Material assessment: Count pieces and evaluate material balance
+2. Piece activity: Which pieces are well-placed? Which are passive?
+3. King safety: Is either king under threat? Safe or exposed?
+4. Tactics: Look for any pins, forks, skewers, or forcing moves
+5. Strategic goal: What's the best plan for ${playerColor}?
+
+Based on this analysis, select the BEST MOVE from the legal moves list above.
+
+Best move: `;
+
+    // Alternative Tier 1 (ultra-simple for tinyllama):
+    // if (player.model.includes('tiny') || player.model.includes('1.1b')) {
+    //   prompt = `Chess (${playerColor} to move):
+    // ${boardASCII}
+    // Recent: ${moveHistory}
+    // Legal moves: ${legalMoves.map(m => m.san).join(', ')}
+    // Best move: `;
+    // }
+
+    // Alternative Tier 3 (deep analysis for larger models like Dolphin):
+    // if (player.model.includes('dolphin') || player.model.includes('13b')) {
+    //   prompt = `Position Analysis - ${playerColor}
+    // ${boardASCII}
+    // [Similar to Tier 2 but with more detail...]`
+    // }
 
     try {
       const moveStartTime = Date.now();
+
+      // Determine appropriate parameters based on model size
+      const isTinyModel = player.model.includes('tiny') || player.model.includes('1.1b');
+      const isLargeModel = player.model.includes('dolphin') || player.model.includes('13b') || player.model.includes('mixtral');
+
       const response = await fetch('http://localhost:11434/api/generate', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify({
           model: player.model,
           prompt,
-          temperature: Math.max(0.1, player.temperature - 0.3), // Lower temp for better move selection
+          // Chess requires deterministic move selection, not creativity
+          temperature: isTinyModel ? 0.3 : 0.2,  // Very low for consistent strategic play
           stream: false,
-          num_predict: 256, // Shorter output for faster responses
-          top_p: 0.9, // Slightly more focused
-          top_k: 40,
-          stop: ['\n'], // Stop at newline
+          // Allow more tokens for structured reasoning
+          num_predict: isLargeModel ? 1024 : isTinyModel ? 128 : 512,
+          // More focused sampling for better reasoning
+          top_p: 0.8,
+          top_k: 30,
+          // Better stop tokens for structured output
+          stop: ['Best move:', 'Best move', 'Final move', '\n\n'],
         }),
       });
 
@@ -231,112 +389,57 @@ Best move:`;
         throw new Error('Empty response from Ollama');
       }
 
-      // Extract move from structured format: "Best move: [MOVE]"
-      let extractedMove = null;
-      let confidence = 0;
+      // Use improved multi-strategy move extraction
+      const extracted = extractMoveFromResponse(responseText, legalMoves);
 
-      // Look for the structured output section
-      const finalAnswerMatch = responseText.match(/Best move:\s*([a-zA-Z0-9#=+\-]+)/i);
-      if (finalAnswerMatch) {
-        extractedMove = finalAnswerMatch[1].trim();
+      if (extracted) {
+        const logMessage = `   ⏱️  ${player.name} (${extracted.move}) - Ollama latency: ${moveLatency}ms (quality: ${extracted.quality})`;
+        console.log(logMessage);
+
+        // Return complete decision data for research
+        return {
+          move: extracted.move,
+          latency: moveLatency,
+          confidence: extracted.confidence || 0.7,
+          decision: {
+            prompt,
+            response: responseText,
+            parsingStatus: 'success',
+            extractionQuality: extracted.quality,
+            tokensIn: data.prompt_eval_count || 0,
+            tokensOut: data.eval_count || 0,
+          },
+        };
       }
 
-      // Extract confidence score if available
-      const confidenceMatch = responseText.match(/Confidence:\s*(\d+)/i);
-      if (confidenceMatch) {
-        confidence = parseInt(confidenceMatch[1]) / 100;
-      }
+      // No move extracted - this is a failure, don't fall back to engine
+      throw new Error(`Could not extract valid move from response (tried structured patterns, paragraph end, and full text matching)`)
+    } catch (error) {
+      const errorMsg = error instanceof Error ? error.message : String(error);
+      const moveLatency = Date.now() - moveStartTime;
+      console.error(`   ❌ Ollama request failed: ${errorMsg}`);
 
-      // If structured format didn't work, try extracting SAN moves from response
-      if (!extractedMove) {
-        // Look for SAN notation patterns (Nf3, e4, Bxc5, O-O, exd5, etc.)
-        const sanMatches = responseText.match(/\b([NBRQK]?[a-h]?[1-8]?[x@]?[a-h][1-8](?:=[NBRQ])?[+#]?)\b/g);
-        if (sanMatches && sanMatches.length > 0) {
-          extractedMove = sanMatches[sanMatches.length - 1]; // Take last occurrence
-        }
-      }
-
-      // Validate extracted move against legal moves
-      if (extractedMove) {
-        const moveLower = extractedMove.toLowerCase();
-
-        // Try exact SAN match first
-        const sanMatch = legalMoves.find(m => m.san && m.san.toLowerCase() === moveLower);
-        if (sanMatch) {
-          const logMessage = confidence > 0
-            ? `   ⏱️  ${player.name} (${sanMatch.san}) - Ollama latency: ${moveLatency}ms (confidence: ${Math.round(confidence * 100)}%)`
-            : `   ⏱️  ${player.name} (${sanMatch.san}) - Ollama latency: ${moveLatency}ms`;
-          console.log(logMessage);
-          // NEW: Return complete decision data (immutable artifact)
+      // IMPORTANT: Do NOT fall back to engine moves - this taints the research data
+      // Instead: use a random legal move (maintains research integrity)
+      if (legalMoves && legalMoves.length > 0) {
+        const randomMove = legalMoves[Math.floor(Math.random() * legalMoves.length)];
+        if (randomMove && randomMove.san) {
+          console.log(`   ⏱️  ${player.name} (${randomMove.san}) - Ollama error, using random legal move (${moveLatency}ms)`);
           return {
-            move: sanMatch.san,
+            move: randomMove.san,
             latency: moveLatency,
-            confidence,
+            confidence: 0,
             decision: {
-              prompt,
-              response: responseText,
-              parsingStatus: 'success',
-              tokensIn: data.prompt_eval_count || 0,
-              tokensOut: data.eval_count || 0,
+              parsingStatus: 'error_fallback',
+              error: errorMsg,
+              tokensIn: 0,
+              tokensOut: 0,
             },
           };
         }
-
-        // Try LAN (long algebraic) match
-        const lanMatch = legalMoves.find(m => {
-          const mLan = (m.lan || m.uci || '').toLowerCase();
-          return mLan === moveLower;
-        });
-        if (lanMatch) {
-          const logMessage = confidence > 0
-            ? `   ⏱️  ${player.name} (${lanMatch.san}) - Ollama latency: ${moveLatency}ms (confidence: ${Math.round(confidence * 100)}%)`
-            : `   ⏱️  ${player.name} (${lanMatch.san}) - Ollama latency: ${moveLatency}ms`;
-          console.log(logMessage);
-          return { move: lanMatch.san, latency: moveLatency, confidence };
-        }
       }
 
-      // Fallback: extract from response text using pattern matching
-      const allMovePatterns = responseText.match(/\b([NBRQK]?[a-h]?[1-8]?[x@]?[a-h][1-8](?:=[NBRQ])?[+#]?)\b/g);
-      if (allMovePatterns && allMovePatterns.length > 0) {
-        for (const pattern of allMovePatterns.reverse()) { // Check most recent mentions first
-          const patternLower = pattern.toLowerCase();
-          const matchedMove = legalMoves.find(m => m.san && m.san.toLowerCase() === patternLower);
-          if (matchedMove) {
-            console.log(`   ⏱️  ${player.name} (${matchedMove.san}) - Ollama latency: ${moveLatency}ms (extracted from analysis)`);
-            return { move: matchedMove.san, latency: moveLatency, confidence };
-          }
-        }
-      }
-
-      // Final fallback: use engine's best move
-      const bestMove = this.getBestMove(legalMoves);
-      if (bestMove && bestMove.san) {
-        console.log(`   ⏱️  ${player.name} (${bestMove.san}) - Using engine evaluation (Ollama failed to return valid move after ${moveLatency}ms)`);
-        return { move: bestMove.san, latency: moveLatency };
-      }
-
-      throw new Error(`No valid move extracted from response after ${moveLatency}ms`);
-    } catch (error) {
-      const errorMsg = error instanceof Error ? error.message : String(error);
-      console.error(`   ❌ Ollama request failed: ${errorMsg}`);
-      // Fallback to best move on error
-      try {
-        const bestMove = this.getBestMove(legalMoves);
-        if (bestMove && bestMove.san) {
-          console.log(`   ⏱️  ${player.name} (${bestMove.san}) - Using best legal move (error fallback)`);
-          return { move: bestMove.san, latency: 0 };
-        }
-      } catch (fallbackError) {
-        const fallbackMsg = fallbackError instanceof Error ? fallbackError.message : String(fallbackError);
-        console.error(`   ❌ Fallback also failed: ${fallbackMsg}`);
-      }
-      // Last resort - just use first legal move
-      if (legalMoves && legalMoves.length > 0 && legalMoves[0] && legalMoves[0].san) {
-        console.log(`   ⏱️  ${player.name} (${legalMoves[0].san}) - Using first legal move (last resort)`);
-        return { move: legalMoves[0].san, latency: 0 };
-      }
-      throw new Error('No legal moves available');
+      throw new Error(`Ollama failed and no legal moves available: ${errorMsg}`);
     }
   }
 
