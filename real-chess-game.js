@@ -347,9 +347,10 @@ Best move: `;
     // [Similar to Tier 2 but with more detail...]`
     // }
 
-    try {
-      const moveStartTime = Date.now();
+    // Define moveStartTime OUTSIDE try block so it's available in catch
+    const moveStartTime = Date.now();
 
+    try {
       // Determine appropriate parameters based on model size
       const isTinyModel = player.model.includes('tiny') || player.model.includes('1.1b');
       const isLargeModel = player.model.includes('dolphin') || player.model.includes('13b') || player.model.includes('mixtral');

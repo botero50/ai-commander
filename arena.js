@@ -68,9 +68,9 @@ class ChessArena {
     this.players = [
       {
         id: 'p1',
-        name: process.env.BRAIN_P1 || 'ollama:tinyllama',
+        name: process.env.BRAIN_P1 || 'ollama:dolphin-mixtral:8x7b',
         provider: 'ollama',
-        model: (process.env.BRAIN_P1 || 'ollama:tinyllama').split(':')[1],
+        model: (process.env.BRAIN_P1 || 'ollama:dolphin-mixtral:8x7b').split(':')[1],
       },
       {
         id: 'p2',
